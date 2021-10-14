@@ -1,0 +1,189 @@
+---
+title: "CoVaRR-Net Pillar 6"
+subtitle: "Demo R Notebook: Example genomic epidemiology analyses"
+author: "Carmen Lia Murall, Raphael Poujol, Susanne Kraemer"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_document:
+    code_folding: hide
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+
+#coding and data
+library(tidyverse) # wrangling and everything really
+library(knitr) # Needed to set root directory
+library(reticulate) # Needed for the Python code chunk 
+library(lubridate) # dates are special
+#phylo-specific
+library(treeio)
+library(phylotools)
+library(tidytree)
+library(phangorn)
+library(phytools)
+#plotting and tables
+library(ggplot2) # Work-horse plotting package
+library(ggtree) #All things phylogenetic visualization
+library(cowplot) # Needed to make easy multi-panel plots with ggplot2
+library(DT) # Needed to make DT example table
+library(ggbeeswarm) # Needed to make beeswarm plots
+library(gridExtra) # multi-panel plots
+library(kableExtra) # Needed to write out a formatted table
+#colors
+library(RColorBrewer)
+library(colorspace)
+library(viridis)
+
+
+theme_set(theme_classic())
+
+# # This is the Python to be used (which you would only specify if using Python code chunks)
+# use_python("/Users/carme/local/miniconda3/bin/python") # <- FIX this path
+
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = '/Users/carme/Dropbox/Work_Files/sequence_analysis/covid-19/Covarr-Net/')
+```
+
+# Introduction
+
+This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data, for discussion with pillar 6's team and for sharing with collaborators. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), given to the science communication pillar for public dissemination, and the code can be repackaged to give to public health authorities for their internal use.
+
+Canadian genomic and epidemiological data will be regularly pulled from various sources to keep these analyses up-to-date. 
+
+### Data sources
+
+* GISAID  
+* VirusSeq Portal / Viral AI 
+* PHAC  
+* various PT PH websites (e.g. INSPQ)  
+
+
+
+```{r load_data}
+
+## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
+metaCANall <- read.csv("./GISAID/metadata_CANall_2021-09-12_edited.csv")
+metaCANall$Collection.date <- as.Date(metaCANall$Collection.date)
+#max(metaCANall$Collection.date) - min(metaCANall$Collection.date) #time diff: 580 days
+
+#make a pango.group column (combines results from gisaid and my pangolin run):
+metaCANall$pango.group <- metaCANall$scorpio.call
+#fill all empty/na cells
+metaCANall$pango.group[metaCANall$pango.group == ""]<-NA
+#rename some of the groups:
+metaCANall$pango.group<-str_replace_all(metaCANall$pango.group, fixed("B.1.1.7-like+E484K"), "Alpha (B.1.1.7-like) +E484K" )
+metaCANall$pango.group<-str_replace_all(metaCANall$pango.group, fixed("B.1.617.1-like"), "Kappa (B.1.617.1-like)" )
+metaCANall$pango.group<-str_replace_all(metaCANall$pango.group, fixed("B.1.621-like"), "Mu (B.1.621-like)")
+metaCANall$pango.group<-str_replace_na(metaCANall$pango.group, "other")
+
+## 2. LOAD epidemiological data (PHAC)
+
+epidataCANall <- read.csv("./epidata/CDNepidata_covid19-download_PHAC_05-10-21.csv")
+#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
+
+```
+
+
+# Snapshot: SARS-CoV-2 in Canada
+
+
+## Sequencing coverage and sharing
+
+Note that in this demo almost all of Ontario's sequences were not included due to the lack of complete dates in GISAID. Moving forward, using VirusSeq Portal data, we should have better coverage in Ontario.
+
+
+
+## Variants in Canada
+
+Sequence counts for all Canadian data in GISAID, up to August 25th, 2021, shows that by end of summer Alpha and Gamma were still the most sequenced variants. Note that some of the "other" category include some Delta sublineages (AYs) but overall, from the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+
+```{r example_summaries}
+
+# --- Histogram plot: counts per variant of all canadian data -------------
+
+df1 <- metaCANall %>% group_by(pango.group) %>% mutate(count_name_occurr =n()) #count the occurances by names
+
+#plot
+ggplot(df1, aes(x=reorder(pango.group, -count_name_occurr), fill=type))+
+  geom_bar(stat="count", fill = "steelblue", color="steelblue4")+
+  theme_classic()+ ylab("count")+xlab("")+ 
+  #ggtitle("Sequence counts all Canada per variant in GISAID - up to 2021-08-25")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1), axis.text = element_text(size = 12),
+        axis.title.x = element_text(size=12), axis.title.y = element_text(size = 12))
+
+
+#------------- counts over time
+#plot
+ggplot(metaCANall, aes(x=Collection.date, fill=pango.group))+geom_bar(stat = "count")+
+  theme_classic() #+ggtitle("Canadian data in GISAID - pulled Sep 12, 2021")
+
+```
+
+There are two PANGO lineages that have a Canadian origin and have predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
+
+Other lineages of Canadian interest:  
+
+* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks, before Delta arrived  
+* B.1.2 - an American (USA) lineage that spread well in Canada  
+* B.1.160 - an European lineages that spread well in Canada  
+ 
+
+## Canadian trees
+
+Down-sampled Canadian SARS-CoV-2 genomes. Taken from GISAID Sept. 12th, 2021. Alignment GISAID, ML tree in IQ-tree. This tree was generated using TreeTime and visualized in ggtree.
+
+![](./plots/timetree_CANall_downsamp1_demo.png) 
+
+
+This tree shows several features of VOC spread in Canada:
+
+* Alpha spread across most of Canada
+* Gamma was mostly located in BC
+* Alberta represents most of the Delta cases
+* Expansion of Alpha and Gamma coincide with a decrease in detection of wildtype variants
+* Delta is the bulk of what was being sequenced at the end of the summer
+
+These last two points are suggestive of strain (variant) replacement, i.e. competitive exclusion, but more detailed analyses would be required to clarify this.
+
+Divergence tree from TreeTime run, visualized in ggtree.
+
+![](./plots/divergtree_CANall_downsamp1_demo.png)
+
+## Evolution and growth rates of SARS-CoV-2 in Canada
+
+There are various methods to investigate changes in evolutionary rates of VOC/VOIs and compare their relative fitness in an epidemiological context.
+
+For example, root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumlating mutations at a faster pace, or clusters that jump up above the average could inidcate a mutational jump (simlar to what we saw with Alpha when it first appeared in the UK).
+
+ML IQ-tree run in Tempest for root-to-tip data. Linear regression and plotting in R. 
+
+![](./plots/roottotip_CANall_downsamp1_demo.png)
+
+Overall, the evolutionary rate of the Canadian data (0.000875 subs/site/year, grey line) is very close to the global average of 24.162 subs/year (= 0.000822 subs/site/year). Delta, Gamma, and Alpha are all slower than this global average.
+
+
+
+Add here:  
+
+* Root-to-tip plot(s)
+* growth rates (Sally's code)
+* dN/dS (by variant and by gene/domains)
+* Tajima's D
+* other? (e.g. PyR0, nnet R, ?)
+* Delta and its sublineages (specific plots as above, also delta w/+w/o E484K in Canada/PTs)
+
+Are there any BEAST analyses we'd like to do? e.g. infer R0, serial interval, etc for the different Delta sublineages (might have to restrict this geographically to specific PTs with enough coverage)
+
+# Session info {.tabset}
+The version numbers of all packages in the current environment as well as information about the R install is reported below. 
+
+## Hide
+
+## Show
+
+```{r session_info}
+sessionInfo()
+```
