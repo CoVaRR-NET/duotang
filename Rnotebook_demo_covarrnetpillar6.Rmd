@@ -65,19 +65,23 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 ```{r load_data}
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
-metaCANall <- read.csv("./GISAID/metadata_CANall_2021-09-12_edited.csv")
+metaCANall <- read.csv("./GISAID/metadata_CANall_2021-10-11.csv")
 metaCANall$Collection.date <- as.Date(metaCANall$Collection.date)
 #max(metaCANall$Collection.date) - min(metaCANall$Collection.date) #time diff: 580 days
 
-#make a pango.group column (combines results from gisaid and my pangolin run):
-metaCANall$pango.group <- metaCANall$scorpio.call
-#fill all empty/na cells
-metaCANall$pango.group[metaCANall$pango.group == ""]<-NA
-#rename some of the groups:
-metaCANall$pango.group<-str_replace_all(metaCANall$pango.group, fixed("B.1.1.7-like+E484K"), "Alpha (B.1.1.7-like) +E484K" )
-metaCANall$pango.group<-str_replace_all(metaCANall$pango.group, fixed("B.1.617.1-like"), "Kappa (B.1.617.1-like)" )
-metaCANall$pango.group<-str_replace_all(metaCANall$pango.group, fixed("B.1.621-like"), "Mu (B.1.621-like)")
-metaCANall$pango.group<-str_replace_na(metaCANall$pango.group, "other")
+#make a pango.group column
+metaCANall$pango.group <- metaCANall$Variant
+metaCANall$pango.group[metaCANall$pango.group == ""]<-"other"
+metaCANall$pango.group[metaCANall$pango.group == "VOC Alpha 202012/01 GRY (B.1.1.7+Q.x) first detected in the UK" ]<-"Alpha"
+metaCANall$pango.group[metaCANall$pango.group == "VOC Beta GH/501Y.V2 (B.1.351+B.1.351.2+B.1.351.3) first detected in South Africa" ]<-"Beta"
+metaCANall$pango.group[metaCANall$pango.group == "VOC Gamma GR/501Y.V3 (P.1+P.1.x) first detected in Brazil/Japan"   ]<-"Gamma"
+metaCANall$pango.group[metaCANall$pango.group == "VOC Delta GK/478K.V1 (B.1.617.2+AY.x) first detected in India"   ]<-"Delta"
+metaCANall$pango.group[metaCANall$pango.group == "VOI Lambda GR/452Q.V1 (C.37+C.37.1) first detected in Peru"  ]<-"Lambda"
+metaCANall$pango.group[metaCANall$pango.group == "VOI Mu GH (B.1.621+B.1.621.1) first detected in Colombia" ]<-"Mu"
+metaCANall$pango.group[metaCANall$Pango.lineage == "A.23.1" ]<-"A.23.1"
+metaCANall$pango.group[metaCANall$Pango.lineage == "B.1.438.1" ]<-"B.1.438.1"
+
+
 
 ## 2. LOAD epidemiological data (PHAC)
 
@@ -98,27 +102,48 @@ Note that in this demo almost all of Ontario's sequences were not included due t
 
 ## Variants in Canada
 
-Sequence counts for all Canadian data in GISAID, up to August 25th, 2021, shows that by end of summer Alpha and Gamma were still the most sequenced variants. Note that some of the "other" category include some Delta sublineages (AYs) but overall, from the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+Sequence counts for all Canadian data in GISAID, up to Oct 25th, 2021, shows that by end of summer Alpha and Gamma were still the most sequenced variants. Note that some of the "other" category include some Delta sublineages (AYs) but overall, from the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 
 ```{r example_summaries}
 
+
+metaCANall <- filter(metaCANall, !is.na(metaCANall$Collection.date))
+
 # --- Histogram plot: counts per variant of all canadian data -------------
 
-df1 <- metaCANall %>% group_by(pango.group) %>% mutate(count_name_occurr =n()) #count the occurances by names
+
+listpango <- unique(metaCANall$pango.group)
+listpango <- listpango[order(listpango)]
+getpal <- colorRampPalette(brewer.pal(9, "Paired")) #"Set3
+pal <- getpal(length(listpango))
+names(pal) <- listpango
+
+
+#------------- counts over time (by week)
+
+df1 <- metaCANall %>% group_by(pango.group) %>% group_by(week = cut(Collection.date, "week")) #adds week coloum
+dfcount <- df1 %>% group_by(week) %>% count(pango.group)
+
 
 #plot
-ggplot(df1, aes(x=reorder(pango.group, -count_name_occurr), fill=type))+
-  geom_bar(stat="count", fill = "steelblue", color="steelblue4")+
-  theme_classic()+ ylab("count")+xlab("")+ 
-  #ggtitle("Sequence counts all Canada per variant in GISAID - up to 2021-08-25")+
-  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust = 1), axis.text = element_text(size = 12),
-        axis.title.x = element_text(size=12), axis.title.y = element_text(size = 12))
+ggplot(dfcount, aes(x=as.Date(week), y= n, fill=pango.group))+geom_bar(stat = "identity")+
+  scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
+  scale_x_date(date_breaks = "14 day")+
+  theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
 
+#------------- proportion over time (by week)
 
-#------------- counts over time
+# dfprop <- dfcount %>% group_by(pango.group, week) %>% 
+#   summarise(n = n()) %>% 
+#   mutate(freq = prop.table(n))#n / sum(n))
+
+dfcount %>% mutate(freq = prop.table(n)) -> dfprop
+
 #plot
-ggplot(metaCANall, aes(x=Collection.date, fill=pango.group))+geom_bar(stat = "count")+
-  theme_classic() #+ggtitle("Canadian data in GISAID - pulled Sep 12, 2021")
+ggplot(dfprop, aes(x= as.Date(week), y=freq, fill=pango.group))+geom_bar(stat = "identity")+
+  scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
+  scale_x_date(date_breaks = "14 day")+
+  theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
 
 ```
 
@@ -176,6 +201,16 @@ Add here:
 * Delta and its sublineages (specific plots as above, also delta w/+w/o E484K in Canada/PTs)
 
 Are there any BEAST analyses we'd like to do? e.g. infer R0, serial interval, etc for the different Delta sublineages (might have to restrict this geographically to specific PTs with enough coverage)
+
+
+# List of useful tools
+
+Collect a list of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
+
+* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
+* iTol: Tree visualization tool [https://itol.embl.de/itol.cgi]
+
+
 
 # Session info {.tabset}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
