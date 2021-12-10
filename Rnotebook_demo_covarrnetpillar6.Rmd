@@ -209,6 +209,15 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 * UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
 * iTol: Tree visualization tool [https://itol.embl.de/itol.cgi]
+* List of (mostly) modelling tools by CANMOD: [https://canmod.net/tools], includes RECON, outbreak tools for both modelling and genomic epi [https://github.com/reconhub]
+* List of homoplaises in SARS-CoV-2: https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt
+* Erin Gill's COVID-19 dashboard [https://github.com/eringill/COVID_dashboard_reboot]
+* The Epi Graph Network: training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro. [https://thegraphnetwork.training/]
+* Paul's subsampling tool of SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
+* Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
+* IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
+* cov-lineages (summaries of PANGO lineages) [https://cov-lineages.org/lineage_list.html]
+
 
 
 
