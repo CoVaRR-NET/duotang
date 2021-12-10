@@ -1,6 +1,6 @@
 ---
 title: "CoVaRR-Net Pillar 6"
-subtitle: "Demo R Notebook: Example genomic epidemiology analyses"
+subtitle: "R Notebook: Genomic epidemiology analyses"
 author: "Carmen Lia Murall, Raphael Poujol, Susanne Kraemer"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
@@ -53,12 +53,6 @@ This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data
 
 Canadian genomic and epidemiological data will be regularly pulled from various sources to keep these analyses up-to-date. 
 
-### Data sources
-
-* GISAID  
-* VirusSeq Portal / Viral AI 
-* PHAC  
-* various PT PH websites (e.g. INSPQ)  
 
 
 
@@ -209,7 +203,22 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 * UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
 * iTol: Tree visualization tool [https://itol.embl.de/itol.cgi]
+* List of (mostly) modelling tools by CANMOD: [https://canmod.net/tools], includes RECON, outbreak tools for both modelling and genomic epi [https://github.com/reconhub]
+* List of homoplaises in SARS-CoV-2: https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt
+* Erin Gill's COVID-19 dashboard [https://github.com/eringill/COVID_dashboard_reboot]
+* The Epi Graph Network: training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro. [https://thegraphnetwork.training/]
+* Paul's subsampling tool of SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
+* Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
+* IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
+* cov-lineages (summaries of PANGO lineages) [https://cov-lineages.org/lineage_list.html]
 
+
+# Data sources
+
+* GISAID  
+* VirusSeq Portal
+* PHAC  
+* various PT PH websites (e.g. INSPQ)  
 
 
 # Session info {.tabset}
