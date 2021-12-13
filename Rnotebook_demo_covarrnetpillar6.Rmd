@@ -55,9 +55,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 
 
-
 ```{r load_data}
-
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
 gisaiddate="2021_12_10"
@@ -77,13 +75,13 @@ metaCANall$pango.group[metaCANall$pango.group == "VOC_Alpha_202012/01_GRY_(B.1.1
 metaCANall$pango.group[metaCANall$pango.group == "VOC_Beta_GH/501Y.V2_(B.1.351+B.1.351.2+B.1.351.3)_first_detected_in_South_Africa" ]<-"Beta"
 metaCANall$pango.group[metaCANall$pango.group == "VOC_Gamma_GR/501Y.V3_(P.1+P.1.x)_first_detected_in_Brazil/Japan"   ]<-"Gamma"
 metaCANall$pango.group[metaCANall$pango.group == "VOC_Delta_GK/478K.V1_(B.1.617.2+AY.x)_first_detected_in_India"   ]<-"Delta"
+metaCANall$pango.group[metaCANall$Pango_lineage == "AY.4" ]<-"Delta Plus"
 metaCANall$pango.group[metaCANall$pango.group == "VOI_Lambda_GR/452Q.V1_(C.37+C.37.1)_first_detected_in_Peru"  ]<-"Lambda"
 metaCANall$pango.group[metaCANall$pango.group == "VOI_Mu_GH_(B.1.621+B.1.621.1)_first_detected_in_Colombia" ]<-"Mu"
 metaCANall$pango.group[metaCANall$pango.group == "VOI_Mu_GH_(B.1.621+B.1.621.1)_first_detected_in_Colombia" ]<-"Mu"
 metaCANall$pango.group[str_detect(metaCANall$pango.group,"V") ]<-"other"
 metaCANall$pango.group[metaCANall$Pango_lineage == "A.23.1" ]<-"A.23.1"
 metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
-metaCANall$pango.group[metaCANall$Pango_lineage == "AY.4" ]<-"Delta Plus"
 
 
 ## 2. LOAD epidemiological data (PHAC)
@@ -93,7 +91,8 @@ metaCANall$pango.group[metaCANall$Pango_lineage == "AY.4" ]<-"Delta Plus"
 epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
 epidate = tail(epidataCANall,1)$date
-
+epidataAlberta <- epidataCANall[ which(epidataCANall$prnameFR=='Alberta'), ]
+#print(epidataAlberta$numtoday)
 ```
 
 # Snapshot: SARS-CoV-2 in Canada
@@ -191,7 +190,7 @@ For example, root-to-tip plots give estimates of substitution rates. Clusters wi
 
 ML IQ-tree run in Tempest for root-to-tip data. Linear regression and plotting in R. 
 
-![](./plots/roottotip_CANall_downsamp1_demo.png)
+![](./data_needed/roottotip_CANall_downsamp1_demo.png)
 
 Overall, the evolutionary rate of the Canadian data (0.000875 subs/site/year, grey line) is very close to the global average of 24.162 subs/year (= 0.000822 subs/site/year). Delta, Gamma, and Alpha are all slower than this global average.
 
