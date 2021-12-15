@@ -56,11 +56,14 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 
 ```{r load_data}
+
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
 gisaiddate="2021_12_10"
 #date=2021_12_10
-#tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR==1 || substr($1,9,6)=="Canada" && $8=="Human"' > metadata_CANall_$date.csv &
+#tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR==1 || substr($1,9,6)=="Canada" && $8=="Human"' | sort -k3,3 > metadata_CANall_$date.uncorrected.csv 
+#cat metadata_virrusseq_2021_12_08.tsv | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR!=1 && $43!="NA"' | cut -f5,43 | sort -k2,2 > epidatesfromvirrusseq
+#join -1 3 metadata_CANall_2021_12_10.uncorrected.csv -a 1 -2 2 epidatesfromvirrusseq | awk '$4!=$23 && length($4)<10 && length($23)==10{$4=$23} {id=$1;$1=$2;$2=$3;$3=id} {print}' | tr ' ' '\t' > metadata_CANall_2021_12_10.csv
 #zip CoVaRRNet_pillar6notebook/data_needed/metadata_CANall_$date.zip metadata_CANall_$date.csv
 
 metaCANall <- read.csv(unz(paste("./data_needed/metadata_CANall_",gisaiddate,".zip",sep=""),paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t")
@@ -75,14 +78,14 @@ metaCANall$pango.group[metaCANall$pango.group == "VOC_Alpha_202012/01_GRY_(B.1.1
 metaCANall$pango.group[metaCANall$pango.group == "VOC_Beta_GH/501Y.V2_(B.1.351+B.1.351.2+B.1.351.3)_first_detected_in_South_Africa" ]<-"Beta"
 metaCANall$pango.group[metaCANall$pango.group == "VOC_Gamma_GR/501Y.V3_(P.1+P.1.x)_first_detected_in_Brazil/Japan"   ]<-"Gamma"
 metaCANall$pango.group[metaCANall$pango.group == "VOC_Delta_GK/478K.V1_(B.1.617.2+AY.x)_first_detected_in_India"   ]<-"Delta"
-metaCANall$pango.group[metaCANall$Pango_lineage == "AY.4" ]<-"Delta Plus"
+metaCANall$pango.group[metaCANall$Pango_lineage == "AY.25" ]<-"Delta AY.25"
+metaCANall$pango.group[metaCANall$Pango_lineage == "AY.27" ]<-"Delta AY.27"
 metaCANall$pango.group[metaCANall$pango.group == "VOI_Lambda_GR/452Q.V1_(C.37+C.37.1)_first_detected_in_Peru"  ]<-"Lambda"
 metaCANall$pango.group[metaCANall$pango.group == "VOI_Mu_GH_(B.1.621+B.1.621.1)_first_detected_in_Colombia" ]<-"Mu"
 metaCANall$pango.group[metaCANall$pango.group == "VOI_Mu_GH_(B.1.621+B.1.621.1)_first_detected_in_Colombia" ]<-"Mu"
 metaCANall$pango.group[str_detect(metaCANall$pango.group,"V") ]<-"other"
 metaCANall$pango.group[metaCANall$Pango_lineage == "A.23.1" ]<-"A.23.1"
 metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
-
 
 ## 2. LOAD epidemiological data (PHAC)
 
@@ -91,7 +94,7 @@ metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
 epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
 epidate = tail(epidataCANall,1)$date
-epidataAlberta <- epidataCANall[ which(epidataCANall$prnameFR=='Alberta'), ]
+#epidataAlberta <- epidataCANall[ which(epidataCANall$prnameFR=='Alberta'), ]
 #print(epidataAlberta$numtoday)
 ```
 
@@ -106,12 +109,9 @@ Note that in this demo almost all of Ontario's sequences were not included due t
 
 ## Variants in Canada
 
-Sequence counts for all Canadian data in GISAID, up to 2021_12_10, shows that by end of summer Alpha and Gamma were still the most sequenced variants. Note that some of the "other" category include some Delta sublineages (AYs) but overall, from the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+Sequence counts for all Canadian data in GISAID, up to `r epidate`, shows that by end of summer Alpha and Gamma were still the most sequenced variants. Note that some of the "other" category include some Delta sublineages (AYs) but overall, from the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 
 ```{r example_summaries}
-
-
-metaCANall <- filter(metaCANall, !is.na(metaCANall$Collection_date))
 
 # --- Histogram plot: counts per variant of all canadian data -------------
 
@@ -126,29 +126,34 @@ names(pal) <- listpango
 
 #------------- counts over time (by week)
 
-df1 <- metaCANall %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
-dfcount <- df1 %>% group_by(week) %>% count(pango.group)
+plot_metadatadf <- function(meta_tab,pal) {
+  meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
+  df1 <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
+  dfcount <- df1 %>% group_by(week) %>% count(pango.group)
+  #plot
+  ggplot(dfcount, aes(x=as.Date(week), y= n, fill=pango.group))+geom_bar(stat = "identity")+
+    scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
+    scale_x_date(date_breaks = "28 day")+
+    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
+  
+}
+  
+plot_metadatadf_freq <- function(meta_tab,pal) {
+  meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
+  df1 <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
+  dfcount <- df1 %>% group_by(week) %>% count(pango.group)
+  dfcount %>% mutate(freq = prop.table(n)) -> dfprop
+  
+  #plot
+  ggplot(dfprop, aes(x= as.Date(week), y=freq, fill=pango.group))+geom_bar(stat = "identity")+
+    scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
+    scale_x_date(date_breaks = "28 day")+
+    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
+}
 
 
-#plot
-ggplot(dfcount, aes(x=as.Date(week), y= n, fill=pango.group))+geom_bar(stat = "identity")+
-  scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
-  scale_x_date(date_breaks = "14 day")+
-  theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
-
-#------------- proportion over time (by week)
-
-# dfprop <- dfcount %>% group_by(pango.group, week) %>% 
-#   summarise(n = n()) %>% 
-#   mutate(freq = prop.table(n))#n / sum(n))
-
-dfcount %>% mutate(freq = prop.table(n)) -> dfprop
-
-#plot
-ggplot(dfprop, aes(x= as.Date(week), y=freq, fill=pango.group))+geom_bar(stat = "identity")+
-  scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
-  scale_x_date(date_breaks = "14 day")+
-  theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
+plot_metadatadf(metaCANall,pal)
+plot_metadatadf_freq(metaCANall,pal)
 
 ```
 
@@ -161,6 +166,70 @@ Other lineages of Canadian interest:
 * B.1.160 - an European lineages that spread well in Canada  
  
 
+## Provinces {.tabset}
+
+Here we show the same plots but for each provinces 
+```{r province list}
+
+loc=sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
+metaCANall$province <- loc
+print(unique(metaCANall$province))
+```
+
+### British_Columbia
+```{r provinceplot_British_Columbia}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='British_Columbia'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='British_Columbia'), ],pal)
+```
+
+### Alberta
+```{r provinceplot_Alberta}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='Alberta'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Alberta'), ],pal)
+```
+
+### Saskatchewan
+```{r provinceplot_Saskatchewan}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='Saskatchewan'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Saskatchewan'), ],pal)
+```
+
+### Manitoba
+```{r provinceplot_Manitoba}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='Manitoba'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Manitoba'), ],pal)
+```
+
+### Ontario
+```{r provinceplot_Ontario}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='Ontario'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Ontario'), ],pal)
+```
+
+### Quebec
+```{r provinceplot_Quebec}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='Quebec'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Quebec'), ],pal)
+```
+
+### Nova_Scotia
+```{r provinceplot_Nova_Scotia}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='Nova_Scotia'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Nova_Scotia'), ],pal)
+```
+
+### New_Brunswick
+```{r provinceplot_New_Brunswick}
+plot_metadatadf(metaCANall[ which(metaCANall$province=='New_Brunswick'), ],pal)
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='New_Brunswick'), ],pal)
+```
+
+### Newfoundland_and_Labrador
+```{r provinceplot_Newfoundland_and_Labrador}
+subtab=metaCANall[ which(metaCANall$province=='Newfoundland' | metaCANall$province=='Newfoundland_and_Labrador' ), ]
+plot_metadatadf(subtab,pal)
+plot_metadatadf_freq(subtab,pal)
+```
 ## Canadian trees
 
 Down-sampled Canadian SARS-CoV-2 genomes. Taken from GISAID Sept. 12th, 2021. Alignment GISAID, ML tree in IQ-tree. This tree was generated using TreeTime and visualized in ggtree.
