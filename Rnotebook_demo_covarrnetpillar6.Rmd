@@ -122,7 +122,20 @@ listpango <- listpango[order(listpango)]
 getpal <- colorRampPalette(brewer.pal(9, "Paired")) #"Set3
 pal <- getpal(length(listpango))
 names(pal) <- listpango
-print(pal["Alpha"])
+pal["Omicron"]="#E52823"
+pal["other"]="grey"
+pal["Alpha"]="#B29C71"
+pal["Delta"]="#A6CEE3"
+pal["Delta AY.27"]="#438FC0"
+pal["Delta AY.25"]="#61A6A0" 
+pal["A.23.1"]="#9AD378"
+pal["B.1.438.1"]="#3EA534"
+pal["Beta"]="#CAB2D6"
+pal["Gamma"]="#444444"
+pal["Lambda"]="#F08C3A"
+pal["Mu"]="#F08C3A"
+
+#print(pal)
 
 #------------- counts over time (by week)
 
@@ -230,7 +243,7 @@ subtab=metaCANall[ which(metaCANall$province=='Newfoundland' | metaCANall$provin
 plot_metadatadf(subtab,pal)
 plot_metadatadf_freq(subtab,pal)
 ```
-## Canadian trees
+## Canadian trees {-}
 
 Down-sampled Canadian SARS-CoV-2 genomes. Taken from GISAID Sept. 12th, 2021. Alignment GISAID, ML tree in IQ-tree. This tree was generated using TreeTime and visualized in ggtree.
 
