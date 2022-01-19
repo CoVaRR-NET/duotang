@@ -1,0 +1,25 @@
+#To generate a subset (and possible replicates) of the Canadian SARS-CoV-2 data from GISAID and the VirusSeq Portal
+
+#A. generate full Canadian dataset:
+#  1. pull latest GISAID mulitple sequence alignment (MSA) and subset to only have Canadian sequences (and wuhan reference)
+#  2. download any Canadian sequences that are more recent (and thus not in the giant MSA) in GISAID
+#  3. cross-check with VirusSeq Portal and add any sequences or metadata not in the MSA or recent extra
+#  4. align sequences from 2 and 3 to the Canadian MSA
+  
+#B. reduce dataset by removing or reducing the number of replicates
+
+#C. subset for phylogenetic analyses
+#Aim is to get around 10-15K for making a ML tree in iqtree (standalone) and can be further downsampled to make time trees (if Nextstrain/TreeTime crashes)
+#Since our intereset is in the most recent evolution of the virus we should downsample the earlier parts of the tree more 
+#Replicates can be generated in parallel if needed.
+
+#Routine 1 (higher resolution in the last 6 months, increasing until the present):
+#  - keep wuhan as the root
+#  - sample 2000 sequences from the start of the epidemic till 6 months ago
+#  - the rest of the 8000 are the most recent with increasing number of sequences per day, 2/day 6months ago, 3/day 5months ago, ...etc, till you get a total around 10K seqs
+
+#Routine 2 (keep all the most recent data):
+#    - keep wuhan as the root
+#    - keep all sequences from last month (this only makes sense if there aren't too many sequences in the last month)
+#    - then keep only half of the previous month (or some reasonable amount)
+#    - keep only 1K or 2K from start of epidemic till 3months ago, choose X number per week (or some other way of ensuring temporal evenness)
