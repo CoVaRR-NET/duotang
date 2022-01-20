@@ -1,0 +1,21 @@
+This full alignment (msa_0111.fasta) is based on 6,900,922 submissions to EpiCoV.
+Both duplicate and low-quality sequences (>5% NNNNs) have been removed, using only complete sequences (length >29,000 bp). The resulting alignment of 6,307,044 sequences is created using mafft https://doi.org/10.1093/molbev/mst010 in 3 separate steps.
+
+(1) Each sequence is individually aligned to the reference hCoV-19/Wuhan/WIV04/2019 (EPI_ISL_402124). Sequences that created dubious insertions of >12 nucleotides in the reference sequence and occurred only once in the database are discarded. The alignments are created with the command:
+mafft --thread -1 input.fasta > output.fasta
+
+(2) Sequences that result in unique insertions in the reference sequence from (1) and has occurred more than once, are used as an initial set of sequences for multiple sequence alignment. For this initial set of sequences, we reduce each contiguous stretches of NNNs into a single letter N. This prevents long stretches of NNNNs from causing unnecessarily long insertions in the initial alignment while sequence information carrying true insertions are retained in the alignment. The first sequence in this initial alignment is the reference (EPI_ISL_402124) sequence. The following command is used to align these initial set of sequences to a version of the reference sequence where the first 29 bases are masked by replacing them with NNNs (refseqWIV04Masked29.fa) :
+mafft --addfragments seqsCausingInsertionsInRef.fasta --thread -1 --6merpair refseqWIV04Masked29.fa > seqsCausingInsertionsInRef_aligned.fasta
+
+(3) The remaining sequences are aligned to the resulting alignment in step (2) with this command:
+mafft --addtotop remainingBatchesOfSequences -thread -1 --6merpair --keeplength --compactmapout reference.fa > msa_0111.fasta
+
+Note that reference.fa in (3) is composed of 2 sequences. The first is the original aligned reference EPI_ISL_402124 containing gaps. The second is the same aligned reference sequence but the gaps are individually replaced by the letter "N". Mafft version 7.497 which supports the addtotop and compactmapout options is used.
+
+Acknowledgements
+================
+We will like to specially thank Kazutaka Katoh (RIMD, Osaka Univ) for formulating this revised multiple alignment strategy and developing new mafft options which significantly improve both the speed and the results of this MSA. We also thank Rob Lanfear for the helpful discussion and suggestions.
+
+Reference
+=========
+Kazutaka Katoh et. al., NAR 2002 Jul 15;30(14):3059-66. MAFFT: a novel method for rapid multiple sequence alignment based on fast Fourier transform
