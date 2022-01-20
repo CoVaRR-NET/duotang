@@ -36,7 +36,7 @@ library(kableExtra) # Needed to write out a formatted table
 library(RColorBrewer)
 library(colorspace)
 library(viridis)
-
+library(MASS)
 
 theme_set(theme_classic())
 
@@ -82,7 +82,7 @@ metaCANall$pango.group[metaCANall$pango.group == "VOI_Mu_GH_(B.1.621+B.1.621.1)_
 metaCANall$pango.group[str_detect(metaCANall$pango.group,"V") ]<-"other"
 metaCANall$pango.group[metaCANall$Pango_lineage == "A.23.1" ]<-"A.23.1"
 metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
-
+metaCANall$pango.group[grepl("B\\.1\\.1\\.529|BA\\.", metaCANall$Pango_lineage)] <- "Omicron"
 
 ## 2. LOAD epidemiological data (PHAC)
 
@@ -186,19 +186,89 @@ Divergence tree from TreeTime run, visualized in ggtree.
 
 There are various methods to investigate changes in evolutionary rates of VOC/VOIs and compare their relative fitness in an epidemiological context.
 
-For example, root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumlating mutations at a faster pace, or clusters that jump up above the average could inidcate a mutational jump (simlar to what we saw with Alpha when it first appeared in the UK).
+For example, root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumlating mutations at a faster pace, or clusters that jump up above the average could indicate a mutational jump (simlar to what we saw with Alpha when it first appeared in the UK).
 
-ML IQ-tree run in Tempest for root-to-tip data. Linear regression and plotting in R. 
+<!--![](./data_needed/roottotip_CANall_downsamp1_demo.png)-->
+Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
+```{r}
+rooted <- read.tree('./data_needed/msa_0908_CANall_downsamp10perday_1.rtt.nwk')
+get.dates <- function(phy, delimiter='_', pos=-1, format='%Y-%m-%d') {
+  dt <- sapply(phy$tip.label, function(x) {
+    tokens <- strsplit(x, delimiter)[[1]]
+    if (pos < 0) { return(tokens[length(tokens)+pos+1]) }
+    else { return(tokens[pos]) }
+  })
+  as.Date(dt, format=format)
+}
+tip.dates <- get.dates(rooted, pos=-2)
 
-![](./data_needed/roottotip_CANall_downsamp1_demo.png)
+# total branch length from root to each tip
+div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
 
-Overall, the evolutionary rate of the Canadian data (0.000875 subs/site/year, grey line) is very close to the global average of 24.162 subs/year (= 0.000822 subs/site/year). Delta, Gamma, and Alpha are all slower than this global average.
+# match tips to metadata to retrieve PANGO lineage assignments
+accno <- gsub(".+_(EPI_ISL_[0-9]+)_.+", "\\1", rooted$tip.label)
+index <- match(accno, metaCANall$Accession_ID)
+pg <- metaCANall$pango.group[index]
 
+blobs <- function(x, y, col, cex=1) {
+  points(x, y, pch=21, cex=cex)
+  points(x, y, bg=col, col=rgb(0,0,0,0), pch=21, cex=cex)
+}
+dlines <- function(x, y, col) {
+  lines(x, y, lwd=2.5)
+  lines(x, y, col=col)
+}
+
+vocs <- c('Alpha', 'Beta', 'Gamma', 'Delta', 'Omicron')
+pal <- hcl.colors(n=length(vocs), palette="Sunset")
+
+par(mar=c(5,5,0,1))
+plot(tip.dates, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
+     xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
+xx <- floor_date(seq(min(tip.dates), max(tip.dates), length.out=5), unit="months")
+axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
+
+blobs(tip.dates[pg=='other'], div[pg=='other'], col='grey', cex=0.8)
+fit0 <- rlm(div[pg=='other'] ~ tip.dates[pg=='other'])
+abline(fit0, col='gray50')
+fits <- list(other=fit0)
+
+for (i in 1:length(vocs)) {
+  variant <- vocs[i]
+  x <- tip.dates[pg==variant]
+  if (all(is.na(x))) next
+  y <- div[pg==variant]
+  blobs(x, y, col=pal[i], cex=0.8)
+  fit <- rlm(y ~ x)
+  dlines(fit$x[,2], predict(fit), col=pal[i])
+  fits[[variant]] <- fit
+}
+
+legend(x=min(tip.dates), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
+```
+
+
+
+```{r}
+ci <- lapply(fits, confint.default)
+kable(data.frame(
+  n=sapply(fits, function(f) nrow(f$x)),                            
+  est=29970*sapply(fits, function(f) f$coef[2]),
+  lower.95=29970*sapply(ci, function(f) f[2,1]),
+  upper.95=29970*sapply(ci, function(f) f[2,2])
+), 
+col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
+format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day)",
+format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
+```
+
+Overall, the evolutionary rate among genomes sampled in Canada (`r lm(div ~ tip.dates)$coef[2]*29970` subs/genome/day, grey line) is close to the global average of `r 0.000822*29970/365` subs/genome/day.
+Compared to other lineages sampled in Canada, variant of concern Alpha (B.1.1.7) exhibited a slightly but significantly lower rate of evolution.
+Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rates, although only Gamma was significantly higher.
 
 
 Add here:  
 
-* Root-to-tip plot(s)
 * growth rates (Sally's code)
 * dN/dS (by variant and by gene/domains)
 * Tajima's D
