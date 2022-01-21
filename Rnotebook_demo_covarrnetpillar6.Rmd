@@ -1,7 +1,7 @@
 ---
 title: "CoVaRR-Net"
 subtitle: "Genomic epidemiology analyses and mathematical modelling notebook"
-author: "Pillar 6 contributors"
+author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
@@ -47,7 +47,7 @@ theme_set(theme_classic())
 opts_knit$set(root.dir = getwd())
 ```
 
-# Contributing authors:  
+### Contributing authors:  
 Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Art Poon, Jesse Shaprio
 
 # Introduction
