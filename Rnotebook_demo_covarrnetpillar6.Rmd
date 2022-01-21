@@ -349,15 +349,20 @@ Compared to other lineages sampled in Canada, variant of concern Alpha (B.1.1.7)
 Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rates, although only Gamma was significantly higher.
 
 
-Add here:  
+## Omicron in Canada
+
+A list of defining mutations of Omicron sub-lineages is found here: https://github.com/PoonLab/gromstole/tree/master/lineages (Art Poon's lab).
+
+<Rapha-graph of Omicron in canada vs. global goes here>
+
+
+### Add here:  
 
 * growth rates (Sally's code)
 * dN/dS (by variant and by gene/domains)
 * Tajima's D
 * other? (e.g. PyR0, nnet R, ?)
-* Delta and its sublineages (specific plots as above, also delta w/+w/o E484K in Canada/PTs)
-
-Are there any BEAST analyses we'd like to do? e.g. infer R0, serial interval, etc for the different Delta sublineages (might have to restrict this geographically to specific PTs with enough coverage)
+* BEAST analyses? e.g. infer R0, serial interval, etc for the different Omicron sublineages (might have to wait for more BA.2)
 
 
 # List of useful tools
