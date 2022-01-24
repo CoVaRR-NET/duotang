@@ -37,6 +37,7 @@ library(RColorBrewer)
 library(colorspace)
 library(viridis)
 library(MASS)
+library(reticulate)
 
 theme_set(theme_classic())
 
@@ -353,7 +354,29 @@ Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rate
 
 A list of defining mutations of Omicron sub-lineages is found here: https://github.com/PoonLab/gromstole/tree/master/lineages (Art Poon's lab).
 
-<Rapha-graph of Omicron in canada vs. global goes here>
+```{python}
+from libs.Functions_For_MutationalGraphs import *
+
+# percent of alt alleles to add mutation label
+# File containing label
+# Default is AminoAcid labele for non synonymous mutations
+def_min_val_label(15)
+load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
+p="data_needed/raphgraph/msa_0120_"
+
+
+namelist=["Canada.BA.1","final.BA.1","Canada.BA.2","final.BA.2","Canada.B.1.1.529","final.B.1.1.529"]
+pathlist=[p+i+".var" for i in namelist]
+
+namelist=[i.replace("_","\n") for i in namelist]
+tablelist=openfiles(pathlist)
+
+poslist=getpositions(tablelist,percentmin=75,addmissing=False)
+poslist=[i for i in poslist if i>50 and i<29950]
+bighist(tablelist,poslist,namelist,mytitle="Omicron mutations: Canada and worldwide")
+
+```
+Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on genomes available on the 20th of january 2022).
 
 
 ### Add here:  
