@@ -37,7 +37,7 @@ library(RColorBrewer)
 library(colorspace)
 library(viridis)
 library(MASS)
-library(reticulate)
+
 
 theme_set(theme_classic())
 
