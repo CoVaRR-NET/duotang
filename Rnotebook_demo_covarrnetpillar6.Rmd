@@ -359,7 +359,8 @@ Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rate
 
 ## Omicron in Canada
 
-A list of defining mutations of Omicron sub-lineages is found here: https://github.com/PoonLab/gromstole/tree/master/lineages (Art Poon's lab).
+A list of defining mutations of Omicron sub-lineages is found here: 
+https://github.com/cov-lineages/constellations/tree/main/constellations/definitions
 
 ```{python}
 import matplotlib.pyplot as plt
