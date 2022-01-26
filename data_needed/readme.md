@@ -1,1 +1,1 @@
-collection of files needed to run the markdown file
+place here any files needed to run the R notebook (e.g. tables, trees, etc.)
