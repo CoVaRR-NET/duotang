@@ -17,6 +17,10 @@ output:
 library(tidyverse) # wrangling and everything really
 library(knitr) # Needed to set root directory
 library(reticulate) # Needed for the Python code chunk 
+#py_install("pandas") #install pandas in virtual environment
+#use_virtualenv(virtualenv = "r-reticulate")
+use_condaenv("r-reticulate")
+#knitr::knit_engines$set(python = reticulate::eng_python)
 library(lubridate) # dates are special
 #phylo-specific
 library(treeio)
@@ -49,13 +53,16 @@ opts_knit$set(root.dir = getwd())
 ```
 
 ### Contributing authors:  
-Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Art Poon, Jesse Shaprio
+
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Art Poon, Jesse Shaprio
+
+Sequence collection, generation, and distribution: Canadian laboratories across the country are making these data publicly available. Below is a complete list of lab authors. 
 
 # Introduction
 
 This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data, for discussion with pillar 6's team and for sharing with collaborators. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), given to the science communication pillar for public dissemination, and the code can be repackaged to give to public health authorities for their internal use.
 
-Canadian genomic and epidemiological data will be regularly pulled from various public sources to keep these analyses up-to-date. We would like to acknoweldge all Canadian laboratories across the country that are making these data publically available. Only representations of aggregate data will be posted here. Below is a list of data sources and lab authors. 
+Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here. 
 
 
 
@@ -355,11 +362,13 @@ Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rate
 A list of defining mutations of Omicron sub-lineages is found here: https://github.com/PoonLab/gromstole/tree/master/lineages (Art Poon's lab).
 
 ```{python}
-from libs.Functions_For_MutationalGraphs import *
+import matplotlib.pyplot as plt
+import numpy as np
+from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
 
 # percent of alt alleles to add mutation label
 # File containing label
-# Default is AminoAcid labele for non synonymous mutations
+# Default is AminoAcid labels for non synonymous mutations
 def_min_val_label(15)
 load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
 p="data_needed/raphgraph/msa_0120_"
