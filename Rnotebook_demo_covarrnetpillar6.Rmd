@@ -383,6 +383,7 @@ tablelist=openfiles(pathlist)
 poslist=getpositions(tablelist,percentmin=75,addmissing=False)
 poslist=[i for i in poslist if i>50 and i<29950]
 bighist(tablelist,poslist,namelist,mytitle="Omicron mutations: Canada and worldwide")
+plt.show()
 
 ```
 Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on genomes available on the 20th of january 2022).
