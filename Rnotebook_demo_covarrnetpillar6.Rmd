@@ -56,7 +56,7 @@ opts_knit$set(root.dir = getwd())
 
 Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Art Poon, Jesse Shaprio
 
-Sequence collection, generation, and distribution: Canadian laboratories across the country are making these data publicly available. Below is a complete list of lab authors is in this repository and more details are below in the Acknowledgement section. 
+Sequence collection, generation, and distribution: Canadian laboratories across the country are making these data publicly available. A complete list of lab authors is in this repository and more details are below in the Acknowledgement section. 
 
 # Introduction
 
