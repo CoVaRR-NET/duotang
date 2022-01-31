@@ -10,13 +10,13 @@
 
 	Note iqtree:  - removes identical sequences, builds the tree, then adds them back in.
 				  - doesn't allow sequences with identical headers
-				  - will fail if there are too many gaps in some of the sequences (it'll tell you which seqs to remove)
+				  - will fail if there are too many gaps in some of the sequences (it'll tell you which seqs to remove)  
 
-	local command:
+	local command:  
 
 		iqtree -s alignment.fasta -m GTR -nt AUTO
 	
-	 This uses GTR as the model (-m forces it to use the model)
+	 This uses GTR as the model (-m forces it to use the model), other models used for SARS-CoV-2 are: GTR+I+R3 (includes invariant sites and discrete rate categories)
 	 -nt or -T AUTO checks how to best use all available cores (don't use this for cluster runs)
 	 note: Nextstrain uses this command:
 	
