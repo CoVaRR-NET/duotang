@@ -28,3 +28,45 @@
 #    - keep all sequences from last month (this only makes sense if there aren't too many sequences in the last month)
 #    - then keep only half of the previous month (or some reasonable amount)
 #    - keep only 1K or 2K from start of epidemic till 3months ago, choose X number per week (or some other way of ensuring temporal evenness)
+
+#Routine 3, implemented and can be change allow to 
+#    - build a file  <identifier> <category>  here category is year-month-province
+#    - subsample from this file, here we split :
+#       - before october 2021 : 2 samples per month and province
+#       - after october 2021 : 5 samples per month and province
+#    - allomicron are added (neeed to be changed)
+
+#keep only the sequences for which date is informed
+
+datafile=msa_0120_Canada.data
+
+cat $datafile | awk '$11!="NA" && length($8)==10{printf "%s\t%s-%s\n",$2,substr($8,1,7),$11}' > canada.id.cat
+cat $datafile |  awk '$18=="B.1.1.529" || substr($18,1,3)=="BA."{print $2}' > omicron_ids
+
+#this function take a 2 column file: <identifier> <category> and a number N
+#for each category it will draw randomely identifiers until N or until the max
+random_draw_cat(){
+    cat $1 | sort -k2 | awk -v max=$2 '
+    BEGIN{srand()}
+    function draw(a){l=length(a);for (i=l; i>l-max && i>0; i--){r=int(rand()*i);print a[r];a[r]=a[i-1]}}
+    pcat==$2{arr[length(arr)]=$1}
+    pcat!=$2 && NR!=1{draw(arr)}
+    pcat!=$2{split("", arr);arr[0]=$1;pcat=$2}
+    END{draw(arr)}'
+}
+
+
+cat omicron_ids > selectedids
+
+cat canada.id.cat | awk 'substr($2,1,6)!="2021-1" && substr($2,1,4)!="2022"' > canada.id.cat_before_2021_10
+random_draw_cat canada.id.cat_before_2021_10 2 >> selectedids
+
+cat canada.id.cat | awk 'substr($2,1,6)=="2021-1" || substr($2,1,4)=="2022"' > canada.id.cat_after_2021_10
+random_draw_cat canada.id.cat_after_2021_10 5 >> selectedids
+
+version=1
+cat selectedids | sort | uniq > selectedids_V$version
+wc -l selectedids_V$version
+join selectedids_V$version -2 2 datafile | awk '{printf ">%s\n%s\n",$1,$2}' > subsampling_V$version.fasta
+join selectedids_V$version -2 2 datafile | awk '{print $1,$8,$10,$18}' | tr ' ' '\t' > subsampling_metadata_V$version.tsv
+
