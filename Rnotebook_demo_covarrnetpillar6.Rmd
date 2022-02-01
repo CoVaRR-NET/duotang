@@ -70,12 +70,12 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_01_26"
-#date=2022_01_26
+gisaiddate="2022_01_31"
+#date=2022_01_31
 #tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR==1 || substr($1,9,6)=="Canada" && $8=="Human"' | sort -k3,3 > metadata_CANall_$date.uncorrected.csv 
 #cat metadata_virrusseq_$date.tsv | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR!=1 && $43!="NA"' | cut -f5,43 | sort -k2,2 | uniq > epidatesfromvirrusseq
 #join -1 3 metadata_CANall_$date.uncorrected.csv -a 1 -2 2 epidatesfromvirrusseq | awk '$4!=$23 && length($4)<10 && length($23)==10{$4=$23} {id=$1;$1=$2;$2=$3;$3=id} {print}' | tr ' ' '\t'| cut -f-22 > metadata_CANall_$date.csv
-#zip /media/rp/partition4data/Dropbox/Raph/covarrnet/essai2/CoVaRRNet_pillar6notebook/data_needed/metadata_CANall_$date.zip metadata_CANall_$date.csv
+#zip /media/rp/partition4data/Dropbox/Raph/covarrnet/CoVaRRNet_Pillar6_Notebook/data_needed/metadata_CANall_$date.zip metadata_CANall_$date.csv
 
 metaCANall <- read.csv(unz(paste("./data_needed/metadata_CANall_",gisaiddate,".zip",sep=""),paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
@@ -86,16 +86,16 @@ metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
 metaCANall$pango.group <- metaCANall$Variant
 metaCANall$pango.group[is.na(metaCANall$pango.group)]<-"other"
 metaCANall$pango.group[grepl("B\\.1\\.1\\.7|Q\\.", metaCANall$Pango_lineage)] <- "Alpha"
-metaCANall$pango.group[grepl("B\\.1\\.351", metaCANall$Pango_lineage)] <- "Beta"
+metaCANall$pango.group[grepl("B\\.1\\.351", metaCANall$Pango_lineage)] <- "Beta/Lambda/Mu" # Beta
 metaCANall$pango.group[grepl("P\\.", metaCANall$Pango_lineage)] <- "Gamma"
 metaCANall$pango.group[grepl("B\\.1\\.617|AY\\.", metaCANall$Pango_lineage)] <- "Delta"
 metaCANall$pango.group[metaCANall$Pango_lineage == "AY.25" ]<-"Delta AY.25"
 metaCANall$pango.group[metaCANall$Pango_lineage == "AY.27" ]<-"Delta AY.27"
-metaCANall$pango.group[grepl("C\\.37|C\\.37\\.1", metaCANall$Pango_lineage)] <- "Lambda"
-metaCANall$pango.group[grepl("B\\.1\\.1\\.529|BA\\.", metaCANall$Pango_lineage)] <- "Omicron"
+metaCANall$pango.group[grepl("C\\.37|C\\.37\\.1", metaCANall$Pango_lineage)] <- "Beta/Lambda/Mu" #lambda
+metaCANall$pango.group[grepl("B\\.1\\.1\\.529|BA\\.", metaCANall$Pango_lineage)] <- "Omicron BA.1"
 metaCANall$pango.group[metaCANall$Pango_lineage == "BA.1.1" ]<-"Omicron BA.1.1"
 metaCANall$pango.group[metaCANall$Pango_lineage == "BA.2" ]<-"Omicron BA.2"
-metaCANall$pango.group[grepl("B\\.1\\.621", metaCANall$Pango_lineage)] <- "Mu"
+metaCANall$pango.group[grepl("B\\.1\\.621", metaCANall$Pango_lineage)] <- "Beta/Lambda/Mu" #Mu
 metaCANall$pango.group[str_detect(metaCANall$pango.group,"V") ]<-"other"
 metaCANall$pango.group[metaCANall$Pango_lineage == "A.23.1" ]<-"A.23.1"
 metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
@@ -103,12 +103,14 @@ metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
 ## 2. LOAD epidemiological data (PHAC)
 
 
-
-epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
-epidate = tail(epidataCANall,1)$date
-#epidataAlberta <- epidataCANall[ which(epidataCANall$prnameFR=='Alberta'), ]
-#print(epidataAlberta$numtoday)
+epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
+epidataCANall$date <- as.Date(epidataCANall$date)
+epidataCANall$prname <- gsub(' ', '_', epidataCANall$prname)
+
+epidate = tail(epidataCANall,1)$date #download date
+
+
 ```
 
 # Snapshot: SARS-CoV-2 in Canada
@@ -130,7 +132,7 @@ listpango <- listpango[order(listpango)]
 getpal <- colorRampPalette(brewer.pal(9, "Paired")) #"Set3
 pal <- getpal(length(listpango))
 names(pal) <- listpango
-pal["Omicron"]="#8B0000"
+pal["Omicron BA.1"]="#8B0000"
 pal["Omicron BA.1.1"]="#Fa8072"
 pal["Omicron BA.2"]="#FF0000"
 pal["other"]="grey"
@@ -142,41 +144,61 @@ pal["A.23.1"]="#9AD378"
 pal["B.1.438.1"]="#3EA534"
 pal["Beta"]="#CAB2D6"
 pal["Gamma"]="#444444"
-pal["Lambda"]="#F08C3A"
+pal["Beta/Lambda/Mu"]="#F08C3A"
 pal["Mu"]="#F08C3A"
 
-#print(pal)
 
 #------------- counts over time (by week)
-
-plot_metadatadf <- function(meta_tab,pal) {
+mindate=as.Date("2020-12-01")
+colorcases="#138808"
+  
+plot_metadatadf <- function(meta_tab,pal,cases) {
   meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
+  meta_tab <- filter(meta_tab, meta_tab$Collection_date > mindate)
   df1 <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
   dfcount <- df1 %>% group_by(week) %>% count(pango.group)
-  #plot
-  ggplot(dfcount, aes(x=as.Date(week), y= n, fill=pango.group))+geom_bar(stat = "identity")+
-    scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
+  cases <- filter(cases, cases$date > mindate)
+  cases <- cases %>% group_by(week = cut(date, "week")) #adds week coloum
+  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=mean))
+  cases <- cases[is.finite(cases$x),]
+  ratio <- max(dfcount$n)/max(cases$x)
+  cases$x=cases$x*ratio
+  ggplot(dfcount, aes(x=as.Date(week)))+
+    geom_bar(stat = "identity", aes(y= n, fill=pango.group))+
+    scale_fill_manual(breaks=listpango, values = pal)+
+    ylab("")+xlab("")+
+    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
     scale_x_date(date_breaks = "28 day")+
-    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
-  
+    geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
+    scale_y_continuous(name = "sequenced cases per week",sec.axis = sec_axis(~./ratio, name="recorded cases per day"))+
+    theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
-  
-plot_metadatadf_freq <- function(meta_tab,pal) {
+
+plot_metadatadf_freq <- function(meta_tab,pal,cases) {
   meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
+  meta_tab <- filter(meta_tab, meta_tab$Collection_date > mindate)
   df1 <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
   dfcount <- df1 %>% group_by(week) %>% count(pango.group)
   dfcount %>% mutate(freq = prop.table(n)) -> dfprop
-  
-  #plot
-  ggplot(dfprop, aes(x= as.Date(week), y=freq, fill=pango.group))+geom_bar(stat = "identity")+
-    scale_fill_manual(breaks=listpango, values = pal)+ ylab("")+xlab("")+
+  cases <- filter(cases, cases$date > mindate)
+  cases <- cases %>% group_by(week = cut(date, "week")) #adds week coloum
+  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=mean))
+  cases <- cases[is.finite(cases$x),]
+  ratio <- 1/max(cases$x)
+  cases$x=cases$x*ratio
+  ggplot(dfprop, aes(x=as.Date(week)))+
+    geom_bar(stat = "identity", aes(y= freq, fill=pango.group))+
+    scale_fill_manual(breaks=listpango, values = pal)+
+    ylab("")+xlab("")+
+    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
     scale_x_date(date_breaks = "28 day")+
-    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))
+    geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
+    scale_y_continuous(name = "sequenced cases per week",sec.axis = sec_axis(~./ratio, name="recorded cases per day"))+
+    theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
 
-
-plot_metadatadf(metaCANall,pal)
-plot_metadatadf_freq(metaCANall,pal)
+plot_metadatadf(metaCANall,pal,epidataCANall)
+plot_metadatadf_freq(metaCANall,pal,epidataCANall)
 
 ```
 
@@ -196,62 +218,70 @@ Here we show the same plots but for each provinces
 
 loc=sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
 metaCANall$province <- loc
-print(unique(metaCANall$province))
 ```
 
 ### British_Columbia
 ```{r provinceplot_British_Columbia}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='British_Columbia'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='British_Columbia'), ],pal)
+prov='British_Columbia'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Alberta
 ```{r provinceplot_Alberta}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='Alberta'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Alberta'), ],pal)
+prov='Alberta'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 ```
 
 ### Saskatchewan
 ```{r provinceplot_Saskatchewan}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='Saskatchewan'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Saskatchewan'), ],pal)
+prov='Saskatchewan'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 ```
 
 ### Manitoba
 ```{r provinceplot_Manitoba}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='Manitoba'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Manitoba'), ],pal)
+prov='Manitoba'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 ```
 
 ### Ontario
 ```{r provinceplot_Ontario}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='Ontario'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Ontario'), ],pal)
+prov='Ontario'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Quebec
 ```{r provinceplot_Quebec}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='Quebec'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Quebec'), ],pal)
+prov='Quebec'
+print(epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Nova_Scotia
 ```{r provinceplot_Nova_Scotia}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='Nova_Scotia'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='Nova_Scotia'), ],pal)
+prov='Nova_Scotia'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### New_Brunswick
 ```{r provinceplot_New_Brunswick}
-plot_metadatadf(metaCANall[ which(metaCANall$province=='New_Brunswick'), ],pal)
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province=='New_Brunswick'), ],pal)
+prov='New_Brunswick'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Newfoundland_and_Labrador
 ```{r provinceplot_Newfoundland_and_Labrador}
-subtab=metaCANall[ which(metaCANall$province=='Newfoundland' | metaCANall$province=='Newfoundland_and_Labrador' ), ]
-plot_metadatadf(subtab,pal)
-plot_metadatadf_freq(subtab,pal)
+prov='Newfoundland_and_Labrador'
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ## Canadian trees {-}
