@@ -124,8 +124,8 @@ def getpositions(tablelist,percentmin=0,addmissing=False):
 
 def bighist(tablelist,poslist,y_names,mytitle="",suptables=[],PDFname=""):
     
-    fig = plt.figure(figsize=(len(poslist)/3+5,2*(len(tablelist)+len(suptables)+1)), constrained_layout=False)
-    print(len(tablelist)+len(suptables)+1)
+    fig = plt.figure(figsize=(len(poslist)/3+6,2*(len(tablelist)+len(suptables)+2)), constrained_layout=False)
+    #print(len(tablelist)+len(suptables)+1)
     gs = fig.add_gridspec(nrows=len(tablelist)+len(suptables)+1, ncols=1, hspace=0)
     ax = gs.subplots(sharex=True)
     x_names=(tablelist[0].iloc[poslist]["POS"].astype(str))
@@ -133,14 +133,14 @@ def bighist(tablelist,poslist,y_names,mytitle="",suptables=[],PDFname=""):
         ax[i].bar(x_names , suptables[i] , bottom=[0]*len(poslist) , color="grey" , edgecolor="none" , width=1)
     for i in range(len(tablelist)):
         axx=ax[i+len(suptables)]
-        print(i)
+        #print(i)
         nb_sample=sum(tablelist[i].iloc[0][["A","C","G","T","."]])
         if nb_sample<10000:
             str_nb_sample="\nn="+str(nb_sample)+""
         else:
             str_nb_sample="\nn="+str(int(nb_sample/1000))+"K"
         axx.set(yticks=[25,50,75])
-        axx.set_ylabel(y_names[i]+str_nb_sample,  fontsize=20)
+        axx.set_ylabel(y_names[i]+str_nb_sample,  fontsize=18)
         axx.set_ylim((0,100))
         axx.margins(0, 0)  
         all_pos_toplot=tablelist[i].iloc[poslist]
