@@ -1,4 +1,10 @@
-#@Author=Arnaud NG
+#@Author = Arnaud N’Guessan
+
+#previous versions of the code were published here: 
+# https://github.com/arnaud00013/SARS_CoV_2_haplotypes_Tajima_D_2020_time_series and were used in two publications:
+# Mostefai et al. (2022) Data-driven approaches for genetic characterization of SARS-CoV-2 lineages, Frontiers in Medicine
+# Murall et al. (2021) A small number of early introductions seeded widespread transmission of SARS-CoV-2 in Quebec, Canada, Genome Medicine
+
 #This script compute Tajima's D and dN/dS using SARS-CoV-2 consensus sequences 
 
 #requires 4 input files in the working directory:
@@ -33,10 +39,10 @@ library("vegan")
 library("session")
 library("infotheo")
 
-setwd("C:/Users/carme/Dropbox/Work_Files/sequence_analysis/covid-19/Covarr-Net/Notebook/Tajima_D_and_dN_dS_example_code/")
+setwd("C:/path/Tajima_D_and_dN_dS_example_code/")
 
 #import script arguments
-output_workspace <- as.character("C:/Users/carme/Dropbox/Work_Files/sequence_analysis/covid-19/Covarr-Net/Notebook/Tajima_D_and_dN_dS_example_code/")
+output_workspace <- as.character("C:/path/Tajima_D_and_dN_dS_example_code/")
 #output_workspace <- as.character(commandArgs(TRUE)[1]) #ABSOLUTE Path of the folder containing the data (fasta and metadata)
 nb_cores <- 4 #as.integer(commandArgs(TRUE)[2]) #Number of cpus
 #Number of cpus for Tajima's D analysis. It corresponds to the number of months that will be analyzed in parallel. Thus, it should be <=7 for Wave 1.
