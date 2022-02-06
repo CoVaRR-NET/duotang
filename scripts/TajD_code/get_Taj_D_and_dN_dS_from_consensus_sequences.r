@@ -45,7 +45,7 @@ setwd("C:/path/Tajima_D_and_dN_dS_example_code/")
 output_workspace <- as.character("C:/path/Tajima_D_and_dN_dS_example_code/")
 #output_workspace <- as.character(commandArgs(TRUE)[1]) #ABSOLUTE Path of the folder containing the data (fasta and metadata)
 nb_cores <- 4 #as.integer(commandArgs(TRUE)[2]) #Number of cpus
-#Number of cpus for Tajima's D analysis. It corresponds to the number of time periods (14 days as mentioned below) that will be analyzed in parallel.
+#Number of cpus for Tajima's D analysis. It corresponds to the number of time periods (14 days long as mentioned below) that will be analyzed in parallel.
 
 #min_date <- as.character(commandArgs(TRUE)[3]) #Date at which the analyses of the consensus sequences should start
 #max_date <- as.character(commandArgs(TRUE)[4]) #Date at which the analyses of the consensus sequences should end
