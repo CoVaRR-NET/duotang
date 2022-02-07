@@ -238,8 +238,8 @@ More up-to-date covid data for this province can be found here:
 https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
 ```{r provinceplot_Alberta}
 prov='Alberta'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Saskatchewan
@@ -248,8 +248,8 @@ More up-to-date covid data for this province can be found here:
 https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
 ```{r provinceplot_Saskatchewan}
 prov='Saskatchewan'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Manitoba
@@ -258,8 +258,8 @@ More up-to-date covid data for this province can be found here:
 https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
 ```{r provinceplot_Manitoba}
 prov='Manitoba'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
+plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
+plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Ontario
@@ -278,7 +278,6 @@ More up-to-date covid data for this province can be found here:
 https://www.inspq.qc.ca/covid-19/donnees/variants
 ```{r provinceplot_Quebec}
 prov='Quebec'
-print(epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
