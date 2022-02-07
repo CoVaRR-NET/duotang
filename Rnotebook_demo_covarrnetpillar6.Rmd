@@ -1,6 +1,6 @@
 ---
 title: "CoVaRR-Net"
-subtitle: "Genomic epidemiology analyses and mathematical modelling notebook"
+subtitle: "Proof of concept: Genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
@@ -36,7 +36,6 @@ library(DT) # Needed to make DT example table
 library(ggbeeswarm) # Needed to make beeswarm plots
 library(gridExtra) # multi-panel plots
 library(kableExtra) # Needed to write out a formatted table
-library(scales)
 #colors
 library(RColorBrewer)
 library(colorspace)
@@ -55,16 +54,17 @@ opts_knit$set(root.dir = getwd())
 
 ### Contributing authors:  
 
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Art Poon, Jesse Shaprio
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Art Poon, Jesse Shaprio. Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ) which include: Sally Otto, Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and Erin Gill. 
 
-Sequence collection, generation, and distribution: Canadian laboratories across the country are making these data publicly available. A complete list of lab authors is in this repository and more details are below in the Acknowledgement section. 
+Sequence collection, generation, and release: Canadian laboratories across the country are making these data publicly available. A complete list of lab authors is in this repository and more details are below in the Acknowledgement section.   
+[ideally: add lab list right here with drop-down menu (?)]
 
 # Introduction
 
-This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data, for discussion with pillar 6's team and for sharing with collaborators. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), given to the science communication pillar for public dissemination, and the code can be repackaged to give to public health authorities for their internal use.
+This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim to investigate viral evolution and spread. It is for discussion with pillar 6's team and for sharing with collaborators, e.g. PH labs. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), discussions with the science communication pillar for public dissemination, and the code can be used or repackaged for public health authorities/laboratories for their internal use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here. 
-
+[aim: use only VirusSeq Portal data]
 
 
 ```{r load_data}
@@ -82,43 +82,33 @@ metaCANall <- read.csv(unz(paste("./data_needed/metadata_CANall_",gisaiddate,".z
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
 #max(metaCANall$Collection.date) - min(metaCANall$Collection.date) #time diff: 580 days
 
-
-
-
-VOCVOI <- data.frame(name = character(),pattern = character(),color = numeric())
-print(nrow(VOCVOI))
-VOCVOI[nrow(VOCVOI)+1, ]=list("Alpha",         "B.1.1.7|Q.","#B29C71")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta/Lambda/Mu","B.1.351",   "#F08C3A") #Beta
-VOCVOI[nrow(VOCVOI)+1, ]=list("Gamma",         "P.",        "#444444")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta",         "B.1.617|AY.","#A6CEE3")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.25",   "AY.25",       "#61A6A0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.27",   "AY.27",       "#438FC0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta/Lambda/Mu","C.37|C.37.1", "#F08C3A")#lambda
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.","#8B0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1.1","BA.1.1",       "#FA8072")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.2",  "BA.2",         "#FF0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta/Lambda/Mu","B.1.621",      "#F08C3A")#Mu
-VOCVOI[nrow(VOCVOI)+1, ]=list("A.23.1",        "A.23.1",       "#9AD378")
-VOCVOI[nrow(VOCVOI)+1, ]=list("B.1.438.1",     "B.1.438.1",    "#3EA534")
-
 #make a pango.group column
-metaCANall$pango.group <-"other"
-pal["other"]="grey"
-for (row in 1:nrow(VOCVOI)) {
-    name <- VOCVOI[row, "name"]
-    pattern=gsub("\\.",".",VOCVOI[row, "pattern"])
-    metaCANall$pango.group[grepl(pattern, metaCANall$Pango_lineage)] <- name
-    pal[name]=VOCVOI[row, "color"]
-}
 
+metaCANall$pango.group <- metaCANall$Variant
+metaCANall$pango.group[is.na(metaCANall$pango.group)]<-"other"
+metaCANall$pango.group[grepl("B\\.1\\.1\\.7|Q\\.", metaCANall$Pango_lineage)] <- "Alpha"
+metaCANall$pango.group[grepl("B\\.1\\.351", metaCANall$Pango_lineage)] <- "Beta/Lambda/Mu" # Beta
+metaCANall$pango.group[grepl("P\\.", metaCANall$Pango_lineage)] <- "Gamma"
+metaCANall$pango.group[grepl("B\\.1\\.617|AY\\.", metaCANall$Pango_lineage)] <- "Delta"
+metaCANall$pango.group[metaCANall$Pango_lineage == "AY.25" ]<-"Delta AY.25"
+metaCANall$pango.group[metaCANall$Pango_lineage == "AY.27" ]<-"Delta AY.27"
+metaCANall$pango.group[grepl("C\\.37|C\\.37\\.1", metaCANall$Pango_lineage)] <- "Beta/Lambda/Mu" #lambda
+metaCANall$pango.group[grepl("B\\.1\\.1\\.529|BA\\.", metaCANall$Pango_lineage)] <- "Omicron BA.1"
+metaCANall$pango.group[metaCANall$Pango_lineage == "BA.1.1" ]<-"Omicron BA.1.1"
+metaCANall$pango.group[metaCANall$Pango_lineage == "BA.2" ]<-"Omicron BA.2"
+metaCANall$pango.group[grepl("B\\.1\\.621", metaCANall$Pango_lineage)] <- "Beta/Lambda/Mu" #Mu
+metaCANall$pango.group[str_detect(metaCANall$pango.group,"V") ]<-"other"
+metaCANall$pango.group[metaCANall$Pango_lineage == "A.23.1" ]<-"A.23.1"
+metaCANall$pango.group[metaCANall$Pango_lineage == "B.1.438.1" ]<-"B.1.438.1"
 
-  ## 2. LOAD epidemiological data (PHAC)
+## 2. LOAD epidemiological data (PHAC)
 
 
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
 epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
 epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub(' ', '_', epidataCANall$prname)
+
 epidate = tail(epidataCANall,1)$date #download date
 
 
@@ -130,174 +120,304 @@ epidate = tail(epidataCANall,1)$date #download date
 
 ## Variants in Canada
 
-Sequence counts for all Canadian data in GISAID, up to `r gisaiddate`, and cases count downloaded on the `r epidate` from  health-infobase.canada.ca. Note that some of the "other" category include some Delta sublineages (AYs) but overall, from the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`, shows that by end of summer Alpha and Gamma were still the most sequenced variants. From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). Case counts over time are added for comparison as sequencing coverage varies over time.
 
-```{r, fig.width=8,fig.height=5}
+Important caveat: This plot shows the changing composition of sequences posted to GISAID and the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, and only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
+
+```{r example_summaries}
 
 # --- Histogram plot: counts per variant of all canadian data -------------
 
+listpango <- unique(metaCANall$pango.group)
+print(listpango)
+listpango <- listpango[order(listpango)]
+getpal <- colorRampPalette(brewer.pal(9, "Paired")) #"Set3
+pal <- getpal(length(listpango))
+names(pal) <- listpango
+pal["Omicron BA.1"]="#8B0000"
+pal["Omicron BA.1.1"]="#Fa8072"
+pal["Omicron BA.2"]="#FF0000"
+pal["other"]="grey"
+pal["Alpha"]="#B29C71"
+pal["Delta"]="#A6CEE3"
+pal["Delta AY.27"]="#438FC0"
+pal["Delta AY.25"]="#61A6A0" 
+pal["A.23.1"]="#9AD378"
+pal["B.1.438.1"]="#3EA534"
+pal["Beta"]="#CAB2D6"
+pal["Gamma"]="#444444"
+pal["Beta/Lambda/Mu"]="#F08C3A"
+pal["Mu"]="#F08C3A"
+
+
 #------------- counts over time (by week)
-mindate=as.Date("2020-11-01")
-maxdate=as.Date(gsub('_','-',gisaiddate))
-maxdate=as.Date("2022-01-10")
+mindate=as.Date("2020-12-01")
 colorcases="#138808"
   
 plot_metadatadf <- function(meta_tab,pal,cases) {
   meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
   meta_tab <- filter(meta_tab, meta_tab$Collection_date > mindate)
-  meta_tab <- filter(meta_tab, meta_tab$Collection_date < maxdate)
-  meta_tab <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
-  meta_tab <- meta_tab %>% group_by(week) %>% count(pango.group)
+  df1 <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
+  dfcount <- df1 %>% group_by(week) %>% count(pango.group)
   cases <- filter(cases, cases$date > mindate)
-  cases <- filter(cases, cases$date < maxdate)
-  cases <- cases %>% group_by(week = cut(date, "week")) #adds week column
-  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=sum))
-  cases$x=cases$x/7
-  ratio <- max(data.frame(aggregate(meta_tab$n, by=list(Category=meta_tab$week), FUN=sum))$x)/max(cases$x)
+  cases <- cases %>% group_by(week = cut(date, "week")) #adds week coloum
+  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=mean))
+  cases <- cases[is.finite(cases$x),]
+  ratio <- max(dfcount$n)/max(cases$x)
   cases$x=cases$x*ratio
-  print(pal)
-  ggplot(meta_tab, aes(x=as.Date(week)))+
+  ggplot(dfcount, aes(x=as.Date(week)))+
     geom_bar(stat = "identity", aes(y= n, fill=pango.group))+
-    scale_fill_manual(breaks=unique(sort(meta_tab$pango.group)), values = pal)+
+    scale_fill_manual(breaks=listpango, values = pal)+
     ylab("")+xlab("")+
     theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
     scale_x_date(date_breaks = "28 day")+
     geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
-    scale_y_continuous(name = "sequenced cases per day",sec.axis = sec_axis(~./ratio, name="recorded cases per day",labels=label_number_auto()))+
+    scale_y_continuous(name = "sequenced cases per week",sec.axis = sec_axis(~./ratio, name="recorded cases per day"))+
     theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
-
 
 plot_metadatadf_freq <- function(meta_tab,pal,cases) {
   meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
   meta_tab <- filter(meta_tab, meta_tab$Collection_date > mindate)
-  meta_tab <- filter(meta_tab, meta_tab$Collection_date < maxdate)
-  meta_tab <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
-  meta_tab <- meta_tab %>% group_by(week) %>% count(pango.group)
-  meta_tab %>% mutate(freq = prop.table(n)) -> dfprop
+  df1 <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
+  dfcount <- df1 %>% group_by(week) %>% count(pango.group)
+  dfcount %>% mutate(freq = prop.table(n)) -> dfprop
   cases <- filter(cases, cases$date > mindate)
-  cases <- filter(cases, cases$date < maxdate)
-  cases <- cases %>% group_by(week = cut(date, "week")) #adds week column
-  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=sum))
-  cases$x=cases$x/7
+  cases <- cases %>% group_by(week = cut(date, "week")) #adds week coloum
+  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=mean))
+  cases <- cases[is.finite(cases$x),]
   ratio <- 1/max(cases$x)
   cases$x=cases$x*ratio
   ggplot(dfprop, aes(x=as.Date(week)))+
     geom_bar(stat = "identity", aes(y= freq, fill=pango.group))+
-    scale_fill_manual(breaks=unique(sort(dfprop$pango.group)), values = pal)+
+    scale_fill_manual(breaks=listpango, values = pal)+
     ylab("")+xlab("")+
     theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
     scale_x_date(date_breaks = "28 day")+
     geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
-    scale_y_continuous(name = "sequenced cases per day",sec.axis = sec_axis(~./ratio, name="recorded cases per day",labels=label_number_auto()))+
+    scale_y_continuous(name = "sequenced cases per week",sec.axis = sec_axis(~./ratio, name="recorded cases per day"))+
     theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
+
 plot_metadatadf(metaCANall,pal,epidataCANall)
 plot_metadatadf_freq(metaCANall,pal,epidataCANall)
 
 ```
 
-There are two PANGO lineages that have a Canadian origin and have predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
+There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
 
 Other lineages of Canadian interest:  
 
-* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks, before Delta arrived  
+* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - an American (USA) lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
  
 
 ## Provinces {.tabset}
 
-Here we show the same plots but for each provinces 
+Here we show the same plots but for each province. The NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/
 ```{r province list}
 
 loc=sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
 metaCANall$province <- loc
 ```
 
-### British_Columbia
-```{r provinceplot_British_Columbia, fig.width=8,fig.height=5}
+### British_Columbia  
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
+```{r provinceplot_British_Columbia}
 prov='British_Columbia'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Alberta
-```{r provinceplot_Alberta, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
+```{r provinceplot_Alberta}
 prov='Alberta'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 ```
 
 ### Saskatchewan
-```{r provinceplot_Saskatchewan, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
+```{r provinceplot_Saskatchewan}
 prov='Saskatchewan'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 ```
 
 ### Manitoba
-```{r provinceplot_Manitoba, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
+```{r provinceplot_Manitoba}
 prov='Manitoba'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prnameFR==prov), ])
 ```
 
 ### Ontario
-```{r provinceplot_Ontario, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
+```{r provinceplot_Ontario}
 prov='Ontario'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Quebec
-```{r provinceplot_Quebec, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://www.inspq.qc.ca/covid-19/donnees/variants
+```{r provinceplot_Quebec}
 prov='Quebec'
+print(epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Nova_Scotia
-```{r provinceplot_Nova_Scotia, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
+```{r provinceplot_Nova_Scotia}
 prov='Nova_Scotia'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### New_Brunswick
-```{r provinceplot_New_Brunswick, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
+```{r provinceplot_New_Brunswick}
 prov='New_Brunswick'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
 ### Newfoundland_and_Labrador
-```{r provinceplot_Newfoundland_and_Labrador, fig.width=8,fig.height=5}
+[include here: provincial specific caveats or points provinces want to make]  
+More up-to-date covid data for this province can be found here:  
+https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
+```{r provinceplot_Newfoundland_and_Labrador}
 prov='Newfoundland_and_Labrador'
 plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],pal,epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
-## Canadian trees {-}
+## Canadian trees {.tabset}
 
-Down-sampled Canadian SARS-CoV-2 genomes. Taken from GISAID Sept. 12th, 2021. Alignment GISAID, ML tree in IQ-tree. 
+Down-sampled Canadian SARS-CoV-2 genomes (n ~ 8000 genomes). Pulled from GISAID Jan. 20th, 2022. Alignment from GISAID, ML tree reconstructed in [IQ-TREE](http://www.iqtree.org/), time tree estimated in [TreeTime](https://github.com/neherlab/treetime), and plotting with [ggtree](https://github.com/YuLab-SMU/ggtree). 
 
-![](./data_needed/ML_CANall_subsamp1_n13K.png) 
+```{r message=FALSE}
 
+### metadata and trees
+metasub1 <- read.delim( "./data_needed/subsample1.1_8Ktrim_metadata.tsv")
+MLtree_sub1 <- read.tree("./data_needed/subsample1.1_8Ktrim_mltree.nwk")
+ttree_sub1 <- read.tree("./data_needed/subsample1.1_8Ktrim_timetree.nwk")
 
+### needed for plotting
+
+#pango group colours
+listpangogp <- unique(metasub1$Variant) 
+listpangogp[order(listpangogp)] -> listpangogp #reorder
+pal <- rep(NA,length(listpangogp))
+names(pal) <- listpangogp
+pal["other"][[1]] <- "white"
+pal["Alpha"][[1]] <- "pink"
+pal["A.2.5.2"][[1]] <- "purple"
+pal["A.23.1"][[1]] <- "orchid"
+pal["B.1.438.1"][[1]] <- "#3EA534"
+pal["Delta + AY.*"][[1]] <- "#A6CEE3"
+pal["Delta AY.25"][[1]] <- "#61A6A0"
+pal["Delta AY.27"][[1]] <- "blue"
+pal["Gamma"][[1]] <- "#444444"
+pal["Lambda"][[1]] <- "red"
+pal["Mu"][[1]] <- "black"
+pal["Beta"][[1]] <- "gold"
+pal["Omicron"][[1]] <- "palegoldenrod"
+pal["Omicron B.1.1.529"][[1]] <- "#8B0000"
+pal["Omicron BA.1"][[1]] <- "#FA8072"
+pal["Omicron BA.2"][[1]] <- "brown"
+
+#division colours for heatmap
+df_PTs <-data.frame(divisions=metasub1$division2) #make df for heatmaps
+rownames(df_PTs) <- metasub1$label #needs row names for heatmaps
+
+#division colours
+listPTs <- unique(metasub1$division2)
+listPTs <- listPTs[order(listPTs)]
+listPTs <- listPTs[-3] #remove hubei
+getpal2 <- colorRampPalette(brewer.pal(9, "Spectral")) #"Set3
+pal2 <- getpal2(length(listPTs))
+names(pal2) <- listPTs
+
+### time tree
+mrdate <- max(na.omit(metasub1$date))
+
+p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("label", "Variant"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1)+
+  geom_tippoint(aes(color = Variant), size=0.5)+ #, shape= lab
+  scale_color_manual(breaks=listpangogp, values = pal)+
+  #ggtitle("Time tree - Canada - downsample1")+
+  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )+
+  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+
+plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
+  scale_fill_manual(breaks=listPTs, values = pal2)
+
+### diversity ML tree
+p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("label", "Variant"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1)+
+  geom_tippoint(aes(color = Variant), size=0.5)+ 
+  scale_color_manual(breaks=listpangogp, values = pal)+
+  #ggtitle("ML tree - Canada - subsample1, n = 8K")+
+  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )+
+  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+
+plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
+  scale_fill_manual(breaks=listPTs, values = pal2)
+
+```
+
+```{r}
+table(metasub1$Variant)
+```
+
+### Time Tree
+```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+plot1
+```
+
+### Diversity Tree
+```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+plot2
+```
 
 
 ## Evolution and growth rates of SARS-CoV-2 in Canada
 
 There are various methods to investigate changes in evolutionary rates of VOC/VOIs and compare their relative fitness in an epidemiological context.
 
-For example, root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumlating mutations at a faster pace, or clusters that jump up above the average could indicate a mutational jump (simlar to what we saw with Alpha when it first appeared in the UK).
+For example, root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumulating mutations at a faster pace, or clusters that jump up above the average could indicate a mutational jump (similar to what we saw with Alpha when it first appeared in the UK).
 
 <!--![](./data_needed/roottotip_CANall_downsamp1_demo.png)-->
 Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
-```{r}
+```{r, dpi=300}
 #RTT code contributed by Art Poon
-rooted <- read.tree('./data_needed/msa_0908_CANall_downsamp10perday_1.rtt.nwk')
+rooted <- read.tree('./data_needed/subsample1.1_8Ktrim_mltree.rtt.nwk')
+metadataRTT <- read.delim("./data_needed/subsample1.1_8Ktrim_metadata.tsv")
+
 get.dates <- function(phy, delimiter='_', pos=-1, format='%Y-%m-%d') {
   dt <- sapply(phy$tip.label, function(x) {
     tokens <- strsplit(x, delimiter)[[1]]
@@ -313,8 +433,8 @@ div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
 
 # match tips to metadata to retrieve PANGO lineage assignments
 accno <- gsub(".+_(EPI_ISL_[0-9]+)_.+", "\\1", rooted$tip.label)
-index <- match(accno, metaCANall$Accession_ID)
-pg <- metaCANall$pango.group[index]
+index <- match(accno, metadataRTT$Accession_ID)
+pg <- metadataRTT$pango.group[index]
 
 blobs <- function(x, y, col, cex=1) {
   points(x, y, pch=21, cex=cex)
@@ -378,6 +498,7 @@ Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rate
 Compilation of analyses of omicron and its sublineages in Canada.
 
 ```{python}
+#code developed by Rapahel Poujol and Susanne Kraemer
 import matplotlib.pyplot as plt
 import numpy as np
 from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
@@ -406,13 +527,17 @@ plt.show()
 Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on genomes available on the 20th of january 2022).
 
 
-### Add here:  
+## Aspirational  
 
-* growth rates (Sally's code)
-* dN/dS (by variant and by gene/domains)
-* Tajima's D
-* other? (e.g. PyR0, nnet R, ?)
-* BEAST analyses? e.g. infer R0, serial interval, etc for the different Omicron sublineages (might have to wait for more BA.2)
+We are in the process of adding or would like to develop code for some of the following analyses:   
+* variant growth rates (Sally)  
+* dN/dS (by variant and by gene/domains)  
+* Tajima's D  
+* clustering analyses (Caroline)  
+* other? (e.g. PyR0, nnet R, ?)  
+* BEAST analyses? e.g. infer R0, serial interval, etc for the different Omicron sublineages (might have to wait for more BA.2)  
+
+With anonymized data on vaccination status, severity/outcome, reason for sequencing (e.g. outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving. Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
 
 
 # List of useful tools
@@ -420,19 +545,21 @@ Mutational profile (point mutations>75%) of Omicron and its sublineages in Canad
 Collect a list of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
 
 * UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
-* iTol: Tree visualization tool [https://itol.embl.de/itol.cgi]
 * List of (mostly) modelling tools by CANMOD: [https://canmod.net/tools], includes RECON, outbreak tools for both modelling and genomic epi [https://github.com/reconhub]
 * List of homoplaises in SARS-CoV-2: https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt
 * Erin Gill's COVID-19 dashboard [https://github.com/eringill/COVID_dashboard_reboot]
 * The Epi Graph Network: training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro. [https://thegraphnetwork.training/]
-* Paul's subsampling tool of SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
+* Nybbler tool for subsampling SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
 * Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
 * IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
 * cov-lineages (summaries of PANGO lineages) [https://cov-lineages.org/lineage_list.html]
 * CoVizu (analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time) [https://github.com/PoonLab/covizu/]
+* COVID-MVP (mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health, CIDGOH) [https://covidmvp.cidgoh.ca/]
+* Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
 
 
 # Acknowledgements and Data sources
+
 We thank all the authors, developers, and contributors to the GISAID and VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN). 
 
 We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
@@ -442,8 +569,8 @@ We would like to thank the GISAID Initiative and are grateful to all of the data
 Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID's innovative contribution to global health. Global Challenges, 1:33-46. DOI:10.1002/gch2.1018, PMCID:31565258
 Shu, Y., McCauley, J. (2017) GISAID: From vision to reality. EuroSurveillance, 22(13), DOI: 10.2807/1560-7917.ES.2017.22.13.30494, PMCID: PMC5388101
 
-* VirusSeq Portal (https://virusseq-dataportal.ca/explorer)
-The list of participating labs in CanCoGen is found in this repository.
+* The Canadian VirusSeq Data Portal (https://virusseq-dataportal.ca) 
+We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory(RRPL), Nova Scotia Health Authority, Alberta ProvLab North(APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory(NML), BCCDC Public Health Laboratory, Public Health Ontario(PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research(OICR), Manitoba Cadham Provincial Laborator, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
 
 * Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
 
