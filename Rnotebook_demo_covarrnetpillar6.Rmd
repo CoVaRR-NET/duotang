@@ -48,7 +48,7 @@ theme_set(theme_classic())
 
 # # This is the Python to be used (which you would only specify if using Python code chunks)
 # use_python("/Users/carme/local/miniconda3/bin/python") # <- FIX this path
-
+Sys.setenv(RETICULATE_PYTHON = "my_env/bin/python")#python path that works for Susanne
 # You would need to change this folder to be wherever you wanted the html file to be written.
 opts_knit$set(root.dir = getwd())
 ```
