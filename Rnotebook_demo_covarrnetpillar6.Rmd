@@ -20,6 +20,7 @@ library(reticulate) # Needed for the Python code chunk
 #py_install("pandas") #install pandas in virtual environment
 #use_virtualenv(virtualenv = "r-reticulate")
 use_condaenv("r-reticulate")
+Sys.setenv(RETICULATE_PYTHON = "/media/rp/partition4data/Dropbox/Raph/covarrnet/python_R_env/bin/python")
 #knitr::knit_engines$set(python = reticulate::eng_python)
 library(lubridate) # dates are special
 #phylo-specific
@@ -72,8 +73,8 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_02_15"
-#date=2022_02_15
+gisaiddate="2022_02_21"
+#date=2022_02_21
 #tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR==1 || substr($1,9,6)=="Canada" && $8=="Human"' | sort -k3,3 > metadata_CANall_$date.uncorrected.csv 
 #filefromVirusSeq=ca932c34-22dc-4f95-918c-152a2904464b
 #tar -axf $filefromVirusSeq -O  files-archive-$filefromVirusSeq.tsv | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR!=1 && $43!="NA"' | cut -f5,43 | sort -k2,2 | uniq > epidatesfromvirrusseq_$date
@@ -212,8 +213,7 @@ Other lineages of Canadian interest:
 Here we show the same plots but for each province. The NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/
 ```{r province list}
 
-loc=sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
-metaCANall$province <- loc
+metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
 ```
 
 ### British_Columbia  
@@ -501,10 +501,10 @@ from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
 # Default is AminoAcid labels for non synonymous mutations
 def_min_val_label(15)
 load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
-p="data_needed/raphgraph/msa_0120_"
+p="data_needed/raphgraph/msa_0220_"
 
 
-namelist=["Canada.BA.1","final.BA.1","Canada.BA.2","final.BA.2","Canada.B.1.1.529","final.B.1.1.529"]
+namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
 pathlist=[p+i+".var" for i in namelist]
 
 namelist=[i.replace("_","\n") for i in namelist]
