@@ -49,7 +49,7 @@ theme_set(theme_classic())
 # # This is the Python to be used (which you would only specify if using Python code chunks)
 # use_python("/Users/carme/local/miniconda3/bin/python") # <- FIX this path
 # Sys.setenv(RETICULATE_PYTHON = "/media/rp/partition4data/Dropbox/Raph/covarrnet/python_R_env/bin/python")#python path that works for Raphael
-# Sys.setenv(RETICULATE_PYTHON = "my_env/bin/python")#python path that works for Susanne
+ Sys.setenv(RETICULATE_PYTHON = "my_env/bin/python")#python path that works for Susanne
 # You would need to change this folder to be wherever you wanted the html file to be written.
 opts_knit$set(root.dir = getwd())
 ```
@@ -68,6 +68,9 @@ This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here. 
 [aim: use only VirusSeq Portal data]
 
+# Caveats
+
+Because of the evolving screening and sequencing strategies over time, publicly available genomes do not necessarily represent the actual proportions of circulating lineages. Thus, we would like to highlight that the data and analyses presented here may be impacted by potential biases resulting from the variability of jurisdictional sampling, screening, sequencing methods and strategies.
 
 ```{r load_data}
 
@@ -308,58 +311,48 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ## Canadian trees {.tabset}
 
-Down-sampled Canadian SARS-CoV-2 genomes (n ~ 8000 genomes). Pulled from GISAID Jan. 20th, 2022. Alignment from GISAID, ML tree reconstructed in [IQ-TREE](http://www.iqtree.org/), time tree estimated in [TreeTime](https://github.com/neherlab/treetime), and plotting with [ggtree](https://github.com/YuLab-SMU/ggtree). 
+# Methodology
+
+Canadian genomes were obtained from the GISAID msa on the 20th of February 2022 and down-sampled to one genome per lineage, province and month + one genome of each omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+
+# Caveat
+
+In the tree trimming process, all BA.2 genomes were removed from the dataset, as they were flagged as outliers during the calculation of the molecular clock.
 
 ```{r message=FALSE}
 
 ### metadata and trees
-metasub1 <- read.delim( "./data_needed/subsample1.1_8Ktrim_metadata.tsv")
-MLtree_sub1 <- read.tree("./data_needed/subsample1.1_8Ktrim_mltree.nwk")
-ttree_sub1 <- read.tree("./data_needed/subsample1.1_8Ktrim_timetree.nwk")
+metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
+MLtree_sub1 <- read.tree("./data_needed/iqtree_trimmed_noBA2.nwk")
+ttree_sub1 <- read.tree("./data_needed/subsample_V1_timetree.nwk")
 
 ### needed for plotting
-
-#pango group colours
-listpangogp <- unique(metasub1$Variant) 
-listpangogp[order(listpangogp)] -> listpangogp #reorder
-pal <- rep(NA,length(listpangogp))
-names(pal) <- listpangogp
-pal["other"][[1]] <- "white"
-pal["Alpha"][[1]] <- "pink"
-pal["A.2.5.2"][[1]] <- "purple"
-pal["A.23.1"][[1]] <- "orchid"
-pal["B.1.438.1"][[1]] <- "#3EA534"
-pal["Delta + AY.*"][[1]] <- "#A6CEE3"
-pal["Delta AY.25"][[1]] <- "#61A6A0"
-pal["Delta AY.27"][[1]] <- "blue"
-pal["Gamma"][[1]] <- "#444444"
-pal["Lambda"][[1]] <- "red"
-pal["Mu"][[1]] <- "black"
-pal["Beta"][[1]] <- "gold"
-pal["Omicron"][[1]] <- "palegoldenrod"
-pal["Omicron B.1.1.529"][[1]] <- "#8B0000"
-pal["Omicron BA.1"][[1]] <- "#FA8072"
-pal["Omicron BA.2"][[1]] <- "brown"
-
+pango_frame<-metaCANall[c("Pango_lineage","pango.group")]
+pango_col<-pango_frame %>% distinct()#make a lookup table for all lineages to pango.group
+metasub1<-merge(metasub1,pango_col,by.x="Variant",by.y="Pango_lineage",all.y=FALSE,all.x=TRUE)
+division_frame<-metaCANall[c("Virus_name","province")]
+metasub1<-merge(metasub1,division_frame,by.x="GISAID",by.y="Virus_name",all.y=FALSE,all.x=TRUE)
+listpangogp<-unique(metasub1$pango.group)
+listpangogp<-sort(listpangogp)
 #division colours for heatmap
-df_PTs <-data.frame(divisions=metasub1$division2) #make df for heatmaps
-rownames(df_PTs) <- metasub1$label #needs row names for heatmaps
+df_PTs <-data.frame(divisions=metasub1$province) #make df for heatmaps
+rownames(df_PTs) <- metasub1$EPI #needs row names for heatmaps
 
 #division colours
-listPTs <- unique(metasub1$division2)
+listPTs <- unique(metasub1$province)
 listPTs <- listPTs[order(listPTs)]
-listPTs <- listPTs[-3] #remove hubei
-getpal2 <- colorRampPalette(brewer.pal(9, "Spectral")) #"Set3
+listPTs <- listPTs[-11] #remove hubei
+getpal2 <- colorRampPalette(brewer.pal(10, "Spectral")) #"Set3
 pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
 
 ### time tree
-mrdate <- max(na.omit(metasub1$date))
+mrdate <- max(na.omit(metasub1$Date))
 
-p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("label", "Variant"), drop=FALSE] + 
+p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = Variant), size=0.5)+ #, shape= lab
-  scale_color_manual(breaks=listpangogp, values = pal)+
+  geom_tippoint(aes(color = pango.group), size=0.5)+ #, shape= lab
+  scale_color_manual(breaks=listpangogp,values=pal)+
   #ggtitle("Time tree - Canada - downsample1")+
   coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
   guides(color = guide_legend(override.aes = list(size = 4) ) )+
@@ -369,9 +362,9 @@ plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F
   scale_fill_manual(breaks=listPTs, values = pal2)
 
 ### diversity ML tree
-p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("label", "Variant"), drop=FALSE] + 
+p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = Variant), size=0.5)+ 
+  geom_tippoint(aes(color = pango.group), size=0.5)+ 
   scale_color_manual(breaks=listpangogp, values = pal)+
   #ggtitle("ML tree - Canada - subsample1, n = 8K")+
   coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
@@ -384,7 +377,7 @@ plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F
 ```
 
 ```{r}
-table(metasub1$Variant)
+table(metasub1$pango.group)
 ```
 
 ### Time Tree
@@ -408,26 +401,17 @@ For example, root-to-tip plots give estimates of substitution rates. Clusters wi
 Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
 ```{r, dpi=300}
 #RTT code contributed by Art Poon
-rooted <- read.tree('./data_needed/subsample1.1_8Ktrim_mltree.rtt.nwk')
-metadataRTT <- read.delim("./data_needed/subsample1.1_8Ktrim_metadata.tsv")
-
-get.dates <- function(phy, delimiter='_', pos=-1, format='%Y-%m-%d') {
-  dt <- sapply(phy$tip.label, function(x) {
-    tokens <- strsplit(x, delimiter)[[1]]
-    if (pos < 0) { return(tokens[length(tokens)+pos+1]) }
-    else { return(tokens[pos]) }
-  })
-  as.Date(dt, format=format)
-}
-tip.dates <- get.dates(rooted, pos=-2)
-
+rooted <- read.tree('./data_needed/iqtree_trimmed_noBA2.nwk')
+metadataRTT <- metasub1
+vocs<-names(pal)
+name_list<-rooted$tip.label
+index1<-match(name_list,metadataRTT$EPI)
+date <- metadataRTT$Date[index1]
+pg <- metadataRTT$pango.group[index1]
+date<-as.Date(date)
 # total branch length from root to each tip
 div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
 
-# match tips to metadata to retrieve PANGO lineage assignments
-accno <- gsub(".+_(EPI_ISL_[0-9]+)_.+", "\\1", rooted$tip.label)
-index <- match(accno, metadataRTT$Accession_ID)
-pg <- metadataRTT$pango.group[index]
 
 blobs <- function(x, y, col, cex=1) {
   points(x, y, pch=21, cex=cex)
@@ -438,23 +422,22 @@ dlines <- function(x, y, col) {
   lines(x, y, col=col)
 }
 
-vocs <- c('Alpha', 'Beta', 'Gamma', 'Delta', 'Omicron')
-pal <- hcl.colors(n=length(vocs), palette="Sunset")
+
 
 par(mar=c(5,5,0,1))
-plot(tip.dates, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
+plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
      xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-xx <- floor_date(seq(min(tip.dates), max(tip.dates), length.out=5), unit="months")
+xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
 axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
 
-blobs(tip.dates[pg=='other'], div[pg=='other'], col='grey', cex=0.8)
-fit0 <- rlm(div[pg=='other'] ~ tip.dates[pg=='other'])
+blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=0.8)
+fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
 abline(fit0, col='gray50')
 fits <- list(other=fit0)
 
 for (i in 1:length(vocs)) {
   variant <- vocs[i]
-  x <- tip.dates[pg==variant]
+  x <- date[pg==variant]
   if (all(is.na(x))) next
   y <- div[pg==variant]
   blobs(x, y, col=pal[i], cex=0.8)
@@ -463,7 +446,7 @@ for (i in 1:length(vocs)) {
   fits[[variant]] <- fit
 }
 
-legend(x=min(tip.dates), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
+legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
 ```
 
 
@@ -481,7 +464,7 @@ format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day)",
 format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
 ```
 
-Overall, the evolutionary rate among genomes sampled in Canada (`r lm(div ~ tip.dates)$coef[2]*29970` subs/genome/day, grey line) is close to the global average of `r 0.000822*29970/365` subs/genome/day.
+Overall, the evolutionary rate among genomes sampled in Canada (`r lm(div ~ date)$coef[2]*29970` subs/genome/day, grey line) is close to the global average of `r 0.000822*29970/365` subs/genome/day.
 Compared to other lineages sampled in Canada, variant of concern Alpha (B.1.1.7) exhibited a slightly but significantly lower rate of evolution.
 Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rates, although only Gamma was significantly higher.
 
@@ -517,7 +500,7 @@ plt.show()
 
 ```
 
-Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on genomes available on the 20th of january 2022).
+Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on all genomes available on GISAID on the 20th of February 2022).
 
 
 ## Aspirational  
