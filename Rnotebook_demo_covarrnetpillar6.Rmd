@@ -93,16 +93,16 @@ metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
 
 VOCVOI <- data.frame(name = character(),pattern = character(),color = numeric())
 VOCVOI[nrow(VOCVOI)+1, ]=list("Alpha",         "B.1.1.7|Q.","#B29C71")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta/Lambda/Mu","B.1.351",   "#F08C3A") #Beta
+VOCVOI[nrow(VOCVOI)+1, ]=list("Beta",         "B.1.351",   "#F08C3A") #Beta
 VOCVOI[nrow(VOCVOI)+1, ]=list("Gamma",         "P.",        "#444444")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Delta",         "B.1.617|AY.","#A6CEE3")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.25",   "AY.25",       "#61A6A0")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.27",   "AY.27",       "#438FC0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta/Lambda/Mu","C.37|C.37.1", "#F08C3A")#lambda
+VOCVOI[nrow(VOCVOI)+1, ]=list("Lambda",       "C.37|C.37.1", "#CD950C")#lambda
 VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.","#8B0000")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1.1","BA.1.1",       "#FA8072")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.2",  "BA.2",         "#FF0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta/Lambda/Mu","B.1.621",      "#F08C3A")#Mu
+VOCVOI[nrow(VOCVOI)+1, ]=list("Mu",           "B.1.621",      "#BB4513")#Mu
 VOCVOI[nrow(VOCVOI)+1, ]=list("A.23.1",        "A.23.1",       "#9AD378")
 VOCVOI[nrow(VOCVOI)+1, ]=list("B.1.438.1",     "B.1.438.1",    "#3EA534")
 #make a pango.group column
@@ -215,8 +215,9 @@ Other lineages of Canadian interest:
 
 Here we show the same plots but for each province. The NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/
 ```{r province list}
-
 metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
+metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
+metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
 ```
 
 ### British_Columbia  
@@ -315,16 +316,13 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 Canadian genomes were obtained from the GISAID msa on the 20th of February 2022 and down-sampled to one genome per lineage, province and month + one genome of each omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
 
-# Caveat
-
-In the tree trimming process, all BA.2 genomes were removed from the dataset, as they were flagged as outliers during the calculation of the molecular clock.
 
 ```{r message=FALSE}
 
 ### metadata and trees
 metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
-MLtree_sub1 <- read.tree("./data_needed/iqtree_trimmed_noBA2.nwk")
-ttree_sub1 <- read.tree("./data_needed/subsample_V1_timetree.nwk")
+MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
+ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
 
 ### needed for plotting
 pango_frame<-metaCANall[c("Pango_lineage","pango.group")]
@@ -351,28 +349,30 @@ mrdate <- max(na.omit(metasub1$Date))
 
 p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=0.5)+ #, shape= lab
+  geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
   scale_color_manual(breaks=listpangogp,values=pal)+
   #ggtitle("Time tree - Canada - downsample1")+
   coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
   guides(color = guide_legend(override.aes = list(size = 4) ) )+
   theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
 
-plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
-  scale_fill_manual(breaks=listPTs, values = pal2)
+plot1<-p1#don't plot provinces
+#plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
+#  scale_fill_manual(breaks=listPTs, values = pal2)
 
 ### diversity ML tree
 p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=0.5)+ 
+  geom_tippoint(aes(color = pango.group), size=1)+ 
   scale_color_manual(breaks=listpangogp, values = pal)+
   #ggtitle("ML tree - Canada - subsample1, n = 8K")+
   coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
   guides(color = guide_legend(override.aes = list(size = 4) ) )+
   theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
 
-plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
-  scale_fill_manual(breaks=listPTs, values = pal2)
+plot2<-p2
+#plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
+#  scale_fill_manual(breaks=listPTs, values = pal2)
 
 ```
 
@@ -401,7 +401,7 @@ For example, root-to-tip plots give estimates of substitution rates. Clusters wi
 Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
 ```{r, dpi=300}
 #RTT code contributed by Art Poon
-rooted <- read.tree('./data_needed/iqtree_trimmed_noBA2.nwk')
+rooted <- MLtree_sub1
 metadataRTT <- metasub1
 vocs<-names(pal)
 name_list<-rooted$tip.label
@@ -430,7 +430,7 @@ plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
 xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
 axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
 
-blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=0.8)
+blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
 fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
 abline(fit0, col='gray50')
 fits <- list(other=fit0)
