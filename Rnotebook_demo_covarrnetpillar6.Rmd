@@ -43,6 +43,8 @@ library(colorspace)
 library(viridis)
 library(MASS)
 
+library(bbmle)
+library(HelpersMG)
 
 theme_set(theme_classic())
 
@@ -73,7 +75,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 # Caveats
 
-Because of the evolving screening and sequencing strategies over time, publicly available genomes do not necessarily represent the actual proportions of circulating lineages. Thus, we would like to highlight that the data and analyses presented here may be impacted by potential biases resulting from the variability of jurisdictional sampling, screening, sequencing methods and strategies.
+All analyses below draw on the most recent publicly available viral sequence data, and should be interpreted with caution due to lags in reporting and biases that can differ across provinces or territories. For example, specific variants or populations might be prioritized for sequencing at certain times in certain jurisdictions. When possible, these differences in sampling strategies are mentioned but they are not always known. These analyses are subject to change given new data.
 
 ```{r load_data}
 
@@ -83,10 +85,12 @@ gisaiddate="2022_03_01"
 
 metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
-#max(metaCANall$Collection.date) - min(metaCANall$Collection.date) #time diff: 580 days
+
+metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
+metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
+metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
 
 #make a pango.group column
-
 VOCVOI <- data.frame(name = character(),pattern = character(),color = numeric())
 VOCVOI[nrow(VOCVOI)+1, ]=list("Alpha",         "B.1.1.7|Q.","#B29C71")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Beta",         "B.1.351",   "#F08C3A") #Beta
@@ -95,7 +99,7 @@ VOCVOI[nrow(VOCVOI)+1, ]=list("Delta",         "B.1.617|AY.","#A6CEE3")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.25",   "AY.25",       "#61A6A0")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.27",   "AY.27",       "#438FC0")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Lambda",       "C.37|C.37.1", "#CD950C")#lambda
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.","#8B0000")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.1","#8B0000")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1.1","BA.1.1",       "#FA8072")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.2",  "BA.2",         "#FF0000")
 VOCVOI[nrow(VOCVOI)+1, ]=list("Mu",           "B.1.621",      "#BB4513")#Mu
@@ -145,13 +149,8 @@ maxdate=as.Date("2022-02-28")
 colorcases="#138808"
 
 
-  
 plot_metadatadf <- function(meta_tab,cases) {
-  meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
-  meta_tab <- filter(meta_tab, meta_tab$Collection_date > mindate)
-  meta_tab <- filter(meta_tab, meta_tab$Collection_date < maxdate)
-  meta_tab <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
-  meta_tab <- meta_tab %>% group_by(week) %>% count(pango.group)
+  meta_tab = meta_tab %>% filter(!is.na(Collection_date),Collection_date > mindate,Collection_date < maxdate) %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) %>% count(pango.group)
   cases <- filter(cases, cases$date > mindate)
   cases <- filter(cases, cases$date < maxdate)
   cases <- cases %>% group_by(week = cut(date, "week")) #adds week column
@@ -170,11 +169,7 @@ plot_metadatadf <- function(meta_tab,cases) {
     theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
 plot_metadatadf_freq <- function(meta_tab,cases) {
-  meta_tab <- filter(meta_tab, !is.na(meta_tab$Collection_date))
-  meta_tab <- filter(meta_tab, meta_tab$Collection_date > mindate)
-  meta_tab <- filter(meta_tab, meta_tab$Collection_date < maxdate)
-  meta_tab <- meta_tab %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) #adds week coloum
-  meta_tab <- meta_tab %>% group_by(week) %>% count(pango.group)
+  meta_tab = meta_tab %>% filter(!is.na(Collection_date),Collection_date > mindate,Collection_date < maxdate) %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) %>% count(pango.group)
   meta_tab %>% mutate(freq = prop.table(n)) -> dfprop
   cases <- filter(cases, cases$date > mindate)
   cases <- filter(cases, cases$date < maxdate)
@@ -193,6 +188,7 @@ plot_metadatadf_freq <- function(meta_tab,cases) {
     scale_y_continuous(name = "sequenced cases per day",sec.axis = sec_axis(~./ratio, name="recorded cases per day",labels=label_number_auto()))+
     theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
+
 plot_metadatadf(metaCANall,epidataCANall)
 plot_metadatadf_freq(metaCANall,epidataCANall)
 
@@ -205,16 +201,10 @@ Other lineages of Canadian interest:
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - an American (USA) lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
- 
 
 ## Provinces {.tabset}
 
 Here we show the same plots but for each province. The NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/
-```{r province list}
-metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
-metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
-metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
-```
 
 ### British Columbia  
 [include here: provincial specific caveats or points provinces want to make]  
@@ -311,6 +301,230 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 # Methodology
 
 Canadian genomes were obtained from the GISAID msa on the 20th of February 2022 and down-sampled to one genome per lineage, province and month + one genome of each omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+
+
+# Likelihood estimator of selection given two lineages
+
+## Omicron in Canada
+
+```{r example_summaries}
+
+name1<-"BA.1" #Can include a list here (first value is used as plot labels)
+name2<-"BA.1.1" #Can include a list here (first value is used as plot labels)
+name3<-"BA.2" #Can include a list here (first value is used as plot labels)
+  
+#Set a starting date
+#Note that the startdate shouldn't be too much before both alleles become common
+#or rare migration events that die off could throw off the estimation procedure 
+#(so that the parameter estimates account for the presence of those alleles long in the past).
+startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
+
+a = metaCANall %>% filter(grepl("BA.", Pango_lineage), province <= "British_Columbia", !is.na(Collection_date)) %>% group_by(Collection_date) %>% count(Pango_lineage)
+b = metaCANall %>% filter(grepl("BA.", Pango_lineage), province <= "Alberta", !is.na(Collection_date)) %>% group_by(Collection_date) %>% count(Pango_lineage)
+mydatalist=list(a,b)
+
+
+for( mydata in mydatalist){
+  
+  #Set the final date:
+  lastdate<-max(mydata$Collection_date)
+  
+  #filter data to after that starting date
+  data1 <- filter(mydata, Pango_lineage %in% name1)
+  data1 <- filter(data1, Collection_date >= startdate)
+  data2 <- filter(mydata, Pango_lineage %in% name2)
+  data2 <- filter(data2, Collection_date >= startdate)
+  data3 <- filter(mydata, Pango_lineage %in% name3)
+  data3 <- filter(data3, Collection_date >= startdate)
+  
+  #convert time to an integer counter for use in fitting, first using the last date as time 0:
+  data1$time = as.numeric(difftime(data1$Collection_date, lastdate, units = "days"))
+  data2$time = as.numeric(difftime(data2$Collection_date, lastdate, units = "days"))
+  data3$time = as.numeric(difftime(data3$Collection_date, lastdate, units = "days"))
+  
+  #allow multiple Pango lineages to be combined if name1 or name2 includes a list, summing n
+  data1 <- as.data.frame(unique(data1 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
+  data2 <- as.data.frame(unique(data2 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
+  data3 <- as.data.frame(unique(data3 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
+  name1 <- name1[[1]]
+  name2 <- name2[[1]]
+  name3 <- name3[[1]]
+  data1$Pango_lineage <- name1
+  data2$Pango_lineage <- name2
+  data3$Pango_lineage <- name3
+  
+  #join lists in a dataframe to plot proportions and represent time as a list of integers
+  timestart<-as.numeric(difftime(startdate, lastdate, units = "days"))
+  timeend<-as.numeric(difftime(lastdate, lastdate, units = "days"))
+  toplot <- data.frame(time = seq.int(timestart,timeend))
+  toplot$n1 <- data1$n[match(toplot$time,data1$time)]
+  toplot$n2 <- data2$n[match(toplot$time,data2$time)]
+  toplot$n3 <- data3$n[match(toplot$time,data3$time)]
+  toplot[is.na(toplot)] = 0 #Any NA's refer to no variant of that type on a day, set to zero
+  
+  
+  #To aid in the ML search, we rescale time to be centered as close as possible
+  #to the midpoint for the second variable (p=0.5), to make sure that the alleles 
+  #are segregating at the reference date.
+  #If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
+  refdate<-which(abs(toplot$n2/(toplot$n1+toplot$n2+toplot$n3)-0.5)==min(abs(toplot$n2/(toplot$n1+toplot$n2+toplot$n3)-0.5),na.rm=TRUE))
+  refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
+  timeend <- (timeend-timestart)-refdate
+  timestart <- -refdate
+  toplot$time <- seq.int(timestart,timeend)
+  data1$time <- data1$time + (timeend-timestart)-refdate
+  data2$time <- data2$time + (timeend-timestart)-refdate
+  data3$time <- data3$time + (timeend-timestart)-refdate
+  
+  #date converter
+  dateseq <- seq.Date(startdate,lastdate,"days")
+  dateconverter <- data.frame(time=toplot$time,date=dateseq)
+  
+  # plot(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$time,xlab="Time",ylab="proportion",ylim=c(0,1),col=col2)
+  # points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$time,xlab="Time",ylab="proportion",cex=0.5,col=col3)
+  #With time started in this way, we can use 0.5 as the frequency at t=0 (startp):
+  startp <- 0.5
+  #To get an estimate for the initial p value to try, we average the last 10 points before refdate
+  #tempforp <- which(0 == data2$time)
+  #startp <- mean(toplot$n2[(tempforp-9):tempforp])/(mean(toplot$n1[(tempforp-9):tempforp])+mean(toplot$n2[(tempforp-9):tempforp]))
+  
+  ##############################
+  # Likelihood with two types
+  ##############################
+  ################################
+  # Using mle2 and profile in BBMLE
+  ################################
+  #Alternatively, it looks like the BBMLE package performs well and gives
+  #confidence intervals for the parameters.  Here, we have to flip the sign
+  #of the log-likelihood directly for use with mle2 (can't send control=list(fnscale=-1) through?).
+  trifunc <- function(p2,p3,s2,s3){
+    -(sum(data1$n*log((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time))))+
+        sum(data2$n*log(p2*exp(s2*data2$time)/((1-p2-p3)+p2*exp(s2*data2$time)+p3*exp(s3*data2$time))))+
+        sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
+  }
+  startpar<-list(p2=startp, p3=0.05, s2=0.1, s3=0.1)
+  bbml<-mle2(trifunc, start = startpar)
+  bbml
+  #lnL
+  bbml.value<--bbml@min
+  
+  #These confidence intervals are similar (I PREFER uniroot based on the profile likelihood procedure)
+  #confint(bbml) # based on inverting a spline fit to the profile 
+  
+  #confint(bbml,method="quad") # based on the quadratic approximation at the maximum likelihood estimate
+  
+  myconf<-confint(bbml,method="uniroot") # based on root-finding to find the exact point where the profile crosses the critical level
+  myconf
+  
+  #Interesting way of profiling the likelihood
+  #bbprofile<-profile(bbml)
+  #plot(bbprofile)
+  #proffun(bbml)
+  
+  ################################
+  # Drawing random parameters for CI
+  ################################
+  #We can draw random values for the parameters from the Hessian to determine the
+  #variation in {p,s} combinations consistent with the data using RandomFromHessianOrMCMC.
+  
+  
+  
+  #We can also generate confidence intervals accounting for uncertainty in all parameters 
+  #by drawing from the covariance matrix estimated from the Hessian (the matrix of double derivatives
+  #describing the curvature of the likelihood surface near the ML peak).
+  bbfit<-c(p2=bbml@details[["par"]][["p2"]],p3=bbml@details[["par"]][["p3"]],
+           s2=bbml@details[["par"]][["s2"]],s3=bbml@details[["par"]][["s3"]])
+  bbfit
+  bbhessian<-bbml@details[["hessian"]]
+  colnames(bbhessian) <- c("p2","p3","s2","s3")
+  rownames(bbhessian) <- c("p2","p3","s2","s3")
+  bbhessian
+  
+  df <- RandomFromHessianOrMCMC(Hessian=(bbhessian), 
+                                fitted.parameters=bbfit, 
+                                method="Hessian",replicates=1000)$random
+  
+  #Once we get the set of {p,s} values, we can run them through the s-shaped curve of selection
+  scurve1 <- function(p2,p3,s2,s3){
+    (p2*exp(s2*toplot$time)/((1-p2-p3)+p2*exp(s2*toplot$time)+p3*exp(s3*toplot$time)))
+  }
+  
+  scurve2 <- function(p2,p3,s2,s3){
+    (p3*exp(s3*toplot$time)/((1-p2-p3)+p2*exp(s2*toplot$time)+p3*exp(s3*toplot$time)))
+  }
+  
+  #Generating a list of frequencies at each time point given each {p,s} combination
+  #NOTE - We could run more time points, if projections into the future were desired just by 
+  #extending toplot$time
+  setofcurves2 <- t(mapply(scurve1,df[,1],df[,2],df[,3],df[,4]))
+  setofcurves3 <- t(mapply(scurve2,df[,1],df[,2],df[,3],df[,4]))
+  
+  #95% innerquantiles
+  lowercurve1 <- c()
+  uppercurve1 <- c()
+  lowercurve2 <- c()
+  uppercurve2 <- c()
+  for (tt in 1:length(toplot$time))  {
+    lower1<-quantile(setofcurves2[,tt],0.025)
+    upper1<-quantile(setofcurves2[,tt],0.975)
+    lowercurve1<-append(lowercurve1,lower1)
+    uppercurve1<-append(uppercurve1,upper1)
+    
+    lower2<-quantile(setofcurves3[,tt],0.025)
+    upper2<-quantile(setofcurves3[,tt],0.975)
+    lowercurve2<-append(lowercurve2,lower2)
+    uppercurve2<-append(uppercurve2,upper2)
+  }
+  #add date column
+  toplot$date <- dateconverter$date
+  
+  #A graph with 95% quantiles based on the Hessian draws.
+  
+  #png(file=paste0("curves_",i,".png"))
+  plot(y=uppercurve1,x=toplot$date,type="l",xlab="",ylab="proportion",ylim=c(0,1))
+  points(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha("red", 0.7), cex=sqrt(toplot$n2)/3)#cex=(toplot$n2/log(10))/20)#cex=toplot$n2/50 )#cex = 0.5)
+  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha("blue", 0.7), cex=sqrt(toplot$n3)/3)#, cex=(toplot$n3/log(10))/20) #cex=toplot$n3/50 )#cex = 0.5)
+  polygon(c(toplot$date, rev(toplot$date)), c(lowercurve1, rev(uppercurve1)),col = alpha("red", 0.5))
+  polygon(c(toplot$date, rev(toplot$date)), c(lowercurve2, rev(uppercurve2)),col = alpha("blue", 0.5))
+  lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+        x=toplot$date,type="l")
+  lines(y=(bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+        x=toplot$date,type="l")
+  str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf[3],3),nsmall=3),format(round(myconf[7],3),nsmall=3))
+  str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf[4],3),nsmall=3),format(round(myconf[8],3),nsmall=3))
+  text(x=toplot$date[1],y=0.95,str2,col = col2,pos=4, cex = 1)
+  text(x=toplot$date[1],y=0.87,str3,col = col3,pos=4, cex = 1)
+  #dev.off()
+  
+  ################################
+  # Looking for a breakpoint
+  ################################
+  # Visually looking for breaks in the slope over time (formal breakpoint search
+  # is in the two variant code).
+  
+  #png(file=paste0("logit_",i, ".png"))
+  options( scipen = 5 )
+  plot(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date, pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/3,
+       log="y",ylim=c(0.001,1000), yaxt = "n", xlab="",ylab="logit")
+  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date, pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/3)
+  lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+        x=toplot$date, type="l",col="black")#, col=col2)
+  lines(y=(bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+        x=toplot$date, type="l",col = "black")#, col=col3)
+  str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf[3],3),nsmall=3),format(round(myconf[7],3),nsmall=3))
+  str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf[4],3),nsmall=3),format(round(myconf[8],3),nsmall=3))
+  text(x=toplot$date[1],y=500,str2,col = col2,pos=4, cex = 1)
+  text(x=toplot$date[1],y=200,str3,col = col3,pos=4, cex = 1)
+  axis(2, at=c(0.001,0.01,0.1,1,10,100,1000), labels=c(0.001,0.01,0.1,1,10,100,1000))
+  dev.off()
+  
+  #Bends suggest a changing selection over time (e.g., due to the impact of vaccinations
+  #differentially impacting the variants). Sharper turns are more often due to NPI measures. 
+}
+#####################################################
+# tabs for displaying in notebook
+#each PT tab should have curve plot and breakpoint plot side by side
+```
 
 
 ```{r message=FALSE}
@@ -449,7 +663,7 @@ legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8
 
 ```{r}
 ci <- lapply(fits, confint.default)
-kable(data.frame(... = 
+kable(data.frame(
   n=sapply(fits, function(f) nrow(f$x)),                            
   est=29970*sapply(fits, function(f) f$coef[2]),
   lower.95=29970*sapply(ci, function(f) f[2,1]),
