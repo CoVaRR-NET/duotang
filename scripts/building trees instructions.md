@@ -51,7 +51,7 @@
 
    Local command:
    
-      treetime --tree tree_file.nwk --aln alignment.fasta --dates dates.tsv --reroot IDofseq
-   
+      treetime --tree tree_file.nwk --aln alignment.fasta --dates dates.tsv --reroot IDofseq --clock-filter 0
+    
    the --reroot function forces the root to be the sequence you designate (e.g. IDofseq =  "Wuhan/WIV04/2019")  
    Note: if you get any sequences "in the future" then these needed to be pruned in step 3. Remove them.

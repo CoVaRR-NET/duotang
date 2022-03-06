@@ -81,7 +81,7 @@ Because of the evolving screening and sequencing strategies over time, publicly 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_03_01"
+gisaiddate="2022_03_04"
 
 metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
@@ -207,11 +207,6 @@ Other lineages of Canadian interest:
 ## Provinces {.tabset}
 
 Here we show the same plots but for each province. The NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/
-```{r province list}
-metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
-metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
-metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
-```
 
 ### BC
 #### British Columbia  
@@ -335,8 +330,15 @@ name3<-"BA.2" #Can include a list here (first value is used as plot labels)
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
 
-for( prov in list("Alberta","British_Columbia","Ontario")){
-  mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == "British_Columbia", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+for( prov in list("Canada (no AB)","British_Columbia","Saskatchewan","Ontario")){
+  prov="British_Columbia"
+  mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  if(prov=="East provinces (NL+NS+NB+ON+QC)"){
+    mydata= metaCANall %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador","Quebec","Ontario"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  }
+  if(prov=="Canada (no AB)"){
+    mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  }
   
   #Set the final date:
   lastdate<-max(mydata$Collection_date)
@@ -374,7 +376,8 @@ for( prov in list("Alberta","British_Columbia","Ontario")){
   #to the midpoint for the second variable (p=0.5), to make sure that the alleles 
   #are segregating at the reference date.
   #If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
-  refdate<-which(abs(toplot$n2/(toplot$n1+toplot$n2+toplot$n3)-0.5)==min(abs(toplot$n2/(toplot$n1+toplot$n2+toplot$n3)-0.5),na.rm=TRUE))
+  v=toplot$n1*toplot$n2*toplot$n3
+  refdate<-which(v==max(v,na.rm=TRUE))
   refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
   timeend <- (timeend-timestart)-refdate
   timestart <- -refdate

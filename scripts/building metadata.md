@@ -1,9 +1,9 @@
 # this lines allow to build a metadata table from GISAID metadata and to correct them using  virusseq-dataportal
 
 #Report the date of the GISAID metadata downloaded in the Rnotebook
-date=2022_03_01
+date=2022_03_04
 #this key come from the file downloaded on virusseq-dataportal.ca
-filefromVirusSeq=ca932c34-22dc-4f95-918c-152a2904464b
+filefromVirusSeq=c6440a4c-5690-408a-ba5f-d10f95e47a91
 
 #extract and reformat the metadatas from GISAID
 tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR==1 || substr($1,9,6)=="Canada" && $8=="Human"' | sort -k3,3 > metadata_CANall_$date.uncorrected.csv 
