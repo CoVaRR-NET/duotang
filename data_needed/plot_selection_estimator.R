@@ -1,6 +1,8 @@
-library(tidytree)
-library(bbmle)
-library(HelpersMG)
+suppressMessages(suppressWarnings(library(tidytree)))
+suppressMessages(suppressWarnings(library(bbmle)))
+suppressMessages(suppressWarnings(library(HelpersMG)))
+
+
 plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
   if(prov=="East provinces (NL+NS+NB+ON+QC)"){
@@ -202,5 +204,5 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   #Bends suggest a changing selection over time (e.g., due to the impact of vaccinations
   #differentially impacting the variants). Sharper turns are more often due to NPI measures. 
 }
-detach('package:bbmle')
-detach('package:HelpersMG')
+
+

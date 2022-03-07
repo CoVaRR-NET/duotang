@@ -316,7 +316,6 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-#metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
 MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
 ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
 
@@ -451,7 +450,6 @@ Of particular interest when there is any newly arriving or emerging lineage is w
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates calculated here. Canada wide estimates, thus, do not include this province. 
 
 ```{r setting function for selection estimator}
-
 name1<-"BA.1" #Can include a list here (first value is used as plot labels)
 name2<-"BA.1.1" #Can include a list here (first value is used as plot labels)
 name3<-"BA.2" #Can include a list here (first value is used as plot labels)
@@ -467,8 +465,6 @@ source("data_needed/plot_selection_estimator.R")
 #each PT tab should have curve plot and breakpoint plot side by side
 ```
 
-##Methods
-[enter methods here]
 
 ### Canada
 #### Canada without Alberta
@@ -498,7 +494,8 @@ plot_selection_estimator("Saskatchewan",startdate,name1,name2,name3)
 plot_selection_estimator("Ontario",startdate,name1,name2,name3)
 ```
 
-
+### Methods
+[enter methods here]
 
 # Root-to-tip analyses  
 
@@ -506,8 +503,9 @@ Root-to-tip plots give estimates of substitution rates. Clusters with stronger p
 
 ```{r, dpi=300}
 #RTT code contributed by Art Poon
-rooted <- MLtree_sub1
-metadataRTT <- metasub1
+metadataRTT<-read.table("data_needed/subsampling_metadata_V1.tsv",h=T)
+metadataRTT<-merge(metadataRTT,metasub1,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
+rooted <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
 vocs<-names(pal)
 name_list<-rooted$tip.label
 index1<-match(name_list,metadataRTT$EPI)
