@@ -1,6 +1,6 @@
 ---
 title: "CoVaRR-Net"
-subtitle: "Proof of concept: Genomic epidemiology analyses and mathematical modelling notebook"
+subtitle: "Genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
@@ -61,27 +61,26 @@ opts_knit$set(root.dir = getwd())
 
 ### Contributing authors:  
 
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Art Poon, Jesse Shaprio. Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ) which include: Sally Otto, Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and Erin Gill. 
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sally Otto, Art Poon, Jesse Shaprio. Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ) which include: Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, William Hsiao, and Erin Gill. 
 
-Sequence collection, generation, and release: Canadian laboratories across the country are making these data publicly available. A complete list of lab authors is in this repository and more details are below in the Acknowledgement section.   
-[ideally: add lab list right here with drop-down menu (?)]
+Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here. A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
-# Introduction
+
+# Introduction  
 
 This notebook is to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim to investigate viral evolution and spread. It is for discussion with pillar 6's team and for sharing with collaborators, e.g. PH labs. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), discussions with the science communication pillar for public dissemination, and the code can be used or repackaged for public health authorities/laboratories for their internal use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here. 
 [aim: use only VirusSeq Portal data]
 
-# Caveats
-
+**Caveat**
 Because of the evolving screening and sequencing strategies over time, publicly available genomes do not necessarily represent the actual proportions of circulating lineages. Thus, we would like to highlight that the data and analyses presented here may be impacted by potential biases resulting from the variability of jurisdictional sampling, screening, sequencing methods and strategies.
 
 ```{r load_data}
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_03_01"
+gisaiddate="2022_03_04"
 
 metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
@@ -130,15 +129,13 @@ epidate = tail(epidataCANall,1)$date #download date
 
 ```
 
-# Snapshot: SARS-CoV-2 in Canada
 
+# SARS-CoV-2 in Canada
 
+## Variants in Canada over time
 
-## Variants in Canada
-
-Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`, shows that by end of summer Alpha and Gamma were still the most sequenced variants. From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). Case counts over time are added for comparison as sequencing coverage varies over time.
-
-Important caveat: This plot shows the changing composition of sequences posted to GISAID and the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, and only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
+**Important caveat:**  
+These plots show the changing composition of sequences posted to GISAID and the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, and only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
 
@@ -195,27 +192,32 @@ plot_metadatadf_freq(metaCANall,epidataCANall)
 
 ```
 
+Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
+
+
+From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jursictional differences of these plots.    
+
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
 
 Other lineages of Canadian interest:  
 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
-* B.1.2 - an American (USA) lineage that spread well in Canada  
+* B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
  
 
 ## Provinces {.tabset}
 
-Here we show the same plots but for each province. The NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/
-```{r province list}
-metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
-metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
-metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
-```
+Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/  
+
+**Disclaimer:**   
+All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions. When possible, these differences in sampling strategies are mentioned but they are not always known. These analyses are subject to change given new data.  
+
+With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021, and thus switched to targeted testing of priority groups (e.g. hospitalized patients, health care workers, and people in high-risk settings). Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
 
 ### BC
 #### British Columbia  
-[include here: provincial specific caveats or points provinces want to make]  
+Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized)
 More up-to-date covid data for this province can be found here:  
 http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
 ```{r provinceplot_British_Columbia, fig.show="hold", out.width="50%"}
@@ -226,7 +228,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### AL
 #### Alberta
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
 ```{r provinceplot_Alberta, fig.show="hold", out.width="50%"}
@@ -237,7 +238,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### SK
 #### Saskatchewan
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
 ```{r provinceplot_Saskatchewan, fig.show="hold", out.width="50%"}
@@ -248,7 +248,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### MB
 #### Manitoba
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
 ```{r provinceplot_Manitoba, fig.show="hold", out.width="50%"}
@@ -259,7 +258,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### ON
 #### Ontario
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
 ```{r provinceplot_Ontario, fig.show="hold", out.width="50%"}
@@ -270,7 +268,7 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### QC
 #### Quebec
-[include here: provincial specific caveats or points provinces want to make]  
+Provincial random sequencing has been temporarily suspended as of Feb 8th, 2021. Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie 
 More up-to-date covid data for this province can be found here:  
 https://www.inspq.qc.ca/covid-19/donnees/variants
 ```{r provinceplot_Quebec, fig.show="hold", out.width="50%"}
@@ -281,7 +279,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### NS
 #### Nova Scotia
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
 ```{r provinceplot_Nova_Scotia, fig.show="hold", out.width="50%"}
@@ -292,7 +289,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### NB
 #### New Brunswick
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
 ```{r provinceplot_New_Brunswick, fig.show="hold", out.width="50%"}
@@ -303,7 +299,6 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ### NL
 #### Newfoundland and Labrador
-[include here: provincial specific caveats or points provinces want to make]  
 More up-to-date covid data for this province can be found here:  
 https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 ```{r provinceplot_Newfoundland_and_Labrador, fig.show="hold", out.width="50%"}
@@ -312,18 +307,136 @@ plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ w
 plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
 ```
 
-## Canadian trees {.tabset}
 
-# Methodology
+## Canadian trees {.tabset}  
 
-Canadian genomes were obtained from the GISAID msa on the 20th of February 2022 and down-sampled to one genome per lineage, province and month + one genome of each omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada. 
+[ADD HERE A CAVEAT IF WE INCLUDE THE PROVINCIAL HEATMAP AND IF IT'S WELLMIXED OR NOT]
+
+```{r message=FALSE}
+
+### metadata and trees
+metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
+MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
+ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
+
+### needed for plotting
+pango_frame<-metaCANall[c("Pango_lineage","pango.group")]
+pango_col<-pango_frame %>% distinct()#make a lookup table for all lineages to pango.group
+metasub1<-merge(metasub1,pango_col,by.x="Variant",by.y="Pango_lineage",all.y=FALSE,all.x=TRUE)
+division_frame<-metaCANall[c("Virus_name","province")]
+metasub1<-merge(metasub1,division_frame,by.x="GISAID",by.y="Virus_name",all.y=FALSE,all.x=TRUE)
+listpangogp<-unique(metasub1$pango.group)
+listpangogp<-sort(listpangogp)
+#division colours for heatmap
+df_PTs <-data.frame(divisions=metasub1$province) #make df for heatmaps
+rownames(df_PTs) <- metasub1$EPI #needs row names for heatmaps
+
+#division colours
+listPTs <- unique(metasub1$province)
+listPTs <- listPTs[order(listPTs)]
+listPTs <- listPTs[-11] #remove hubei
+getpal2 <- colorRampPalette(brewer.pal(10, "Spectral")) #"Set3
+pal2 <- getpal2(length(listPTs))
+names(pal2) <- listPTs
+
+### time tree
+mrdate <- max(na.omit(metasub1$Date))
+
+p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1)+
+  geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
+  scale_color_manual(breaks=listpangogp,values=pal)+
+  #ggtitle("Time tree - Canada - downsample1")+
+  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )+
+  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+
+plot1<-p1#don't plot provinces
+#plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
+#  scale_fill_manual(breaks=listPTs, values = pal2)
+
+### diversity ML tree
+p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1)+
+  geom_tippoint(aes(color = pango.group), size=1)+ 
+  scale_color_manual(breaks=listpangogp, values = pal)+
+  #ggtitle("ML tree - Canada - subsample1, n = 8K")+
+  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )+
+  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+
+plot2<-p2
+#plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
+#  scale_fill_manual(breaks=listPTs, values = pal2)
+
+```
+
+```{r}
+table(metasub1$pango.group)
+```
+
+### Time Tree
+```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+plot1
+```
+
+### Diversity Tree
+```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+plot2
+```
 
 
-# Likelihood estimator of selection given two lineages
+## Mutational composition of Omicron
 
-## Omicron in Canada
+Compilation of analyses of omicron and its sublineages in Canada relative to global compositions.
 
-```{r message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+```{python}
+#code developed by Rapahel Poujol and Susanne Kraemer
+import matplotlib.pyplot as plt
+import numpy as np
+from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
+
+# percent of alt alleles to add mutation label
+# File containing label
+# Default is AminoAcid labels for non synonymous mutations
+def_min_val_label(15)
+load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
+p="data_needed/raphgraph/msa_0220_"
+
+
+namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
+pathlist=[p+i+".var" for i in namelist]
+
+namelist=[i.replace("_","\n") for i in namelist]
+tablelist=openfiles(pathlist)
+
+poslist=getpositions(tablelist,percentmin=75,addmissing=False)
+poslist=[i for i in poslist if i>50 and i<29950]
+bighist(tablelist,poslist,namelist,mytitle="Omicron mutations: Canada and worldwide")
+plt.show()
+
+```
+
+Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on all genomes available on GISAID on the [ADD CORRECT DATE]).
+
+
+
+
+# Evolution and growth of SARS-CoV-2 in Canada  
+
+There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods.
+
+
+## Likelihood estimator of selection given two lineages {.tabset}  
+
+Of particular interest when there is any newly arriving or emerging lineage is whether it has a selective advantage (and by how much) relative to the lineages already circulating in the population. Given the current national dominance of Omicron, the estimator is applied to the sublineages of Omicron.
+[ADD HERE HOW TO READ THE VALUES, AND MAYBE A PREVIOUS VOC AT EMERGENCE TO COMPARE/BASELINE]
+
+**Caveat**
+Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates calculated here. Canada wide estimates, thus, do not include this province. 
+
+```{r setting function for selection estimator}
 
 name1<-"BA.1" #Can include a list here (first value is used as plot labels)
 name2<-"BA.1.1" #Can include a list here (first value is used as plot labels)
@@ -335,8 +448,14 @@ name3<-"BA.2" #Can include a list here (first value is used as plot labels)
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
 
-for( prov in list("Alberta","British_Columbia","Ontario")){
-  mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == "British_Columbia", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
+  mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  if(prov=="East provinces (NL+NS+NB+ON+QC)"){
+    mydata= metaCANall %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador","Quebec","Ontario"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  }
+  if(prov=="Canada (no AB)"){
+    mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  }
   
   #Set the final date:
   lastdate<-max(mydata$Collection_date)
@@ -374,7 +493,8 @@ for( prov in list("Alberta","British_Columbia","Ontario")){
   #to the midpoint for the second variable (p=0.5), to make sure that the alleles 
   #are segregating at the reference date.
   #If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
-  refdate<-which(abs(toplot$n2/(toplot$n1+toplot$n2+toplot$n3)-0.5)==min(abs(toplot$n2/(toplot$n1+toplot$n2+toplot$n3)-0.5),na.rm=TRUE))
+  v=toplot$n1*toplot$n2*toplot$n3
+  refdate<-which(v==max(v,na.rm=TRUE))
   refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
   timeend <- (timeend-timestart)-refdate
   timestart <- -refdate
@@ -529,94 +649,46 @@ for( prov in list("Alberta","British_Columbia","Ontario")){
   #Bends suggest a changing selection over time (e.g., due to the impact of vaccinations
   #differentially impacting the variants). Sharper turns are more often due to NPI measures. 
 }
+
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
 ```
 
+### Canada
+#### Canada without Alberta
 
-```{r message=FALSE}
-
-### metadata and trees
-metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
-MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
-ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
-
-### needed for plotting
-pango_frame<-metaCANall[c("Pango_lineage","pango.group")]
-pango_col<-pango_frame %>% distinct()#make a lookup table for all lineages to pango.group
-metasub1<-merge(metasub1,pango_col,by.x="Variant",by.y="Pango_lineage",all.y=FALSE,all.x=TRUE)
-division_frame<-metaCANall[c("Virus_name","province")]
-metasub1<-merge(metasub1,division_frame,by.x="GISAID",by.y="Virus_name",all.y=FALSE,all.x=TRUE)
-listpangogp<-unique(metasub1$pango.group)
-listpangogp<-sort(listpangogp)
-#division colours for heatmap
-df_PTs <-data.frame(divisions=metasub1$province) #make df for heatmaps
-rownames(df_PTs) <- metasub1$EPI #needs row names for heatmaps
-
-#division colours
-listPTs <- unique(metasub1$province)
-listPTs <- listPTs[order(listPTs)]
-listPTs <- listPTs[-11] #remove hubei
-getpal2 <- colorRampPalette(brewer.pal(10, "Spectral")) #"Set3
-pal2 <- getpal2(length(listPTs))
-names(pal2) <- listPTs
-
-### time tree
-mrdate <- max(na.omit(metasub1$Date))
-
-p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
-  scale_color_manual(breaks=listpangogp,values=pal)+
-  #ggtitle("Time tree - Canada - downsample1")+
-  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
-  guides(color = guide_legend(override.aes = list(size = 4) ) )+
-  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
-
-plot1<-p1#don't plot provinces
-#plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
-#  scale_fill_manual(breaks=listPTs, values = pal2)
-
-### diversity ML tree
-p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=1)+ 
-  scale_color_manual(breaks=listpangogp, values = pal)+
-  #ggtitle("ML tree - Canada - subsample1, n = 8K")+
-  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
-  guides(color = guide_legend(override.aes = list(size = 4) ) )+
-  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
-
-plot2<-p2
-#plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
-#  scale_fill_manual(breaks=listPTs, values = pal2)
-
+```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator("Canada (no AB)",startdate,name1,name2,name3)
 ```
 
-```{r}
-table(metasub1$pango.group)
+### BC
+#### British Columbia
+
+```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator("British_Columbia",startdate,name1,name2,name3)
 ```
 
-### Time Tree
-```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
-plot1
+### SK
+#### Saskatchewan
+
+```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator("Saskatchewan",startdate,name1,name2,name3)
 ```
 
-### Diversity Tree
-```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
-plot2
+### Ontario
+#### Ontario
+
+```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator("Ontario",startdate,name1,name2,name3)
 ```
 
 
-## Evolution and growth rates of SARS-CoV-2 in Canada
 
-There are various methods to investigate changes in evolutionary rates of VOC/VOIs and compare their relative fitness in an epidemiological context.
+# Root-to-tip analyses  
 
-For example, root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumulating mutations at a faster pace, or clusters that jump up above the average could indicate a mutational jump (similar to what we saw with Alpha when it first appeared in the UK).
+Root-to-tip plots give estimates of substitution rates. Clusters with stronger positive slopes than the average SARS-CoV-2 dataset, are an indication that they are accumulating mutations at a faster pace, or clusters that jump up above the average could indicate a mutational jump (similar to what we saw with Alpha when it first appeared in the UK).
 
-<!--![](./data_needed/roottotip_CANall_downsamp1_demo.png)-->
-Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
 ```{r, dpi=300}
 #RTT code contributed by Art Poon
 rooted <- MLtree_sub1
@@ -668,7 +740,6 @@ legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8
 ```
 
 
-
 ```{r}
 ci <- lapply(fits, confint.default)
 kable(data.frame(
@@ -682,56 +753,35 @@ format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day)",
 format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
 ```
 
-Overall, the evolutionary rate among genomes sampled in Canada (`r lm(div ~ date)$coef[2]*29970` subs/genome/day, grey line) is close to the global average of `r 0.000822*29970/365` subs/genome/day.
-Compared to other lineages sampled in Canada, variant of concern Alpha (B.1.1.7) exhibited a slightly but significantly lower rate of evolution.
-Both variants of concern Gamma (P.1) and Delta (B.1.617.2) exhibited higher rates, although only Gamma was significantly higher.
+The evolutionary rate among genomes sampled in Canada is (`r lm(div ~ date)$coef[2]*29970` subs/genome/day, grey line). For comparison, the global average of `r 0.000822*29970/365` subs/genome/day [ADD REF - nextstrain estimate?].
 
 
-## Omicron in Canada
 
-Compilation of analyses of omicron and its sublineages in Canada.
-
-```{python}
-#code developed by Rapahel Poujol and Susanne Kraemer
-import matplotlib.pyplot as plt
-import numpy as np
-from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
-
-# percent of alt alleles to add mutation label
-# File containing label
-# Default is AminoAcid labels for non synonymous mutations
-def_min_val_label(15)
-load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
-p="data_needed/raphgraph/msa_0220_"
-
-
-namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
-pathlist=[p+i+".var" for i in namelist]
-
-namelist=[i.replace("_","\n") for i in namelist]
-tablelist=openfiles(pathlist)
-
-poslist=getpositions(tablelist,percentmin=75,addmissing=False)
-poslist=[i for i in poslist if i>50 and i<29950]
-bighist(tablelist,poslist,namelist,mytitle="Omicron mutations: Canada and worldwide")
-plt.show()
-
-```
-
-Mutational profile (point mutations>75%) of Omicron and its sublineages in Canada and global (based on all genomes available on GISAID on the 20th of February 2022).
-
-
-## Aspirational  
+# Underdevelopment and aspirational
 
 We are in the process of adding or would like to develop code for some of the following analyses:   
-* variant growth rates (Sally)  
 * dN/dS (by variant and by gene/domains)  
-* Tajima's D  
-* clustering analyses (Caroline)  
-* other? (e.g. PyR0, nnet R, ?)  
-* BEAST analyses? e.g. infer R0, serial interval, etc for the different Omicron sublineages (might have to wait for more BA.2)  
+* Tajima's D over time  
+* clustering analyses
+* genomically inferred epidemiological parameters: R0, serial interval, etc.
 
 With anonymized data on vaccination status, severity/outcome, reason for sequencing (e.g. outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving. Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
+
+
+# Methodology  
+
+## Phylogenetic trees
+Canadian genomes were obtained from the GISAID msa on the [ADD CORRECT DATE HERE] and down-sampled to one genome per lineage, province and month + one genome of each omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime) [ADD HERE ASSUMPTIONS, E.G. STRICT OR RELAXED CLOCK?], and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+
+## Selection Coefficents
+[SALLY ADDS HERE METHODS HERE]
+
+## Root-to-tip
+Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
+
+## Mutation composition graph
+[EXPLAIN HOW RAPH-GRAPH IS GENERATED]
+
 
 
 # List of useful tools
@@ -752,6 +802,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 * Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
 
 
+
 # Acknowledgements and Data sources
 
 We thank all the authors, developers, and contributors to the GISAID and VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN). 
@@ -764,11 +815,12 @@ Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID's 
 Shu, Y., McCauley, J. (2017) GISAID: From vision to reality. EuroSurveillance, 22(13), DOI: 10.2807/1560-7917.ES.2017.22.13.30494, PMCID: PMC5388101
 
 * The Canadian VirusSeq Data Portal (https://virusseq-dataportal.ca) 
-We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory(RRPL), Nova Scotia Health Authority, Alberta ProvLab North(APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory(NML), BCCDC Public Health Laboratory, Public Health Ontario(PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research(OICR), Manitoba Cadham Provincial Laborator, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
+We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory (RRPL), Nova Scotia Health Authority, Alberta ProvLab North (APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory (NML), Institut National de Sante Publique du Quebec (INSPQ), BCCDC Public Health Laboratory, Public Health Ontario (PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research (OICR), Provincial Public Health Laboratory Network of Nova Scotia, Centre Hospitalier Universitaire Georges L. Dumont - New Brunswick, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
 
 * Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
 
 * various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)  
+
 
 
 # Session info {.tabset}
