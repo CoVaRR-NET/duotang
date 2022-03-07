@@ -316,16 +316,22 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
+#metasub1 <- read.delim( "./data_needed/subsampling_metadata_V1.tsv")
 MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
 ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
+
+tips<-ttree_sub1$tip.label
+epis<-sapply(strsplit(tips,"\\|"),`[`,1)
+metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]
+ttree_sub1$tip.label<-epis
+
 
 ### needed for plotting
 pango_frame<-metaCANall[c("Pango_lineage","pango.group")]
 pango_col<-pango_frame %>% distinct()#make a lookup table for all lineages to pango.group
-metasub1<-merge(metasub1,pango_col,by.x="Variant",by.y="Pango_lineage",all.y=FALSE,all.x=TRUE)
-division_frame<-metaCANall[c("Virus_name","province")]
-metasub1<-merge(metasub1,division_frame,by.x="GISAID",by.y="Virus_name",all.y=FALSE,all.x=TRUE)
+#metasub1<-merge(metasub1,pango_col,by.x="Variant",by.y="Pango_lineage",all.y=FALSE,all.x=TRUE)
+#division_frame<-metaCANall[c("Virus_name","province")]
+#metasub1<-merge(metasub1,division_frame,by.x="GISAID",by.y="Virus_name",all.y=FALSE,all.x=TRUE)
 listpangogp<-unique(metasub1$pango.group)
 listpangogp<-sort(listpangogp)
 #division colours for heatmap
@@ -341,9 +347,9 @@ pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
 
 ### time tree
-mrdate <- max(na.omit(metasub1$Date))
+mrdate <- max(na.omit(metasub1$Collection_date))
 
-p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("EPI", "pango.group"), drop=FALSE] + 
+p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("Accession_ID", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1)+
   geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
   scale_color_manual(breaks=listpangogp,values=pal)+
