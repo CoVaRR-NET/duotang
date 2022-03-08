@@ -401,15 +401,30 @@ p3 <- ggtree(ttree_omi, mrsd = as.Date(mrdate)) %<+% metasub_omi[,c("Accession_I
 
 plot3 <- gheatmap(p3, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
   scale_fill_manual(breaks=listPTs, values = pal2)
+
+### omicron diversity tree
+MLtree_omi<-keep.tip(MLtree_sub1,all_omi)
+
+p4 <- ggtree(MLtree_omi) %<+% metasub_omi[,c("Accession_ID", "pango.group"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1)+
+  geom_tippoint(aes(color = pango.group), size=1)+ 
+  scale_color_manual(breaks=listpangogp, values = pal)+
+  #ggtitle("ML tree - Canada - subsample1, n = 8K")+
+  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )+
+  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+
+plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
+ scale_fill_manual(breaks=listPTs, values = pal2)
 ```
 
 ```{r}
 table(metasub1$pango.group)
 ```
 
-### Omicron Time Tree
+### Omicron Diversity Tree
 ```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
-plot3
+plot4
 ```
 
 ### Time Tree
