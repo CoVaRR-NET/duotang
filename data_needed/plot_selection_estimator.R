@@ -93,11 +93,10 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   #These confidence intervals are similar (I PREFER uniroot based on the profile likelihood procedure)
   #confint(bbml) # based on inverting a spline fit to the profile 
   
-  #confint(bbml,method="quad") # based on the quadratic approximation at the maximum likelihood estimate
+  myconf<-confint(bbml,method="quad") # based on the quadratic approximation at the maximum likelihood estimate
   
-  myconf<-confint(bbml,method="uniroot") # based on root-finding to find the exact point where the profile crosses the critical level
-  myconf
-  
+ # myconf<-confint(bbml,method="uniroot") # based on root-finding to find the exact point where the profile crosses the critical level
+
   #Interesting way of profiling the likelihood
   #bbprofile<-profile(bbml)
   #plot(bbprofile)
@@ -173,10 +172,10 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
         x=toplot$date,type="l")
   lines(y=(bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
         x=toplot$date,type="l")
-  str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf[3],3),nsmall=3),format(round(myconf[7],3),nsmall=3))
-  str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf[4],3),nsmall=3),format(round(myconf[8],3),nsmall=3))
+  str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf["s2","2.5 %"],3),nsmall=3),format(round(myconf["s2","97.5 %"],3),nsmall=3))
+  str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf["s3","2.5 %"],3),nsmall=3),format(round(myconf["s3","97.5 %"],3),nsmall=3))
   text(x=toplot$date[1],y=0.95,str2,col = col2,pos=4, cex = 1)
-  text(x=toplot$date[1],y=0.87,str3,col = col3,pos=4, cex = 1)
+  text(x=toplot$date[1],y=0.90,str3,col = col3,pos=4, cex = 1)
   #dev.off()
   
   ################################
@@ -187,17 +186,17 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   
   #png(file=paste0("logit_",i, ".png"))
   options( scipen = 5 )
-  plot(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date, pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/3,
+  plot(y=toplot$n2/toplot$n1,x=toplot$date, pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/3,
        log="y",ylim=c(0.001,1000), yaxt = "n", xlab="",ylab=paste0("logit in ",prov))
-  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date, pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/3)
-  lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+  points(y=toplot$n3/toplot$n1,x=toplot$date, pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/3)
+  lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/(1-bbfit[["p2"]]-bbfit[["p3"]])),
         x=toplot$date, type="l",col="black")#, col=col2)
-  lines(y=(bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+  lines(y=(bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time)/(1-bbfit[["p2"]]-bbfit[["p3"]])),
         x=toplot$date, type="l",col = "black")#, col=col3)
-  str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf[3],3),nsmall=3),format(round(myconf[7],3),nsmall=3))
-  str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf[4],3),nsmall=3),format(round(myconf[8],3),nsmall=3))
+  str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf["s2","2.5 %"],3),nsmall=3),format(round(myconf["s2","97.5 %"],3),nsmall=3))
+  str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf["s3","2.5 %"],3),nsmall=3),format(round(myconf["s3","97.5 %"],3),nsmall=3))
   text(x=toplot$date[1],y=500,str2,col = col2,pos=4, cex = 1)
-  text(x=toplot$date[1],y=200,str3,col = col3,pos=4, cex = 1)
+  text(x=toplot$date[1],y=250,str3,col = col3,pos=4, cex = 1)
   axis(2, at=c(0.001,0.01,0.1,1,10,100,1000), labels=c(0.001,0.01,0.1,1,10,100,1000))
   #dev.off()
   
