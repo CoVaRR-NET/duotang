@@ -422,11 +422,6 @@ plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F
 table(metasub1$pango.group)
 ```
 
-### Omicron Diversity Tree
-```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
-plot4
-```
-
 ### Time Tree
 ```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
 plot1
