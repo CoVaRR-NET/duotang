@@ -604,7 +604,7 @@ The above table reflects the substitution rate per unit time for a specific line
 
 
 
-# Future development
+## Future development
 
 We are in the process of adding or would like to develop code for some of the following analyses:   
 * dN/dS (by variant and by gene/domains)  
