@@ -18,6 +18,8 @@ mv temp epidatesfromvirrusseq_$date
 #join both files and replace sample dates from GISAID that are in virusseq-dataportal
 join -1 3 metadata_CANall_$date.uncorrected.csv -a 1 -2 1 epidatesfromvirrusseq_$date | awk '$4!=$23 && length($4)<10 && length($23)==10{$4=$23} {id=$1;$1=$2;$2=$3;$3=id} {print}' | tr ' ' '\t'| cut -f-22 > metadata_CANall_$date.csv
 
+#add ref here
+
 #this zip have to be placed in data_needed
 zip metadata_CANall_last.zip metadata_CANall_$date.csv
 
