@@ -73,8 +73,6 @@ This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiologica
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here. 
 [aim: use only VirusSeq Portal data]
 
-**Caveat**
-Because of the evolving screening and sequencing strategies over time, publicly available genomes do not necessarily represent the actual proportions of circulating lineages. Thus, we would like to highlight that the data and analyses presented here may be impacted by potential biases resulting from the variability of jurisdictional sampling, screening, sequencing methods, and strategies.
 
 ```{r load_data}
 
@@ -402,7 +400,7 @@ plot2
 
 ## Mutational composition of Omicron
 
-Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally ("final").
+Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally.
 
 ```{python}
 #code developed by Rapahel Poujol and Susanne Kraemer
@@ -418,7 +416,7 @@ load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
 p="data_needed/raphgraph/msa_0220_"
 
 
-namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
+namelist=["Canada.BA.1","Global.BA.1","Canada.BA.1.1","Global.BA.1.1","Canada.BA.2","Global.BA.2","Global.BA.3"]
 pathlist=[p+i+".var" for i in namelist]
 
 namelist=[i.replace("_","\n") for i in namelist]
