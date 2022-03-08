@@ -70,8 +70,7 @@ Sequence collection, generation, release, and feedback on analyses: Canadian lab
 
 This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread. It is for discussion with pillar 6's team and for sharing with collaborators, e.g. PH labs. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
 
-Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here. 
-[aim: use only VirusSeq Portal data]
+Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here.
 
 
 ```{r load_data}
@@ -193,7 +192,7 @@ plot_metadatadf_freq(metaCANall,epidataCANall)
 Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
 
 
-From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jursictional differences of these plots.    
+From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jursictional differences of these plots.    
 
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
 
@@ -308,8 +307,7 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 
 ## Canadian trees {.tabset}  
 
-Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada. 
-[ADD HERE A CAVEAT IF WE INCLUDE THE PROVINCIAL HEATMAP AND IF IT'S WELLMIXED OR NOT]
+Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
 
 ```{r message=FALSE}
 
@@ -337,7 +335,7 @@ listpangogp<-unique(metasub1$pango.group)
 listpangogp<-sort(listpangogp)
 #division colours for heatmap
 df_PTs <-data.frame(divisions=metasub1$province) #make df for heatmaps
-rownames(df_PTs) <- metasub1$EPI #needs row names for heatmaps
+rownames(df_PTs) <- metasub1$Accession_ID #needs row names for heatmaps
 
 #division colours
 listPTs <- unique(metasub1$province)
@@ -381,10 +379,37 @@ plot2<-p2
 #plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
 #  scale_fill_manual(breaks=listPTs, values = pal2)
 
+### omicron time tree
+metasub_omi<-metasub1[metasub1$pango.group %in% c("Omicron BA.1","Omicron BA.1.1", "Omicron BA.2"),]
+omi_epis<-metasub_omi$Accession_ID
+ref<-"EPI_ISL_402124"
+all_omi<-c(omi_epis,ref)
+ttree_omi<-keep.tip(ttree_sub1,all_omi)
+
+p3 <- ggtree(ttree_omi, mrsd = as.Date(mrdate)) %<+% metasub_omi[,c("Accession_ID", "pango.group"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1)+
+  geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
+  scale_color_manual(breaks=listpangogp,values=pal)+
+  #ggtitle("Time tree - Canada - downsample1")+
+  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )+
+  scale_x_continuous(breaks = c(Date2decimal("2020-01-01"), Date2decimal("2020-03-01"), Date2decimal("2020-06-01"),Date2decimal("2020-09-01"),
+                                Date2decimal("2021-01-01"),Date2decimal("2021-03-01"), Date2decimal("2021-06-01"),Date2decimal("2021-09-01")),
+                     labels=c(format(as.Date("2020-01-01"), "%Y"), format(as.Date("2020-03-01"), "%b"), format(as.Date("2020-06-01"), "%b"), format(as.Date("2020-09-01"), "%b"),
+                              format(as.Date("2021-01-01"), "%Y"), format(as.Date("2021-03-01"), "%b"), format(as.Date("2021-06-01"), "%b"), format(as.Date("2021-09-01"), "%b")))+  
+  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+
+plot3 <- gheatmap(p3, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
+  scale_fill_manual(breaks=listPTs, values = pal2)
 ```
 
 ```{r}
 table(metasub1$pango.group)
+```
+
+### Omicron Time Tree
+```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+plot3
 ```
 
 ### Time Tree
@@ -429,7 +454,7 @@ plt.show()
 
 ```
 
-Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on GISAID on the [ADD CORRECT DATE]).
+Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on GISAID on `r gisaiddate`.
 
 
 
@@ -439,7 +464,7 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 <!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
 
 
-## Evolution and growth of SARS-CoV-2 sublineages in Canada  {.tabset}  
+## Evolution of omicron sublineages in Canada  {.tabset}  
 
 Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population. Here we examine the major sublineages currently in Canada and their relative rate of spread. 
 
@@ -449,7 +474,7 @@ For comparison, Alpha had a selective advantage of 6-11% per day over preexistin
 SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
 **Caveat**
-Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. 
+Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
 
 ```{r setting function for selection estimator}
 name1<-"BA.1" #Can include a list here (first value is used as plot labels)
@@ -565,11 +590,11 @@ format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day)",
 format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
 ```
 
-The evolutionary rate among genomes sampled in Canada is (`r lm(div ~ date)$coef[2]*29970` subs/genome/day, grey line). For comparison, the global average of `r 0.000822*29970/365` subs/genome/day [ADD REF - nextstrain estimate?].
+The above table reflects the substitution rate per unit time for a specific lineage, that is the slope observed within samples of that lineage. Currently, substitution rates are based on a single tree. Future substitution rates will represent averages based on three trees created by independant subsampling of the Canadian data.
 
 
 
-# Underdevelopment and aspirational
+# Under development and aspirational
 
 We are in the process of adding or would like to develop code for some of the following analyses:   
 * dN/dS (by variant and by gene/domains)  
@@ -581,30 +606,32 @@ With anonymized data on vaccination status, severity/outcome, reason for sequenc
 
 
 
-## Methodology {.tabset} 
+# Methodology {.tabset} 
 
 
-### Trees
-#### Phylogenetic trees
-Canadian genomes were obtained from the GISAID msa on the [ADD CORRECT DATE HERE] and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime) [ADD HERE ASSUMPTIONS, E.G. STRICT OR RELAXED CLOCK?], and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+## Trees
+### Phylogenetic trees
+Canadian genomes were obtained from the GISAID msa on the `r gisaiddate` and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
 
-### Mutation
-#### Mutation composition graph
-[EXPLAIN HOW RAPH-GRAPH IS GENERATED]
+## Mutational composition
+### Mutation composition graph
+Mutational graphs reporting mutations seen in at least 75% of the sequences in each group in C. Bars are colored by substitution type, and the corresponding amino acid changes are shown. Genomic position annotation was done using SnpEFF
 
-### Selection
-#### Selection Coefficents
-To estimate selection, we used standard likelihood techniques. In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time. If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \fract{p_i(0) \exp(s_i t)}{\Sum_j p_j(0) \exp(s_j t)}$$, where $s_i$ is the selection coefficient favouring sub-type $i$. A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
+## Selection
+### Selection Coefficents
+To estimate selection, we used standard likelihood techniques. In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time. If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \frac{p_i(0) \exp(s_i t)}{\sum_j p_j(0) \exp(s_j t)}$$, where $s_i$ is the selection coefficient favouring sub-type $i$. A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
 
-At any given time $t$, the probability of observing $n_i$ sequences of sublineage $i$ is multinomially distributed, given the total number of sequences from that day and the frequency of each $p_i(t)$. Consequently, the likelihood of seeing the observed sequence data over all times $t$ and over all sublineages $j$ is proportional to $$L = \Product_t \Product_j  p_i(t)^{n_i(t)}$$.
+At any given time $t$, the probability of observing $n_i$ sequences of sublineage $i$ is multinomially distributed, given the total number of sequences from that day and the frequency of each $p_i(t)$. Consequently, the likelihood of seeing the observed sequence data over all times $t$ and over all sublineages $j$ is proportional to $$L = \prod_t \prod_j  p_i(t)^{n_i(t)}$$.
 
 The [BBMLE](https://cran.r-project.org/web/packages/bbmle/bbmle.pdf) package in R was used to maximize the likelihood of the observed data (using the default optimization method, optim). For each selection coefficient, 95% confidence intervals were obtained by profile likelihood (using uniroot). 
 
 Graphs illustrating the rise in frequency of a variant over time are shown (left panels), with the area of each dot proportional to the number of sequences. 95% confidence bands were obtained by randomly drawing 10000 sets of parameters ($p_i$ and $s_i$ for each sub-type) using RandomFromHessianOrMCMC, assuming a multi-normal distribution around the maximum likelihood point (estimated from the Hessian matrix, [Pawitan 2001](https://books.google.ca/books?hl=en&lr=&id=WHsSDAAAQBAJ&oi=fnd&pg=PP1&dq=Pawitan+2001+likelihood&ots=v9sM5DuFrf&sig=vnRb--i2zu0jox_KnBSVxtG2aPg#v=onepage&q=Pawitan%202001%20likelihood&f=false)). At each point in time, the 2.5%-97.5% range of values for $p_i(t)$ are then shown in the confidence bands.
 
-Logit plots (right panels) show $$log(p_i(t)/p_{ref}(t))$$ relative to a given reference genotype (here BA.1), which gives a line whose slope is the strength of selection $s_i$. Changes in slope indicate changes in selection on a variant (e.g., see [Otto et al.](https://mast.queensu.ca/~tday/pdf/Otto2021.pdf)). [TO ADD:  Significant changes in slope were determined by adding possible breakpoints at each week, keeping a breakpoint if it significantly increased the fit.]
+Logit plots (right panels) show $$log(p_i(t)/p_{ref}(t))$$ relative to a given reference genotype (here BA.1), which gives a line whose slope is the strength of selection $s_i$. Changes in slope indicate changes in selection on a variant (e.g., see [Otto et al.](https://mast.queensu.ca/~tday/pdf/Otto2021.pdf)).
 
-These estimates of selection ignore heterogeneity within provinces and may be biased by the arrival of travel-related cases while frequencies are very low. Sampling strategies that oversample clustered cases (e.g., sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time. Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available. 
+These estimates of selection ignore heterogeneity within provinces and may be biased by the arrival of travel-related cases while frequencies are very low. Sampling strategies that oversample clustered cases (e.g., sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time. Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
+
+The code can be found in [https://github.com/CoVaRR-NET/CoVaRRNet_Pillar6_Notebook/blob/main/data_needed/plot_selection_estimator.R]
 
 ### Rates
 #### Root-to-tip estimates of substitution rate

@@ -175,7 +175,7 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf["s2","2.5 %"],3),nsmall=3),format(round(myconf["s2","97.5 %"],3),nsmall=3))
   str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf["s3","2.5 %"],3),nsmall=3),format(round(myconf["s3","97.5 %"],3),nsmall=3))
   text(x=toplot$date[1],y=0.95,str2,col = col2,pos=4, cex = 1)
-  text(x=toplot$date[1],y=0.90,str3,col = col3,pos=4, cex = 1)
+  text(x=toplot$date[1],y=0.88,str3,col = col3,pos=4, cex = 1)
   #dev.off()
   
   ################################
@@ -196,7 +196,7 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   str2=sprintf("%s: %s {%s, %s}",name2,format(round(bbfit[["s2"]],3),nsmall=3),format(round(myconf["s2","2.5 %"],3),nsmall=3),format(round(myconf["s2","97.5 %"],3),nsmall=3))
   str3=sprintf("%s: %s {%s, %s}",name3,format(round(bbfit[["s3"]],3),nsmall=3),format(round(myconf["s3","2.5 %"],3),nsmall=3),format(round(myconf["s3","97.5 %"],3),nsmall=3))
   text(x=toplot$date[1],y=500,str2,col = col2,pos=4, cex = 1)
-  text(x=toplot$date[1],y=250,str3,col = col3,pos=4, cex = 1)
+  text(x=toplot$date[1],y=200,str3,col = col3,pos=4, cex = 1)
   axis(2, at=c(0.001,0.01,0.1,1,10,100,1000), labels=c(0.001,0.01,0.1,1,10,100,1000))
   #dev.off()
   
