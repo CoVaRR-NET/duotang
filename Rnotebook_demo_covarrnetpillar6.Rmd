@@ -315,6 +315,14 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
 ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
 
+
+#########################
+######## WARNING ########
+#########################
+#very temporary 
+ttree_sub1 <-drop.tip(ttree_sub1, "EPI_ISL_9487566|Canada|BA.1")
+MLtree_sub1 <-drop.tip(MLtree_sub1, "EPI_ISL_9487566|Canada|BA.1")
+
 tips<-ttree_sub1$tip.label
 epis<-sapply(strsplit(tips,"\\|"),`[`,1)
 metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]

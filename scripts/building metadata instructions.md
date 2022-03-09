@@ -13,7 +13,8 @@ tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\
 #extract and reformat the metadatas virusseq-dataportal
 tar -axf virusseq-data-release*.tar.gz -O  files-archive-$filefromVirusSeq.tsv | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g'> datafromvirrusseq_$date
 colepi=$(head -1 datafromvirrusseq_2022_03_08 | sed 's/\t/\n/g' | grep -n . | grep GISAID | cut -d':' -f1)
-cat datafromvirrusseq_$date | cut -f5,$colepi | awk 'NR!=1 && $2!="NA"' | sort -k2,2 | uniq > epidatesfromvirrusseq_$date
+coldate=$(head -1 datafromvirrusseq_2022_03_08 | sed 's/\t/\n/g' | grep -n . | grep sample_collection_date | cut -d':' -f1)
+cat datafromvirrusseq_$date | cut -f$coldate,$colepi | awk 'NR!=1 && $2!="NA"' | sort -k2,2 | uniq > epidatesfromvirrusseq_$date
 
 #remove the lines with duplicate GISAID ids
 join <(cut -f2 epidatesfromvirrusseq_$date  | sort | uniq -c | awk '$1!=1{print $2,"toremove"}' ) -a2 -2 2 epidatesfromvirrusseq_$date | grep -v toremove | tr ' ' '\t'  > temp
