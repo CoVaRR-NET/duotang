@@ -140,7 +140,7 @@ These plots show the changing composition of sequences posted to GISAID and the 
 
 mindate=as.Date("2020-11-01")
 maxdate=as.Date(gsub('_','-',gisaiddate))
-maxdate=as.Date("2022-02-28")
+maxdate=as.Date("2022-03-08")
 colorcases="#138808"
 
 
@@ -180,8 +180,8 @@ plot_metadatadf_freq <- function(meta_tab,cases) {
     ylab("")+xlab("")+
     theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
     scale_x_date(date_breaks = "28 day")+
-    geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
-    scale_y_continuous(name = "sequenced cases per day",sec.axis = sec_axis(~./ratio, name="recorded cases per day",labels=label_number_auto()))+
+    #geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
+    scale_y_continuous(name = "sequenced cases per day\naveraged by week",labels=label_number_auto())+
     theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
 }
 plot_metadatadf(metaCANall,epidataCANall)
@@ -312,16 +312,9 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-MLtree_sub1 <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
-ttree_sub1 <- read.tree("./data_needed/time_tree_V1_trimmed.nwk")
+MLtree_sub1 <- read.tree("./data_needed/subsample_V1_scrubbed.nwk")
+ttree_sub1 <- read.tree("./data_needed/timetree_v1.nwk")
 
-
-#########################
-######## WARNING ########
-#########################
-#very temporary 
-ttree_sub1 <-drop.tip(ttree_sub1, "EPI_ISL_9487566|Canada|BA.1")
-MLtree_sub1 <-drop.tip(MLtree_sub1, "EPI_ISL_9487566|Canada|BA.1")
 
 tips<-ttree_sub1$tip.label
 epis<-sapply(strsplit(tips,"\\|"),`[`,1)
@@ -429,6 +422,12 @@ plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F
 ```{r}
 table(metasub1$pango.group)
 ```
+
+### Omicron diversity tree
+```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+plot4
+```
+
 
 ### Time Tree
 ```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
@@ -547,7 +546,7 @@ The slope of root-to-tip plots over time provide an estimate of the substitution
 #RTT code contributed by Art Poon
 metadataRTT<-read.table("data_needed/subsampling_metadata_V1.tsv",h=T)
 metadataRTT<-merge(metadataRTT,metasub1,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
-rooted <- read.tree("./data_needed/iqtree_V1_trimmed.nwk")
+rooted <- read.tree("./data_needed/subsample_V1_scrubbed.nwk")
 vocs<-names(pal)
 name_list<-rooted$tip.label
 index1<-match(name_list,metadataRTT$EPI)
@@ -604,13 +603,118 @@ kable(data.frame(
   upper.95=29970*sapply(ci, function(f) f[2,2])
 ), 
 col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
-format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day)",
+format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day) Subsampling 1",
 format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
 ```
 
 The above table reflects the substitution rate per unit time for a specific lineage, that is the slope observed within samples of that lineage. Currently, substitution rates are based on a single tree. Future substitution rates will represent averages based on three trees created by independant subsampling of the Canadian data.
 
+```{r}
+metadataRTT<-read.table("data_needed/subsampling_metadata_V2.tsv",h=T)
+rooted <- read.tree("./data_needed/subsample_V2_scrubbed.nwk")
+tips<-rooted$tip.label
+epis<-sapply(strsplit(tips,"\\|"),`[`,1)
+metasub2<-metaCANall[metaCANall$Accession_ID %in% epis,]
+metadataRTT<-merge(metadataRTT,metasub2,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
 
+vocs<-names(pal)
+name_list<-rooted$tip.label
+index1<-match(name_list,metadataRTT$EPI)
+date <- metadataRTT$Date[index1]
+pg <- metadataRTT$pango.group[index1]
+date<-as.Date(date)
+# total branch length from root to each tip
+div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
+
+#par(mar=c(5,5,0,1))
+#plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
+#     xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
+#xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
+#axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
+
+#blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
+#fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
+#abline(fit0, col='gray50')
+#fits <- list(other=fit0)
+
+for (i in 1:length(vocs)) {
+  variant <- vocs[i]
+  x <- date[pg==variant]
+  if (all(is.na(x))) next
+  y <- div[pg==variant]
+  #blobs(x, y, col=pal[i], cex=0.8)
+  fit <- rlm(y ~ x)
+  #dlines(fit$x[,2], predict(fit), col=pal[i])
+  fits[[variant]] <- fit
+}
+
+#legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
+
+ci <- lapply(fits, confint.default)
+kable(data.frame(
+  n=sapply(fits, function(f) nrow(f$x)),                            
+  est=29970*sapply(fits, function(f) f$coef[2]),
+  lower.95=29970*sapply(ci, function(f) f[2,1]),
+  upper.95=29970*sapply(ci, function(f) f[2,2])
+), 
+col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
+format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day) Subsampling 2",
+format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
+```
+
+
+```{r}
+metadataRTT<-read.table("data_needed/subsampling_metadata_V3.tsv",h=T)
+rooted <- read.tree("./data_needed/subsample_V3_scrubbed.nwk")
+tips<-rooted$tip.label
+epis<-sapply(strsplit(tips,"\\|"),`[`,1)
+metasub3<-metaCANall[metaCANall$Accession_ID %in% epis,]
+metadataRTT<-merge(metadataRTT,metasub2,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
+
+vocs<-names(pal)
+name_list<-rooted$tip.label
+index1<-match(name_list,metadataRTT$EPI)
+date <- metadataRTT$Date[index1]
+pg <- metadataRTT$pango.group[index1]
+date<-as.Date(date)
+# total branch length from root to each tip
+div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
+
+#par(mar=c(5,5,0,1))
+#plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
+#     xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
+#xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
+#axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
+
+#blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
+#fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
+#abline(fit0, col='gray50')
+#fits <- list(other=fit0)
+
+for (i in 1:length(vocs)) {
+  variant <- vocs[i]
+  x <- date[pg==variant]
+  if (all(is.na(x))) next
+  y <- div[pg==variant]
+  #blobs(x, y, col=pal[i], cex=0.8)
+  fit <- rlm(y ~ x)
+  #dlines(fit$x[,2], predict(fit), col=pal[i])
+  fits[[variant]] <- fit
+}
+
+#legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
+
+ci <- lapply(fits, confint.default)
+kable(data.frame(
+  n=sapply(fits, function(f) nrow(f$x)),                            
+  est=29970*sapply(fits, function(f) f$coef[2]),
+  lower.95=29970*sapply(ci, function(f) f[2,1]),
+  upper.95=29970*sapply(ci, function(f) f[2,2])
+), 
+col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
+format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day) Subsampling 3",
+format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
+```
 
 ## Future development
 
