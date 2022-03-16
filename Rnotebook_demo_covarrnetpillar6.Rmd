@@ -455,10 +455,10 @@ from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
 # Default is AminoAcid labels for non synonymous mutations
 def_min_val_label(15)
 load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
-p="data_needed/raphgraph/msa_0220_"
+p="data_needed/raphgraph/msa_0308_"
 
 
-namelist=["Canada.BA.1","Global.BA.1","Canada.BA.1.1","Global.BA.1.1","Canada.BA.2","Global.BA.2","Global.BA.3"]
+namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
 pathlist=[p+i+".var" for i in namelist]
 
 namelist=[i.replace("_","\n") for i in namelist]
