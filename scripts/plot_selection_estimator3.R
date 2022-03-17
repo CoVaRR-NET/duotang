@@ -3,7 +3,7 @@ suppressMessages(suppressWarnings(library(bbmle)))
 suppressMessages(suppressWarnings(library(HelpersMG)))
 suppressMessages(suppressWarnings(library(dplyr)))
 
-plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3) {
+plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3) {
   mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
   if(prov=="East provinces (NL+NS+NB+ON+QC)"){
     mydata= metaCANall %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador","Quebec","Ontario"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
@@ -160,12 +160,10 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3) {
   toplot$date <- dateconverter$date
   
   #A graph with 95% quantiles based on the Hessian draws.
-  col2=pal[paste0("Omicron ",name2)]
-  col3=pal[paste0("Omicron ",name3)]
   #png(file=paste0("curves_",i,".png"))
-  plot(y=uppercurve1,x=toplot$date,type="l",xlab="",ylab=paste0("proportion in ",prov),ylim=c(0,1))
-  points(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/3)#cex=(toplot$n2/log(10))/20)#cex=toplot$n2/50 )#cex = 0.5)
-  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/3)#, cex=(toplot$n3/log(10))/20) #cex=toplot$n3/50 )#cex = 0.5)
+  plot(y=uppercurve1,x=toplot$date,type="l",xlab="Time",ylab=paste0("proportion in ",prov),ylim=c(0,1))
+  points(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/5)#cex=(toplot$n2/log(10))/20)#cex=toplot$n2/50 )#cex = 0.5)
+  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/5)#, cex=(toplot$n3/log(10))/20) #cex=toplot$n3/50 )#cex = 0.5)
   polygon(c(toplot$date, rev(toplot$date)), c(lowercurve1, rev(uppercurve1)),col = alpha(col2, 0.5))
   polygon(c(toplot$date, rev(toplot$date)), c(lowercurve2, rev(uppercurve2)),col = alpha(col3, 0.5))
   lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
@@ -187,7 +185,7 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3) {
   #png(file=paste0("logit_",i, ".png"))
   options( scipen = 5 )
   plot(y=toplot$n2/toplot$n1,x=toplot$date, pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/3,
-       log="y",ylim=c(0.001,1000), yaxt = "n", xlab="",ylab=paste0("logit in ",prov))
+       log="y",ylim=c(0.001,1000), yaxt = "n", xlab="Time",ylab=paste0("logit in ",prov))
   points(y=toplot$n3/toplot$n1,x=toplot$date, pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/3)
   lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/(1-bbfit[["p2"]]-bbfit[["p3"]])),
         x=toplot$date, type="l",col="black")#, col=col2)
@@ -198,6 +196,7 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3) {
   text(x=toplot$date[1],y=500,str2,col = col2,pos=4, cex = 1)
   text(x=toplot$date[1],y=200,str3,col = col3,pos=4, cex = 1)
   axis(2, at=c(0.001,0.01,0.1,1,10,100,1000), labels=c(0.001,0.01,0.1,1,10,100,1000))
+  print(str3)
   #dev.off()
   
   #Bends suggest a changing selection over time (e.g., due to the impact of vaccinations
