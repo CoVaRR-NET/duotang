@@ -127,7 +127,7 @@ plot_selection_estimator2 <- function(prov,startdate,name1,name2) {
 
   df <- RandomFromHessianOrMCMC(Hessian=(bbhessian), 
                               fitted.parameters=bbfit, 
-                              method="Hessian",replicates=1000)$random
+                              method="Hessian",replicates=1000, silent = TRUE)$random
 
   #Once we get the set of {p,s} values, we can run them through the s-shaped curve of selection
   scurve <- function(p,s){
