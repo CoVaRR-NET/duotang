@@ -503,7 +503,8 @@ name3<-"BA.2" #Can include a list here (first value is used as plot labels)
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
-source("data_needed/plot_selection_estimator.R")
+source("scripts/plot_selection_estimator3.R")
+source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
@@ -514,28 +515,35 @@ source("data_needed/plot_selection_estimator.R")
 #### Canada without Alberta
 
 ```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("Canada (no AB)",startdate,name1,name2,name3)
+plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3)
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("British_Columbia",startdate,name1,name2,name3)
+plot_selection_estimator3("British_Columbia",startdate,name1,name2,name3)
 ```
 
 ### SK
 #### Saskatchewan
 
 ```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("Saskatchewan",startdate,name1,name2,name3)
+plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3)
 ```
 
 ### ON
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("Ontario",startdate,name1,name2,name3)
+plot_selection_estimator3("Ontario",startdate,name1,name2,name3)
+```
+
+### QC
+#### Quebec
+
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Quebec",startdate,name1,name2)
 ```
 
 ## Root-to-tip analyses  
