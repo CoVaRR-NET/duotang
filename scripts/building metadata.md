@@ -1,15 +1,18 @@
 # this lines allow to build a metadata table from GISAID metadata and to correct them using  virusseq-dataportal
 
 #Report the date of the GISAID metadata downloaded in the Rnotebook
-date=2022_03_04
+date=2022_03_15
 #this key come from the file downloaded on virusseq-dataportal.ca
-filefromVirusSeq=c6440a4c-5690-408a-ba5f-d10f95e47a91
+filefromVirusSeq=38ae43e7-fbf2-4446-9e6f-8f51ed2797f8
 
 #extract and reformat the metadatas from GISAID
 tar -axf metadata_tsv_$date.tar.xz metadata.tsv -O | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR==1 || substr($1,9,6)=="Canada" && $8=="Human"' | sort -k3,3 > metadata_CANall_$date.uncorrected.csv 
 
 #extract and reformat the metadatas virusseq-dataportal
-tar -axf $filefromVirusSeq -O  files-archive-$filefromVirusSeq.tsv | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' | awk 'NR!=1 && $43!="NA"' | cut -f5,43 | sort -k2,2 | uniq > epidatesfromvirrusseq_$date
+tar -axf $filefromVirusSeq -O  files-archive-$filefromVirusSeq.tsv | tr ' ' '_'  | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | sed 's/\t$/\tNA/g' > metadatafromvirrusseq_$date
+coldate=$(head -1 metadatafromvirrusseq_2022_03_15 | sed 's/\t/\n/g' | grep -n . | grep sample_collection_date$ | cut -d':' -f1)
+colGISAID=$(head -1 metadatafromvirrusseq_2022_03_15 | sed 's/\t/\n/g' | grep -n . | grep GISAID_accession | cut -d':' -f1)
+cat metadatafromvirrusseq_$date | cut -f$coldate,$colGISAID | awk 'NR!=1 && $2!="NA"' | sort -k2,2 | uniq > epidatesfromvirrusseq_$date
 
 #remove the lines with duplicate GISAID ids
 join <(cut -f2 epidatesfromvirrusseq_$date  | sort | uniq -c | awk '$1!=1{print $2,"toremove"}' ) -a2 -2 2 epidatesfromvirrusseq_$date | grep -v toremove | tr ' ' '\t'  > temp
