@@ -596,18 +596,15 @@ legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8
 
 ```{r}
 ci <- lapply(fits, confint.default)
-kable(data.frame(
+est1<-data.frame(
   n=sapply(fits, function(f) nrow(f$x)),                            
   est=29970*sapply(fits, function(f) f$coef[2]),
   lower.95=29970*sapply(ci, function(f) f[2,1]),
   upper.95=29970*sapply(ci, function(f) f[2,2])
-), 
-col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
-format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day) Subsampling 1",
-format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
+)
+est1$rep<-"Rep1"
+est1$Lineage<-row.names(est1)
 ```
-
-The above table reflects the substitution rate per unit time for a specific lineage, that is the slope observed within samples of that lineage. Currently, substitution rates are based on a single tree. Future substitution rates will represent averages based on three trees created by independant subsampling of the Canadian data.
 
 ```{r}
 metadataRTT<-read.table("data_needed/subsampling_metadata_V2.tsv",h=T)
@@ -626,40 +623,24 @@ date<-as.Date(date)
 # total branch length from root to each tip
 div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
 
-#par(mar=c(5,5,0,1))
-#plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
-#     xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-#xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
-#axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
-
-#blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
-#fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
-#abline(fit0, col='gray50')
-#fits <- list(other=fit0)
-
 for (i in 1:length(vocs)) {
   variant <- vocs[i]
   x <- date[pg==variant]
   if (all(is.na(x))) next
   y <- div[pg==variant]
-  #blobs(x, y, col=pal[i], cex=0.8)
   fit <- rlm(y ~ x)
-  #dlines(fit$x[,2], predict(fit), col=pal[i])
   fits[[variant]] <- fit
 }
 
-#legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
-
 ci <- lapply(fits, confint.default)
-kable(data.frame(
+est2<-data.frame(
   n=sapply(fits, function(f) nrow(f$x)),                            
   est=29970*sapply(fits, function(f) f$coef[2]),
   lower.95=29970*sapply(ci, function(f) f[2,1]),
   upper.95=29970*sapply(ci, function(f) f[2,2])
-), 
-col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
-format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day) Subsampling 2",
-format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
+)
+est2$rep<-"Rep2"
+est2$Lineage<-row.names(est2)
 ```
 
 
@@ -680,41 +661,39 @@ date<-as.Date(date)
 # total branch length from root to each tip
 div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
 
-#par(mar=c(5,5,0,1))
-#plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
-#     xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-#xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
-#axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
-
-#blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
-#fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
-#abline(fit0, col='gray50')
-#fits <- list(other=fit0)
 
 for (i in 1:length(vocs)) {
   variant <- vocs[i]
   x <- date[pg==variant]
   if (all(is.na(x))) next
   y <- div[pg==variant]
-  #blobs(x, y, col=pal[i], cex=0.8)
   fit <- rlm(y ~ x)
-  #dlines(fit$x[,2], predict(fit), col=pal[i])
   fits[[variant]] <- fit
 }
 
-#legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
 
 ci <- lapply(fits, confint.default)
-kable(data.frame(
+est3<-data.frame(
   n=sapply(fits, function(f) nrow(f$x)),                            
   est=29970*sapply(fits, function(f) f$coef[2]),
   lower.95=29970*sapply(ci, function(f) f[2,1]),
   upper.95=29970*sapply(ci, function(f) f[2,2])
-), 
-col.names = c("Number of genomes", "Estimate", "Lower 95% CI", "Upper 95% CI"),
-format="html", align="rrrr", caption="Molecular clock rates (subs/genome/day) Subsampling 3",
-format.args = list(scientific = FALSE), digits=4, table.attr = "style='width:100%;'")
+)
+est3$rep<-"Rep3"
+est3$Lineage<-row.names(est3)
 ```
+
+```{r}
+sec.frame<-rbind(est1,est2,est3)
+sec.frame$est[sec.frame$est<0]<-0
+sec.frame$lower.95[sec.frame$lower.95<0]<-0
+ggplot(sec.frame,aes(x=Lineage,y=est,fill=rep))+geom_bar(position=position_dodge(),stat="identity",color="black")+
+  theme(axis.text.x = element_text(size=12, angle=65,hjust=1,vjust=0.95))+  
+  geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
+                 position=position_dodge(1))+
+  labs(y="Estimate \n (Substitutions / Genome / Day)",x="Lineage",fill="Subsample")
+```
+
 
 ## Future development
 
