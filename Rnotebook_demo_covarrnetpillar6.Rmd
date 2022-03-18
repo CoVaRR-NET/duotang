@@ -77,42 +77,42 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_03_08"
+#gisaiddate="2022_03_08"
 
-metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
-metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
+meta <- read.csv(gzfile("data_needed/virusseq.2022-03-16T15:17:45.csv.gz"))
+meta$sample.collection.date <- as.Date(meta$sample.collection.date)
+meta$province <- meta$geo_loc_name..state.province.territory.
 
-metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
-metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
-metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
 
 #make a pango.group column
+VOCVOI <- data.frame(
+  name=c('Alpha', 'Beta', 'Gamma', 'Delta', 'Delta AY.25', 'Delta AY.27', 
+         'Lambda', 'Omicron BA.1', 'Omicron BA.1.1', 'Omicron BA.2', 'Mu',
+         'A.23.1', 'B.1.438.1'),
+  pattern=c('^B\\.1\\.1\\.7|^Q\\.', '^B\\.1\\.351', '^P\\.', 
+            '^B\\.1\\.617|^(?!AY\\.2[57])AY\\.', '^AY\\.25', '^AY\\.27', 
+            '^C\\.37|^C\\.37\\.1', '^B\\.1\\.1\\.529|^BA\\.1$', 
+            '^BA\\.1\\.1', '^BA\\.2', '^B\\.1\\.621', 
+            '^A\\.23\\.1', '^B\\.1\\.438\\.1'),
+  color=c('#B29C71', '#F08C3A', '#444444', '#A6CEE3', '#61A6A0',
+          '#438FC0', '#CD950C', '#8B0000', '#FA8072', '#FF0000',
+          '#BB4513', '#9AD378', '#3EA534')
+)
 
-VOCVOI <- data.frame(name = character(),pattern = character(),color = numeric())
-VOCVOI[nrow(VOCVOI)+1, ]=list("Alpha",         "B.1.1.7|Q.","#B29C71")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta",         "B.1.351",   "#F08C3A") #Beta
-VOCVOI[nrow(VOCVOI)+1, ]=list("Gamma",         "P.",        "#444444")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta",         "B.1.617|AY.","#A6CEE3")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.25",   "AY.25",       "#61A6A0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.27",   "AY.27",       "#438FC0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Lambda",       "C.37|C.37.1", "#CD950C")#lambda
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.1","#8B0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1.1","BA.1.1",       "#FA8072")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.2",  "BA.2",         "#FF0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Mu",           "B.1.621",      "#BB4513")#Mu
-VOCVOI[nrow(VOCVOI)+1, ]=list("A.23.1",        "A.23.1",       "#9AD378")
-VOCVOI[nrow(VOCVOI)+1, ]=list("B.1.438.1",     "B.1.438.1",    "#3EA534")
 #make a pango.group column
-metaCANall$pango.group <-"other"
-pal=rainbow(0)
-pal["other"]="grey"
-for (row in 1:nrow(VOCVOI)) {
-    name <- VOCVOI[row, "name"]
-    pattern=gsub("\\.",".",VOCVOI[row, "pattern"])
-    metaCANall$pango.group[grepl(pattern, metaCANall$Pango_lineage)] <- name
-    pal[name]=VOCVOI[row, "color"]
-}
+variants <- sapply(VOCVOI$pattern, function(p) 
+  grepl(p, meta$lineage, perl=T))
 
+# verify that every row matches either 0 or 1 patterns
+# table(apply(variants, 1, sum))
+
+meta$pango.group <- 'other'
+meta$pango.group[apply(variants, 1, sum)==1] <- VOCVOI$name[unlist(apply(variants, 1, which))]
+meta$pango.group <- as.factor(meta$pango.group)
+
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+pal["other"] <- 'grey'  # named character vector
 
 ## 2. LOAD epidemiological data (PHAC)
 
@@ -134,13 +134,25 @@ epidate = tail(epidataCANall,1)$date #download date
 **Important caveat:**  
 These plots show the changing composition of sequences posted to GISAID and the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
+```{r}
+require(lubridate)
+meta$week <- cut(meta$sample.collection.date, 'week')
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
+meta1$week <- as.factor(as.character(meta1$week))
+
+barplot(table(meta1$pango.group, meta1$week), 
+        col=pal[match(levels(meta1$pango.group), names(pal))], 
+        border=NA)
+```
+
+
 ```{r example_summaries, fig.show="hold", out.width="50%"}
 
 # --- Histogram plot: counts per variant of all canadian data -------------
 
-mindate=as.Date("2020-11-01")
-maxdate=as.Date(gsub('_','-',gisaiddate))
-maxdate=as.Date("2022-03-08")
+mindate <- as.Date("2020-11-01")
+#maxdate=as.Date(gsub('_','-',gisaiddate))
+maxdate <- as.Date("2022-03-08")
 colorcases="#138808"
 
 
