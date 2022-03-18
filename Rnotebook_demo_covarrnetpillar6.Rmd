@@ -11,7 +11,7 @@ output:
     toc_float: true
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE}
 
 #coding and data
 library(tidyverse) # wrangling and everything really
@@ -682,6 +682,8 @@ est3<-data.frame(
 est3$rep<-"Rep3"
 est3$Lineage<-row.names(est3)
 ```
+
+### Selection coefficient estimates (based on three independant subsamples)
 
 ```{r}
 sec.frame<-rbind(est1,est2,est3)
