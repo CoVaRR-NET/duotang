@@ -136,13 +136,32 @@ These plots show the changing composition of sequences posted to GISAID and the 
 
 ```{r}
 require(lubridate)
+require(plotly, quiet=T)
 meta$week <- cut(meta$sample.collection.date, 'week')
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
-barplot(table(meta1$pango.group, meta1$week), 
-        col=pal[match(levels(meta1$pango.group), names(pal))], 
-        border=NA)
+#barplot(table(meta1$pango.group, meta1$week), 
+#        col=pal[match(levels(meta1$pango.group), names(pal))], 
+#        border=NA)
+tab <- table(meta1$pango.group, meta1$week)
+dat <- data.frame(unlist(tab))
+names(dat) <- c('pango.group', 'week', 'count')
+
+require(r2d3)
+
+r2d3(dat, script="js/streamgraph.js")
+```
+
+
+```{r}
+# devtools::install_github("hrbrmstr/streamgraph")
+require(streamgraph)
+
+plt <- streamgraph(dat, key="pango.group", value="count", date='week') %>%
+  sg_fill_manual(pal[match(levels(meta1$pango.group), names(pal))])
+plt
+#saveWidget(plt, file="streamgraph.html")
 ```
 
 
