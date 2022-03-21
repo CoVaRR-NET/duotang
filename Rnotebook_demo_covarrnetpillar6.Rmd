@@ -77,7 +77,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_03_08"
+gisaiddate="2022_03_15"
 
 metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
@@ -140,7 +140,7 @@ These plots show the changing composition of sequences posted to GISAID and the 
 
 mindate=as.Date("2020-11-01")
 maxdate=as.Date(gsub('_','-',gisaiddate))
-maxdate=as.Date("2022-03-08")
+maxdate=as.Date("2022-03-15")
 colorcases="#138808"
 
 
@@ -497,13 +497,18 @@ Selection coefficients are not estimated for Alberta, which is currently taking 
 name1<-"BA.1" #Can include a list here (first value is used as plot labels)
 name2<-"BA.1.1" #Can include a list here (first value is used as plot labels)
 name3<-"BA.2" #Can include a list here (first value is used as plot labels)
-  
+
+#color for each lineage
+col2=pal[paste0("Omicron ",name2)]
+col3=pal[paste0("Omicron ",name3)]
+
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
-source("data_needed/plot_selection_estimator.R")
+source("scripts/plot_selection_estimator3.R")
+source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
@@ -514,28 +519,58 @@ source("data_needed/plot_selection_estimator.R")
 #### Canada without Alberta
 
 ```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("Canada (no AB)",startdate,name1,name2,name3)
+plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("British_Columbia",startdate,name1,name2,name3)
+plot_selection_estimator3("British_Columbia",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### SK
 #### Saskatchewan
 
 ```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("Saskatchewan",startdate,name1,name2,name3)
+plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
+```
+
+
+### MB
+#### Manitoba
+
+```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
 ```
 
 ### ON
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator("Ontario",startdate,name1,name2,name3)
+plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
+```
+
+
+### ON2
+#### Ontario
+
+```{r selection estimator ON2, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Ontario",startdate,name1,name2,col2)
+```
+
+### QC
+#### Quebec
+
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Quebec",startdate,name1,name2,col2)
+```
+
+### East
+#### Quebec
+
+```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
 ```
 
 ## Root-to-tip analyses  
