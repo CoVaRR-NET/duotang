@@ -59,6 +59,9 @@ if(strsplit(getwd(), "/")[[1]][3]=="rp"){#python path that works for Raphael
 opts_knit$set(root.dir = getwd())
 ```
 
+### Important Notice:  
+These data analyses are based on sequence data shared by many labs across Canada and may be biased by non-random sampling, depending on local public health priorities, and should be interpreted in light of these limitations.  
+
 ### Contributing authors:  
 
 Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro. Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, William Hsiao, and Erin Gill. 
