@@ -162,10 +162,6 @@ plot_selection_estimator <- function(prov,startdate,name1,name2,name3) {
   uppercurve2 <- c()
   lowercurve3 <- c()
   uppercurve3 <- c()
-  lowerprojections2 <- c()
-  upperprojections2 <- c()
-  lowerprojections3 <- c()
-  upperprojections3 <- c()
   for (tt in 1:length(toplot$time))  {
     lower2<-quantile(setofcurves2[,tt],0.025)
     upper2<-quantile(setofcurves2[,tt],0.975)
