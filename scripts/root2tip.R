@@ -22,6 +22,8 @@ require(lubridate)
 
 phy <- read.tree(args[1])
 
+#root name EPI_ISL_402124|China|B
+
 get.dates <- function(phy, delimiter='_', pos=-1, format='%Y-%m-%d') {
   dt <- sapply(phy$tip.label, function(x) {
     tokens <- strsplit(x, delimiter)[[1]]

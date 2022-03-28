@@ -77,7 +77,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_03_15"
+gisaiddate="2022_03_21"
 
 metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)

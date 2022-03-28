@@ -77,7 +77,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
-gisaiddate="2022_03_15"
+gisaiddate="2022_03_21"
 
 metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
 metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
@@ -147,6 +147,13 @@ source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
+```
+
+### BC
+#### Ontario
+
+```{r selection estimator ONaa, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator3("British_Columbia",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### ON
