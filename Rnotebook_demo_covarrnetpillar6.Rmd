@@ -79,6 +79,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 #Download metadata from gisaid, put the date here:
 #gisaiddate="2022_03_08"
 
+# this can be made more compact for faster loading
 meta <- read.csv(gzfile("data_needed/virusseq.2022-03-16T15:17:45.csv.gz"))
 meta$sample.collection.date <- as.Date(meta$sample.collection.date)
 meta$province <- meta$geo_loc_name..state.province.territory.
@@ -121,7 +122,7 @@ pal["other"] <- 'grey'  # named character vector
 epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
 epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub(' ', '_', epidataCANall$prname)
-epidate = tail(epidataCANall,1)$date #download date
+epidate <- tail(epidataCANall,1)$date #download date
 
 
 ```
@@ -136,33 +137,79 @@ These plots show the changing composition of sequences posted to GISAID and the 
 
 ```{r}
 require(lubridate)
-require(plotly, quiet=T)
+
 meta$week <- cut(meta$sample.collection.date, 'week')
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
-#barplot(table(meta1$pango.group, meta1$week), 
-#        col=pal[match(levels(meta1$pango.group), names(pal))], 
-#        border=NA)
 tab <- table(meta1$pango.group, meta1$week)
-dat <- data.frame(unlist(tab))
-names(dat) <- c('pango.group', 'week', 'count')
 
-require(r2d3)
+epi <- epidataCANall[epidataCANall$prname=='Canada', ]
+epi$week <- cut(as.Date(epi$date), 'week')
+cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
 
-r2d3(dat, script="js/streamgraph.js")
+idx <- match(names(cases.wk), levels(meta1$week))
+y <- cases.wk[!is.na(idx)]
+y <- y / (max(y)-min(y)) * max(apply(tab, 2, sum))
+
+par(mar=c(5,5,1,5))
+pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
+barplot(tab, col=pal2, 
+      border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
+      ylab="Sequenced cases per week") -> mp
+lines(mp, y, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
+legend(x=max(mp)+1, y=max(y), legend=levels(meta1$pango.group), 
+       bty='n', xpd=NA, cex=0.7, fill=pal2, 
+       x.intersp=0.5, y.intersp=1, border=NA)
+
+#dev.off()
+
+tab2 <- apply(tab, 2, function(x) x/sum(x))
+png("~/slides/img/duotang-barplot2.png", width=6.5*300, height=5*300, res=300)
+{
+  par(mar=c(5,5,1,5))
+  pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
+  barplot(tab2, col=pal2, 
+        border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
+        ylab="Sequenced cases per week (%)") -> mp
+  legend(x=max(mp)+1, y=1, legend=levels(meta1$pango.group), 
+         bty='n', xpd=NA, cex=0.7, fill=pal2, 
+         x.intersp=0.5, y.intersp=1, border=NA)
+}
+dev.off()
 ```
 
 
+
+This is what we want to display, but I want to be able to switch between offsets, like [this example](https://r-graph-gallery.com/155-interactive-streamgraph-change-offset.html).  I also want to be able to toggle between provinces. 
 ```{r}
 # devtools::install_github("hrbrmstr/streamgraph")
 require(streamgraph)
-
-plt <- streamgraph(dat, key="pango.group", value="count", date='week') %>%
+require(htmlwidgets)
+tab <- table(meta1$pango.group, meta1$week)
+dat <- data.frame(unlist(tab))
+names(dat) <- c('pango.group', 'week', 'count')
+plt <- streamgraph(dat, key="pango.group", value="count", date='week') %>% 
   sg_fill_manual(pal[match(levels(meta1$pango.group), names(pal))])
 plt
-#saveWidget(plt, file="streamgraph.html")
+#saveWidget(plt, file="sg_silhouette.html")
 ```
+
+
+
+It looks like we'll have to write our own custom JSs to get the interactivity we want:
+```{r}
+
+tab <- table(meta1$week, meta1$pango.group)
+dat1 <- as.data.frame.matrix(tab)
+dat1$week <- row.names(tab)
+#names(dat1) <- 
+
+library(r2d3)
+#r2d3(data=c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20), script = "barchart.js")
+r2d3(data=dat1, script = "streamgraph.js", viewer="external")
+```
+
 
 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
@@ -223,7 +270,7 @@ plot_metadatadf_freq(metaCANall,epidataCANall)
 Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
 
 
-From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jursictional differences of these plots.    
+From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jurdictional differences of these plots.    
 
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
 
