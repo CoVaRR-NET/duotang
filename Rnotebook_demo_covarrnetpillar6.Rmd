@@ -148,12 +148,14 @@ epi <- epidataCANall[epidataCANall$prname=='Canada', ]
 epi$week <- cut(as.Date(epi$date), 'week')
 cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
 
+# match case counts to variant freq data and rescale as 2nd axis
 idx <- match(names(cases.wk), levels(meta1$week))
 y <- cases.wk[!is.na(idx)]
 y <- y / (max(y)-min(y)) * max(apply(tab, 2, sum))
 
 par(mar=c(5,5,1,5))
 pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
+{
 barplot(tab, col=pal2, 
       border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
       ylab="Sequenced cases per week") -> mp
@@ -161,11 +163,12 @@ lines(mp, y, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
 legend(x=max(mp)+1, y=max(y), legend=levels(meta1$pango.group), 
        bty='n', xpd=NA, cex=0.7, fill=pal2, 
        x.intersp=0.5, y.intersp=1, border=NA)
+}
 
 #dev.off()
 
 tab2 <- apply(tab, 2, function(x) x/sum(x))
-png("~/slides/img/duotang-barplot2.png", width=6.5*300, height=5*300, res=300)
+#png("~/slides/img/duotang-barplot2.png", width=6.5*300, height=5*300, res=300)
 {
   par(mar=c(5,5,1,5))
   pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
@@ -176,39 +179,13 @@ png("~/slides/img/duotang-barplot2.png", width=6.5*300, height=5*300, res=300)
          bty='n', xpd=NA, cex=0.7, fill=pal2, 
          x.intersp=0.5, y.intersp=1, border=NA)
 }
-dev.off()
+#dev.off()
 ```
 
 
 
-This is what we want to display, but I want to be able to switch between offsets, like [this example](https://r-graph-gallery.com/155-interactive-streamgraph-change-offset.html).  I also want to be able to toggle between provinces. 
-```{r}
-# devtools::install_github("hrbrmstr/streamgraph")
-require(streamgraph)
-require(htmlwidgets)
-tab <- table(meta1$pango.group, meta1$week)
-dat <- data.frame(unlist(tab))
-names(dat) <- c('pango.group', 'week', 'count')
-plt <- streamgraph(dat, key="pango.group", value="count", date='week') %>% 
-  sg_fill_manual(pal[match(levels(meta1$pango.group), names(pal))])
-plt
-#saveWidget(plt, file="sg_silhouette.html")
-```
 
 
-
-It looks like we'll have to write our own custom JSs to get the interactivity we want:
-```{r}
-
-tab <- table(meta1$week, meta1$pango.group)
-dat1 <- as.data.frame.matrix(tab)
-dat1$week <- row.names(tab)
-#names(dat1) <- 
-
-library(r2d3)
-#r2d3(data=c(0.3, 0.6, 0.8, 0.95, 0.40, 0.20), script = "barchart.js")
-r2d3(data=dat1, script = "streamgraph.js", viewer="external")
-```
 
 
 
