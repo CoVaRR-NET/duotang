@@ -121,7 +121,7 @@ pal["other"] <- 'grey'  # named character vector
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
 epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
 epidataCANall$date <- as.Date(epidataCANall$date)
-epidataCANall$prname <- gsub(' ', '_', epidataCANall$prname)
+epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
 
@@ -135,114 +135,63 @@ epidate <- tail(epidataCANall,1)$date #download date
 **Important caveat:**  
 These plots show the changing composition of sequences posted to GISAID and the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
-```{r}
+
+```{r example_summaries, fig.show="hold", out.width="50%"}
+
+# --- Histogram plot: counts per variant of all canadian data -------------
+
 require(lubridate)
 
 meta$week <- cut(meta$sample.collection.date, 'week')
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
-tab <- table(meta1$pango.group, meta1$week)
-
-epi <- epidataCANall[epidataCANall$prname=='Canada', ]
-epi$week <- cut(as.Date(epi$date), 'week')
-cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
-
-# match case counts to variant freq data and rescale as 2nd axis
-idx <- match(names(cases.wk), levels(meta1$week))
-y <- cases.wk[!is.na(idx)]
-y <- y / (max(y)-min(y)) * max(apply(tab, 2, sum))
-
-par(mar=c(5,5,1,5))
-pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
-{
-barplot(tab, col=pal2, 
-      border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-      ylab="Sequenced cases per week") -> mp
-lines(mp, y, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
-legend(x=max(mp)+1, y=max(y), legend=levels(meta1$pango.group), 
-       bty='n', xpd=NA, cex=0.7, fill=pal2, 
-       x.intersp=0.5, y.intersp=1, border=NA)
-}
-
-#dev.off()
-
-tab2 <- apply(tab, 2, function(x) x/sum(x))
-#png("~/slides/img/duotang-barplot2.png", width=6.5*300, height=5*300, res=300)
-{
+plot.variants <- function(region='Canada', scaled=FALSE) {
+  if (region=='Canada') {
+    tab <- table(meta1$pango.group, meta1$week)  
+  } else {
+    meta2 <- meta1[meta1$province==region, ]
+    tab <- table(meta2$pango.group, meta2$week)  
+  }
+  
   par(mar=c(5,5,1,5))
   pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
-  barplot(tab2, col=pal2, 
-        border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-        ylab="Sequenced cases per week (%)") -> mp
-  legend(x=max(mp)+1, y=1, legend=levels(meta1$pango.group), 
-         bty='n', xpd=NA, cex=0.7, fill=pal2, 
-         x.intersp=0.5, y.intersp=1, border=NA)
-}
-#dev.off()
-```
-
-
-
-
-
-
-
-
-```{r example_summaries, fig.show="hold", out.width="50%"}
-
-# --- Histogram plot: counts per variant of all canadian data -------------
-
-mindate <- as.Date("2020-11-01")
-#maxdate=as.Date(gsub('_','-',gisaiddate))
-maxdate <- as.Date("2022-03-08")
-colorcases="#138808"
-
-
   
-plot_metadatadf <- function(meta_tab,cases) {
-  meta_tab = meta_tab %>% filter(!is.na(Collection_date),Collection_date > mindate,Collection_date < maxdate) %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) %>% count(pango.group)
-  cases <- filter(cases, cases$date > mindate)
-  cases <- filter(cases, cases$date < maxdate)
-  cases <- cases %>% group_by(week = cut(date, "week")) #adds week column
-  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=sum))
-  cases$x=cases$x/7
-  ratio <- max(data.frame(aggregate(meta_tab$n, by=list(Category=meta_tab$week), FUN=sum))$x)/max(cases$x)
-  cases$x=cases$x*ratio
-  ggplot(meta_tab, aes(x=as.Date(week)))+
-    geom_bar(stat = "identity", aes(y= n, fill=pango.group))+
-    scale_fill_manual(breaks=unique(sort(meta_tab$pango.group)), values = pal)+
-    ylab("")+xlab("")+
-    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
-    scale_x_date(date_breaks = "28 day")+
-    geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
-    scale_y_continuous(name = "sequenced cases per day",sec.axis = sec_axis(~./ratio, name="recorded cases per day",labels=label_number_auto()))+
-    theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
+  if (scaled) {
+    tab2 <- apply(tab, 2, function(x) x/sum(x))
+    par(mar=c(5,5,1,5))
+    pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
+    barplot(tab2, col=pal2, 
+          border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
+          ylab="Sequenced cases per week (%)") -> mp
+    legend(x=max(mp)+1, y=1, legend=levels(meta1$pango.group), 
+           bty='n', xpd=NA, cex=0.7, fill=pal2, 
+           x.intersp=0.5, y.intersp=1, border=NA)
+  } else {
+    epi <- epidataCANall[epidataCANall$prname==region, ]
+    epi$week <- cut(as.Date(epi$date), 'week')
+    cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
+    
+    # match case counts to variant freq data and rescale as 2nd axis
+    idx <- match(names(cases.wk), levels(meta1$week))
+    y <- cases.wk[!is.na(idx)]
+    y <- y / (max(y)-min(y)) * max(apply(tab, 2, sum))
+  
+    barplot(tab, col=pal2, 
+            border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
+            ylab="Sequenced cases per week") -> mp
+    lines(mp, y, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
+    legend(x=max(mp)+1, y=max(y), legend=levels(meta1$pango.group), 
+           bty='n', xpd=NA, cex=0.7, fill=pal2, 
+           x.intersp=0.5, y.intersp=1, border=NA)
+  }
+  
 }
-plot_metadatadf_freq <- function(meta_tab,cases) {
-  meta_tab = meta_tab %>% filter(!is.na(Collection_date),Collection_date > mindate,Collection_date < maxdate) %>% group_by(pango.group) %>% group_by(week = cut(Collection_date, "week")) %>% count(pango.group)
-  meta_tab %>% mutate(freq = prop.table(n)) -> dfprop
-  cases <- filter(cases, cases$date > mindate)
-  cases <- filter(cases, cases$date < maxdate)
-  cases <- cases %>% group_by(week = cut(date, "week")) #adds week column
-  cases <- data.frame(aggregate(cases$numtoday, by=list(Category=cases$week), FUN=sum))
-  cases$x=cases$x/7
-  ratio <- 1/max(cases$x)
-  cases$x=cases$x*ratio
-  ggplot(dfprop, aes(x=as.Date(week)))+
-    geom_bar(stat = "identity", aes(y= freq, fill=pango.group))+
-    scale_fill_manual(breaks=unique(sort(dfprop$pango.group)), values = pal)+
-    ylab("")+xlab("")+
-    theme_classic()+theme(axis.text.x = element_text(angle=90, vjust=0.1,hjust=0.1))+
-    scale_x_date(date_breaks = "28 day")+
-    #geom_line(data=cases, aes(x=as.Date(Category),y=x),size=2,color=colorcases,alpha=0.6)+
-    scale_y_continuous(name = "sequenced cases per day\naveraged by week",labels=label_number_auto())+
-    theme(axis.title.y.right = element_text(color = colorcases),axis.text.y.right = element_text(color = colorcases))
-}
-plot_metadatadf(metaCANall,epidataCANall)
-plot_metadatadf_freq(metaCANall,epidataCANall)
 
+plot.variants()
+plot.variants(scaled=T)
 ```
+
 
 Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
 
@@ -273,9 +222,8 @@ Provincial sequencing strategy includes a subset of representative positive samp
 Additional up-to-date covid data for this province can be found here:  
 http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
 ```{r provinceplot_British_Columbia, fig.show="hold", out.width="50%"}
-prov='British_Columbia'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='British Columbia')
+plot.variants(region='British Columbia', scaled=T)
 ```
 
 ### AL
@@ -283,9 +231,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
 ```{r provinceplot_Alberta, fig.show="hold", out.width="50%"}
-prov='Alberta'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Alberta')
+plot.variants(region='Alberta', scaled=T)
 ```
 
 ### SK
@@ -293,9 +240,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
 ```{r provinceplot_Saskatchewan, fig.show="hold", out.width="50%"}
-prov='Saskatchewan'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Saskatchewan')
+plot.variants(region='Saskatchewan', scaled=T)
 ```
 
 ### MB
@@ -303,9 +249,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
 ```{r provinceplot_Manitoba, fig.show="hold", out.width="50%"}
-prov='Manitoba'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Manitoba')
+plot.variants(region='Manitoba', scaled=T)
 ```
 
 ### ON
@@ -313,9 +258,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
 ```{r provinceplot_Ontario, fig.show="hold", out.width="50%"}
-prov='Ontario'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Ontario')
+plot.variants(region='Ontario', scaled=T)
 ```
 
 ### QC
@@ -324,9 +268,8 @@ Provincial random sequencing has been temporarily suspended as of Feb 8th, 2021.
 Additiona up-to-date COVID data for this province can be found here:  
 https://www.inspq.qc.ca/covid-19/donnees/variants
 ```{r provinceplot_Quebec, fig.show="hold", out.width="50%"}
-prov='Quebec'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Quebec')
+plot.variants(region='Quebec', scaled=T)
 ```
 
 ### NS
@@ -334,9 +277,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
 ```{r provinceplot_Nova_Scotia, fig.show="hold", out.width="50%"}
-prov='Nova_Scotia'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Nova Scotia')
+plot.variants(region='Nova Scotia', scaled=T)
 ```
 
 ### NB
@@ -344,9 +286,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
 ```{r provinceplot_New_Brunswick, fig.show="hold", out.width="50%"}
-prov='New_Brunswick'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='New Brunswick')
+plot.variants(region='New Brunswick', scaled=T)
 ```
 
 ### NL
@@ -354,9 +295,8 @@ plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANa
 Additional up-to-date COVID data for this province can be found here:  
 https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 ```{r provinceplot_Newfoundland_and_Labrador, fig.show="hold", out.width="50%"}
-prov='Newfoundland_and_Labrador'
-plot_metadatadf(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
-plot_metadatadf_freq(metaCANall[ which(metaCANall$province==prov), ],epidataCANall[ which(epidataCANall$prname==prov), ])
+plot.variants(region='Newfoundland and Labrador')
+plot.variants(region='Newfoundland and Labrador', scaled=T)
 ```
 
 
