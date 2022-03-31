@@ -101,8 +101,6 @@ VOCVOI <- data.frame(
           '#438FC0', '#CD950C', '#8B0000', '#FA8072', '#FF0000',
           '#BB4513', '#9AD378', '#3EA534')
 )
-
-#make a pango.group column
 variants <- sapply(VOCVOI$pattern, function(p) 
   grepl(p, meta$lineage, perl=T))
 
@@ -126,7 +124,11 @@ epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
-
+# for barplots
+require(lubridate)
+meta$week <- cut(meta$sample.collection.date, 'week')
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
+meta1$week <- as.factor(as.character(meta1$week))
 ```
 
 
@@ -141,13 +143,6 @@ These plots show the changing composition of sequences posted to GISAID and the 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
 
 # --- Histogram plot: counts per variant of all canadian data -------------
-
-require(lubridate)
-
-meta$week <- cut(meta$sample.collection.date, 'week')
-meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
-meta1$week <- as.factor(as.character(meta1$week))
-
 plot.variants <- function(region='Canada', scaled=FALSE) {
   if (region=='Canada') {
     tab <- table(meta1$pango.group, meta1$week)  
@@ -155,13 +150,12 @@ plot.variants <- function(region='Canada', scaled=FALSE) {
     meta2 <- meta1[meta1$province==region, ]
     tab <- table(meta2$pango.group, meta2$week)  
   }
-  
-  par(mar=c(5,5,1,5))
+  # reorder colour palette
   pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
   
   if (scaled) {
-    tab2 <- apply(tab, 2, function(x) x/sum(x))
     par(mar=c(5,5,1,5))
+    tab2 <- apply(tab, 2, function(x) x/sum(x))
     pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
     barplot(tab2, col=pal2, 
           border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
@@ -169,7 +163,9 @@ plot.variants <- function(region='Canada', scaled=FALSE) {
     legend(x=max(mp)+1, y=1, legend=levels(meta1$pango.group), 
            bty='n', xpd=NA, cex=0.7, fill=pal2, 
            x.intersp=0.5, y.intersp=1, border=NA)
-  } else {
+  } 
+  else {
+    par(mar=c(5,5,3,5), adj=0)
     epi <- epidataCANall[epidataCANall$prname==region, ]
     epi$week <- cut(as.Date(epi$date), 'week')
     cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
@@ -177,17 +173,23 @@ plot.variants <- function(region='Canada', scaled=FALSE) {
     # match case counts to variant freq data and rescale as 2nd axis
     idx <- match(names(cases.wk), levels(meta1$week))
     y <- cases.wk[!is.na(idx)]
-    y <- y / (max(y)-min(y)) * max(apply(tab, 2, sum))
+    lab.y <- pretty(y)  # for drawing axis
+    max.count <- max(apply(tab, 2, sum))
+    y2 <- y / (max(y)-min(y)) * max.count  # scale to variant counts
+    at.y <- lab.y / (max(y)-min(y)) * max.count
   
     barplot(tab, col=pal2, 
             border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
             ylab="Sequenced cases per week") -> mp
-    lines(mp, y, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
-    legend(x=max(mp)+1, y=max(y), legend=levels(meta1$pango.group), 
-           bty='n', xpd=NA, cex=0.7, fill=pal2, 
+    lines(mp, y2, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
+    axis(side=4, at=at.y, labels=format(lab.y, scientific=F), hadj=0,
+         las=1, cex.axis=0.7, col='grey50', col.ticks='grey50',
+         col.axis='grey50')
+    legend(x=mean(mp), y=max(y2), xjust=0.5, yjust=0, 
+           legend=levels(meta1$pango.group), 
+           bty='n', xpd=NA, cex=0.7, fill=pal2, ncol=5,
            x.intersp=0.5, y.intersp=1, border=NA)
   }
-  
 }
 
 plot.variants()

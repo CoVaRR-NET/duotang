@@ -19,7 +19,7 @@ def iter_fasta(handle, sample=None):
     of handle, sequence tuples.
 
     :param handle:  open stream to FASTA file in read mode
-    :param sample:  dict, values keyed by sequence header
+    :param sample:  dict, (lineage, coldate) keyed by sequence header
 
     :yield tuples, (header, sequence)
     """
@@ -27,15 +27,24 @@ def iter_fasta(handle, sample=None):
     for line in handle:
         if line.startswith('>'):
             if len(sequence) > 0:
-                if sample is None or h in sample:
+                if sample is None:
                     yield h, sequence
+                elif h in sample:
+                    lineage, coldate = sample[h]
+                    h2 = f"{h}_{lineage}_{coldate}"
+                    yield h2, sequence
                 sequence = ''
             h = line.lstrip('>').rstrip()
         else:
             sequence += line.strip().upper()
+
     # handle last record
-    if sample is None or h in sample:
+    if sample is None:
         yield h, sequence
+    elif h in sample:
+        lineage, coldate = sample[h]
+        h2 = f"{h}_{lineage}_{coldate}"
+        yield h2, sequence
 
 
 def batcher(stream, size=100, maxn=2000, minlen=29000):
