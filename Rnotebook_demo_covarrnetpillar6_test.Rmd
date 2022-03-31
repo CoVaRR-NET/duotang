@@ -1,0 +1,266 @@
+---
+title: "CoVaRR-Net"
+subtitle: "Genomic epidemiology analyses and mathematical modelling notebook"
+author: "Pillar 6"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_document:
+    code_folding: hide
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+
+#coding and data
+library(tidyverse) # wrangling and everything really
+library(knitr) # Needed to set root directory
+library(reticulate) # Needed for the Python code chunk 
+#py_install("pandas") #install pandas in virtual environment
+#use_virtualenv(virtualenv = "r-reticulate")
+use_condaenv("r-reticulate")
+#knitr::knit_engines$set(python = reticulate::eng_python)
+library(lubridate) # dates are special
+#phylo-specific
+library(treeio)
+library(phylotools)
+library(tidytree)
+library(phangorn)
+library(phytools)
+#plotting and tables
+library(ggplot2) # Work-horse plotting package
+library(ggtree) #All things phylogenetic visualization
+library(cowplot) # Needed to make easy multi-panel plots with ggplot2
+library(DT) # Needed to make DT example table
+library(ggbeeswarm) # Needed to make beeswarm plots
+library(gridExtra) # multi-panel plots
+library(kableExtra) # Needed to write out a formatted table
+library(scales)
+#colors
+library(RColorBrewer)
+library(colorspace)
+library(viridis)
+library(MASS)
+
+#library(bbmle)
+#library(HelpersMG)
+
+theme_set(theme_classic())
+
+# # This is the Python to be used (which you would only specify if using Python code chunks)
+# use_python("/Users/carme/local/miniconda3/bin/python") # <- FIX this path
+if(strsplit(getwd(), "/")[[1]][3]=="rp"){#python path that works for Raphael
+  Sys.setenv(RETICULATE_PYTHON = "/media/rp/partition4data/Dropbox/Raph/covarrnet/python_R_env/bin/python")
+}else{#python path that works for Susanne
+   Sys.setenv(RETICULATE_PYTHON = "my_env/bin/python")
+}
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = getwd())
+```
+
+### Contributing authors:  
+
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro. Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, William Hsiao, and Erin Gill. 
+
+Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here. A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
+
+
+# Introduction  
+
+This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread. It is for discussion with pillar 6's team and for sharing with collaborators, e.g. PH labs. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
+
+Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here.
+
+
+```{r load_data}
+
+## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
+#Download metadata from gisaid, put the date here:
+gisaiddate="2022_03_21"
+
+metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
+metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
+
+metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
+metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
+metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
+
+#make a pango.group column
+
+VOCVOI <- data.frame(name = character(),pattern = character(),color = numeric())
+VOCVOI[nrow(VOCVOI)+1, ]=list("Alpha",         "B.1.1.7|Q.","#B29C71")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Beta",         "B.1.351",   "#F08C3A") #Beta
+VOCVOI[nrow(VOCVOI)+1, ]=list("Gamma",         "P.",        "#444444")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Delta",         "B.1.617|AY.","#A6CEE3")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.25",   "AY.25",       "#61A6A0")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.27",   "AY.27",       "#438FC0")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Lambda",       "C.37|C.37.1", "#CD950C")#lambda
+VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.1","#8B0000")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1.1","BA.1.1",       "#FA8072")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.2",  "BA.2",         "#FF0000")
+VOCVOI[nrow(VOCVOI)+1, ]=list("Mu",           "B.1.621",      "#BB4513")#Mu
+VOCVOI[nrow(VOCVOI)+1, ]=list("A.23.1",        "A.23.1",       "#9AD378")
+VOCVOI[nrow(VOCVOI)+1, ]=list("B.1.438.1",     "B.1.438.1",    "#3EA534")
+#make a pango.group column
+metaCANall$pango.group <-"other"
+pal=rainbow(0)
+pal["other"]="grey"
+for (row in 1:nrow(VOCVOI)) {
+    name <- VOCVOI[row, "name"]
+    pattern=gsub("\\.",".",VOCVOI[row, "pattern"])
+    metaCANall$pango.group[grepl(pattern, metaCANall$Pango_lineage)] <- name
+    pal[name]=VOCVOI[row, "color"]
+}
+
+```
+
+
+## Selection on omicron sublineages {.tabset}  
+
+Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population. Here we examine the major sublineages currently in Canada and their relative rate of spread. 
+
+Currently, the major variants circulating are Omicron sublineages BA.1, BA.1.1, and BA.2. Sub-lineage BA.1 was initially prevalent, but Omicron sublineages BA.1.1 and BA.2 have been spreading, as illustrated in the plots below. Left plot: y-axis is the proportion of sublineages BA.1.1 and BA.2 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.1.1 or BA.2)/freq(BA.1)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
+
+For comparison, Alpha had a selective advantage of 6-11% per day over preexisting
+SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+
+**Caveat**
+Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
+
+```{r setting function for selection estimator}
+name1<-"BA.1" #Can include a list here (first value is used as plot labels)
+name2<-"BA.1.1" #Can include a list here (first value is used as plot labels)
+name3<-"BA.2" #Can include a list here (first value is used as plot labels)
+
+#color for each lineage
+col2=pal[paste0("Omicron ",name2)]
+col3=pal[paste0("Omicron ",name3)]
+
+#Set a starting date
+#Note that the startdate shouldn't be too much before both alleles become common
+#or rare migration events that die off could throw off the estimation procedure 
+#(so that the parameter estimates account for the presence of those alleles long in the past).
+startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
+source("scripts/plot_selection_estimator3.R")
+source("scripts/plot_selection_estimator2.R")
+#####################################################
+# tabs for displaying in notebook
+#each PT tab should have curve plot and breakpoint plot side by side
+```
+
+### BC
+#### Ontario
+
+```{r selection estimator ONaa, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator3("British_Columbia",startdate,name1,name2,name3,col2,col3)
+```
+
+### ON
+#### Ontario
+
+```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
+```
+
+
+### ON2
+#### Ontario
+
+```{r selection estimator ON2, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Ontario",startdate,name1,name2,col2)
+```
+
+## Future development
+
+We are in the process of adding or would like to develop code for some of the following analyses:   
+* dN/dS (by variant and by gene/domains)  
+* Tajima's D over time  
+* clustering analyses
+* genomically inferred epidemiological parameters: R0, serial interval, etc.
+
+With anonymized data on vaccination status, severity/outcome, reason for sequencing (e.g. outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving. Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
+
+
+
+# Methodology {.tabset} 
+
+
+## Trees
+### Phylogenetic trees
+Canadian genomes were obtained from the GISAID msa on the `r gisaiddate` and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+
+## Mutational composition
+### Mutation composition graph
+Mutational graphs reporting mutations seen in at least 75% of the sequences in each group in C. Bars are colored by substitution type, and the corresponding amino acid changes are shown. Genomic position annotation was done using SnpEFF
+
+## Selection
+### Selection Coefficents
+To estimate selection, we used standard likelihood techniques. In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time. If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \frac{p_i(0) \exp(s_i t)}{\sum_j p_j(0) \exp(s_j t)},$$ where $s_i$ is the selection coefficient favouring sub-type $i$. A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
+
+At any given time $t$, the probability of observing $n_i$ sequences of sublineage $i$ is multinomially distributed, given the total number of sequences from that day and the frequency of each $p_i(t)$. Consequently, the likelihood of seeing the observed sequence data over all times $t$ and over all sublineages $j$ is proportional to $$L = \prod_t \prod_j  p_i(t)^{n_i(t)}.$$
+
+The [BBMLE](https://cran.r-project.org/web/packages/bbmle/bbmle.pdf) package in R was used to maximize the likelihood of the observed data (using the default optimization method, optim). For each selection coefficient, 95% confidence intervals were obtained by profile likelihood (using uniroot). 
+
+Graphs illustrating the rise in frequency of a variant over time are shown (left panels), with the area of each dot proportional to the number of sequences. 95% confidence bands were obtained by randomly drawing 10000 sets of parameters ($p_i$ and $s_i$ for each sub-type) using RandomFromHessianOrMCMC, assuming a multi-normal distribution around the maximum likelihood point (estimated from the Hessian matrix, [Pawitan 2001](https://books.google.ca/books?hl=en&lr=&id=WHsSDAAAQBAJ&oi=fnd&pg=PP1&dq=Pawitan+2001+likelihood&ots=v9sM5DuFrf&sig=vnRb--i2zu0jox_KnBSVxtG2aPg#v=onepage&q=Pawitan%202001%20likelihood&f=false)). At each point in time, the 2.5%-97.5% range of values for $p_i(t)$ are then shown in the confidence bands.
+
+Logit plots (right panels) show $$ln(\frac{p_i(t)}{p_{ref}(t)})$$ relative to a given reference genotype (here BA.1), which gives a line whose slope is the strength of selection $s_i$. Changes in slope indicate changes in selection on a variant (e.g., see [Otto et al.](https://mast.queensu.ca/~tday/pdf/Otto2021.pdf)).
+
+These estimates of selection ignore heterogeneity within provinces and may be biased by the arrival of travel-related cases while frequencies are very low. Sampling strategies that oversample clustered cases (e.g., sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time. Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
+
+The code can be found in [https://github.com/CoVaRR-NET/CoVaRRNet_Pillar6_Notebook/blob/main/data_needed/plot_selection_estimator.R]
+
+### Rates
+#### Root-to-tip estimates of substitution rate
+Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
+
+
+# List of useful tools
+
+Collect a list of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
+
+* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
+* List of (mostly) modelling tools by CANMOD: [https://canmod.net/tools], includes RECON, outbreak tools for both modelling and genomic epi [https://github.com/reconhub]
+* List of homoplaises in SARS-CoV-2: https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt
+* Erin Gill's COVID-19 dashboard [https://github.com/eringill/COVID_dashboard_reboot]
+* The Epi Graph Network: training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro. [https://thegraphnetwork.training/]
+* Nybbler tool for subsampling SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
+* Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
+* IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
+* cov-lineages (summaries of PANGO lineages) [https://cov-lineages.org/lineage_list.html]
+* CoVizu (analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time) [https://github.com/PoonLab/covizu/]
+* COVID-MVP (mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health, CIDGOH) [https://covidmvp.cidgoh.ca/]
+* Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
+
+
+
+# Acknowledgements and sources
+
+We thank all the authors, developers, and contributors to the GISAID and VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN). 
+
+We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
+
+* GISAID  (https://www.gisaid.org/)
+We would like to thank the GISAID Initiative and are grateful to all of the data contributors, i.e. the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
+Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID's innovative contribution to global health. Global Challenges, 1:33-46. DOI:10.1002/gch2.1018, PMCID:31565258
+Shu, Y., McCauley, J. (2017) GISAID: From vision to reality. EuroSurveillance, 22(13), DOI: 10.2807/1560-7917.ES.2017.22.13.30494, PMCID: PMC5388101
+
+* The Canadian VirusSeq Data Portal (https://virusseq-dataportal.ca) 
+We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory (RRPL), Nova Scotia Health Authority, Alberta ProvLab North (APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory (NML), Institut National de Sante Publique du Quebec (INSPQ), BCCDC Public Health Laboratory, Public Health Ontario (PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research (OICR), Provincial Public Health Laboratory Network of Nova Scotia, Centre Hospitalier Universitaire Georges L. Dumont - New Brunswick, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
+
+* Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
+
+* various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)  
+
+
+
+# Session info {.tabset}
+The version numbers of all packages in the current environment as well as information about the R install is reported below. 
+
+## Hide
+
+## Show
+
+```{r session_info}
+sessionInfo()
+```
