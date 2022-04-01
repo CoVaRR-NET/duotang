@@ -144,16 +144,17 @@ col3=pal[paste0("Omicron ",name3)]
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator3.R")
 source("scripts/plot_selection_estimator2.R")
+source("scripts/plot_selection_estimator4.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
 ```
 
 ### BC
-#### Ontario
+#### Canada
 
 ```{r selection estimator ONaa, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("British_Columbia",startdate,name1,name2,name3,col2,col3)
+plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### ON
