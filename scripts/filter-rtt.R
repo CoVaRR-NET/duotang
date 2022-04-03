@@ -6,7 +6,7 @@ if (length(args) < 1) {
        "  output CSV:  file to write tip names and dates for TimeTree\n",
        "  delimiter:  (optional) char separating fields in tip labels, default '_'\n",
        "  position:  (optional) index of field corresponding to collection date,\n",
-       "             use negative values to count from last field, (default -2)\n",
+       "             use negative values to count from last field, (default -1)\n",
        "  format:  (optional) date format (ISO default yyyy-mm-dd)\n\n")
 }
 
@@ -31,6 +31,7 @@ get.dates <- function(phy, delimiter='_', pos=-1, format='%Y-%m-%d') {
   as.Date(dt, format=format)
 }
 
+tip.dates <- get.dates(rtt, delimiter, pos, format)
 div <- node.depth.edgelength(rtt)[1:Ntip(rtt)]
 fit <- lm(div~tip.dates)
 out <- summary(fit)
