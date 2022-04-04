@@ -351,41 +351,58 @@ pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
 
 ### time tree
-mrdate <- max(na.omit(metasub1$Collection_date))
+mrdate <- max(na.omit(metasub1$sample.collection.date))
 
-p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+% metasub1[,c("Accession_ID", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
-  scale_color_manual(breaks=listpangogp,values=pal)+
+p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+%
+  metasub1[,c("specimen.collector.sample.ID", "pango.group"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1) +
+  geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
+  scale_color_manual(breaks=listpangogp, values=pal) +
   #ggtitle("Time tree - Canada - downsample1")+
-  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
-  guides(color = guide_legend(override.aes = list(size = 4) ) )+
-  scale_x_continuous(breaks = c(Date2decimal("2020-01-01"), Date2decimal("2020-03-01"), Date2decimal("2020-06-01"),Date2decimal("2020-09-01"),
-                                Date2decimal("2021-01-01"),Date2decimal("2021-03-01"), Date2decimal("2021-06-01"),Date2decimal("2021-09-01")),
-                     labels=c(format(as.Date("2020-01-01"), "%Y"), format(as.Date("2020-03-01"), "%b"), format(as.Date("2020-06-01"), "%b"), format(as.Date("2020-09-01"), "%b"),
-                              format(as.Date("2021-01-01"), "%Y"), format(as.Date("2021-03-01"), "%b"), format(as.Date("2021-06-01"), "%b"), format(as.Date("2021-09-01"), "%b")))+  
-  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+  coord_cartesian(clip = 'off') + 
+  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
+  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
+  scale_x_continuous(breaks = c(
+    Date2decimal("2020-01-01"), Date2decimal("2020-03-01"), 
+    Date2decimal("2020-06-01"), Date2decimal("2020-09-01"),
+    Date2decimal("2021-01-01"), Date2decimal("2021-03-01"), 
+    Date2decimal("2021-06-01"), Date2decimal("2021-09-01")
+    ),
+    labels = c(format(as.Date("2020-01-01"), "%Y"),
+               format(as.Date("2020-03-01"), "%b"), 
+               format(as.Date("2020-06-01"), "%b"), 
+               format(as.Date("2020-09-01"), "%b"),
+               format(as.Date("2021-01-01"), "%Y"),
+               format(as.Date("2021-03-01"), "%b"), 
+               format(as.Date("2021-06-01"), "%b"), 
+               format(as.Date("2021-09-01"), "%b"))
+    ) +  
+  theme(legend.position = "right", legend.title = element_blank(), 
+        legend.text = element_text(size =12))
 
-plot1<-p1#don't plot provinces
+plot1 <- p1  #don't plot provinces
 #plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
 #  scale_fill_manual(breaks=listPTs, values = pal2)
 
 ### diversity ML tree
-p2 <- ggtree(MLtree_sub1) %<+% metasub1[,c("Accession_ID", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=1)+ 
-  scale_color_manual(breaks=listpangogp, values = pal)+
+p2 <- ggtree(MLtree_sub1) %<+% 
+  metasub1[ , c("specimen.collector.sample.ID", "pango.group"), drop=FALSE] + 
+  geom_tippoint(color="black", size=1) +
+  geom_tippoint(aes(color = pango.group), size=1) + 
+  scale_color_manual(breaks=listpangogp, values = pal) +
   #ggtitle("ML tree - Canada - subsample1, n = 8K")+
-  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
-  guides(color = guide_legend(override.aes = list(size = 4) ) )+
-  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+  coord_cartesian(clip = 'off') + 
+  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
+  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
+  theme(legend.position = "right", legend.title = element_blank(), 
+        legend.text = element_text(size =12))
 
-plot2<-p2
+plot2 <- p2
 #plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
 #  scale_fill_manual(breaks=listPTs, values = pal2)
 
 ### omicron time tree
-metasub_omi<-metasub1[metasub1$pango.group %in% c("Omicron BA.1","Omicron BA.1.1", "Omicron BA.2"),]
+metasub_omi <- metasub1[metasub1$pango.group %in% c("Omicron BA.1", "Omicron BA.1.1", "Omicron BA.2"), ]
 omi_epis<-metasub_omi$Accession_ID
 ref<-"EPI_ISL_402124"
 all_omi<-c(omi_epis,ref)
