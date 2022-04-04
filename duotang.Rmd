@@ -311,37 +311,42 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-MLtree_sub1 <- read.tree("./data_needed/subsample_V1_scrubbed.nwk")
-ttree_sub1 <- read.tree("./data_needed/timetree_v1.nwk")
+MLtree_sub1 <- read.tree("./data_needed/sample1.filtered.nwk")
+ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
 
+stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
 
-tips<-ttree_sub1$tip.label
-epis<-sapply(strsplit(tips,"\\|"),`[`,1)
-metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]
-ttree_sub1$tip.label<-epis
+get.tipnames <- function(tip.label) {
+  sapply(tip.label, function(x) {
+    tokens <- strsplit(x, "_")[[1]]
+    ntok <- length(tokens)
+    paste(tokens[1:(ntok-2)], collapse='_')
+  })
+}
+MLtree_sub1$tip.label <- get.tipnames(MLtree_sub1$tip.label)
+ttree_sub1$tip.label <- get.tipnames(ttree_sub1$tip.label)
+#epis <- sapply(strsplit(tips,"\\|"),`[`,1)
+#metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]
+metasub1 <- meta[meta$fasta.header.name %in% ttree_sub1$tip.label, ]
+stopifnot(nrow(metasub1) == Ntip(ttree_sub1))
 
-tips_ML<-MLtree_sub1$tip.label
-epis_ML<-sapply(strsplit(tips_ML,"\\|"),`[`,1)
-MLtree_sub1$tip.label<-epis_ML
-MLtree_sub1$edge.length <- MLtree_sub1$edge.length*29903#scale to number of mutations
+#scale to number of mutations
+MLtree_sub1$edge.length <- MLtree_sub1$edge.length*29903
 
 ### needed for plotting
-pango_frame<-metaCANall[c("Pango_lineage","pango.group")]
-pango_col<-pango_frame %>% distinct()#make a lookup table for all lineages to pango.group
-#metasub1<-merge(metasub1,pango_col,by.x="Variant",by.y="Pango_lineage",all.y=FALSE,all.x=TRUE)
-#division_frame<-metaCANall[c("Virus_name","province")]
-#metasub1<-merge(metasub1,division_frame,by.x="GISAID",by.y="Virus_name",all.y=FALSE,all.x=TRUE)
-listpangogp<-unique(metasub1$pango.group)
-listpangogp<-sort(listpangogp)
-#division colours for heatmap
+pango_frame <- meta[c("lineage", "pango.group")]
+pango_col <- pango_frame %>% distinct()  #make a lookup table for all lineages to pango.group
+listpangogp <- unique(metasub1$pango.group)
+listpangogp <- sort(listpangogp)
+# division colours for heatmap
 df_PTs <-data.frame(divisions=metasub1$province) #make df for heatmaps
-rownames(df_PTs) <- metasub1$Accession_ID #needs row names for heatmaps
+rownames(df_PTs) <- metasub1$specimen.collector.sample.ID  #needs row names for heatmaps
 
 #division colours
 listPTs <- unique(metasub1$province)
 listPTs <- listPTs[order(listPTs)]
-listPTs <- listPTs[-11] #remove hubei
-getpal2 <- colorRampPalette(brewer.pal(10, "Spectral")) #"Set3
+#listPTs <- listPTs[-11]  # remove hubei
+getpal2 <- colorRampPalette(brewer.pal(length(listPTs), "Spectral")) #"Set3
 pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
 
