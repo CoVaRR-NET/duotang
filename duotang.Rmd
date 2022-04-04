@@ -596,160 +596,111 @@ plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2
 
 ## Root-to-tip analyses  
 
-The slope of root-to-tip plots over time provide an estimate of the substitution rate. A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
+The slope of root-to-tip plots over time provide an estimate of the substitution rate.  A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
 ```{r, dpi=300}
 #RTT code contributed by Art Poon
-metadataRTT<-read.table("data_needed/subsampling_metadata_V1.tsv",h=T)
-metadataRTT<-merge(metadataRTT,metasub1,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
-rooted <- read.tree("./data_needed/subsample_V1_scrubbed.nwk")
-vocs<-names(pal)
-name_list<-rooted$tip.label
-index1<-match(name_list,metadataRTT$EPI)
-date <- metadataRTT$Date[index1]
-pg <- metadataRTT$pango.group[index1]
-date<-as.Date(date)
-# total branch length from root to each tip
-div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
-
-
 blobs <- function(x, y, col, cex=1) {
   points(x, y, pch=21, cex=cex)
   points(x, y, bg=col, col=rgb(0,0,0,0), pch=21, cex=cex)
 }
+
 dlines <- function(x, y, col) {
   lines(x, y, lwd=2.5)
   lines(x, y, col=col)
 }
 
-
-
-par(mar=c(5,5,0,1))
-plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
-     xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
-axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)
-
-blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
-fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
-abline(fit0, col='gray50')
-fits <- list(other=fit0)
-
-for (i in 1:length(vocs)) {
-  variant <- vocs[i]
-  x <- date[pg==variant]
-  if (all(is.na(x))) next
-  y <- div[pg==variant]
-  blobs(x, y, col=pal[i], cex=0.8)
-  fit <- rlm(y ~ x)
-  dlines(fit$x[,2], predict(fit), col=pal[i])
-  fits[[variant]] <- fit
+fit.rtt <- function(path, plot=FALSE) {
+  rooted <- read.tree(path)
+  rooted$tip.label <- get.tipnames(rooted$tip.label)
+  metadataRTT <- meta[meta$fasta.header.name %in% rooted$tip.label, ]
+  
+  index1 <- match(rooted$tip.label, metadataRTT$fasta.header.name)
+  date <- metadataRTT$sample.collection.date[index1]
+  pg <- metadataRTT$pango.group[index1]
+  date <- as.Date(date)
+  # total branch length from root to each tip
+  div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
+  
+  fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
+  fits <- list(other=fit0)
+  
+  if (plot) {
+    par(mar=c(5,5,0,1))
+    plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
+         xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
+    xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
+    axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)  
+    blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
+    abline(fit0, col='gray50')
+  }
+  
+  for (i in 1:nrow(VOCVOI)) {
+    variant <- VOCVOI$name[i]
+    x <- date[pg==variant]
+    if (all(is.na(x))) next
+    y <- div[pg==variant]
+    
+    fit <- rlm(y ~ x)
+    fits[[variant]] <- fit
+    
+    if (plot) {
+      blobs(x, y, col=VOCVOI$color[i], cex=0.8)
+      dlines(fit$x[,2], predict(fit), col=VOCVOI$color[i])  
+    }
+  }
+  
+  if (plot) {
+    legend(x=min(date), y=max(div), legend=VOCVOI$name, pch=21,
+           pt.bg=VOCVOI$color, bty='n', cex=0.8)    
+  }
+  fits
 }
 
-legend(x=min(date), y=max(div), legend=vocs, pch=21, pt.bg=pal, bty='n', cex=0.8)
+fit1 <- fit.rtt("./data_needed/sample1.filtered.nwk", plot=TRUE)
 ```
 
 
 ```{r}
-ci <- lapply(fits, confint.default)
-est1<-data.frame(
-  n=sapply(fits, function(f) nrow(f$x)),                            
-  est=29970*sapply(fits, function(f) f$coef[2]),
-  lower.95=29970*sapply(ci, function(f) f[2,1]),
-  upper.95=29970*sapply(ci, function(f) f[2,2])
-)
-est1$rep<-"Rep1"
-est1$Lineage<-row.names(est1)
-```
-
-```{r}
-metadataRTT<-read.table("data_needed/subsampling_metadata_V2.tsv",h=T)
-rooted <- read.tree("./data_needed/subsample_V2_scrubbed.nwk")
-tips<-rooted$tip.label
-epis<-sapply(strsplit(tips,"\\|"),`[`,1)
-metasub2<-metaCANall[metaCANall$Accession_ID %in% epis,]
-metadataRTT<-merge(metadataRTT,metasub2,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
-
-vocs<-names(pal)
-name_list<-rooted$tip.label
-index1<-match(name_list,metadataRTT$EPI)
-date <- metadataRTT$Date[index1]
-pg <- metadataRTT$pango.group[index1]
-date<-as.Date(date)
-# total branch length from root to each tip
-div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
-
-for (i in 1:length(vocs)) {
-  variant <- vocs[i]
-  x <- date[pg==variant]
-  if (all(is.na(x))) next
-  y <- div[pg==variant]
-  fit <- rlm(y ~ x)
-  fits[[variant]] <- fit
+confint.rlm <- function(object, ...) {
+  # https://stackoverflow.com/questions/49156932/getting-confidence-intervals-for-robust-regression-coefficient-massrlm
+  object$df.residual <- MASS:::summary.rlm(object)$df[2]
+  confint.lm(object, ...)
+}
+get.ci <- function(fits) {
+  ci <- lapply(fits, confint.rlm)
+  est <- data.frame(
+    n = sapply(fits, function(f) nrow(f$x)),                            
+    est = 29903*sapply(fits, function(f) f$coef[2]),
+    lower.95 = 29903*sapply(ci, function(f) f[2,1]),
+    upper.95 = 29903*sapply(ci, function(f) f[2,2])
+  )
+  est$Lineage <- row.names(est)
+  est
 }
 
-ci <- lapply(fits, confint.default)
-est2<-data.frame(
-  n=sapply(fits, function(f) nrow(f$x)),                            
-  est=29970*sapply(fits, function(f) f$coef[2]),
-  lower.95=29970*sapply(ci, function(f) f[2,1]),
-  upper.95=29970*sapply(ci, function(f) f[2,2])
-)
-est2$rep<-"Rep2"
-est2$Lineage<-row.names(est2)
+fit2 <- fit.rtt("data_needed/sample2.filtered.nwk", plot=FALSE)
+fit3 <- fit.rtt("data_needed/sample3.filtered.nwk", plot=FALSE)
+
 ```
 
 
-```{r}
-metadataRTT<-read.table("data_needed/subsampling_metadata_V3.tsv",h=T)
-rooted <- read.tree("./data_needed/subsample_V3_scrubbed.nwk")
-tips<-rooted$tip.label
-epis<-sapply(strsplit(tips,"\\|"),`[`,1)
-metasub3<-metaCANall[metaCANall$Accession_ID %in% epis,]
-metadataRTT<-merge(metadataRTT,metasub2,by.x="GISAID",by.y="Virus_name",all.x=TRUE)
-
-vocs<-names(pal)
-name_list<-rooted$tip.label
-index1<-match(name_list,metadataRTT$EPI)
-date <- metadataRTT$Date[index1]
-pg <- metadataRTT$pango.group[index1]
-date<-as.Date(date)
-# total branch length from root to each tip
-div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
-
-
-for (i in 1:length(vocs)) {
-  variant <- vocs[i]
-  x <- date[pg==variant]
-  if (all(is.na(x))) next
-  y <- div[pg==variant]
-  fit <- rlm(y ~ x)
-  fits[[variant]] <- fit
-}
-
-
-ci <- lapply(fits, confint.default)
-est3<-data.frame(
-  n=sapply(fits, function(f) nrow(f$x)),                            
-  est=29970*sapply(fits, function(f) f$coef[2]),
-  lower.95=29970*sapply(ci, function(f) f[2,1]),
-  upper.95=29970*sapply(ci, function(f) f[2,2])
-)
-est3$rep<-"Rep3"
-est3$Lineage<-row.names(est3)
-```
-
-### Selection coefficient estimates (based on three independant subsamples)
+### Molecular clock estimates (based on three independant subsamples)
 
 ```{r}
-sec.frame<-rbind(est1,est2,est3)
-sec.frame$est[sec.frame$est<0]<-0
-sec.frame$lower.95[sec.frame$lower.95<0]<-0
-ggplot(sec.frame,aes(x=Lineage,y=est,fill=rep))+geom_bar(position=position_dodge(),stat="identity",color="black")+
-  theme(axis.text.x = element_text(size=12, angle=65,hjust=1,vjust=0.95))+  
+est1 <- get.ci(fit1); est1$rep <- 'Rep1'
+est2 <- get.ci(fit2); est2$rep <- 'Rep2'
+est3 <- get.ci(fit3); est3$rep <- 'Rep3'
+sec.frame <- rbind(est1, est2, est3)
+sec.frame$est[sec.frame$est < 0] <- 0
+sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
+ggplot(sec.frame, aes(x=Lineage, y=est, fill=rep)) + 
+  geom_bar(position=position_dodge(), stat="identity", color="black") + 
+  theme(axis.text.x = element_text(size=12, angle=65, hjust=1, vjust=0.95)) + 
   geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
-                 position=position_dodge(1))+
-  labs(y="Estimate \n (Substitutions / Genome / Day)",x="Lineage",fill="Subsample")
+                position=position_dodge(1)) +
+  labs(y="Estimate \n (Substitutions / Genome / Day)",
+       x="Lineage", fill="Subsample")
 ```
 
 
