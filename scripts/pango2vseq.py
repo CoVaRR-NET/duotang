@@ -4,9 +4,9 @@ import gzip
 import sys
 
 parser = argparse.ArgumentParser("Append Pangolin outputs to VirusSeq metadata")
-parser.add_argument("metadata", type=str, help="<input> VirusSeq metadata TSV file")
+parser.add_argument("metadata", type=str, help="<input> VirusSeq metadata TSV file (can be .gz)")
 parser.add_argument("pangolin_csv", type=str, help="<input> Pangolin output CSV")
-parser.add_argument("output", type=argparse.FileType('w'), help="<output> combined CSV")
+parser.add_argument("output", type=str, help="<output> file to write combined CSV (.gz)")
 args = parser.parse_args()
 
 # import Pangolin results
@@ -31,6 +31,7 @@ for row in rows:
     row.update(lineage)
 
 fieldnames = list(rows[0].keys())
-writer = csv.DictWriter(args.output, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
+outfile = gzip.open(args.output, 'w')
+writer = csv.DictWriter(outfile, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
 writer.writeheader()
 writer.writerows(rows)
