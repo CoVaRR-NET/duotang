@@ -60,7 +60,7 @@ outliers <- which(abs(residuals(fit)) > 3*stderr)
 #points(tip.dates[outliers], residuals(fit)[outliers], col='red')
 
 # export files for TreeTime
-pruned <- drop.tip(rtt, tip=rtt$tip.label[outliers])
+pruned <- drop.tip(rooted, tip=rooted$tip.label[outliers])
 write.tree(pruned, file=args[2])
 dates <- data.frame(name=pruned$tip.label, date=tip.dates[-outliers])
 write.table(dates, sep='\t', file=args[3], row.names=F, quote=F)
