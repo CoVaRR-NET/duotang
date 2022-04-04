@@ -31,7 +31,7 @@ for row in rows:
     row.update(lineage)
 
 fieldnames = list(rows[0].keys())
-outfile = gzip.open(args.output, 'w')
+outfile = gzip.open(args.output, 'wt')
 writer = csv.DictWriter(outfile, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
 writer.writeheader()
 writer.writerows(rows)
