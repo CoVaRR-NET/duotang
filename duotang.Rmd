@@ -637,6 +637,9 @@ fit.rtt <- function(path, plot=FALSE) {
   
   for (i in 1:nrow(VOCVOI)) {
     variant <- VOCVOI$name[i]
+    if (sum(pg==variant) < 3) {
+      next
+    }
     x <- date[pg==variant]
     if (all(is.na(x))) next
     y <- div[pg==variant]
@@ -657,7 +660,7 @@ fit.rtt <- function(path, plot=FALSE) {
   fits
 }
 
-fit1 <- fit.rtt("./data_needed/sample1.filtered.nwk", plot=TRUE)
+fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
 ```
 
 
@@ -679,8 +682,8 @@ get.ci <- function(fits) {
   est
 }
 
-fit2 <- fit.rtt("data_needed/sample2.filtered.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/sample3.filtered.nwk", plot=FALSE)
+fit2 <- fit.rtt("data_needed/sample2.rtt.nwk", plot=FALSE)
+fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
 
 ```
 
@@ -694,9 +697,11 @@ est3 <- get.ci(fit3); est3$rep <- 'Rep3'
 sec.frame <- rbind(est1, est2, est3)
 sec.frame$est[sec.frame$est < 0] <- 0
 sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
-ggplot(sec.frame, aes(x=Lineage, y=est, fill=rep)) + 
-  geom_bar(position=position_dodge(), stat="identity", color="black") + 
-  theme(axis.text.x = element_text(size=12, angle=65, hjust=1, vjust=0.95)) + 
+ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
+  geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
+  scale_fill_manual(values=VOCVOI$color) + 
+  theme(axis.text.x = element_text(size=9, angle=45, hjust=1, vjust=0.95),
+        legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
   geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
                 position=position_dodge(1)) +
   labs(y="Estimate \n (Substitutions / Genome / Day)",
