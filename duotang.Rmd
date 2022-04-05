@@ -311,8 +311,10 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-MLtree_sub1 <- read.tree("./data_needed/sample1.filtered.nwk")
+MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
+require(lubridate)
+dateseq <- seq(ymd('2019-12-01'), ymd('2021-09-01'), by='3 month')
 
 stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
 
@@ -339,7 +341,7 @@ pango_col <- pango_frame %>% distinct()  #make a lookup table for all lineages t
 listpangogp <- unique(metasub1$pango.group)
 listpangogp <- sort(listpangogp)
 # division colours for heatmap
-df_PTs <-data.frame(divisions=metasub1$province) #make df for heatmaps
+df_PTs <- data.frame(divisions=metasub1$province) #make df for heatmaps
 rownames(df_PTs) <- metasub1$specimen.collector.sample.ID  #needs row names for heatmaps
 
 #division colours
@@ -354,7 +356,8 @@ names(pal2) <- listPTs
 mrdate <- max(na.omit(metasub1$sample.collection.date))
 
 p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+%
-  metasub1[,c("specimen.collector.sample.ID", "pango.group"), drop=FALSE] + 
+  metasub1[ , c("fasta.header.name", "pango.group"), 
+            drop=FALSE] + 
   geom_tippoint(color="black", size=1) +
   geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
   scale_color_manual(breaks=listpangogp, values=pal) +
@@ -362,21 +365,9 @@ p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+%
   coord_cartesian(clip = 'off') + 
   theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
   guides(color = guide_legend(override.aes = list(size = 4) ) ) +
-  scale_x_continuous(breaks = c(
-    Date2decimal("2020-01-01"), Date2decimal("2020-03-01"), 
-    Date2decimal("2020-06-01"), Date2decimal("2020-09-01"),
-    Date2decimal("2021-01-01"), Date2decimal("2021-03-01"), 
-    Date2decimal("2021-06-01"), Date2decimal("2021-09-01")
-    ),
-    labels = c(format(as.Date("2020-01-01"), "%Y"),
-               format(as.Date("2020-03-01"), "%b"), 
-               format(as.Date("2020-06-01"), "%b"), 
-               format(as.Date("2020-09-01"), "%b"),
-               format(as.Date("2021-01-01"), "%Y"),
-               format(as.Date("2021-03-01"), "%b"), 
-               format(as.Date("2021-06-01"), "%b"), 
-               format(as.Date("2021-09-01"), "%b"))
-    ) +  
+  scale_x_continuous(
+    breaks = Date2decimal(dateseq),
+    labels = format(dateseq, c("%b", "%Y", "%b", "%b"))) +  
   theme(legend.position = "right", legend.title = element_blank(), 
         legend.text = element_text(size =12))
 
@@ -386,7 +377,7 @@ plot1 <- p1  #don't plot provinces
 
 ### diversity ML tree
 p2 <- ggtree(MLtree_sub1) %<+% 
-  metasub1[ , c("specimen.collector.sample.ID", "pango.group"), drop=FALSE] + 
+  metasub1[ , c("fasta.header.name", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1) +
   geom_tippoint(aes(color = pango.group), size=1) + 
   scale_color_manual(breaks=listpangogp, values = pal) +
@@ -403,41 +394,52 @@ plot2 <- p2
 
 ### omicron time tree
 metasub_omi <- metasub1[metasub1$pango.group %in% c("Omicron BA.1", "Omicron BA.1.1", "Omicron BA.2"), ]
-omi_epis<-metasub_omi$Accession_ID
-ref<-"EPI_ISL_402124"
-all_omi<-c(omi_epis,ref)
-ttree_omi<-keep.tip(ttree_sub1,all_omi)
+#omi_epis<-metasub_omi$Accession_ID
+#ref<-"EPI_ISL_402124"
+#all_omi<-c(omi_epis,ref)
+all_omi <- metasub_omi$fasta.header.name
+ttree_omi<-keep.tip(ttree_sub1, all_omi)
 
-p3 <- ggtree(ttree_omi, mrsd = as.Date(mrdate)) %<+% metasub_omi[,c("Accession_ID", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=1)+ #, shape= lab
-  scale_color_manual(breaks=listpangogp,values=pal)+
+p3 <- ggtree(ttree_omi, mrsd = as.Date(mrdate)) %<+%
+  metasub_omi[ , c("fasta.header.name", "pango.group"), 
+               drop=FALSE] + 
+  geom_tippoint(color="black", size=1) +
+  geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
+  scale_color_manual(breaks=listpangogp,values=pal) +
   #ggtitle("Time tree - Canada - downsample1")+
-  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
-  guides(color = guide_legend(override.aes = list(size = 4) ) )+
-  scale_x_continuous(breaks = c(Date2decimal("2020-01-01"), Date2decimal("2020-03-01"), Date2decimal("2020-06-01"),Date2decimal("2020-09-01"),
-                                Date2decimal("2021-01-01"),Date2decimal("2021-03-01"), Date2decimal("2021-06-01"),Date2decimal("2021-09-01")),
-                     labels=c(format(as.Date("2020-01-01"), "%Y"), format(as.Date("2020-03-01"), "%b"), format(as.Date("2020-06-01"), "%b"), format(as.Date("2020-09-01"), "%b"),
-                              format(as.Date("2021-01-01"), "%Y"), format(as.Date("2021-03-01"), "%b"), format(as.Date("2021-06-01"), "%b"), format(as.Date("2021-09-01"), "%b")))+  
-  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+  coord_cartesian(clip = 'off') + 
+  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
+  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
+  scale_x_continuous(breaks = Date2decimal(dateseq),
+                     labels = format(dateseq, c("%b", "%Y", "%b", "%b"))) +
+  theme(legend.position = "right", legend.title = element_blank(), 
+        legend.text = element_text(size =12))
 
-plot3 <- gheatmap(p3, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
+plot3 <- gheatmap(p3, df_PTs[, "divisions", drop = FALSE], 
+                  width= 0.1, color = F, colnames = F, 
+                  legend_title = F) + 
   scale_fill_manual(breaks=listPTs, values = pal2)
 
 ### omicron diversity tree
-MLtree_omi<-keep.tip(MLtree_sub1,all_omi)
+MLtree_omi<-keep.tip(MLtree_sub1, all_omi)
 
-p4 <- ggtree(MLtree_omi) %<+% metasub_omi[,c("Accession_ID", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1)+
-  geom_tippoint(aes(color = pango.group), size=1)+ 
-  scale_color_manual(breaks=listpangogp, values = pal)+
+p4 <- ggtree(MLtree_omi) %<+% 
+  metasub_omi[ , c("fasta.header.name", "pango.group"), 
+               drop=FALSE] + 
+  geom_tippoint(color="black", size=1) +
+  geom_tippoint(aes(color = pango.group), size=1) + 
+  scale_color_manual(breaks=listpangogp, values = pal) +
   #ggtitle("ML tree - Canada - subsample1, n = 8K")+
-  coord_cartesian(clip = 'off') + theme_tree2(plot.margin=margin(6, 40, 6, 6))+
-  guides(color = guide_legend(override.aes = list(size = 4) ) )+
-  theme(legend.position = "right", legend.title = element_blank(), legend.text = element_text(size =12))
+  coord_cartesian(clip = 'off') + 
+  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
+  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
+  theme(legend.position = "right", legend.title = element_blank(), 
+        legend.text = element_text(size =12))
 
-plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
- scale_fill_manual(breaks=listPTs, values = pal2)
+plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], 
+                  width= 0.1, color = F, colnames = F, 
+                  legend_title = F) +
+  scale_fill_manual(breaks=listPTs, values = pal2)
 ```
 
 ```{r}
