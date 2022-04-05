@@ -4,35 +4,35 @@ suppressMessages(suppressWarnings(library(HelpersMG)))
 suppressMessages(suppressWarnings(library(dplyr)))
 
 plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3) {
-  mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  mydata=meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. == prov, !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
   if(prov=="East provinces (NL+NS+NB+ON+QC)"){
-    mydata= metaCANall %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador","Quebec","Ontario"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+    mydata= meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. %in% list("Nova Scotia","New Brunswick","Newfoundland and Labrador","Quebec","Ontario"), !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
   }
   if(prov=="Canada (no AB)"){
-    mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+    mydata=meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. != "Alberta", !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
   }
   
   #Set the final date:
-  lastdate<-max(mydata$Collection_date)
+  lastdate<-max(mydata$sample.collection.date)
   
   #convert time to an integer counter for use in fitting, first using the last date as time 0:
-  mydata$time = as.numeric(difftime(mydata$Collection_date, lastdate, units = "days"))
+  mydata$time = as.numeric(difftime(mydata$sample.collection.date, lastdate, units = "days"))
   
   #filter data to after that starting date
-  data1 <- filter(mydata, Pango_lineage %in% name1)
-  data2 <- filter(mydata, Pango_lineage %in% name2)
-  data3 <- filter(mydata, Pango_lineage %in% name3)
+  data1 <- filter(mydata, lineage %in% name1)
+  data2 <- filter(mydata, lineage %in% name2)
+  data3 <- filter(mydata, lineage %in% name3)
   
   #allow multiple Pango lineages to be combined if name1 or name2 includes a list, summing n
-  data1 <- as.data.frame(unique(data1 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
-  data2 <- as.data.frame(unique(data2 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
-  data3 <- as.data.frame(unique(data3 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
+  data1 <- as.data.frame(unique(data1 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
+  data2 <- as.data.frame(unique(data2 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
+  data3 <- as.data.frame(unique(data3 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
   name1 <- name1[[1]]
   name2 <- name2[[1]]
   name3 <- name3[[1]]
-  data1$Pango_lineage <- name1
-  data2$Pango_lineage <- name2
-  data3$Pango_lineage <- name3
+  data1$lineage <- name1
+  data2$lineage <- name2
+  data3$lineage <- name3
   
   #join lists in a dataframe to plot proportions and represent time as a list of integers
   timestart<-as.numeric(difftime(startdate, lastdate, units = "days"))
@@ -85,6 +85,7 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
         sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
   }
   startpar<-list(p2=startp, p3=0.05, s2=0.1, s3=0.1)
+  #bbml<-mle2(trifunc, start = startpar,lower=c(p2=10^-5, p3=10^-5))
   bbml<-mle2(trifunc, start = startpar)
   bbml
   #lnL
