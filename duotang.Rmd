@@ -137,7 +137,7 @@ meta1$week <- as.factor(as.character(meta1$week))
 ## Variants in Canada over time
 
 **Important caveat:**  
-These plots show the changing composition of sequences posted to GISAID and the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
+These plots show the changing composition of sequences posted to the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
@@ -478,7 +478,7 @@ from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
 # Default is AminoAcid labels for non synonymous mutations
 def_min_val_label(15)
 load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
-p="data_needed/raphgraph/msa_0308_"
+p="data_needed/raphgraph/msa_0327_"
 
 
 namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
