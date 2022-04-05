@@ -17,12 +17,12 @@ suppressMessages(suppressWarnings(library(dplyr)))
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 plot_selection_estimator2 <- function(prov,startdate,name1,name2,col2) {
-  mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  mydata=meta %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
   if(prov=="East provinces (NL+NS+NB)"){
-    mydata= metaCANall %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+    mydata= meta %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
   }
   if(prov=="Canada (no AB)"){
-    mydata=metaCANall %>% filter(grepl("BA.", Pango_lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+    mydata=meta %>% filter(grepl("BA.", Pango_lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
     }
     
   #Set a final date:
