@@ -76,9 +76,9 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 ```{r load_data}
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
-#Download metadata from gisaid, put the date here:
+#Download metadata from VirusSeq, put the date here:
 
-gisaiddate="2022_03_21"
+VirusSeq_date="2022_03_16"
 
 
 # this can be made more compact for faster loading
@@ -197,7 +197,7 @@ plot.variants(scaled=T)
 ```
 
 
-Sequence counts for all Canadian data in GISAID and VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
+Sequence counts for all Canadian data in VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
 
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jurdictional differences of these plots.    
@@ -494,7 +494,7 @@ plt.show()
 
 ```
 
-Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on GISAID on `r gisaiddate`.
+Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_date`.
 
 
 
@@ -549,7 +549,7 @@ plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("British_Columbia",startdate,name1,name2,name3,col2,col3)
+plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### SK
@@ -574,13 +574,6 @@ plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
 plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
 ```
 
-
-### ON2
-#### Ontario
-
-```{r selection estimator ON2, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("Ontario",startdate,name1,name2,col2)
-```
 
 ### QC
 #### Quebec
@@ -728,7 +721,7 @@ With anonymized data on vaccination status, severity/outcome, reason for sequenc
 
 ## Trees
 ### Phylogenetic trees
-Canadian genomes were obtained from the GISAID msa on the `r gisaiddate` and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+Canadian genomes were obtained from the VirusSeq data on the `r VirusSeq_date` and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the pangolin alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
 
 ## Mutational composition
 ### Mutation composition graph
@@ -778,7 +771,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 We thank all the authors, developers, and contributors to the GISAID and VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN). 
 
-We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
+We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the VirusSeq database, on which this research is based.
 
 * GISAID  (https://www.gisaid.org/)
 We would like to thank the GISAID Initiative and are grateful to all of the data contributors, i.e. the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.

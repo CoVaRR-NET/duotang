@@ -11,7 +11,7 @@ output:
     toc_float: true
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE}
 
 #coding and data
 library(tidyverse) # wrangling and everything really
@@ -77,43 +77,68 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from gisaid, put the date here:
+
 gisaiddate="2022_03_21"
 
-metaCANall <- read.csv(unz("./data_needed/metadata_CANall_last.zip",paste("metadata_CANall_",gisaiddate,".csv",sep="")),sep="\t",row.names=NULL)
-metaCANall$Collection_date <- as.Date(metaCANall$Collection_date)
 
-metaCANall$province <- sapply(strsplit(metaCANall$Location,"_/_"), `[`, 3)
-metaCANall$province [metaCANall$province  == "Newfoundland"] <- "Newfoundland_and_Labrador"
-metaCANall$province [metaCANall$province  == "Labrador"] <- "Newfoundland_and_Labrador"
+# this can be made more compact for faster loading
+meta <- read.csv(gzfile("data_needed/virusseq.2022-03-16T15:17:45.csv.gz"))
+meta$sample.collection.date <- as.Date(meta$sample.collection.date)
+meta$province <- meta$geo_loc_name..state.province.territory.
+
 
 #make a pango.group column
+VOCVOI <- data.frame(
+  name=c('Alpha', 'Beta', 'Gamma', 'Delta', 'Delta AY.25', 'Delta AY.27', 
+         'Lambda', 'Omicron BA.1', 'Omicron BA.1.1', 'Omicron BA.2', 'Mu',
+         'A.23.1', 'B.1.438.1'),
+  pattern=c('^B\\.1\\.1\\.7|^Q\\.', '^B\\.1\\.351', '^P\\.', 
+            '^B\\.1\\.617|^(?!AY\\.2[57])AY\\.', '^AY\\.25', '^AY\\.27', 
+            '^C\\.37|^C\\.37\\.1', '^B\\.1\\.1\\.529|^BA\\.1$', 
+            '^BA\\.1\\.1', '^BA\\.2', '^B\\.1\\.621', 
+            '^A\\.23\\.1', '^B\\.1\\.438\\.1'),
+  color=c('#B29C71', '#F08C3A', '#444444', '#A6CEE3', '#61A6A0',
+          '#438FC0', '#CD950C', '#8B0000', '#FA8072', '#FF0000',
+          '#BB4513', '#9AD378', '#3EA534')
+)
+variants <- sapply(VOCVOI$pattern, function(p) 
+  grepl(p, meta$lineage, perl=T))
 
-VOCVOI <- data.frame(name = character(),pattern = character(),color = numeric())
-VOCVOI[nrow(VOCVOI)+1, ]=list("Alpha",         "B.1.1.7|Q.","#B29C71")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Beta",         "B.1.351",   "#F08C3A") #Beta
-VOCVOI[nrow(VOCVOI)+1, ]=list("Gamma",         "P.",        "#444444")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta",         "B.1.617|AY.","#A6CEE3")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.25",   "AY.25",       "#61A6A0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Delta AY.27",   "AY.27",       "#438FC0")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Lambda",       "C.37|C.37.1", "#CD950C")#lambda
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1",  "B.1.1.529|BA.1","#8B0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.1.1","BA.1.1",       "#FA8072")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Omicron BA.2",  "BA.2",         "#FF0000")
-VOCVOI[nrow(VOCVOI)+1, ]=list("Mu",           "B.1.621",      "#BB4513")#Mu
-VOCVOI[nrow(VOCVOI)+1, ]=list("A.23.1",        "A.23.1",       "#9AD378")
-VOCVOI[nrow(VOCVOI)+1, ]=list("B.1.438.1",     "B.1.438.1",    "#3EA534")
-#make a pango.group column
-metaCANall$pango.group <-"other"
-pal=rainbow(0)
-pal["other"]="grey"
-for (row in 1:nrow(VOCVOI)) {
-    name <- VOCVOI[row, "name"]
-    pattern=gsub("\\.",".",VOCVOI[row, "pattern"])
-    metaCANall$pango.group[grepl(pattern, metaCANall$Pango_lineage)] <- name
-    pal[name]=VOCVOI[row, "color"]
-}
+# verify that every row matches either 0 or 1 patterns
+# table(apply(variants, 1, sum))
 
+meta$pango.group <- 'other'
+meta$pango.group[apply(variants, 1, sum)==1] <- VOCVOI$name[unlist(apply(variants, 1, which))]
+meta$pango.group <- as.factor(meta$pango.group)
+
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+pal["other"] <- 'grey'  # named character vector
+
+## 2. LOAD epidemiological data (PHAC)
+
+
+#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
+epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
+epidataCANall$date <- as.Date(epidataCANall$date)
+epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
+epidate <- tail(epidataCANall,1)$date #download date
+
+# for barplots
+require(lubridate)
+meta$week <- cut(meta$sample.collection.date, 'week')
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
+meta1$week <- as.factor(as.character(meta1$week))
 ```
+
+Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on GISAID on `r gisaiddate`.
+
+
+
+
+<!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
+
+<!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
 
 
 ## Selection on omicron sublineages {.tabset}  
@@ -144,17 +169,44 @@ col3=pal[paste0("Omicron ",name3)]
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator3.R")
 source("scripts/plot_selection_estimator2.R")
-source("scripts/plot_selection_estimator4.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
 ```
 
-### BC
-#### Canada
 
-```{r selection estimator ONaa, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+### Canada
+#### Canada without Alberta
+
+```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3)
+```
+
+### BC
+#### British Columbia
+
+```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+mydata=meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. == "British_Columbia", !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
+
+unique(meta[c("geo_loc_name..state.province.territory.")])
+
+plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,col3)
+
+```
+
+### SK
+#### Saskatchewan
+
+```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
+```
+
+
+### MB
+#### Manitoba
+
+```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
 ```
 
 ### ON
@@ -171,6 +223,135 @@ plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
 ```{r selection estimator ON2, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 plot_selection_estimator2("Ontario",startdate,name1,name2,col2)
 ```
+
+### QC
+#### Quebec
+
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("Quebec",startdate,name1,name2,col2)
+```
+
+### East
+#### Quebec
+
+```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
+```
+
+## Root-to-tip analyses  
+
+The slope of root-to-tip plots over time provide an estimate of the substitution rate.  A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
+
+```{r, dpi=300}
+#RTT code contributed by Art Poon
+blobs <- function(x, y, col, cex=1) {
+  points(x, y, pch=21, cex=cex)
+  points(x, y, bg=col, col=rgb(0,0,0,0), pch=21, cex=cex)
+}
+
+dlines <- function(x, y, col) {
+  lines(x, y, lwd=2.5)
+  lines(x, y, col=col)
+}
+
+fit.rtt <- function(path, plot=FALSE) {
+  rooted <- read.tree(path)
+  rooted$tip.label <- get.tipnames(rooted$tip.label)
+  metadataRTT <- meta[meta$fasta.header.name %in% rooted$tip.label, ]
+  
+  index1 <- match(rooted$tip.label, metadataRTT$fasta.header.name)
+  date <- metadataRTT$sample.collection.date[index1]
+  pg <- metadataRTT$pango.group[index1]
+  date <- as.Date(date)
+  # total branch length from root to each tip
+  div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
+  
+  fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
+  fits <- list(other=fit0)
+  
+  if (plot) {
+    par(mar=c(5,5,0,1))
+    plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
+         xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
+    xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
+    axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)  
+    blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
+    abline(fit0, col='gray50')
+  }
+  
+  for (i in 1:nrow(VOCVOI)) {
+    variant <- VOCVOI$name[i]
+    if (sum(pg==variant) < 3) {
+      next
+    }
+    x <- date[pg==variant]
+    if (all(is.na(x))) next
+    y <- div[pg==variant]
+    
+    fit <- rlm(y ~ x)
+    fits[[variant]] <- fit
+    
+    if (plot) {
+      blobs(x, y, col=VOCVOI$color[i], cex=0.8)
+      dlines(fit$x[,2], predict(fit), col=VOCVOI$color[i])  
+    }
+  }
+  
+  if (plot) {
+    legend(x=min(date), y=max(div), legend=VOCVOI$name, pch=21,
+           pt.bg=VOCVOI$color, bty='n', cex=0.8)    
+  }
+  fits
+}
+
+fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
+```
+
+
+```{r}
+confint.rlm <- function(object, ...) {
+  # https://stackoverflow.com/questions/49156932/getting-confidence-intervals-for-robust-regression-coefficient-massrlm
+  object$df.residual <- MASS:::summary.rlm(object)$df[2]
+  confint.lm(object, ...)
+}
+get.ci <- function(fits) {
+  ci <- lapply(fits, confint.rlm)
+  est <- data.frame(
+    n = sapply(fits, function(f) nrow(f$x)),                            
+    est = 29903*sapply(fits, function(f) f$coef[2]),
+    lower.95 = 29903*sapply(ci, function(f) f[2,1]),
+    upper.95 = 29903*sapply(ci, function(f) f[2,2])
+  )
+  est$Lineage <- row.names(est)
+  est
+}
+
+fit2 <- fit.rtt("data_needed/sample2.rtt.nwk", plot=FALSE)
+fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
+
+```
+
+
+### Molecular clock estimates (based on three independant subsamples)
+
+```{r}
+est1 <- get.ci(fit1); est1$rep <- 'Rep1'
+est2 <- get.ci(fit2); est2$rep <- 'Rep2'
+est3 <- get.ci(fit3); est3$rep <- 'Rep3'
+sec.frame <- rbind(est1, est2, est3)
+sec.frame$est[sec.frame$est < 0] <- 0
+sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
+ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
+  geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
+  scale_fill_manual(values=VOCVOI$color) + 
+  theme(axis.text.x = element_text(size=9, angle=45, hjust=1, vjust=0.95),
+        legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
+  geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
+                position=position_dodge(1)) +
+  labs(y="Estimate \n (Substitutions / Genome / Day)",
+       x="Lineage", fill="Subsample")
+```
+
 
 ## Future development
 
