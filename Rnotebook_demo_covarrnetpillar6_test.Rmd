@@ -180,15 +180,101 @@ source("scripts/plot_selection_estimator2.R")
 
 ```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3)
+plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-mydata=meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. == "British_Columbia", !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
+mydata=meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. == "Saskatchewan", !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
 
-unique(meta[c("geo_loc_name..state.province.territory.")])
+
+
+print(mydata)
+lastdate<-max(mydata$sample.collection.date)
+
+#convert time to an integer counter for use in fitting, first using the last date as time 0:
+mydata$time = as.numeric(difftime(mydata$sample.collection.date, lastdate, units = "days"))
+
+#filter data to after that starting date
+data1 <- filter(mydata, lineage %in% name1)
+data2 <- filter(mydata, lineage %in% name2)
+data3 <- filter(mydata, lineage %in% name3)
+
+#allow multiple Pango lineages to be combined if name1 or name2 includes a list, summing n
+data1 <- as.data.frame(unique(data1 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
+data2 <- as.data.frame(unique(data2 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
+data3 <- as.data.frame(unique(data3 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
+name1 <- name1[[1]]
+name2 <- name2[[1]]
+name3 <- name3[[1]]
+data1$lineage <- name1
+data2$lineage <- name2
+data3$lineage <- name3
+
+#join lists in a dataframe to plot proportions and represent time as a list of integers
+timestart<-as.numeric(difftime(startdate, lastdate, units = "days"))
+timeend<-as.numeric(difftime(lastdate, lastdate, units = "days"))
+toplot <- data.frame(time = seq.int(timestart,timeend))
+toplot$n1 <- data1$n[match(toplot$time,data1$time)]
+toplot$n2 <- data2$n[match(toplot$time,data2$time)]
+toplot$n3 <- data3$n[match(toplot$time,data3$time)]
+toplot[is.na(toplot)] = 0 #Any NA's refer to no variant of that type on a day, set to zero
+
+
+#To aid in the ML search, we rescale time to be centered as close as possible
+#to the midpoint for the second variable (p=0.5), to make sure that the alleles 
+#are segregating at the reference date.
+#If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
+v=toplot$n1*toplot$n2*toplot$n3
+refdate<-which(v==max(v,na.rm=TRUE))
+refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
+timeend <- (timeend-timestart)-refdate
+timestart <- -refdate
+toplot$time <- seq.int(timestart,timeend)
+data1$time <- data1$time + (timeend-timestart)-refdate
+data2$time <- data2$time + (timeend-timestart)-refdate
+data3$time <- data3$time + (timeend-timestart)-refdate
+
+#date converter
+dateseq <- seq.Date(startdate,lastdate,"days")
+dateconverter <- data.frame(time=toplot$time,date=dateseq)
+
+startp <- 0.5
+
+trifunc <- function(p2,p3,s2,s3){
+  print(paste("p2",str(p2)))
+  print(paste("p3",str(p3)))
+  print(paste("s2",str(s2)))
+  print(paste("s3",str(s3)))
+  -(sum(data1$n*log((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time))))+
+      sum(data2$n*log(p2*exp(s2*data2$time)/((1-p2-p3)+p2*exp(s2*data2$time)+p3*exp(s3*data2$time))))+
+      sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
+}
+
+p2=1.4
+p3=0.0499
+s2=0.0998
+s3=0.538
+
+print((1-p2-p3))
+print((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time)))
+print(sum(data1$n*log((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time)))))
+print(sum(data2$n*log(p2*exp(s2*data2$time)/((1-p2-p3)+p2*exp(s2*data2$time)+p3*exp(s3*data2$time)))))
+print(sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
+print(log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time))))
+print(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))
+
+bbml<-mle2(trifunc, start = startpar, lower=c(p2=10^-5, p3=10^-5),upper=c(p2=1-10^-5,p3=1-10^-5))
+
+print(data2)
+
+bbml
+
+#lnL
+bbml.value<--bbml@min
+
 
 plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,col3)
 
@@ -237,209 +323,6 @@ plot_selection_estimator2("Quebec",startdate,name1,name2,col2)
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
 ```
-
-## Root-to-tip analyses  
-
-The slope of root-to-tip plots over time provide an estimate of the substitution rate.  A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
-
-```{r, dpi=300}
-#RTT code contributed by Art Poon
-blobs <- function(x, y, col, cex=1) {
-  points(x, y, pch=21, cex=cex)
-  points(x, y, bg=col, col=rgb(0,0,0,0), pch=21, cex=cex)
-}
-
-dlines <- function(x, y, col) {
-  lines(x, y, lwd=2.5)
-  lines(x, y, col=col)
-}
-
-fit.rtt <- function(path, plot=FALSE) {
-  rooted <- read.tree(path)
-  rooted$tip.label <- get.tipnames(rooted$tip.label)
-  metadataRTT <- meta[meta$fasta.header.name %in% rooted$tip.label, ]
-  
-  index1 <- match(rooted$tip.label, metadataRTT$fasta.header.name)
-  date <- metadataRTT$sample.collection.date[index1]
-  pg <- metadataRTT$pango.group[index1]
-  date <- as.Date(date)
-  # total branch length from root to each tip
-  div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
-  
-  fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
-  fits <- list(other=fit0)
-  
-  if (plot) {
-    par(mar=c(5,5,0,1))
-    plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
-         xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-    xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
-    axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)  
-    blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
-    abline(fit0, col='gray50')
-  }
-  
-  for (i in 1:nrow(VOCVOI)) {
-    variant <- VOCVOI$name[i]
-    if (sum(pg==variant) < 3) {
-      next
-    }
-    x <- date[pg==variant]
-    if (all(is.na(x))) next
-    y <- div[pg==variant]
-    
-    fit <- rlm(y ~ x)
-    fits[[variant]] <- fit
-    
-    if (plot) {
-      blobs(x, y, col=VOCVOI$color[i], cex=0.8)
-      dlines(fit$x[,2], predict(fit), col=VOCVOI$color[i])  
-    }
-  }
-  
-  if (plot) {
-    legend(x=min(date), y=max(div), legend=VOCVOI$name, pch=21,
-           pt.bg=VOCVOI$color, bty='n', cex=0.8)    
-  }
-  fits
-}
-
-fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
-```
-
-
-```{r}
-confint.rlm <- function(object, ...) {
-  # https://stackoverflow.com/questions/49156932/getting-confidence-intervals-for-robust-regression-coefficient-massrlm
-  object$df.residual <- MASS:::summary.rlm(object)$df[2]
-  confint.lm(object, ...)
-}
-get.ci <- function(fits) {
-  ci <- lapply(fits, confint.rlm)
-  est <- data.frame(
-    n = sapply(fits, function(f) nrow(f$x)),                            
-    est = 29903*sapply(fits, function(f) f$coef[2]),
-    lower.95 = 29903*sapply(ci, function(f) f[2,1]),
-    upper.95 = 29903*sapply(ci, function(f) f[2,2])
-  )
-  est$Lineage <- row.names(est)
-  est
-}
-
-fit2 <- fit.rtt("data_needed/sample2.rtt.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
-
-```
-
-
-### Molecular clock estimates (based on three independant subsamples)
-
-```{r}
-est1 <- get.ci(fit1); est1$rep <- 'Rep1'
-est2 <- get.ci(fit2); est2$rep <- 'Rep2'
-est3 <- get.ci(fit3); est3$rep <- 'Rep3'
-sec.frame <- rbind(est1, est2, est3)
-sec.frame$est[sec.frame$est < 0] <- 0
-sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
-ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
-  geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
-  scale_fill_manual(values=VOCVOI$color) + 
-  theme(axis.text.x = element_text(size=9, angle=45, hjust=1, vjust=0.95),
-        legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
-  geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
-                position=position_dodge(1)) +
-  labs(y="Estimate \n (Substitutions / Genome / Day)",
-       x="Lineage", fill="Subsample")
-```
-
-
-## Future development
-
-We are in the process of adding or would like to develop code for some of the following analyses:   
-* dN/dS (by variant and by gene/domains)  
-* Tajima's D over time  
-* clustering analyses
-* genomically inferred epidemiological parameters: R0, serial interval, etc.
-
-With anonymized data on vaccination status, severity/outcome, reason for sequencing (e.g. outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving. Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
-
-
-
-# Methodology {.tabset} 
-
-
-## Trees
-### Phylogenetic trees
-Canadian genomes were obtained from the GISAID msa on the `r gisaiddate` and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the GISAID alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
-
-## Mutational composition
-### Mutation composition graph
-Mutational graphs reporting mutations seen in at least 75% of the sequences in each group in C. Bars are colored by substitution type, and the corresponding amino acid changes are shown. Genomic position annotation was done using SnpEFF
-
-## Selection
-### Selection Coefficents
-To estimate selection, we used standard likelihood techniques. In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time. If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \frac{p_i(0) \exp(s_i t)}{\sum_j p_j(0) \exp(s_j t)},$$ where $s_i$ is the selection coefficient favouring sub-type $i$. A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
-
-At any given time $t$, the probability of observing $n_i$ sequences of sublineage $i$ is multinomially distributed, given the total number of sequences from that day and the frequency of each $p_i(t)$. Consequently, the likelihood of seeing the observed sequence data over all times $t$ and over all sublineages $j$ is proportional to $$L = \prod_t \prod_j  p_i(t)^{n_i(t)}.$$
-
-The [BBMLE](https://cran.r-project.org/web/packages/bbmle/bbmle.pdf) package in R was used to maximize the likelihood of the observed data (using the default optimization method, optim). For each selection coefficient, 95% confidence intervals were obtained by profile likelihood (using uniroot). 
-
-Graphs illustrating the rise in frequency of a variant over time are shown (left panels), with the area of each dot proportional to the number of sequences. 95% confidence bands were obtained by randomly drawing 10000 sets of parameters ($p_i$ and $s_i$ for each sub-type) using RandomFromHessianOrMCMC, assuming a multi-normal distribution around the maximum likelihood point (estimated from the Hessian matrix, [Pawitan 2001](https://books.google.ca/books?hl=en&lr=&id=WHsSDAAAQBAJ&oi=fnd&pg=PP1&dq=Pawitan+2001+likelihood&ots=v9sM5DuFrf&sig=vnRb--i2zu0jox_KnBSVxtG2aPg#v=onepage&q=Pawitan%202001%20likelihood&f=false)). At each point in time, the 2.5%-97.5% range of values for $p_i(t)$ are then shown in the confidence bands.
-
-Logit plots (right panels) show $$ln(\frac{p_i(t)}{p_{ref}(t)})$$ relative to a given reference genotype (here BA.1), which gives a line whose slope is the strength of selection $s_i$. Changes in slope indicate changes in selection on a variant (e.g., see [Otto et al.](https://mast.queensu.ca/~tday/pdf/Otto2021.pdf)).
-
-These estimates of selection ignore heterogeneity within provinces and may be biased by the arrival of travel-related cases while frequencies are very low. Sampling strategies that oversample clustered cases (e.g., sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time. Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
-
-The code can be found in [https://github.com/CoVaRR-NET/CoVaRRNet_Pillar6_Notebook/blob/main/data_needed/plot_selection_estimator.R]
-
-### Rates
-#### Root-to-tip estimates of substitution rate
-Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
-
-
-# List of useful tools
-
-Collect a list of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
-
-* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
-* List of (mostly) modelling tools by CANMOD: [https://canmod.net/tools], includes RECON, outbreak tools for both modelling and genomic epi [https://github.com/reconhub]
-* List of homoplaises in SARS-CoV-2: https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt
-* Erin Gill's COVID-19 dashboard [https://github.com/eringill/COVID_dashboard_reboot]
-* The Epi Graph Network: training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro. [https://thegraphnetwork.training/]
-* Nybbler tool for subsampling SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
-* Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
-* IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
-* cov-lineages (summaries of PANGO lineages) [https://cov-lineages.org/lineage_list.html]
-* CoVizu (analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time) [https://github.com/PoonLab/covizu/]
-* COVID-MVP (mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health, CIDGOH) [https://covidmvp.cidgoh.ca/]
-* Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
-
-
-
-# Acknowledgements and sources
-
-We thank all the authors, developers, and contributors to the GISAID and VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN). 
-
-We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
-
-* GISAID  (https://www.gisaid.org/)
-We would like to thank the GISAID Initiative and are grateful to all of the data contributors, i.e. the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
-Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID's innovative contribution to global health. Global Challenges, 1:33-46. DOI:10.1002/gch2.1018, PMCID:31565258
-Shu, Y., McCauley, J. (2017) GISAID: From vision to reality. EuroSurveillance, 22(13), DOI: 10.2807/1560-7917.ES.2017.22.13.30494, PMCID: PMC5388101
-
-* The Canadian VirusSeq Data Portal (https://virusseq-dataportal.ca) 
-We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory (RRPL), Nova Scotia Health Authority, Alberta ProvLab North (APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory (NML), Institut National de Sante Publique du Quebec (INSPQ), BCCDC Public Health Laboratory, Public Health Ontario (PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research (OICR), Provincial Public Health Laboratory Network of Nova Scotia, Centre Hospitalier Universitaire Georges L. Dumont - New Brunswick, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
-
-* Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
-
-* various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)  
-
-
-
-# Session info {.tabset}
-The version numbers of all packages in the current environment as well as information about the R install is reported below. 
-
-## Hide
 
 ## Show
 

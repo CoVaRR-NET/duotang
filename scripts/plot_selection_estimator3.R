@@ -85,6 +85,7 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
         sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
   }
   startpar<-list(p2=startp, p3=0.05, s2=0.1, s3=0.1)
+  #bbml<-mle2(trifunc, start = startpar,lower=c(p2=10^-5, p3=10^-5))
   bbml<-mle2(trifunc, start = startpar)
   bbml
   #lnL

@@ -556,7 +556,7 @@ plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,co
 #### Saskatchewan
 
 ```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
+#plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
 ```
 
 
@@ -564,7 +564,7 @@ plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
 #### Manitoba
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
+#plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
 ```
 
 ### ON
