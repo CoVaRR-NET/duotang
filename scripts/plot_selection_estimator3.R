@@ -43,12 +43,13 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
   toplot$n3 <- data3$n[match(toplot$time,data3$time)]
   toplot[is.na(toplot)] = 0 #Any NA's refer to no variant of that type on a day, set to zero
   
+  print(toplot)
   
   #To aid in the ML search, we rescale time to be centered as close as possible
   #to the midpoint for the second variable (p=0.5), to make sure that the alleles 
   #are segregating at the reference date.
   #If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
-  v=toplot$n1*toplot$n2*toplot$n3
+  v=toplot$n1*toplot$n2*toplot$n3/(toplot$n1+toplot$n2+toplot$n3)^3
   refdate<-which(v==max(v,na.rm=TRUE))
   refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
   timeend <- (timeend-timestart)-refdate
@@ -197,7 +198,6 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
   text(x=toplot$date[1],y=500,str2,col = col2,pos=4, cex = 1)
   text(x=toplot$date[1],y=200,str3,col = col3,pos=4, cex = 1)
   axis(2, at=c(0.001,0.01,0.1,1,10,100,1000), labels=c(0.001,0.01,0.1,1,10,100,1000))
-  print(str3)
   #dev.off()
   
   #Bends suggest a changing selection over time (e.g., due to the impact of vaccinations
