@@ -48,7 +48,7 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
   #to the midpoint for the second variable (p=0.5), to make sure that the alleles 
   #are segregating at the reference date.
   #If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
-  v=toplot$n1*toplot$n2*toplot$n3
+  v <- toplot$n1*toplot$n2*toplot$n3 / (toplot$n1+toplot$n2+toplot$n3)^3
   refdate<-which(v==max(v,na.rm=TRUE))
   refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
   timeend <- (timeend-timestart)-refdate
