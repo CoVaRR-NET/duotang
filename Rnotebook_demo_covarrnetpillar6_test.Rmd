@@ -180,102 +180,12 @@ source("scripts/plot_selection_estimator2.R")
 
 ```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3)
-plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-mydata=meta %>% filter(grepl("BA.", lineage), geo_loc_name..state.province.territory. == "Saskatchewan", !is.na(sample.collection.date), sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% count(lineage)
-
-
-
-print(mydata)
-lastdate<-max(mydata$sample.collection.date)
-
-#convert time to an integer counter for use in fitting, first using the last date as time 0:
-mydata$time = as.numeric(difftime(mydata$sample.collection.date, lastdate, units = "days"))
-
-#filter data to after that starting date
-data1 <- filter(mydata, lineage %in% name1)
-data2 <- filter(mydata, lineage %in% name2)
-data3 <- filter(mydata, lineage %in% name3)
-
-#allow multiple Pango lineages to be combined if name1 or name2 includes a list, summing n
-data1 <- as.data.frame(unique(data1 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
-data2 <- as.data.frame(unique(data2 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
-data3 <- as.data.frame(unique(data3 %>% group_by(time) %>% transmute(day=sample.collection.date,  n=sum(n), time=time)))
-name1 <- name1[[1]]
-name2 <- name2[[1]]
-name3 <- name3[[1]]
-data1$lineage <- name1
-data2$lineage <- name2
-data3$lineage <- name3
-
-#join lists in a dataframe to plot proportions and represent time as a list of integers
-timestart<-as.numeric(difftime(startdate, lastdate, units = "days"))
-timeend<-as.numeric(difftime(lastdate, lastdate, units = "days"))
-toplot <- data.frame(time = seq.int(timestart,timeend))
-toplot$n1 <- data1$n[match(toplot$time,data1$time)]
-toplot$n2 <- data2$n[match(toplot$time,data2$time)]
-toplot$n3 <- data3$n[match(toplot$time,data3$time)]
-toplot[is.na(toplot)] = 0 #Any NA's refer to no variant of that type on a day, set to zero
-
-
-#To aid in the ML search, we rescale time to be centered as close as possible
-#to the midpoint for the second variable (p=0.5), to make sure that the alleles 
-#are segregating at the reference date.
-#If we set t=0 when p is near 0 or 1, then the likelihood surface is very flat.
-v=toplot$n1*toplot$n2*toplot$n3
-refdate<-which(v==max(v,na.rm=TRUE))
-refdate<-refdate[[1]] #Just in case there is more than one matching point, the first is taken
-timeend <- (timeend-timestart)-refdate
-timestart <- -refdate
-toplot$time <- seq.int(timestart,timeend)
-data1$time <- data1$time + (timeend-timestart)-refdate
-data2$time <- data2$time + (timeend-timestart)-refdate
-data3$time <- data3$time + (timeend-timestart)-refdate
-
-#date converter
-dateseq <- seq.Date(startdate,lastdate,"days")
-dateconverter <- data.frame(time=toplot$time,date=dateseq)
-
-startp <- 0.5
-
-trifunc <- function(p2,p3,s2,s3){
-  print(paste("p2",str(p2)))
-  print(paste("p3",str(p3)))
-  print(paste("s2",str(s2)))
-  print(paste("s3",str(s3)))
-  -(sum(data1$n*log((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time))))+
-      sum(data2$n*log(p2*exp(s2*data2$time)/((1-p2-p3)+p2*exp(s2*data2$time)+p3*exp(s3*data2$time))))+
-      sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
-}
-
-p2=1.4
-p3=0.0499
-s2=0.0998
-s3=0.538
-
-print((1-p2-p3))
-print((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time)))
-print(sum(data1$n*log((1-p2-p3)/((1-p2-p3)+p2*exp(s2*data1$time)+p3*exp(s3*data1$time)))))
-print(sum(data2$n*log(p2*exp(s2*data2$time)/((1-p2-p3)+p2*exp(s2*data2$time)+p3*exp(s3*data2$time)))))
-print(sum(data3$n*log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))))
-print(log(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time))))
-print(p3*exp(s3*data3$time)/((1-p2-p3)+p2*exp(s2*data3$time)+p3*exp(s3*data3$time)))
-
-bbml<-mle2(trifunc, start = startpar, lower=c(p2=10^-5, p3=10^-5),upper=c(p2=1-10^-5,p3=1-10^-5))
-
-print(data2)
-
-bbml
-
-#lnL
-bbml.value<--bbml@min
-
-
 plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,col3)
 
 ```
@@ -292,7 +202,7 @@ plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
 #### Manitoba
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
+plot_selection_estimator3("Manitoba",startdate,name1,name2,col2)
 ```
 
 ### ON
@@ -307,7 +217,7 @@ plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
 #### Ontario
 
 ```{r selection estimator ON2, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("Ontario",startdate,name1,name2,col2)
+plot_selection_estimator3("Ontario",startdate,name1,name2,col2)
 ```
 
 ### QC
