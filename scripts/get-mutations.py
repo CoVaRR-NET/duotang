@@ -35,20 +35,24 @@ def filter_fasta(handle, headers):
         yield h, sequence  # handle last record
 
 
-def get_headers(path, lineage):
+def get_headers(path, lineage, lineage_field='lineage', header_field="fasta header name",
+                delimiter=','):
     """
     Load metadata from gzip-compressed CSV file and extract FASTA headers
     for samples of a given lineage.
     :param path:  str, absolute or relative path to TSV file
     :param lineage:  str, PANGO lineage
+    :param lineage_field:  str, fieldname for PANGO lineage
+    :param header_field:  str, fieldname for sequence name (header)
+    :param delimiter:  str, field separating character
     :return:  dict, fasta header names, no values
     """
     handle = gzip.open(path, 'rt')
     result = {}
-    for row in csv.DictReader(handle):
-        if row["lineage"] != lineage:
+    for row in csv.DictReader(handle, delimiter=delimiter):
+        if row[lineage_field] != lineage:
             continue
-        result.update({row["fasta header name"]: None})
+        result.update({row[header_field]: None})
     return result
 
 
@@ -124,25 +128,41 @@ def count_bases(iter, reflen):
 
 if __name__ == "__main__":
     # command-line interface
+    import codecs
+
+    def unescaped_str(arg_str):
+        return codecs.decode(str(arg_str), 'unicode_escape')
+
     parser = argparse.ArgumentParser("Extract nucleotide frequencies for all genomes "
                                      "of a given lineage.")
-    parser.add_argument("infile", type=str, help="input, xz-compressed FASTA file from virusseq.py")
+
+    parser.add_argument("infile", type=str, help="input, xz-compressed FASTA file")
     parser.add_argument("lineage", type=str, help="PANGO lineage designation")
-    parser.add_argument("metadata", type=str, help="input, gz-compressed CSV file from pango2seq.py")
+    parser.add_argument("metadata", type=str, help="input, gz-compressed CSV file with PANGO lineages")
     parser.add_argument("outfile", type=argparse.FileType('w'),
                         help="output, path to write TSV file of nucleotide frequencies")
+
     parser.add_argument("--reffile", type=str, default="data_needed/NC_045512.fa",
                         help="optional, path to reference genome FASTA")
     parser.add_argument("--limit", type=int, default=5000,
                         help="optional, maximum tolerance for gaps due to misalignment "
                              "(default 5000)")
+    parser.add_argument("--seqname", type=str, default="fasta header name",
+                        help="optional, fieldname for headers to link sequences between "
+                             "FASTA and metadata files")
+    parser.add_argument("--pango", type=str, default="lineage",
+                        help="optional, fieldname for PANGO lineage in metadata")
+    parser.add_argument("--delimiter", type=unescaped_str, default=",",
+                        help="optional, delimiter for metadata file")
+
     args = parser.parse_args()
 
     with open(args.reffile) as handle:
         header, refseq = next(iter_fasta(handle))
         reflen = len(refseq)
 
-    headers = get_headers(args.metadata, args.lineage)
+    headers = get_headers(args.metadata, lineage=args.lineage, lineage_field=args.pango,
+                          header_field=args.seqname, delimiter=args.delimiter)
     if len(headers) == 0:
         print(f"ERROR: Metadata does not contain any samples of lineage {args.lineage}.")
         sys.exit()
