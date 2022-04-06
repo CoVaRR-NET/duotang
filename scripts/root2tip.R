@@ -47,13 +47,16 @@ fit <- lm(div ~ tip.dates)
 out <- summary(fit)
 stderr <- out$coefficients[1,2]
 
-# visualization
-#par(mar=c(5,5,1,1))
-#plot(tip.dates, div, pch=19, cex=0.5, col=rgb(0.5,0,0,0.2), bty='n')
-#abline(fit, lwd=2)
-#plot(residuals(fit), cex=0.5)
-#abline(a=fit$coef[1]+4*stderr, b=fit$coef[2], lty=2)
-#abline(a=fit$coef[1]-4*stderr, b=fit$coef[2], lty=2)
+# visualization - for debugging only!
+if (FALSE) {
+  par(mar=c(5,5,1,1))
+  plot(tip.dates, div, pch=19, cex=0.5, col=rgb(0.5,0,0,0.2), bty='n')
+  abline(fit, lwd=2)
+  abline(a=fit$coef[1]+3*stderr, b=fit$coef[2], lty=2)
+  abline(a=fit$coef[1]-3*stderr, b=fit$coef[2], lty=2)
+  idx <- grepl("BA\\.1", rooted$tip.label)
+  points(tip.dates[idx], div[idx])  
+}
 
 outliers <- which(abs(residuals(fit)) > 4*stderr)
 #plot(tip.dates, residuals(fit))
