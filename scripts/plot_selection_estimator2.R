@@ -17,12 +17,16 @@ suppressMessages(suppressWarnings(library(dplyr)))
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 plot_selection_estimator2 <- function(prov,startdate,name1,name2,col2) {
-  mydata=meta %>% filter(grepl("BA.", Pango_lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+  mydata <- meta %>% filter(grepl("BA.", lineage), province == prov, !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(lineage)
   if(prov=="East provinces (NL+NS+NB)"){
-    mydata= meta %>% filter(grepl("BA.", Pango_lineage), province %in% list("Nova_Scotia","New_Brunswick","Newfoundland_and_Labrador"), !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+    mydata <- meta %>% filter(
+      grepl("BA.", lineage),
+      province %in% list("Nova_Scotia", "New_Brunswick", "Newfoundland_and_Labrador"),
+      !is.na(Collection_date), Collection_date >= startdate
+    ) %>% group_by(Collection_date) %>% count(lineage)
   }
   if(prov=="Canada (no AB)"){
-    mydata=meta %>% filter(grepl("BA.", Pango_lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(Pango_lineage)
+    mydata = meta %>% filter(grepl("BA.", lineage), province != "Alberta", !is.na(Collection_date), Collection_date >= startdate) %>% group_by(Collection_date) %>% count(lineage)
     }
     
   #Set a final date:
@@ -32,8 +36,8 @@ plot_selection_estimator2 <- function(prov,startdate,name1,name2,col2) {
   mydata$time = as.numeric(difftime(mydata$Collection_date, lastdate, units = "days"))
   
   #filter data to after that starting date
-  data1 <- filter(mydata, Pango_lineage %in% name1)
-  data2 <- filter(mydata, Pango_lineage %in% name2)
+  data1 <- filter(mydata, lineage %in% name1)
+  data2 <- filter(mydata, lineage %in% name2)
   
   #allow multiple Pango lineages to be combined if name1 or name2 includes a list, summing n
   data1 <- as.data.frame(unique(data1 %>% group_by(time) %>% transmute(day=Collection_date,  n=sum(n), time=time)))
