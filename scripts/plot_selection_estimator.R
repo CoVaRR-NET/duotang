@@ -120,8 +120,8 @@ plot_selection_estimator <- function(prov, startdate, reference, mutants, col) {
     counts[match(mutdata[[j]]$time, ts), j+1] <- mutdata[[j]]$n
   }
   
-  # calculate log-likelihood
-  sum(counts * log(pr.vecs))
+  # calculate log-likelihood (negative sign because optimizer minimizes)
+  -sum(counts * log(pr.vecs))
 }
 
 
