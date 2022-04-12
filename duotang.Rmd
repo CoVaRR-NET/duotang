@@ -48,13 +48,6 @@ library(MASS)
 
 theme_set(theme_classic())
 
-# # This is the Python to be used (which you would only specify if using Python code chunks)
-# use_python("/Users/carme/local/miniconda3/bin/python") # <- FIX this path
-if(strsplit(getwd(), "/")[[1]][3]=="rp"){#python path that works for Raphael
-  Sys.setenv(RETICULATE_PYTHON = "/media/rp/partition4data/Dropbox/Raph/covarrnet/python_R_env/bin/python")
-}else{#python path that works for Susanne
-   Sys.setenv(RETICULATE_PYTHON = "my_env/bin/python")
-}
 # You would need to change this folder to be wherever you wanted the html file to be written.
 opts_knit$set(root.dir = getwd())
 ```
@@ -467,33 +460,6 @@ plot2
 
 Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally.
 
-```{python}
-#code developed by Rapahel Poujol and Susanne Kraemer
-import matplotlib.pyplot as plt
-import numpy as np
-from data_needed.raphgraph.libs.Functions_For_MutationalGraphs import *
-
-# percent of alt alleles to add mutation label
-# File containing label
-# Default is AminoAcid labels for non synonymous mutations
-def_min_val_label(15)
-load_mut_names("data_needed/raphgraph/libs/Mut_Nuc_AA_ORF.dic")
-p="data_needed/raphgraph/msa_0327_"
-
-
-namelist=["Canada.BA.1","final.BA.1","Canada.BA.1.1","final.BA.1.1","Canada.BA.2","final.BA.2","final.BA.3"]
-pathlist=[p+i+".var" for i in namelist]
-
-namelist=[i.replace("_","\n") for i in namelist]
-tablelist=openfiles(pathlist)
-
-poslist=getpositions(tablelist,percentmin=75,addmissing=False)
-poslist=[i for i in poslist if i>50 and i<29950]
-bighist(tablelist,poslist,namelist,mytitle="Omicron mutations: Canada and worldwide")
-plt.show()
-
-```
-
 Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_date`.
 
 
@@ -542,14 +508,16 @@ source("scripts/plot_selection_estimator2.R")
 #### Canada without Alberta
 
 ```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("Canada (no AB)",startdate,name1,name2,name3,col2,col3)
+plot_selection_estimator3("Canada (no AB)", startdate, name1, name2, name3, 
+                          col2, col3)
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,col3)
+plot_selection_estimator3("British Columbia", startdate, name1, name2, name3, 
+                          col2, col3)
 ```
 
 ### SK
@@ -571,7 +539,8 @@ plot_selection_estimator3("British Columbia",startdate,name1,name2,name3,col2,co
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
+plot_selection_estimator3("Ontario", startdate, name1, name2, name3,
+                          col2, col3)
 ```
 
 
@@ -579,7 +548,7 @@ plot_selection_estimator3("Ontario",startdate,name1,name2,name3,col2,col3)
 #### Quebec
 
 ```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("Quebec",startdate,name1,name2,col2)
+plot_selection_estimator2("Quebec", startdate, name1, name2, col2)
 ```
 
 ### East
