@@ -19,7 +19,7 @@ Note `<datetime>` is a placeholder for the date and time associated with downloa
 
 | Command | Description | Outputs | Expected time |
 |---------|-------------|---------|---------------|
-| `python3 virusseq.py` | downloads most recent data release from [VirusSeq database](https://virusseq-dataportal.ca/) | `virusseq.<datetime>.fasta.xz` and `virusseq.<datetime>.metadata.tsv.gz` | ~15 minutes |
+| `bash download.sh` | download data release from VirusSeq, separate and re-compress | `virusseq.fasta.xz`, `virusseq.metadata.tsv.gz` | 10 minutes |
 | `conda activate pangolin` | activates conda environment for Pangolin | | fast |
 | `mpirun -np 8 python3 mangolin.py virusseq.<datetime>.fasta.xz` | uses MPI environment to classify sequences in parallel | `magnolin.0.csv`, `mangolin.1.csv`, etc. | ~30 minutes |
 | `conda deactivate` | revert to default user environment | | fast |
