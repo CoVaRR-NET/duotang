@@ -440,18 +440,18 @@ table(metasub1$pango.group)
 ```
 
 ### Omicron diversity tree
-```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
 plot4
 ```
 
 
-### Time Tree
-```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+### Time Tree {.active}
+```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
 plot1
 ```
 
 ### Diversity Tree
-```{r message=FALSE , echo = FALSE, fig.width=10,fig.height=25}
+```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
 plot2
 ```
 
@@ -483,21 +483,22 @@ SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day ov
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
 
 ```{r setting function for selection estimator}
-name1<-"BA.1" #Can include a list here (first value is used as plot labels)
-name2<-"BA.1.1" #Can include a list here (first value is used as plot labels)
-name3<-"BA.2" #Can include a list here (first value is used as plot labels)
-
+name1<-"BA.1" 
+name2<-"BA.1.1" 
+name3<-"BA.2" 
+startpar2 <- list(p=0.5, s=0.1)
+startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
+  
 #color for each lineage
-col2=pal[paste0("Omicron ",name2)]
-col3=pal[paste0("Omicron ",name3)]
+col <- c(pal[paste0("Omicron ",name2)], pal[paste0("Omicron ",name3)])
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
-source("scripts/plot_selection_estimator3.R")
-source("scripts/plot_selection_estimator2.R")
+source("scripts/plot_selection_estimator.R")
+#source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
@@ -507,148 +508,83 @@ source("scripts/plot_selection_estimator2.R")
 ### Canada
 #### Canada without Alberta
 
-```{r selection estimator Canada, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("Canada (no AB)", startdate, name1, name2, name3, 
-                          col2, col3)
+```{r selection estimator Canada, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar3,
+                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
 ```
 
 ### BC
 #### British Columbia
 
-```{r selection estimator BC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("British Columbia", startdate, name1, name2, name3, 
-                          col2, col3)
+```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+plot.selection.estimate(region="British Columbia", startdate=startdate, startpar=startpar,
+                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col,
+                        method="Nelder-Mead")
 ```
 
 ### SK
 #### Saskatchewan
 
-```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
+plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=startpar,
+                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
 ```
 
 
 ### MB
 #### Manitoba
 
-```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
+plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar,
+                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
 ```
 
 ### ON
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator3("Ontario", startdate, name1, name2, name3,
-                          col2, col3)
+#plot_selection_estimator3("Ontario", startdate, name1, name2, name3,
+#                          col2, col3)
+plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
+                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
 ```
 
 
 ### QC
 #### Quebec
 
-```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("Quebec", startdate, name1, name2, col2)
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+#plot_selection_estimator2("Quebec", startdate, name1, name2, col2)
+plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar,
+                         reference=c("BA.1", "BA.1.1"), mutants=list("BA.2"), col=col)
 ```
 
 ### East
-#### Quebec
+#### East provinces
 
-```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
+```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+#plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
+plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, 
+                        startpar=startpar, reference=c("BA.1", "BA.1.1"), 
+                        mutants=list("BA.2"), col=col)
 ```
+
 
 ## Root-to-tip analyses  
 
 The slope of root-to-tip plots over time provide an estimate of the substitution rate.  A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
 ```{r, dpi=300}
-#RTT code contributed by Art Poon
-blobs <- function(x, y, col, cex=1) {
-  points(x, y, pch=21, cex=cex)
-  points(x, y, bg=col, col=rgb(0,0,0,0), pch=21, cex=cex)
-}
-
-dlines <- function(x, y, col) {
-  lines(x, y, lwd=2.5)
-  lines(x, y, col=col)
-}
-
-fit.rtt <- function(path, plot=FALSE) {
-  rooted <- read.tree(path)
-  rooted$tip.label <- get.tipnames(rooted$tip.label)
-  metadataRTT <- meta[meta$fasta.header.name %in% rooted$tip.label, ]
-  
-  index1 <- match(rooted$tip.label, metadataRTT$fasta.header.name)
-  date <- metadataRTT$sample.collection.date[index1]
-  pg <- metadataRTT$pango.group[index1]
-  date <- as.Date(date)
-  # total branch length from root to each tip
-  div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
-  
-  fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
-  fits <- list(other=fit0)
-  
-  if (plot) {
-    par(mar=c(5,5,0,1))
-    plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
-         xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-    xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
-    axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)  
-    blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
-    abline(fit0, col='gray50')
-  }
-  
-  for (i in 1:nrow(VOCVOI)) {
-    variant <- VOCVOI$name[i]
-    if (sum(pg==variant) < 3) {
-      next
-    }
-    x <- date[pg==variant]
-    if (all(is.na(x))) next
-    y <- div[pg==variant]
-    
-    fit <- rlm(y ~ x)
-    fits[[variant]] <- fit
-    
-    if (plot) {
-      blobs(x, y, col=VOCVOI$color[i], cex=0.8)
-      dlines(fit$x[,2], predict(fit), col=VOCVOI$color[i])  
-    }
-  }
-  
-  if (plot) {
-    legend(x=min(date), y=max(div), legend=VOCVOI$name, pch=21,
-           pt.bg=VOCVOI$color, bty='n', cex=0.8)    
-  }
-  fits
-}
-
+source("scripts/fit-rtt.R")
 fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
 ```
 
 
 ```{r}
-confint.rlm <- function(object, ...) {
-  # https://stackoverflow.com/questions/49156932/getting-confidence-intervals-for-robust-regression-coefficient-massrlm
-  object$df.residual <- MASS:::summary.rlm(object)$df[2]
-  confint.lm(object, ...)
-}
-get.ci <- function(fits) {
-  ci <- lapply(fits, confint.rlm)
-  est <- data.frame(
-    n = sapply(fits, function(f) nrow(f$x)),                            
-    est = 29903*sapply(fits, function(f) f$coef[2]),
-    lower.95 = 29903*sapply(ci, function(f) f[2,1]),
-    upper.95 = 29903*sapply(ci, function(f) f[2,2])
-  )
-  est$Lineage <- row.names(est)
-  est
-}
-
 fit2 <- fit.rtt("data_needed/sample2.rtt.nwk", plot=FALSE)
 fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
-
 ```
 
 
@@ -661,14 +597,19 @@ est3 <- get.ci(fit3); est3$rep <- 'Rep3'
 sec.frame <- rbind(est1, est2, est3)
 sec.frame$est[sec.frame$est < 0] <- 0
 sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
+
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+pal["other"] <- "grey"
+
 ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
   geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
-  scale_fill_manual(values=VOCVOI$color) + 
+  scale_fill_manual(values=pal) + 
   theme(axis.text.x = element_text(size=9, angle=45, hjust=1, vjust=0.95),
         legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
   geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
                 position=position_dodge(1)) +
-  labs(y="Estimate \n (Substitutions / Genome / Day)",
+  labs(y="Substitutions / Genome / Day",
        x="Lineage", fill="Subsample")
 ```
 

@@ -1,9 +1,11 @@
 #' Original implementation in Mathematica by Sarah Otto
 #' First port into R by Carmen Murall
 #' Refactored by Art Poon
-require(bbmle, quietly=T)
-require(HelpersMG, quietly=T)
-require(dplyr, quietly=T)
+suppressMessages({
+  require(bbmle, quietly=T)
+  require(HelpersMG, quietly=T)
+  require(dplyr, quietly=T)  
+})
 
 
 #' combine multiple PANGO lineages in a data set, summing counts
@@ -227,6 +229,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
+  par(mar=c(5,5,1,1))
   plot(toplot$date, scurves[,2], type='l', xlab="Sample collection date", 
        ylab=paste0("Proportion in ", est$region), ylim=c(0, 1))
   if (ncol(scurves) > 2) {
