@@ -68,7 +68,7 @@ suppressMessages({
   # to the midpoint (p=0.5), to make sure that the alleles are segregating at 
   # the reference date.  If we set t=0 when p is near 0 or 1, then the 
   # likelihood surface is very flat.
-  v <- apply(toplot[,-1], 1, prod)
+  v <- apply(toplot[,-1], 1, function(ns) prod(ns) / sum(ns)^length(ns))
   
   refdate <- which(v==max(v, na.rm=TRUE))[1]
   timeend <- -(timestart+refdate)

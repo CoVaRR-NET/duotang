@@ -679,21 +679,16 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 # Acknowledgements and sources
 
-We thank all the authors, developers, and contributors to the GISAID and VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN). 
+We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work.  Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
 
 We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the VirusSeq database, on which this research is based.
-
-* GISAID  (https://www.gisaid.org/)
-We would like to thank the GISAID Initiative and are grateful to all of the data contributors, i.e. the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.
-Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID's innovative contribution to global health. Global Challenges, 1:33-46. DOI:10.1002/gch2.1018, PMCID:31565258
-Shu, Y., McCauley, J. (2017) GISAID: From vision to reality. EuroSurveillance, 22(13), DOI: 10.2807/1560-7917.ES.2017.22.13.30494, PMCID: PMC5388101
 
 * The Canadian VirusSeq Data Portal (https://virusseq-dataportal.ca) 
 We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory (RRPL), Nova Scotia Health Authority, Alberta ProvLab North (APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory (NML), Institut National de Sante Publique du Quebec (INSPQ), BCCDC Public Health Laboratory, Public Health Ontario (PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research (OICR), Provincial Public Health Laboratory Network of Nova Scotia, Centre Hospitalier Universitaire Georges L. Dumont - New Brunswick, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
 
 * Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
 
-* various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)  
+* Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)  
 
 
 
