@@ -1,3 +1,11 @@
+#' Original implementation in Mathematica by Sarah Otto
+#' First port into R by Carmen Murall
+#' Refactored by Art Poon
+require(bbmle, quietly=T)
+require(HelpersMG, quietly=T)
+require(dplyr, quietly=T)
+
+
 #' combine multiple PANGO lineages in a data set, summing counts
 #' TODO: let user specify a regular expression?
 .combine.lineages <- function(df) {
@@ -134,22 +142,23 @@
 #' fit multinomial model to count data by maximum likelihood
 #' @param obj:  data frame, time series for reference type
 #' @param startpar:  list, initial parameter values
+#' @param method:  character, name of method for call to optim(), defaults to 'BFGS'
 #' @return  list, fit = object of class 'mle2'
 #'                confint = matrix returned from confint
 #'                sample = data frame from RandomHessianOrMCMC
-.fit.model <- function(obj, startpar) {
-  refdata <- obj$refdata
-  mutdata <- obj$mutdata
+.fit.model <- function(est, startpar, method="BFGS") {
+  refdata <- est$refdata
+  mutdata <- est$mutdata
   
   if (length(startpar$s) == 1) {
     bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
-                 data=list(refdata=refdata, mutdata=mutdata[1]))  
+                 data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
   } 
   else if (length(startpar$s) == 2) {
     bbml <- mle2(.ll.trinom, 
                  start=list(p1=startpar$p[1], p2=startpar$p[2], 
                             s1=startpar$s[1], s2=startpar$s[2]), 
-                 data=list(refdata=refdata, mutdata=mutdata))  
+                 data=list(refdata=refdata, mutdata=mutdata), method=method)
   }
   else {
     stop("ERROR: function does not currently support more than three types!")
@@ -171,7 +180,7 @@
 }
 
 
-# plot.estimator
+#' Fit selection model and generate a plot
 #' @param region:  character, province name(s)
 #' @param startdate:  Date, earliest sample collection date - should not be too
 #'                    far before both alleles become common, or else rare 
@@ -182,28 +191,30 @@
 #'                 to estimate selection advantages for.
 #' @param startpar:  list, initial parameter values
 #' @param col:  char, vector of colour specification strings
+#' @param method:  char, pass to optim()
 #' @example 
-#' prov <- "Canada (no AB)"
+#' region <- "Canada (no AB)"
 #' startdate <- as.Date("2021-12-15")
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 plot.selection.estimate <- function(region, startdate, reference, mutants, startpar, 
-                           col=c('red', 'blue')) {
+                           col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
-  fit <- .fit.model(est, startpar)
+  toplot <- est$toplot
+  fit <- .fit.model(est, startpar, method=method)
   
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
   
   # generate sigmoidal (S-shaped) curves of selection
-  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=est$toplot$time)
+  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
   # calculate 95% confidence intervals from sampled parameters
   s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
     row <- as.numeric(x)
-    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=est$toplot$time)
+    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
   })
   qcurve <- function(q) {
     sapply(1:ncol(scurves), function(i) {
@@ -252,6 +263,8 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
     text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
   }
+  
+  # TODO: looking for a breakpoint (logit plot)
 }
 
 
