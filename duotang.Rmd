@@ -16,35 +16,27 @@ output:
 #coding and data
 library(tidyverse) # wrangling and everything really
 library(knitr) # Needed to set root directory
-library(reticulate) # Needed for the Python code chunk 
-#py_install("pandas") #install pandas in virtual environment
-#use_virtualenv(virtualenv = "r-reticulate")
-use_condaenv("r-reticulate")
-#knitr::knit_engines$set(python = reticulate::eng_python)
+
 library(lubridate) # dates are special
+
 #phylo-specific
 library(treeio)
 library(phylotools)
 library(tidytree)
-library(phangorn)
+#library(phangorn)
 library(phytools)
+
 #plotting and tables
 library(ggplot2) # Work-horse plotting package
 library(ggtree) #All things phylogenetic visualization
-library(cowplot) # Needed to make easy multi-panel plots with ggplot2
-library(DT) # Needed to make DT example table
-library(ggbeeswarm) # Needed to make beeswarm plots
-library(gridExtra) # multi-panel plots
-library(kableExtra) # Needed to write out a formatted table
-library(scales)
+
 #colors
 library(RColorBrewer)
 library(colorspace)
 library(viridis)
+
 library(MASS)
 
-#library(bbmle)
-#library(HelpersMG)
 
 theme_set(theme_classic())
 
@@ -71,11 +63,11 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022_03_16"
+VirusSeq_date="2022-04-11"
 
 
 # this can be made more compact for faster loading
-meta <- read.csv(gzfile("data_needed/virusseq.2022-03-16T15:17:45.csv.gz"))
+meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
 meta$sample.collection.date <- as.Date(meta$sample.collection.date)
 meta$province <- meta$geo_loc_name..state.province.territory.
 
@@ -118,10 +110,7 @@ epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
 # for barplots
-require(lubridate)
 meta$week <- cut(meta$sample.collection.date, 'week')
-meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
-meta1$week <- as.factor(as.character(meta1$week))
 ```
 
 
@@ -134,13 +123,15 @@ These plots show the changing composition of sequences posted to the VirusSeq Po
 
 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
+meta1$week <- as.factor(as.character(meta1$week))
 
 # --- Histogram plot: counts per variant of all canadian data -------------
 plot.variants <- function(region='Canada', scaled=FALSE) {
   if (region=='Canada') {
     tab <- table(meta1$pango.group, meta1$week)  
   } else {
-    meta2 <- meta1[meta1$province==region, ]
+    meta2 <- meta1[meta1$geo_loc_name..state.province.territory.==region, ]
     tab <- table(meta2$pango.group, meta2$week)  
   }
   # reorder colour palette
@@ -460,9 +451,9 @@ plot2
 
 Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally.
 
+![](raphgraph.png)
+
 Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_date`.
-
-
 
 
 <!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
@@ -483,9 +474,9 @@ SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day ov
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
 
 ```{r setting function for selection estimator}
-name1<-"BA.1" 
-name2<-"BA.1.1" 
-name3<-"BA.2" 
+name1 <- "BA.1" 
+name2 <- unique(meta$lineage[grepl("BA\\.1\\.1\\.", meta$lineage)])  #"BA.1.1" 
+name3 <- unique(meta$lineage[grepl("BA\\.2", meta$lineage)])  # "BA.2" 
 startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
   
@@ -510,25 +501,24 @@ source("scripts/plot_selection_estimator.R")
 
 ```{r selection estimator Canada, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar3,
-                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
+                         reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
 ### BC
 #### British Columbia
 
-```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-plot.selection.estimate(region="British Columbia", startdate=startdate, startpar=startpar,
-                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col,
-                        method="Nelder-Mead")
+```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+plot.selection.estimate(region="British Columbia", startdate=startdate, startpar=startpar3,
+                         reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
 ### SK
 #### Saskatchewan
 
-```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 #plot_selection_estimator3("Saskatchewan",startdate,name1,name2,name3,col2,col3)
-plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=startpar,
-                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
+plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=startpar3,
+                         reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
 
@@ -538,7 +528,7 @@ plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=sta
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
 plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar,
-                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
+                         reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
 ### ON
@@ -548,17 +538,17 @@ plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpa
 #plot_selection_estimator3("Ontario", startdate, name1, name2, name3,
 #                          col2, col3)
 plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
-                         reference=c("BA.1"), mutants=list("BA.1.1", "BA.2"), col=col)
+                         reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
 
 ### QC
 #### Quebec
 
-```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 #plot_selection_estimator2("Quebec", startdate, name1, name2, col2)
-plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar,
-                         reference=c("BA.1", "BA.1.1"), mutants=list("BA.2"), col=col)
+plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar3,
+                         reference=name1, mutants=list(name2, name3), col=col)
 ```
 
 ### East
@@ -567,8 +557,8 @@ plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar,
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
 plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, 
-                        startpar=startpar, reference=c("BA.1", "BA.1.1"), 
-                        mutants=list("BA.2"), col=col)
+                        startpar=startpar3, reference=c(name1), 
+                        mutants=list(name2, name3), col=col)
 ```
 
 

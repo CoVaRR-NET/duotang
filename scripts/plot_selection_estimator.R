@@ -4,8 +4,18 @@
 suppressMessages({
   require(bbmle, quietly=T)
   require(HelpersMG, quietly=T)
-  require(dplyr, quietly=T)  
+  require(dplyr, quietly=T)
+  #require(scales, quietly=T)
 })
+
+
+#' from github.com/ArtPoon/ggfree
+alpha <- function(col, alpha) {
+  sapply(col, function(cl) {
+    vals <- col2rgb(cl)  # convert colour to RGB values
+    rgb(vals[1], vals[2], vals[3], alpha*255, maxColorValue=255)
+  })
+}
 
 
 #' combine multiple PANGO lineages in a data set, summing counts
@@ -66,8 +76,8 @@ suppressMessages({
   
   # To aid in the ML search, we rescale time to be centered as close as possible
   # to the midpoint (p=0.5), to make sure that the alleles are segregating at 
-  # the reference date.  If we set t=0 when p is near 0 or 1, then the 
-  # likelihood surface is very flat.
+  # the reference date.  If we set t=0 when p (e.g., n1/(n1+n2+n3)) is near 0 
+  # or 1, then the likelihood surface is very flat.
   v <- apply(toplot[,-1], 1, function(ns) prod(ns) / sum(ns)^length(ns))
   
   refdate <- which(v==max(v, na.rm=TRUE))[1]
@@ -267,7 +277,31 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
     text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
   }
   
-  # TODO: looking for a breakpoint (logit plot)
+  # second plot - logit transform
+  #options(scipen=5)  # use scientific notation for numbers exceeding 5 digits
+  par(mar=c(5,5,1,1))
+  
+  plot(toplot$date, toplot$n2/toplot$n1, pch=21,
+       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3,
+       log='y', ylim=c(0.001, 1000), yaxt='n', 
+       xlab='Sample collection date',
+       ylab=paste0("Logit in ", est$region))
+  axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
+  
+  lines(toplot$date, scurves[,2] / scurves[,1])
+  text(x=toplot$date[1], y=500, str2, col=col[1], pos=4, cex=1)
+  
+  if (!is.null(toplot$n3)) {
+    # draw second series
+    points(toplot$date, toplot$n3/toplot$n1, pch=21,
+           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/3)
+    lines(toplot$date, scurves[,3] / scurves[,1])
+    text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
+  }
+  
+  # Bends suggest a changing selection over time (e.g., due to the impact of 
+  # vaccinations differentially impacting the variants). Sharper turns are more 
+  # often due to NPI measures. 
 }
 
 
