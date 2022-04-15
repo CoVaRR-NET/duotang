@@ -314,7 +314,7 @@ ttree_sub1$tip.label <- get.tipnames(ttree_sub1$tip.label)
 #epis <- sapply(strsplit(tips,"\\|"),`[`,1)
 #metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]
 metasub1 <- meta[meta$fasta.header.name %in% ttree_sub1$tip.label, ]
-stopifnot(nrow(metasub1) == Ntip(ttree_sub1))
+#stopifnot(nrow(metasub1) == Ntip(ttree_sub1))
 
 #scale to number of mutations
 MLtree_sub1$edge.length <- MLtree_sub1$edge.length*29903
@@ -475,7 +475,7 @@ Selection coefficients are not estimated for Alberta, which is currently taking 
 
 ```{r setting function for selection estimator}
 name1 <- "BA.1" 
-name2 <- unique(meta$lineage[grepl("BA\\.1\\.1\\.", meta$lineage)])  #"BA.1.1" 
+name2 <- unique(meta$lineage[grepl("BA\\.1\\.1$|BA\\.1\\.1\\.", meta$lineage)])  #"BA.1.1"
 name3 <- unique(meta$lineage[grepl("BA\\.2", meta$lineage)])  # "BA.2" 
 startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
@@ -537,8 +537,10 @@ plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpa
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 #plot_selection_estimator3("Ontario", startdate, name1, name2, name3,
 #                          col2, col3)
-plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
-                         reference=c(name1), mutants=list(name2, name3), col=col)
+#plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
+#                         reference=c(name1), mutants=list(name2, name3), col=col)
+plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar2,
+                         reference=c(name1, name2), mutants=list(name3), col=col)
 ```
 
 
