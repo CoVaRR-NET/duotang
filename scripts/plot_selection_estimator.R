@@ -251,7 +251,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
          bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5)
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
-           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n2)/5)
+           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
   }
   
   # display confidence intervals
