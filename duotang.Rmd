@@ -79,8 +79,11 @@ VOCVOI <- data.frame(
          'A.23.1', 'B.1.438.1'),
   pattern=c('^B\\.1\\.1\\.7|^Q\\.', '^B\\.1\\.351', '^P\\.', 
             '^B\\.1\\.617|^(?!AY\\.2[57])AY\\.', '^AY\\.25', '^AY\\.27', 
-            '^C\\.37|^C\\.37\\.1', '^B\\.1\\.1\\.529|^BA\\.1$', 
-            '^BA\\.1\\.1', '^BA\\.2', '^B\\.1\\.621', 
+            '^C\\.37|^C\\.37\\.1',
+            '^B\\.1\\.1\\.529|^BA\\.1$|^BA\\.1\\.1[0-9]$|BA\\.1\\.[2-9]$', 
+            '^BA\\.1\\.1$|^BA\\.1\\.1\\.[0-9]+$', 
+            '^BA\\.2', 
+            '^B\\.1\\.621', 
             '^A\\.23\\.1', '^B\\.1\\.438\\.1'),
   color=c('#B29C71', '#F08C3A', '#444444', '#A6CEE3', '#61A6A0',
           '#438FC0', '#CD950C', '#8B0000', '#FA8072', '#FF0000',
@@ -474,14 +477,15 @@ SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day ov
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
 
 ```{r setting function for selection estimator}
-name1 <- "BA.1" 
+#name1 <- "BA.1"; name2 <- "BA.1.1"; name3 <- "BA.2"
+name1 <- unique(meta$lineage[grepl("BA\\.1$|BA\\.1\\.[2-9]|BA\\.1\\.1[0-9]", meta$lineage)])
 name2 <- unique(meta$lineage[grepl("BA\\.1\\.1$|BA\\.1\\.1\\.", meta$lineage)])  #"BA.1.1"
 name3 <- unique(meta$lineage[grepl("BA\\.2", meta$lineage)])  # "BA.2" 
 startpar2 <- list(p=0.5, s=0.1)
-startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
+startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
   
 #color for each lineage
-col <- c(pal[paste0("Omicron ",name2)], pal[paste0("Omicron ",name3)])
+col <- c(pal["Omicron BA.1.1"], pal["Omicron BA.2"])
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
@@ -500,16 +504,19 @@ source("scripts/plot_selection_estimator.R")
 #### Canada without Alberta
 
 ```{r selection estimator Canada, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar3,
-                         reference=c(name1), mutants=list(name2, name3), col=col)
+#plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar3,
+#                         reference=c(name1), mutants=list(name2, name3), col=col)
+plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar2,
+                         reference=c(name1, name2), mutants=list(name3), col=col)
 ```
 
 ### BC
 #### British Columbia
 
-```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-plot.selection.estimate(region="British Columbia", startdate=startdate, startpar=startpar3,
-                         reference=c(name1), mutants=list(name2, name3), col=col)
+```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=F}
+plot.selection.estimate(region="British Columbia", startdate=startdate, 
+                        startpar=startpar3, reference=c(name1), 
+                        mutants=list(name2, name3), col=col)
 ```
 
 ### SK
@@ -559,8 +566,8 @@ plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar3
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
 plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, 
-                        startpar=startpar3, reference=c(name1), 
-                        mutants=list(name2, name3), col=col)
+                        startpar=startpar2, reference=c(name1, name2), 
+                        mutants=list(name3), col=col)
 ```
 
 
