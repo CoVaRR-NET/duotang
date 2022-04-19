@@ -26,7 +26,7 @@ alpha <- function(col, alpha) {
       day=sample.collection.date, n=sum(n), time=time, lineage=lineage
       )))
   df$lineage <- df$lineage[1]
-  df
+  distinct(df)
 }
 
 
@@ -80,6 +80,7 @@ alpha <- function(col, alpha) {
   # or 1, then the likelihood surface is very flat.
   v <- apply(toplot[,-1], 1, function(ns) prod(ns) / sum(ns)^length(ns))
   
+  # which.max(smooth.spline(v)$y)
   refdate <- which(v==max(v, na.rm=TRUE))[1]
   timeend <- -(timestart+refdate)
   timestart <- -refdate
@@ -185,9 +186,14 @@ alpha <- function(col, alpha) {
   bbhessian <- bbml@details$hessian  # matrix of 2nd order partial derivatives
   dimnames(bbhessian) <- list(names(bbfit), names(bbfit))
   
-  # draw random parameter values from Hessian to determine variation in {p, s}
-  df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
-                                method="Hessian", replicates=1000, silent=T)$random
+  if (any(is.nan(bbhessian))) {
+    df <- NA
+  } else {
+    # draw random parameter values from Hessian to determine variation in {p, s}
+    df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
+                                  method="Hessian", replicates=1000, silent=T)$random  
+  }
+  
   return(list(fit=bbfit, confint=myconf, sample=df))
 }
 
@@ -214,6 +220,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
                            col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
+  toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   fit <- .fit.model(est, startpar, method=method)
   
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
@@ -223,43 +230,48 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
-  # calculate 95% confidence intervals from sampled parameters
-  s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
-    row <- as.numeric(x)
-    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
-  })
-  qcurve <- function(q) {
-    sapply(1:ncol(scurves), function(i) {
-      apply(sapply(s95, function(x) x[,i]), 1, 
-            function(y) quantile(y, q)) 
+  if (!is.na(fit$sample)) {  
+    # calculate 95% confidence intervals from sampled parameters
+    s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
+      row <- as.numeric(x)
+      s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
     })
-  } 
-  lo95 <- qcurve(0.025)
-  hi95 <- qcurve(0.975)
-  
-  toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
-  
-  par(mar=c(5,5,1,1))
-  plot(toplot$date, scurves[,2], type='l', xlab="Sample collection date", 
-       ylab=paste0("Proportion in ", est$region), ylim=c(0, 1))
-  if (ncol(scurves) > 2) {
-    lines(toplot$date, scurves[,3])
+    qcurve <- function(q) {
+      sapply(1:ncol(scurves), function(i) {
+        apply(sapply(s95, function(x) x[,i]), 1, 
+              function(y) quantile(y, q)) 
+      })
+    } 
+    lo95 <- qcurve(0.025)
+    hi95 <- qcurve(0.975)  
   }
   
+  par(mar=c(5,5,1,1))
+  
   # display counts
-  points(toplot$date, toplot$n2/toplot$tot, pch=21, col='black', 
-         bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5)
+  plot(toplot$date, toplot$n2/toplot$tot, ylim=c(0, 1), 
+       pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
+       xlab="Sample collection date", 
+       ylab=paste0("Proportion in ", est$region))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
   }
+
+  # show trendlines
+  lines(toplot$date, scurves[,2])
+  if (ncol(scurves) > 2) {
+    lines(toplot$date, scurves[,3])
+  }
   
-  # display confidence intervals
-  polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
-          col=alpha(col[1], 0.5))
-  if(ncol(lo95) > 2) {
-    polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
-            col=alpha(col[2], 0.5))
+  if (!is.na(fit$sample)) {
+    # display confidence intervals
+    polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
+            col=alpha(col[1], 0.5))
+    if(ncol(lo95) > 2) {
+      polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
+              col=alpha(col[2], 0.5))
+    }
   }
   
   # report parameter estimates on plot
@@ -277,15 +289,15 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
     text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
   }
   
+  
   # second plot - logit transform
   #options(scipen=5)  # use scientific notation for numbers exceeding 5 digits
   par(mar=c(5,5,1,1))
   
   plot(toplot$date, toplot$n2/toplot$n1, pch=21,
-       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3,
-       log='y', ylim=c(0.001, 1000), yaxt='n', 
+       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, ylim=c(0.001, 1000), 
        xlab='Sample collection date',
-       ylab=paste0("Logit in ", est$region))
+       ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
   axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
   
   lines(toplot$date, scurves[,2] / scurves[,1])
