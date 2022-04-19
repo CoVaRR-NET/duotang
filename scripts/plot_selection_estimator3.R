@@ -27,11 +27,14 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
       ) %>% group_by(sample.collection.date) %>% count(lineage)
   }
   
-  # Set the final date:
-  lastdate <- max(mydata$sample.collection.date)
-  
-  # convert time to an integer counter for use in fitting, first using the last date as time 0:
-  mydata$time <- as.numeric(difftime(mydata$sample.collection.date, lastdate, units = "days"))
+  #Set the final date:
+  lastdate<-max(mydata$Collection_date)
+
+  #Set the dates for now-casting (the current date and one week in the future):
+  projdate<-c(Sys.Date(),Sys.Date()+7)
+
+  #convert time to an integer counter for use in fitting, first using the last date as time 0:
+  mydata$time = as.numeric(difftime(mydata$Collection_date, lastdate, units = "days"))
   
   # filter data to after that starting date
   data1 <- filter(mydata, lineage %in% name1)
@@ -60,8 +63,9 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
   toplot$n2 <- data2$n[match(toplot$time,data2$time)]
   toplot$n3 <- data3$n[match(toplot$time,data3$time)]
   toplot[is.na(toplot)] = 0 #Any NA's refer to no variant of that type on a day, set to zero
-  
-  print(toplot)
+
+  timeprojdate <- as.numeric(difftime(projdate, lastdate, units = "days"))
+
   
   #To aid in the ML search, we rescale time to be centered as close as possible
   #to the midpoint for the second variable (p=0.5), to make sure that the alleles 
@@ -76,11 +80,12 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
   data1$time <- data1$time + (timeend-timestart)-refdate
   data2$time <- data2$time + (timeend-timestart)-refdate
   data3$time <- data3$time + (timeend-timestart)-refdate
-  
+  timeproj <- timeprojdate + (timeend-timestart)-refdate
+
   #date converter
   dateseq <- seq.Date(startdate,lastdate,"days")
   dateconverter <- data.frame(time=toplot$time,date=dateseq)
-  
+
   # plot(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$time,xlab="Time",ylab="proportion",ylim=c(0,1),col=col2)
   # points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$time,xlab="Time",ylab="proportion",cex=0.5,col=col3)
   #With time started in this way, we can use 0.5 as the frequency at t=0 (startp):
@@ -148,57 +153,77 @@ plot_selection_estimator3 <- function(prov,startdate,name1,name2,name3,col2,col3
     replicates=1000,
     silent = TRUE)$random
   
-  #Once we get the set of {p,s} values, we can run them through the s-shaped curve of selection
-  scurve1 <- function(p2,p3,s2,s3){
+  #Once we get the set of {p,s} values, we can run them through the s-shaped curve of selection for types 2 and 3
+  scurve2 <- function(p2,p3,s2,s3){
     (p2*exp(s2*toplot$time)/((1-p2-p3)+p2*exp(s2*toplot$time)+p3*exp(s3*toplot$time)))
   }
   
-  scurve2 <- function(p2,p3,s2,s3){
+  scurve3 <- function(p2,p3,s2,s3){
     (p3*exp(s3*toplot$time)/((1-p2-p3)+p2*exp(s2*toplot$time)+p3*exp(s3*toplot$time)))
+  }
+  
+  #Similar functions for the now-casting
+  projcurve2 <- function(p2,p3,s2,s3){
+    (p2*exp(s2*timeproj)/((1-p2-p3)+p2*exp(s2*timeproj)+p3*exp(s3*timeproj)))
+  }
+  
+  projcurve3 <- function(p2,p3,s2,s3){
+    (p3*exp(s3*timeproj)/((1-p2-p3)+p2*exp(s2*timeproj)+p3*exp(s3*timeproj)))
   }
   
   #Generating a list of frequencies at each time point given each {p,s} combination
   #NOTE - We could run more time points, if projections into the future were desired just by 
   #extending toplot$time
-  setofcurves2 <- t(mapply(scurve1,df[,1],df[,2],df[,3],df[,4]))
-  setofcurves3 <- t(mapply(scurve2,df[,1],df[,2],df[,3],df[,4]))
+  setofcurves2 <- t(mapply(scurve2,df[,1],df[,2],df[,3],df[,4]))
+  setofcurves3 <- t(mapply(scurve3,df[,1],df[,2],df[,3],df[,4]))
+  #added now-cast time points separately (could bundle into the above, but didn't want to plot them)
+  setofprojections2 <- t(mapply(projcurve2,df[,1],df[,2],df[,3],df[,4]))
+  setofprojections3 <- t(mapply(projcurve3,df[,1],df[,2],df[,3],df[,4]))
   
-  #95% innerquantiles
-  lowercurve1 <- c()
-  uppercurve1 <- c()
+  #95% innerquantiles for types 2 and 3 
+  #SALLY CHANGED NUMBERING OF LABELS TO BE CONSISTENT 2->type 2
   lowercurve2 <- c()
   uppercurve2 <- c()
+  lowercurve3 <- c()
+  uppercurve3 <- c()
   for (tt in 1:length(toplot$time))  {
-    lower1<-quantile(setofcurves2[,tt],0.025)
-    upper1<-quantile(setofcurves2[,tt],0.975)
-    lowercurve1<-append(lowercurve1,lower1)
-    uppercurve1<-append(uppercurve1,upper1)
-    
-    lower2<-quantile(setofcurves3[,tt],0.025)
-    upper2<-quantile(setofcurves3[,tt],0.975)
+    lower2<-quantile(setofcurves2[,tt],0.025)
+    upper2<-quantile(setofcurves2[,tt],0.975)
     lowercurve2<-append(lowercurve2,lower2)
     uppercurve2<-append(uppercurve2,upper2)
+    
+    lower3<-quantile(setofcurves3[,tt],0.025)
+    upper3<-quantile(setofcurves3[,tt],0.975)
+    lowercurve3<-append(lowercurve3,lower3)
+    uppercurve3<-append(uppercurve3,upper3)
   }
+  
+  #Printing the now-casting
+  for (tt in 1:length(timeproj))  {
+    lower2<-quantile(setofprojections2[,tt],0.025)
+    upper2<-quantile(setofprojections2[,tt],0.975)
+    proj2<-projcurve2(p2=bbfit[["p2"]],s2=bbfit[["s2"]],p3=bbfit[["p3"]],s3=bbfit[["s3"]])[[tt]]
+    str2=sprintf("%s forecast on %s: %s with 95%% CI {%s, %s}",name2,projdate[[tt]],format(round(proj2,3),nsmall=3),format(round(lower2,3),nsmall=3),format(round(upper2,3),nsmall=3))
+    print(str2)
+    
+    lower3<-quantile(setofprojections3[,tt],0.025)
+    upper3<-quantile(setofprojections3[,tt],0.975)
+    proj3<-projcurve3(p2=bbfit[["p2"]],s2=bbfit[["s2"]],p3=bbfit[["p3"]],s3=bbfit[["s3"]])[[tt]]
+    str3=sprintf("%s forecast on %s: %s with 95%% CI {%s, %s}",name3,projdate[[tt]],format(round(proj3,3),nsmall=3),format(round(lower3,3),nsmall=3),format(round(upper3,3),nsmall=3))
+    print(str3)
+  }
+
   #add date column
   toplot$date <- dateconverter$date
   
   #A graph with 95% quantiles based on the Hessian draws.
   #png(file=paste0("curves_",i,".png"))
-  plot(y=uppercurve1, x=toplot$date,type="l", xlab="Time", 
-       ylab=paste0("proportion in ",prov), ylim=c(0,1))
-  points(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3), 
-         x=toplot$date,pch=21, col = "black", bg = alpha(col2, 0.7), 
-         cex=sqrt(toplot$n2)/5)#cex=(toplot$n2/log(10))/20)#cex=toplot$n2/50 )#cex = 0.5)
-  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),
-         x=toplot$date,pch=21, col = "black", bg = alpha(col3, 0.7), 
-         cex=sqrt(toplot$n3)/5)#, cex=(toplot$n3/log(10))/20) #cex=toplot$n3/50 )#cex = 0.5)
-  polygon(c(toplot$date, rev(toplot$date)), c(lowercurve1, rev(uppercurve1)),
-          col = alpha(col2, 0.5))
-  polygon(c(toplot$date, rev(toplot$date)), c(lowercurve2, rev(uppercurve2)),
-          col = alpha(col3, 0.5))
-  lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time) / 
-             ((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]] * exp(bbfit[["s2"]]*toplot$time) + 
-                bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
+  plot(y=uppercurve2,x=toplot$date,type="l",xlab="",ylab=paste0("proportion in ",prov),ylim=c(0,1))
+  points(y=toplot$n2/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha(col2, 0.7), cex=sqrt(toplot$n2)/3)#cex=(toplot$n2/log(10))/20)#cex=toplot$n2/50 )#cex = 0.5)
+  points(y=toplot$n3/(toplot$n1+toplot$n2+toplot$n3),x=toplot$date,pch=21, col = "black", bg = alpha(col3, 0.7), cex=sqrt(toplot$n3)/3)#, cex=(toplot$n3/log(10))/20) #cex=toplot$n3/50 )#cex = 0.5)
+  polygon(c(toplot$date, rev(toplot$date)), c(lowercurve2, rev(uppercurve2)),col = alpha(col2, 0.5))
+  polygon(c(toplot$date, rev(toplot$date)), c(lowercurve3, rev(uppercurve3)),col = alpha(col3, 0.5))
+  lines(y=(bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)/((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time)+bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time))),
         x=toplot$date,type="l")
   lines(y=(bbfit[["p3"]]*exp(bbfit[["s3"]]*toplot$time) / 
              ((1-bbfit[["p2"]]-bbfit[["p3"]])+bbfit[["p2"]]*exp(bbfit[["s2"]]*toplot$time) + 

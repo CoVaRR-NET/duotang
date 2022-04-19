@@ -1,4 +1,4 @@
-# CoVaRRNet_Pillar6_Notebook
+# CoVaRR-Net, Pillar 6's "duotang"
 
 R notebook for compiling our analyses
 
