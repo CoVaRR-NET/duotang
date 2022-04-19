@@ -78,10 +78,12 @@ alpha <- function(col, alpha) {
   # to the midpoint (p=0.5), to make sure that the alleles are segregating at 
   # the reference date.  If we set t=0 when p (e.g., n1/(n1+n2+n3)) is near 0 
   # or 1, then the likelihood surface is very flat.
-  v <- apply(toplot[,-1], 1, function(ns) prod(ns) / sum(ns)^length(ns))
+  v <- apply(toplot[,-1], 1, function(ns) { 
+    ifelse(sum(ns)>0, prod(ns) / sum(ns)^length(ns), 0) 
+    })
   
-  # which.max(smooth.spline(v)$y)
-  refdate <- which(v==max(v, na.rm=TRUE))[1]
+  refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
+  #refdate <- which(v==max(v, na.rm=TRUE))[1]
   timeend <- -(timestart+refdate)
   timestart <- -refdate
   toplot$time <- seq.int(timestart,timeend)
@@ -275,14 +277,14 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   }
   
   # report parameter estimates on plot
-  str2 <- sprintf("%s: %s {%s, %s}", mutants[[1]],
+  str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],
                   format(round(fit$fit[["s1"]],3), nsmall=3), 
                   format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
                   format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
   text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
   
   if (length(mutants) > 1) {
-    str3 <- sprintf("%s: %s {%s, %s}", mutants[[2]],
+    str3 <- sprintf("%s: %s {%s, %s}", est$mutdata[[2]]$lineage[1],
                     format(round(fit$fit[["s2"]], 3), nsmall=3), 
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    

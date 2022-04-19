@@ -429,7 +429,7 @@ plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE],
   scale_fill_manual(breaks=listPTs, values = pal2)
 ```
 
-```{r}
+```{r, eval=FALSE}
 table(metasub1$pango.group)
 ```
 
@@ -491,7 +491,7 @@ col <- c(pal["Omicron BA.1.1"], pal["Omicron BA.2"])
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-as.Date("2021-12-15") #Using a later date with less sampling noise
+startdate<-as.Date("2021-12-01") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator.R")
 #source("scripts/plot_selection_estimator2.R")
 #####################################################
@@ -544,10 +544,10 @@ plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpa
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 #plot_selection_estimator3("Ontario", startdate, name1, name2, name3,
 #                          col2, col3)
-#plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
-#                         reference=c(name1), mutants=list(name2, name3), col=col)
-plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar2,
-                         reference=c(name1, name2), mutants=list(name3), col=col)
+plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
+                         reference=c(name1), mutants=list(name2, name3), col=col)
+#plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar2,
+#                         reference=c(name1, name2), mutants=list(name3), col=col)
 ```
 
 
@@ -616,6 +616,7 @@ ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) +
 ## Future development
 
 We are in the process of adding or would like to develop code for some of the following analyses:   
+
 * dN/dS (by variant and by gene/domains)  
 * Tajima's D over time  
 * clustering analyses
