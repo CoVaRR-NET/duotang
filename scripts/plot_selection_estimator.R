@@ -166,13 +166,14 @@ alpha <- function(col, alpha) {
   mutdata <- est$mutdata
   
   if (length(startpar$s) == 1) {
-    bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
-                 data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
+    start <- list(p1=startpar$p[1], s1=startpar$s[1])
+    bbml <- mle2(.ll.binom, start=start, 
+                 data=list(refdata=refdata, mutdata=mutdata[1]), method=method)
   } 
   else if (length(startpar$s) == 2) {
-    bbml <- mle2(.ll.trinom, 
-                 start=list(p1=startpar$p[1], p2=startpar$p[2], 
-                            s1=startpar$s[1], s2=startpar$s[2]), 
+    start <- list(p1=startpar$p[1], p2=startpar$p[2], 
+                  s1=startpar$s[1], s2=startpar$s[2])
+    bbml <- mle2(.ll.trinom, start=start,
                  data=list(refdata=refdata, mutdata=mutdata), method=method)
   }
   else {
@@ -189,12 +190,25 @@ alpha <- function(col, alpha) {
   dimnames(bbhessian) <- list(names(bbfit), names(bbfit))
   
   if (any(is.nan(bbhessian))) {
-    df <- NA
-  } else {
-    # draw random parameter values from Hessian to determine variation in {p, s}
-    df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
-                                  method="Hessian", replicates=1000, silent=T)$random  
-  }
+    # salvage attempt - re-use `start` variable
+    if (length(startpar$s) == 1) {
+      objfunc <- function(par) {
+        .llfunc(p=par[1], s=par[2], refdata=refdata, mutdata=mutdata)
+      }
+      optml <- optim(as.numeric(start), objfunc)
+    } else {
+      objfunc <- function(par) {
+        .llfunc(p=par[1:2], s=par[3:4], refdata=refdata, mutdata=mutdata)
+      }
+    }
+    optml <- optim(as.numeric(start), objfunc, hessian=TRUE, 
+                   control=list(fnscale=+1))
+    bbhessian <- optml$hessian
+  } 
+  
+  # draw random parameter values from Hessian to determine variation in {p, s}
+  df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
+                                method="Hessian", replicates=1000, silent=T)$random  
   
   return(list(fit=bbfit, confint=myconf, sample=df))
 }
@@ -218,6 +232,7 @@ alpha <- function(col, alpha) {
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
+#' plot.selection.estimate(region, startdate, reference, mutants, startpar)
 plot.selection.estimate <- function(region, startdate, reference, mutants, startpar, 
                            col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
@@ -232,21 +247,20 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
-  if (!is.na(fit$sample)) {  
-    # calculate 95% confidence intervals from sampled parameters
-    s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
-      row <- as.numeric(x)
-      s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
+  # calculate 95% confidence intervals from sampled parameters
+  s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
+    row <- as.numeric(x)
+    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
+  })
+  qcurve <- function(q) {
+    sapply(1:ncol(scurves), function(i) {
+      apply(sapply(s95, function(x) x[,i]), 1, 
+            function(y) quantile(y, q)) 
     })
-    qcurve <- function(q) {
-      sapply(1:ncol(scurves), function(i) {
-        apply(sapply(s95, function(x) x[,i]), 1, 
-              function(y) quantile(y, q)) 
-      })
-    } 
-    lo95 <- qcurve(0.025)
-    hi95 <- qcurve(0.975)  
-  }
+  } 
+  lo95 <- qcurve(0.025)
+  hi95 <- qcurve(0.975)  
+
   
   par(mar=c(5,5,1,1))
   
