@@ -20,7 +20,7 @@ library(knitr) # Needed to set root directory
 library(lubridate) # dates are special
 
 #phylo-specific
-library(treeio)
+library(treeio)  # https://bioconductor.org/packages/release/bioc/html/treeio.html
 library(phylotools)
 library(tidytree)
 #library(phangorn)
