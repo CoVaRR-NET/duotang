@@ -234,7 +234,7 @@ plot.variants(region='British Columbia')
 plot.variants(region='British Columbia', scaled=T)
 ```
 
-### AL
+### AB
 #### Alberta
 Additional up-to-date COVID data for this province can be found here:  
 https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
