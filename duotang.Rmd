@@ -46,16 +46,21 @@ opts_knit$set(root.dir = getwd())
 
 ### Contributing authors:  
 
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro. Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, William Hsiao, and Erin Gill. 
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro.
+Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, William Hsiao, and Erin Gill. 
 
-Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here. A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
+Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
+A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
 
 # Introduction  
 
-This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread. It is for discussion with pillar 6's team and for sharing with collaborators, e.g. PH labs. These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
+This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
+It is for discussion with pillar 6's team and for sharing with collaborators, e.g. PH labs.
+These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
 
-Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date. Only representations of aggregate data will be posted here.
+Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
+Only representations of aggregate data will be posted here.
 
 
 ```{r load_data}
@@ -122,7 +127,11 @@ meta$week <- cut(meta$sample.collection.date, 'week')
 ## Variants in Canada over time
 
 **Important caveat:**  
-These plots show the changing composition of sequences posted to the VirusSeq Portal by PANGO lineage/variant designation. Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories. Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. Thus, interpretation of these plots and comparisons between health regions should be done with caution.
+These plots show the changing composition of sequences posted to the VirusSeq Portal by PANGO lineage/variant designation.
+Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time.
+Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories.
+Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
+Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
@@ -187,7 +196,11 @@ plot.variants(scaled=T)
 Sequence counts for all Canadian data in VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
 
 
-From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs). By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada. The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave. Omicron arrived in November of 2021 and currently the 3 main sublineages in Canada are BA.1, BA.1.1, and BA.2. See below for jurdictional differences of these plots.    
+From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
+The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave.
+Omicron arrived in November of 2021 and currently the three main lineages in Canada are BA.1, BA.1.1, and BA.2, with multiple sub-lineages within each clade, *e.g.*, BA.2.12.
+See below for jurisdictional differences of these plots.    
 
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
 
@@ -203,9 +216,13 @@ Other lineages of Canadian interest:
 Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/  
 
 **Disclaimer:**   
-All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions. When possible, these differences in sampling strategies are mentioned but they are not always known. These analyses are subject to change given new data.  
+All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
+For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
+When possible, these differences in sampling strategies are mentioned but they are not always known.
+These analyses are subject to change given new data.  
 
-With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021, and thus switched to targeted testing of priority groups (e.g. hospitalized patients, health care workers, and people in high-risk settings). Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
+With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021, and thus switched to targeted testing of priority groups (e.g. hospitalized patients, health care workers, and people in high-risk settings).
+Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
 
 ### BC
 #### British Columbia  
@@ -298,10 +315,10 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
-ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
+MLtree_sub1 <- read.tree("./data_needed/sample3.rtt.nwk")
+ttree_sub1 <- read.tree("./data_needed/sample3.timetree.nwk")
 require(lubridate)
-dateseq <- seq(ymd('2019-12-01'), ymd('2021-09-01'), by='3 month')
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-03-01'), by='3 month')
 
 stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
 
@@ -427,15 +444,8 @@ plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE],
                   width= 0.1, color = F, colnames = F, 
                   legend_title = F) +
   scale_fill_manual(breaks=listPTs, values = pal2)
-```
 
-```{r, eval=FALSE}
-table(metasub1$pango.group)
-```
-
-### Omicron diversity tree
-```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
-plot4
+# table(metasub1$pango.group)
 ```
 
 
@@ -447,6 +457,11 @@ plot1
 ### Diversity Tree
 ```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
 plot2
+```
+
+### Omicron diversity tree
+```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
+plot4
 ```
 
 
@@ -466,15 +481,20 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 
 ## Selection on omicron sublineages {.tabset}  
 
-Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population. Here we examine the major sublineages currently in Canada and their relative rate of spread. 
+Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
+Here we examine the major sublineages currently in Canada and their relative rate of spread. 
 
-Currently, the major variants circulating are Omicron sublineages BA.1, BA.1.1, and BA.2. Sub-lineage BA.1 was initially prevalent, but Omicron sublineages BA.1.1 and BA.2 have been spreading, as illustrated in the plots below. Left plot: y-axis is the proportion of sub-lineages BA.1.1 and BA.2 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.1.1 or BA.2)/freq(BA.1)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
+Currently, the major variants circulating are Omicron sublineages BA.1 (including BA.1.2, etc.), BA.1.1 (including BA.1.1.\*), and BA.2 (including BA.2.\*).
+Sub-lineage BA.1 was initially prevalent, but Omicron sublineages BA.1.1 and BA.2 have been spreading, as illustrated in the plots below.
+Left plot: y-axis is the proportion of sub-lineages BA.1.1 and BA.2 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.1.1 or BA.2)/freq(BA.1)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
 
-For comparison, Alpha had a selective advantage of 6-11% per day over preexisting
+For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
 SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
-**Caveat**
-Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection. Canada-wide estimates, thus, do not include this province. Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
+**Caveat:**
+Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection.
+Canada-wide estimates, thus, do not include this province.
+Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
 
 ```{r setting function for selection estimator}
 #name1 <- "BA.1"; name2 <- "BA.1.1"; name3 <- "BA.2"
@@ -513,7 +533,7 @@ plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=s
 ### BC
 #### British Columbia
 
-```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=F}
+```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 plot.selection.estimate(region="British Columbia", startdate=startdate, 
                         startpar=startpar3, reference=c(name1), 
                         mutants=list(name2, name3), col=col)
@@ -573,7 +593,8 @@ plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate,
 
 ## Root-to-tip analyses  
 
-The slope of root-to-tip plots over time provide an estimate of the substitution rate.  A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
+The slope of root-to-tip plots over time provide an estimate of the substitution rate.
+A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
 ```{r, dpi=300}
 source("scripts/fit-rtt.R")
@@ -622,36 +643,58 @@ We are in the process of adding or would like to develop code for some of the fo
 * clustering analyses
 * genomically inferred epidemiological parameters: R0, serial interval, etc.
 
-With anonymized data on vaccination status, severity/outcome, reason for sequencing (e.g. outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving. Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
+With anonymized data on vaccination status, severity/outcome, reason for sequencing (*e.g.*, outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving.
+Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
 
 
 
 # Methodology {.tabset} 
 
+Genome data and metadata are sourced from the [Canadian VirusSeq Data Portal](https://virusseq-dataportal.ca/).
+Pangolin lineage assignments are generated using the [pangoLEARN](https://github.com/cov-lineages/pangoLEARN) algorithm.
+Source code for generating this RMarkdown notebook can be found in [https://github.com/CoVaRR-NET/duotang].
 
 ## Trees
 ### Phylogenetic trees
-Canadian genomes were obtained from the VirusSeq data on the `r VirusSeq_date` and down-sampled to one genome per lineage, province and month + one genome of each Omicron sublineage per province and month (n ~ 5500 genomes). The ML tree was reconstructed based on the pangolin alignment of these genomes using [IQ-TREE](http://www.iqtree.org/). Outliers were identified in [Tempest](http://tree.bio.ed.ac.uk/software/tempest/) and removed from the dataset. Tree time was used to estimate a time tree [TreeTime](https://github.com/neherlab/treetime), and trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+Canadian genomes were obtained from the VirusSeq data on the `r VirusSeq_date` and down-sampled to two genomes per lineage, province and month before October 2021, and five genomes per lineage, province and month after October 2021 (about 10,000 genomes in total).
+We used a Python wrapper of [minimap2](https://github.com/lh3/minimap2) (version 2.17) to generate multiple sequence alignments for these genome samples.
+A maximum likelihood (ML) tree was reconstructed from each alignment using the COVID-19 release of [IQ-TREE](http://www.iqtree.org/) (version 2.2.0).
+Outliers were identified in by root-to-tip regression using the R package [ape](https://cran.r-project.org/web/packages/ape/) and removed from the dataset.
+[TreeTime](https://github.com/neherlab/treetime) was used to reconstruct a time-scaled tree under a strict molecular clock model.
+The resulting trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
 
 ## Mutational composition
 ### Mutation composition graph
-Mutational graphs reporting mutations seen in at least 75% of the sequences in each group in C. Bars are colored by substitution type, and the corresponding amino acid changes are shown. Genomic position annotation was done using SnpEFF
+We extracted mutation frequencies from unaligned genomes using a custom Python wrapper of [minimap2](https://github.com/lh3/minimap2) (version 2.17).
+These data were supplemented with genomic data and metadata from the [NCBI GenNank](https://www.ncbi.nlm.nih.gov/genbank/) database, curated by the [Nextstrain](https://nextstrain.org/ncov/open/global) development team.
+We used these outputs to generate mutational graphs reporting mutations seen in at least 75% of sequences in the respective variants of concern in Canada.
+Bars are colored by substitution type, and the corresponding amino acid changes are shown.
+Genomic position annotations were generated in Python using [SnpEFF](http://pcingola.github.io/SnpEff/).
 
 ## Selection
 ### Selection Coefficents
-To estimate selection, we used standard likelihood techniques. In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time. If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \frac{p_i(0) \exp(s_i t)}{\sum_j p_j(0) \exp(s_j t)},$$ where $s_i$ is the selection coefficient favouring sub-type $i$. A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
+To estimate selection, we used standard likelihood techniques.
+In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time.
+If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \frac{p_i(0) \exp(s_i t)}{\sum_j p_j(0) \exp(s_j t)},$$ where $s_i$ is the selection coefficient favouring sub-type $i$.
+A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
 
-At any given time $t$, the probability of observing $n_i$ sequences of sublineage $i$ is multinomially distributed, given the total number of sequences from that day and the frequency of each $p_i(t)$. Consequently, the likelihood of seeing the observed sequence data over all times $t$ and over all sublineages $j$ is proportional to $$L = \prod_t \prod_j  p_i(t)^{n_i(t)}.$$
+At any given time $t$, the probability of observing $n_i$ sequences of sublineage $i$ is multinomially distributed, given the total number of sequences from that day and the frequency of each $p_i(t)$.
+Consequently, the likelihood of seeing the observed sequence data over all times $t$ and over all sublineages $j$ is proportional to $$L = \prod_t \prod_j  p_i(t)^{n_i(t)}.$$
 
-The [BBMLE](https://cran.r-project.org/web/packages/bbmle/bbmle.pdf) package in R was used to maximize the likelihood of the observed data (using the default optimization method, optim). For each selection coefficient, 95% confidence intervals were obtained by profile likelihood (using uniroot). 
+The [BBMLE](https://cran.r-project.org/web/packages/bbmle/bbmle.pdf) package in R was used to maximize the likelihood of the observed data (using the default optimization method, optim).
+For each selection coefficient, 95% confidence intervals were obtained by profile likelihood (using uniroot). 
 
-Graphs illustrating the rise in frequency of a variant over time are shown (left panels), with the area of each dot proportional to the number of sequences. 95% confidence bands were obtained by randomly drawing 10000 sets of parameters ($p_i$ and $s_i$ for each sub-type) using RandomFromHessianOrMCMC, assuming a multi-normal distribution around the maximum likelihood point (estimated from the Hessian matrix, [Pawitan 2001](https://books.google.ca/books?hl=en&lr=&id=WHsSDAAAQBAJ&oi=fnd&pg=PP1&dq=Pawitan+2001+likelihood&ots=v9sM5DuFrf&sig=vnRb--i2zu0jox_KnBSVxtG2aPg#v=onepage&q=Pawitan%202001%20likelihood&f=false)). At each point in time, the 2.5%-97.5% range of values for $p_i(t)$ are then shown in the confidence bands.
+Graphs illustrating the rise in frequency of a variant over time are shown (left panels), with the area of each dot proportional to the number of sequences.
+95% confidence bands were obtained by randomly drawing 10,000 sets of parameters ($p_i$ and $s_i$ for each sub-type) using `RandomFromHessianOrMCMC`, assuming a multi-normal distribution around the maximum likelihood point (estimated from the Hessian matrix, [Pawitan 2001](https://books.google.ca/books?hl=en&lr=&id=WHsSDAAAQBAJ&oi=fnd&pg=PP1&dq=Pawitan+2001+likelihood&ots=v9sM5DuFrf&sig=vnRb--i2zu0jox_KnBSVxtG2aPg#v=onepage&q=Pawitan%202001%20likelihood&f=false)).
+At each point in time, the 2.5%-97.5% range of values for $p_i(t)$ are then shown in the confidence bands.
 
-Logit plots (right panels) show $$ln(\frac{p_i(t)}{p_{ref}(t)})$$ relative to a given reference genotype (here BA.1), which gives a line whose slope is the strength of selection $s_i$. Changes in slope indicate changes in selection on a variant (e.g., see [Otto et al.](https://mast.queensu.ca/~tday/pdf/Otto2021.pdf)).
+Logit plots (right panels) show $$ln(\frac{p_i(t)}{p_{ref}(t)})$$ relative to a given reference genotype (here BA.1), which gives a line whose slope is the strength of selection $s_i$.
+Changes in slope indicate changes in selection on a variant (*e.g.*, see [Otto et al.](https://mast.queensu.ca/~tday/pdf/Otto2021.pdf)).
 
-These estimates of selection ignore heterogeneity within provinces and may be biased by the arrival of travel-related cases while frequencies are very low. Sampling strategies that oversample clustered cases (e.g., sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time. Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
+These estimates of selection ignore heterogeneity within provinces and may be biased by the arrival of travel-related cases while frequencies are very low.
+Sampling strategies that oversample clustered cases (*e.g.*, sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time.
+Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
 
-The code can be found in [https://github.com/CoVaRR-NET/CoVaRRNet_Pillar6_Notebook/blob/main/data_needed/plot_selection_estimator.R]
 
 ### Rates
 #### Root-to-tip estimates of substitution rate
