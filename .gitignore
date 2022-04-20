@@ -1,6 +1,8 @@
+notebook_demo_covarrnetpillar6_test_files
 .DS_Store
 .Rhistory
-data_needed/raphgraph/libs/__pycache__
 Rnotebook_demo_covarrnetpillar6_old.Rmd
 .format_table_last
 .RData
+data_needed/*
+
