@@ -1,5 +1,7 @@
+
 ---
-title: "CoVaRR-Net"
+title: |
+  ![](./data_needed/CoVaRR-Net_Logo-600.png){width=1lm}  
 subtitle: "Genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
