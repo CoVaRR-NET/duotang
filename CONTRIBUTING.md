@@ -1,3 +1,13 @@
+# Contributing to *duotang*
+
+*duotang* is a collaborative effort involving members of [CoVaRR-Net Pillar 6](https://covarrnet.ca/our-team/#pillar-6) (computational biology and modelling), but we welcome contributions from the SARS-CoV-2 research community as [pull requests from a fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
+All updates, modifications and feature additions to this project are subject to review by our partners in public health.
+You should also review the Canadian VirusSeq Data Portal [data usage policy](https://virusseq-dataportal.ca/acknowledgements).
+
+Resources (metadata, trees, mutation frequency tables) can be updated with new data releases from VirusSeq using the workflow described below.
+
+
+
 # To set up a development/test environment
 
 ## Dependencies
