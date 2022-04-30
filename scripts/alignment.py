@@ -148,6 +148,7 @@ def load_metadata(path):
     handle = gzip.open(path, 'rt')
     metadata = {}
     rows = csv.DictReader(handle)
+    
     for count, row in enumerate(rows):
         lineage = row["lineage"]
         if lineage not in metadata:
@@ -159,8 +160,10 @@ def load_metadata(path):
         except ValueError:
             # skip records with incomplete collection dates
             continue
+        
+        #yearweek = (dt.year, dt.isocalendar().week)
+       	yearweek = (dt.year, dt.isocalendar()[1])
 
-        yearweek = (dt.year, dt.isocalendar().week)
         if yearweek not in metadata[lineage]:
             metadata[lineage].update({yearweek: []})
         metadata[lineage][yearweek].append(
