@@ -1,7 +1,7 @@
 
 ---
 title: |
-  ![](./data_needed/CoVaRR-Net_Logo-600.png){width=1lm}  
+  ![](img/CoVaRR-Net_Logo-600.png){width=1lm}  
 subtitle: "Genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
@@ -70,7 +70,7 @@ Only representations of aggregate data will be posted here.
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-04-11"
+VirusSeq_date="2022-04-28"
 
 
 # this can be made more compact for faster loading
@@ -78,6 +78,12 @@ meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
 meta$sample.collection.date <- as.Date(meta$sample.collection.date)
 meta$province <- meta$geo_loc_name..state.province.territory.
 
+
+# FIXME: restore pangolearn calls overriden by scorpio - issue #46
+plearn <- gsub(".+assignment ([A-Z]+\\.[0-9.]*).*", "\\1",
+               meta$note[meta$lineage=="None"])
+plearn[which(grepl("_", plearn))] <- "None"
+meta$lineage[meta$lineage=="None"] <- plearn
 
 #make a pango.group column
 VOCVOI <- data.frame(
@@ -87,7 +93,7 @@ VOCVOI <- data.frame(
   pattern=c('^B\\.1\\.1\\.7|^Q\\.', '^B\\.1\\.351', '^P\\.', 
             '^B\\.1\\.617|^(?!AY\\.2[57])AY\\.', '^AY\\.25', '^AY\\.27', 
             '^C\\.37|^C\\.37\\.1',
-            '^B\\.1\\.1\\.529|^BA\\.1$|^BA\\.1\\.1[0-9]$|BA\\.1\\.[2-9]$', 
+            '^B\\.1\\.1\\.529|^BA\\.1$|^BA\\.1\\.[1-9][0-9]|BA\\.1\\.[2-9]$', 
             '^BA\\.1\\.1$|^BA\\.1\\.1\\.[0-9]+$', 
             '^BA\\.2', 
             '^B\\.1\\.621', 
@@ -317,8 +323,8 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 ```{r message=FALSE}
 
 ### metadata and trees
-MLtree_sub1 <- read.tree("./data_needed/sample3.rtt.nwk")
-ttree_sub1 <- read.tree("./data_needed/sample3.timetree.nwk")
+MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
+ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
 require(lubridate)
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-03-01'), by='3 month')
 

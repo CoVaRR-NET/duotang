@@ -47,7 +47,7 @@ alpha <- function(col, alpha) {
     geo_loc_name..state.province.territory. %in% prov,
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% count(lineage)
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
   
   # set final date
   lastdate <- max(mydata$sample.collection.date)
