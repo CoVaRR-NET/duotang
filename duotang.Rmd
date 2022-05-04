@@ -141,6 +141,14 @@ Only some infections are detected by PCR testing, only some of those are sent fo
 Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
+```{r}
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
+meta1$week <- as.factor(as.character(meta1$week))
+
+library(r2d3)
+r2d3(meta1, script="js/barplot.js")
+```
+
 
 ```{r example_summaries, fig.show="hold", out.width="50%"}
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
@@ -504,7 +512,7 @@ source("scripts/subtype_plotter.R")
 
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 plot.subvariants(sublineage=c(name1))
-plot.subvariants(sublineage=c(name1),scale=T)
+plot.subvariants(sublineage=c(name1), scale=T)
 ```
 
 ### BA.1.1
