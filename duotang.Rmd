@@ -487,6 +487,42 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 <!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
 
 
+## Omicron sublineages in Canada {.tabset} 
+
+Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
+
+```{r setting function for subtype plotter}
+name1 <- unique(meta$lineage[grepl("BA\\.1$|BA\\.1\\.[2-9]|BA\\.1\\.1[0-9]", meta$lineage)])
+name2 <- unique(meta$lineage[grepl("BA\\.1\\.1$|BA\\.1\\.1\\.", meta$lineage)])  #"BA.1.1"
+name3 <- unique(meta$lineage[grepl("BA\\.2", meta$lineage)])  # "BA.2" 
+
+source("scripts/subtype_plotter.R")
+```
+
+### BA.1
+#### Sublineage BA.1
+
+```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+plot.subvariants(sublineage=c(name1))
+plot.subvariants(sublineage=c(name1),scale=T)
+```
+
+### BA.1.1
+#### Sublineage BA.1.1
+
+```{r subtype plotter BA.1.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+plot.subvariants(sublineage=c(name2))
+plot.subvariants(sublineage=c(name2),scale=T)
+```
+
+### BA.2
+#### Sublineage BA.2
+```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+plot.subvariants(sublineage=c(name3))
+plot.subvariants(sublineage=c(name3),scale=T)
+```
+
+
 ## Selection on omicron sublineages {.tabset}  
 
 Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
