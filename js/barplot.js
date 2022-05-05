@@ -4,8 +4,8 @@ console = d3.window(div.node()).console;
 
 // create drop-down menu to select stacked plot offset
 const opts = [
-  {name: "expand", value: "d3.stackOffsetExpand"},
   {name: "none", value: "d3.stackOffsetNone"},
+  {name: "expand", value: "d3.stackOffsetExpand"},
   {name: "silhouette", value: "d3.stackOffsetSilhouette"},
   {name: "wiggle", value: "d3.stackOffsetWiggle", selected: true}
 ];
@@ -56,9 +56,12 @@ var stack = d3.stack().keys(variants),
     series = stack(data);
 
 
-var ymax = d3.max(series, function(y) { 
-  return d3.max(y, function(d) { return d[1]; }) 
-});
+var ymin = d3.min(series, function(y) { 
+                  return d3.min(y, function(d) { return d[0]; })
+                }),
+    ymax = d3.max(series, function(y) { 
+                  return d3.max(y, function(d) { return d[1]; }) 
+                });
 
 var weeks = data.map(x => new Date(x.week));
 
@@ -67,7 +70,7 @@ var xScale = d3.scaleTime()
           .domain([weeks[0], weeks[m-1]])
           .range([0, width]),
     yScale = d3.scaleLinear()
-          .domain([0, ymax])
+          .domain([ymin, ymax])
           .range([height, 0]),
     bandwidth = xScale(weeks[1]) - xScale(weeks[0]);
 
@@ -91,10 +94,20 @@ var barplot = svg.append("g")
 function updateBarplot(offset) {
   stack = d3.stack().keys(variants).offset(offset);
   series = stack(data);
-  console.log(series);
+  
+  // modify vertical scale
+  ymin = d3.min(series, function(y) { 
+    return d3.min(y, function(d) { return d[0]; }) 
+  });
+  ymax = d3.max(series, function(y) { 
+    return d3.max(y, function(d) { return d[1]; }) 
+  });
+  yScale = d3.scaleLinear().domain([ymin, ymax])
+          .range([height, 0]);
+          
   barplot.data(series)
          .transition()
-         .duration(2000)
+         .duration(500)
          .attr("d", area)
          .attr("fill", function(d, i) { return color(i); });
 }
