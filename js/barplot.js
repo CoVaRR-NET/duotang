@@ -1,4 +1,6 @@
 /**
+ * Inspired by https://observablehq.com/@d3/streamgraph-transitions
+ * 
  *  r2d3 passes a `data` object to this JavaScript, as well as a 
  *  reference to a <div> element in the Rmarkdown document 
  *  with a predefined `width` and `height`.
@@ -45,8 +47,8 @@ var svg = div.append("svg")
         .attr("width", div.attr("width"))
         .attr("height", div.attr("height"));
 
-// append a new group to SVG with nice margins
-var margin = {top: 40, right: 10, bottom: 20, left: 10},
+// append a new group to SVG with nice margins (where axis labels are drawn)
+var margin = {top: 5, right: 50, bottom: 20, left: 50},
     width = width - margin.left - margin.right,
     height = height - margin.top - margin.bottom,
     g = svg.append("g")
@@ -110,8 +112,7 @@ var area = d3.area()
     .y1(function(d) { return yScale(d[1]); })
     .curve(d3.curveBasis);
 
-var barplot = svg.append("g")
-                 .selectAll("path")
+var barplot = g.selectAll("path")
                  .data(series)
                  .enter().append("path")
                  .attr("class", "layer")
@@ -122,7 +123,6 @@ var barplot = svg.append("g")
 svg.selectAll(".layer")
     .attr("opacity", 1)
     .on("mouseover", function(event, datum) {
-      console.log("mouseover");
       d3.select(this)
         .classed("hover", true)
         .attr("stroke", "#000000")
@@ -146,7 +146,6 @@ svg.selectAll(".layer")
              .style("top", (coords[1] + yoffset - 30) + "px");
     })
     .on("mouseout", function(event, datum) {
-      console.log("mouseout");
       d3.select(this)
         .classed("hover", false)
         .attr("stroke-width", "0");
@@ -168,12 +167,22 @@ var xAxis = d3.axisBottom(xScale)
                    return d3.timeFormat('%Y')(date);
                  }
               });
-
-svg.append("g")
+              
+g.append("g")
    .attr("class", "x axis")
    .attr("transform", "translate(0," + height + ")")
    .call(xAxis);
 
+  
+// draw y-axis
+g.append("g")
+   .attr("class", "yl_axis")
+   .attr("transform", "translate(0, 0)")
+   .call(d3.axisLeft(yScale));
+g.append("g")
+   .attr("class", "yr_axis")
+   .attr("transform", "translate(" + width + ", 0)")
+   .call(d3.axisRight(yScale));
 
 function updateBarplot(offset) {
   stack = d3.stack().keys(variants).offset(offset);
@@ -188,7 +197,14 @@ function updateBarplot(offset) {
   });
   yScale = d3.scaleLinear().domain([ymin, ymax])
           .range([height, 0]);
-          
+  
+  svg.select("g.yl_axis").transition()
+     .duration(500)
+     .call(d3.axisLeft(yScale));
+  svg.select("g.yr_axis").transition()
+     .duration(500)
+     .call(d3.axisRight(yScale));
+  
   barplot.data(series)
          .transition()
          .duration(500)
