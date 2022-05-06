@@ -65,7 +65,7 @@ var tooltip = div.append("div")
 
 // extract variant names, e.g., "Omicron (BA.1)"
 var labels = Object.keys(data["Canada"][0]),
-    variants = labels.filter(w => w!=="week"),
+    variants = labels.filter(w => w!=="_row"),
     palette = {  // mapped to variants in alphabetical order
       "A.23.1": "#9AD378", 
       "Alpha": "#B29C71", 
@@ -98,7 +98,7 @@ var ymin = d3.min(series, function(y) {
                   return d3.max(y, function(d) { return d[1]; }) 
                 });
 
-var weeks = data["Canada"].map(x => new Date(x.week)),
+var weeks = data["Canada"].map(x => new Date(x._row)),
     week;
 
 

@@ -117,14 +117,11 @@ meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
 dat <- lapply(unique(meta1$province), function(x) {
-  tab <- as.data.frame.matrix(table(meta1$week[meta1$province==x], meta1$pango.group[meta1$province==x]))
-  tab$week <- row.names(tab)
-  tab
+  as.data.frame.matrix(table(meta1$week[meta1$province==x], meta1$pango.group[meta1$province==x]))
 })
 names(dat) <- unique(meta1$province)
 
 tab <- as.data.frame.matrix(table(meta1$week, meta1$pango.group))
-tab$week <- row.names(tab)
 dat[['Canada']] <- tab
 
 r2d3(data=toJSON(dat), script="js/barplot.js", container="div", elementId="barplot-element")
