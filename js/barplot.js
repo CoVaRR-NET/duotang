@@ -1,15 +1,21 @@
-console = d3.window(div.node()).console;
-//console.log(data);
+/**
+ *  r2d3 passes a `data` object to this JavaScript, as well as a 
+ *  reference to a <div> element in the Rmarkdown document 
+ *  with a predefined `width` and `height`.
+ */
 
+// this is required to pass messages to JavaScript console
+console = d3.window(div.node()).console;
 
 // create drop-down menu to select stacked plot offset
 const opts = [
-  {name: "none", value: "d3.stackOffsetNone"},
-  {name: "expand", value: "d3.stackOffsetExpand"},
+  {name: "basic", value: "d3.stackOffsetNone"},
+  {name: "percent", value: "d3.stackOffsetExpand"},
   {name: "silhouette", value: "d3.stackOffsetSilhouette"},
-  {name: "wiggle", value: "d3.stackOffsetWiggle", selected: true}
+  {name: "streamgraph", value: "d3.stackOffsetWiggle", selected: true}
 ];
 
+// bind option values to function calls
 const offsets = {
   "d3.stackOffsetExpand": d3.stackOffsetExpand,
   "d3.stackOffsetNone": d3.stackOffsetNone,
@@ -17,45 +23,59 @@ const offsets = {
   "d3.stackOffsetWiggle": d3.stackOffsetWiggle,
 };
 
-var selector = div.append('select')
+var selectlabel = div.append('label').text("Layout: ");
+
+var selector = selectlabel.append('select')
                  .attr('class', 'select')
                  .on('change', function(event) {
                    var myChoice = event.target.selectedOptions[0];
-                   console.log(myChoice);
-                   updateBarplot(offsets[myChoice.value]);  // pass function
+                   //console.log(myChoice);
+                   updateBarplot(offsets[myChoice.value]);  // redraw
                  });
 
 var choices = selector.selectAll("option")
                       .data(opts).enter()
                       .append('option')
                       .text(function(d) { return d.name; })
-                      .attr("value", function(d) { return d.value; });
+                      .attr("value", function(d) { return d.value; })
+                      .attr("selected", function(d) {return d.selected; });
 
-
+// append an SVG element to the div
 var svg = div.append("svg")
         .attr("width", div.attr("width"))
         .attr("height", div.attr("height"));
 
-
-
+// append a new group to SVG with nice margins
 var margin = {top: 40, right: 10, bottom: 20, left: 10},
     width = width - margin.left - margin.right,
     height = height - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    g = svg.append("g")
+           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// append tooltip element
+var tooltip = div.append("div")
+    .attr("class", "tooltip")
+    .attr("id", "tooltipContainer")
+    .style("position", "absolute")
+    .style("z-index", "20")
+    .style("visibility", "hidden")
+    .style("pointer-events", "none");
+
+// extract variant names, e.g., "Omicron (BA.1)"
 var labels = Object.keys(data[0]),
     variants = labels.filter(w => w!=="week"),
     palette = ["#9AD378", "#B29C71", "#3EA534", "#F08C3A", "#A6CEE3", "#61A6A0", 
             "#438FC0", "#444444", "#CD950C", "#BB4513", "#8B0000", "#FA8072",
-            "#FF0000", "#888888"];
+            "#FF0000", "#888888"];  // mapped to variants in alphabetical order
 
 var n = variants.length,  // number of categories
     m = data.length;  // number of observations (time points)
 
-var stack = d3.stack().keys(variants),
+// generate stacked series from data
+var stack = d3.stack().keys(variants).offset(d3.stackOffsetWiggle),
     series = stack(data);
 
-
+// vertical limits
 var ymin = d3.min(series, function(y) { 
                   return d3.min(y, function(d) { return d[0]; })
                 }),
@@ -63,7 +83,9 @@ var ymin = d3.min(series, function(y) {
                   return d3.max(y, function(d) { return d[1]; }) 
                 });
 
-var weeks = data.map(x => new Date(x.week));
+// all Mondays!
+var weeks = data.map(x => new Date(x.week)),
+    week;
 
 
 var xScale = d3.scaleTime()
@@ -72,12 +94,16 @@ var xScale = d3.scaleTime()
     yScale = d3.scaleLinear()
           .domain([ymin, ymax])
           .range([height, 0]),
-    bandwidth = xScale(weeks[1]) - xScale(weeks[0]);
+    bandwidth = xScale(weeks[1]) - xScale(weeks[0]),
+    xtime,
+    yoffset = 342;//document.getElementById("barplot-element").getBoundingClientRect().y;
+
 
 var color = d3.scaleOrdinal()
     .domain(variants)
     .range(palette);
 
+// draws shapes with interpolation between data points (curve)
 var area = d3.area()
     .x(function(d, i) { return xScale(weeks[i]); })
     .y0(function(d) { return yScale(d[0]); })
@@ -88,8 +114,66 @@ var barplot = svg.append("g")
                  .selectAll("path")
                  .data(series)
                  .enter().append("path")
+                 .attr("class", "layer")
                  .attr("d", area)
                  .attr("fill", function(d, i) { return color(i); });
+
+// http://bl.ocks.org/WillTurman/4631136
+svg.selectAll(".layer")
+    .attr("opacity", 1)
+    .on("mouseover", function(event, datum) {
+      console.log("mouseover");
+      d3.select(this)
+        .classed("hover", true)
+        .attr("stroke", "#000000")
+        .attr("stroke-width", "0.5px");
+        
+      svg.selectAll(".layer").transition()
+         .duration(250)
+         .attr("opacity", function(d, j) {
+           return j != datum.index ? 0.5 : 1;
+         })
+    })
+    .on("mousemove", function(event, datum) {
+      coords = d3.pointer(event);
+      //xtime = xScale.invert(event.x);
+      xtime = xScale.invert(coords[0]);
+      week = d3.bisect(weeks, xtime);
+      
+      tooltip.html( "<p>" + datum.key + "<br/>" + datum[week].data[datum.key] + "</p>" )
+             .style("visibility", "visible")
+             .style("left", (coords[0] + 30) + "px")
+             .style("top", (coords[1] + yoffset - 30) + "px");
+    })
+    .on("mouseout", function(event, datum) {
+      console.log("mouseout");
+      d3.select(this)
+        .classed("hover", false)
+        .attr("stroke-width", "0");
+      tooltip.style("visibility", "hidden");
+        
+      svg.selectAll(".layer")
+         .transition()
+         .duration(100)
+         .attr("opacity", "1");
+    });
+
+// draw x-axis labels
+var xAxis = d3.axisBottom(xScale)
+              .tickFormat(function(date){
+                 if (d3.timeYear(date) < date) {
+                   // abbreviate months (October to Oct)
+                   return d3.timeFormat('%b')(date);
+                 } else {
+                   return d3.timeFormat('%Y')(date);
+                 }
+              });
+
+svg.append("g")
+   .attr("class", "x axis")
+   .attr("transform", "translate(0," + height + ")")
+   .call(xAxis);
+
 
 function updateBarplot(offset) {
   stack = d3.stack().keys(variants).offset(offset);
