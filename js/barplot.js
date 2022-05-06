@@ -64,18 +64,31 @@ var tooltip = div.append("div")
     .style("pointer-events", "none");
 
 // extract variant names, e.g., "Omicron (BA.1)"
-var labels = Object.keys(data[0]),
+var labels = Object.keys(data["Canada"][0]),
     variants = labels.filter(w => w!=="week"),
-    palette = ["#9AD378", "#B29C71", "#3EA534", "#F08C3A", "#A6CEE3", "#61A6A0", 
-            "#438FC0", "#444444", "#CD950C", "#BB4513", "#8B0000", "#FA8072",
-            "#FF0000", "#888888"];  // mapped to variants in alphabetical order
+    palette = {  // mapped to variants in alphabetical order
+      "A.23.1": "#9AD378", 
+      "Alpha": "#B29C71", 
+      "B.1.438.1": "#3EA534", 
+      "Beta": "#F08C3A", 
+      "Delta": "#A6CEE3", 
+      "Delta AY.25": "#61A6A0", 
+      "Delta AY.27": "#438FC0", 
+      "Gamma": "#444444", 
+      "Lambda": "#CD950C", 
+      "Mu": "#BB4513", 
+      "Omicron BA.1": "#8B0000", 
+      "Omicron BA.1.1": "#FA8072",
+      "Omicron BA.2": "#FF0000", 
+      "other": "#888888"
+    };
 
 var n = variants.length,  // number of categories
-    m = data.length;  // number of observations (time points)
+    m = data["Canada"].length;  // number of observations (time points)
 
 // generate stacked series from data
 var stack = d3.stack().keys(variants).offset(d3.stackOffsetWiggle),
-    series = stack(data);
+    series = stack(data["Canada"]);
 
 // vertical limits
 var ymin = d3.min(series, function(y) { 
@@ -85,8 +98,7 @@ var ymin = d3.min(series, function(y) {
                   return d3.max(y, function(d) { return d[1]; }) 
                 });
 
-// all Mondays!
-var weeks = data.map(x => new Date(x.week)),
+var weeks = data["Canada"].map(x => new Date(x.week)),
     week;
 
 
@@ -98,12 +110,12 @@ var xScale = d3.scaleTime()
           .range([height, 0]),
     bandwidth = xScale(weeks[1]) - xScale(weeks[0]),
     xtime,
-    yoffset = 342;//document.getElementById("barplot-element").getBoundingClientRect().y;
+    yoffset = document.getElementById("barplot-element").getBoundingClientRect().y;
 
 
 var color = d3.scaleOrdinal()
     .domain(variants)
-    .range(palette);
+    .range(variants.map(v => palette[v]));
 
 // draws shapes with interpolation between data points (curve)
 var area = d3.area()
@@ -143,7 +155,7 @@ svg.selectAll(".layer")
       tooltip.html( "<p>" + datum.key + "<br/>" + datum[week].data[datum.key] + "</p>" )
              .style("visibility", "visible")
              .style("left", (coords[0] + 30) + "px")
-             .style("top", (coords[1] + yoffset - 30) + "px");
+             .style("top", (coords[1] + yoffset - 20) + "px");
     })
     .on("mouseout", function(event, datum) {
       d3.select(this)
@@ -186,7 +198,7 @@ g.append("g")
 
 function updateBarplot(offset) {
   stack = d3.stack().keys(variants).offset(offset);
-  series = stack(data);
+  series = stack(data["Canada"]);  // TODO: change data set here
   
   // modify vertical scale
   ymin = d3.min(series, function(y) { 
