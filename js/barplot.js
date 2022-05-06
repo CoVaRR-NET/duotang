@@ -4,6 +4,11 @@
  *  r2d3 passes a `data` object to this JavaScript, as well as a 
  *  reference to a <div> element in the Rmarkdown document 
  *  with a predefined `width` and `height`.
+ * 
+ *  Note about scoping:  objects from r2d3 are, by default, embedded
+ *  within a shadow DOM.  d3.select() will not be able to find elements
+ *  within this DOM.  To select those elements, you need to do a search 
+ *  from div, i.e., div.select()
  */
 
 // this is required to pass messages to JavaScript console
@@ -17,22 +22,17 @@ const opts = [
   {name: "streamgraph", value: "d3.stackOffsetWiggle", selected: true}
 ];
 
-// bind option values to function calls
-const offsets = {
-  "d3.stackOffsetExpand": d3.stackOffsetExpand,
-  "d3.stackOffsetNone": d3.stackOffsetNone,
-  "d3.stackOffsetSilhouette": d3.stackOffsetSilhouette,
-  "d3.stackOffsetWiggle": d3.stackOffsetWiggle,
-};
 
 var selectlabel = div.append('label').text("Layout: ");
 
 var selector = selectlabel.append('select')
                  .attr('class', 'select')
+                 .attr('id', 'offset-select')
                  .on('change', function(event) {
-                   var myChoice = event.target.selectedOptions[0];
+                   //var myChoice = event.target.selectedOptions[0];
                    //console.log(myChoice);
-                   updateBarplot(offsets[myChoice.value]);  // redraw
+                   //updateBarplot(offsets[myChoice.value]);  // redraw
+                   updateBarplot();
                  });
 
 var choices = selector.selectAll("option")
@@ -41,6 +41,33 @@ var choices = selector.selectAll("option")
                       .text(function(d) { return d.name; })
                       .attr("value", function(d) { return d.value; })
                       .attr("selected", function(d) {return d.selected; });
+
+// append another drop-down for region
+const opts2 = [
+  {name: "Canada", value: "Canada", selected: true},
+  {name: "British Columbia", value: "British Columbia"},
+  {name: "Alberta", value: "Alberta"},
+  {name: "Saskatchewan", value: "Saskatchewan"},
+  {name: "Manitoba", value: "Manitoba"},
+  {name: "Ontario", value: "Ontario"},
+  {name: "Quebec", value: "Quebec"},
+  {name: "New Brunswick", value: "New Brunswick"},
+  {name: "Newfoundland and Labrador", value: "Newfoundland and Labrador"},
+];
+
+var selectlabel2 = div.append('label').text("  Region: "),
+    selector2 = selectlabel2.append('select')
+                 .attr('class', 'select')
+                 .attr('id', 'region-select')
+                 .on('change', function(event) {
+                   updateBarplot();  // redraw
+                 }),
+    choices2 = selector2.selectAll("option")
+                        .data(opts2).enter()
+                        .append('option')
+                        .text(function(d) { return d.name; })
+                        .attr("value", function(d) { return d.value; })
+                        .attr("selected", function(d) {return d.selected; });
 
 // append an SVG element to the div
 var svg = div.append("svg")
@@ -196,9 +223,21 @@ g.append("g")
    .attr("transform", "translate(" + width + ", 0)")
    .call(d3.axisRight(yScale));
 
-function updateBarplot(offset) {
-  stack = d3.stack().keys(variants).offset(offset);
-  series = stack(data["Canada"]);  // TODO: change data set here
+// bind option values to function calls
+const offsets = {
+  "d3.stackOffsetExpand": d3.stackOffsetExpand,
+  "d3.stackOffsetNone": d3.stackOffsetNone,
+  "d3.stackOffsetSilhouette": d3.stackOffsetSilhouette,
+  "d3.stackOffsetWiggle": d3.stackOffsetWiggle,
+};
+
+function updateBarplot() {
+  var offset = div.select("select#offset-select").property("value"),
+      offsetf = offsets[offset],
+      region = div.select("select#region-select").property("value");
+  
+  stack = d3.stack().keys(variants).offset(offsetf);
+  series = stack(data[region]);  // TODO: change data set here
   
   // modify vertical scale
   ymin = d3.min(series, function(y) { 
