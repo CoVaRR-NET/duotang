@@ -69,31 +69,8 @@ var selectlabel2 = div.append('label').text("  Region: "),
                         .attr("value", function(d) { return d.value; })
                         .attr("selected", function(d) {return d.selected; });
 
-// append an SVG element to the div
-var svg = div.append("svg")
-        .attr("width", div.attr("width"))
-        .attr("height", div.attr("height"));
-
-// append a new group to SVG with nice margins (where axis labels are drawn)
-var margin = {top: 5, right: 50, bottom: 20, left: 50},
-    width = width - margin.left - margin.right,
-    height = height - margin.top - margin.bottom,
-    g = svg.append("g")
-           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-// append tooltip element
-var tooltip = div.append("div")
-    .attr("class", "tooltip")
-    .attr("id", "tooltipContainer")
-    .style("position", "absolute")
-    .style("z-index", "20")
-    .style("visibility", "hidden")
-    .style("pointer-events", "none");
-
-// extract variant names, e.g., "Omicron (BA.1)"
-var labels = Object.keys(data["Canada"][0]),
-    variants = labels.filter(w => w!=="_row"),
-    palette = {  // mapped to variants in alphabetical order
+// draw legend box
+const palette = {  // mapped to variants in alphabetical order
       "A.23.1": "#9AD378", 
       "Alpha": "#B29C71", 
       "B.1.438.1": "#3EA534", 
@@ -109,6 +86,55 @@ var labels = Object.keys(data["Canada"][0]),
       "Omicron BA.2": "#FF0000", 
       "other": "#888888"
     };
+
+
+// https://d3-graph-gallery.com/graph/custom_legend.html
+var legend = div.append("svg")
+                .attr("width", div.attr("width"))
+                .attr("height", "70px");
+
+legend.selectAll("mydots")
+      .data(Object.entries(palette))
+      .enter().append("circle")
+      .attr("cx", function(d, i) { return (i%5)*120 + 50; })
+      .attr("cy", function(d, i) { return Math.floor(i/5)*20 + 10; })
+      .attr("r", 6)
+      .style("fill", function(d) { return d[1]; } );
+      
+legend.selectAll("mylabels")
+      .data(Object.entries(palette))
+      .enter().append("text")
+      .attr("x", function(d, i) { return (i%5)*120 + 60; })
+      .attr("y", function(d, i) { return Math.floor(i/5)*20 + 10; })
+      .text(function(d) { return d[0]; })
+      .style("alignment-baseline", "middle")
+      .style("font-size", "8pt");
+      
+// append an SVG element to the div
+var svg = div.append("svg")
+        .attr("width", div.attr("width"))
+        .attr("height", div.attr("height"));
+
+// append a new group to SVG with nice margins (where axis labels are drawn)
+var margin = {top: 0, right: 50, bottom: 20, left: 50},
+    width = width - margin.left - margin.right,
+    height = height - margin.top - margin.bottom,
+    g = svg.append("g")
+           .attr("id", "barplot-group")
+           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// append tooltip element
+var tooltip = div.append("div")
+    .attr("class", "tooltip")
+    .attr("id", "tooltipContainer")
+    .style("position", "absolute")
+    .style("z-index", "20")
+    .style("visibility", "hidden")
+    .style("pointer-events", "none");
+
+// extract variant names, e.g., "Omicron (BA.1)"
+var labels = Object.keys(data["Canada"][0]),
+    variants = labels.filter(w => w!=="_row");
 
 var n = variants.length,  // number of categories
     m = data["Canada"].length;  // number of observations (time points)
@@ -129,6 +155,24 @@ var weeks = data["Canada"].map(x => new Date(x._row)),
     week;
 
 
+function absolutePosition(el) {
+  // https://stackoverflow.com/questions/25630035/javascript-getboundingclientrect-changes-while-scrolling
+    var top = 0,
+        offsetBase = absolutePosition.offsetBase;
+    if (!offsetBase && document.body) {
+        offsetBase = absolutePosition.offsetBase = document.createElement('div');
+        offsetBase.style.cssText = 'position:absolute;left:0;top:0';
+        document.body.appendChild(offsetBase);
+    }
+    if (el && el.ownerDocument === document && 'getBoundingClientRect' in el && 
+        offsetBase) {
+        var boundingRect = el.getBoundingClientRect();
+        var baseRect = offsetBase.getBoundingClientRect();
+        top = boundingRect.top - baseRect.top;
+    }
+    return top;
+}
+
 var xScale = d3.scaleTime()
           .domain([weeks[0], weeks[m-1]])
           .range([0, width]),
@@ -137,7 +181,7 @@ var xScale = d3.scaleTime()
           .range([height, 0]),
     bandwidth = xScale(weeks[1]) - xScale(weeks[0]),
     xtime,
-    yoffset = document.getElementById("barplot-element").getBoundingClientRect().y;
+    yoffset = absolutePosition(svg.node());
 
 
 var color = d3.scaleOrdinal()
@@ -181,8 +225,8 @@ svg.selectAll(".layer")
       
       tooltip.html( "<p>" + datum.key + "<br/>" + datum[week].data[datum.key] + "</p>" )
              .style("visibility", "visible")
-             .style("left", (coords[0] + 30) + "px")
-             .style("top", (coords[1] + yoffset - 20) + "px");
+             .style("left", (coords[0] + 100) + "px")
+             .style("top", (coords[1] + yoffset - 50) + "px");
     })
     .on("mouseout", function(event, datum) {
       d3.select(this)

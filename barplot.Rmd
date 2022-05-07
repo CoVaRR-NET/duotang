@@ -112,6 +112,7 @@ meta$week <- cut(meta$sample.collection.date, 'week')
 
 
 ## Variants in Canada over time
+
 ```{r}
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
