@@ -53,6 +53,7 @@ const opts2 = [
   {name: "Quebec", value: "Quebec"},
   {name: "New Brunswick", value: "New Brunswick"},
   {name: "Newfoundland and Labrador", value: "Newfoundland and Labrador"},
+  {name: "Nova Scotia", value: "Nova Scotia"}
 ];
 
 var selectlabel2 = div.append('label').text("  Region: "),
@@ -153,6 +154,9 @@ var ymin = d3.min(series, function(y) {
 
 var weeks = data["Canada"].map(x => new Date(x._row)),
     week;
+
+// allow browser to resize height of this section to accommodate SVGs
+d3.select("#barplot-element").style("height", "auto");
 
 
 function absolutePosition(el) {
