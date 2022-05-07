@@ -39,6 +39,9 @@ library(viridis)
 
 library(MASS)
 
+# used for passing data to JavaScript D3 framework
+library(r2d3)
+library(jsonlite)
 
 theme_set(theme_classic())
 
@@ -142,62 +145,22 @@ Sequencing volumes and priority have changed during the pandemic, and the sequen
 Thus, interpretation of these plots and comparisons between health regions should be done with caution.
 
 
-```{r example_summaries, fig.show="hold", out.width="50%"}
+```{r example_summaries, out.height="580px"}
+# focus on emergence of VoCs in Canada
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
-# --- Histogram plot: counts per variant of all canadian data -------------
-plot.variants <- function(region='Canada', scaled=FALSE) {
-  if (region=='Canada') {
-    tab <- table(meta1$pango.group, meta1$week)  
-  } else {
-    meta2 <- meta1[meta1$geo_loc_name..state.province.territory.==region, ]
-    tab <- table(meta2$pango.group, meta2$week)  
-  }
-  # reorder colour palette
-  pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
-  
-  if (scaled) {
-    par(mar=c(5,5,1,5))
-    tab2 <- apply(tab, 2, function(x) x/sum(x))
-    pal2 <- pal[match(levels(meta1$pango.group), names(pal))]
-    barplot(tab2, col=pal2, 
-          border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-          ylab="Sequenced cases per week (%)") -> mp
-    legend(x=max(mp)+1, y=1, legend=levels(meta1$pango.group), 
-           bty='n', xpd=NA, cex=0.7, fill=pal2, 
-           x.intersp=0.5, y.intersp=1, border=NA)
-  } 
-  else {
-    par(mar=c(5,5,3,5), adj=0)
-    epi <- epidataCANall[epidataCANall$prname==region, ]
-    epi$week <- cut(as.Date(epi$date), 'week')
-    cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
-    
-    # match case counts to variant freq data and rescale as 2nd axis
-    idx <- match(names(cases.wk), levels(meta1$week))
-    y <- cases.wk[!is.na(idx)]
-    lab.y <- pretty(y)  # for drawing axis
-    max.count <- max(apply(tab, 2, sum))
-    y2 <- y / (max(y)-min(y)) * max.count  # scale to variant counts
-    at.y <- lab.y / (max(y)-min(y)) * max.count
-  
-    barplot(tab, col=pal2, 
-            border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-            ylab="Sequenced cases per week") -> mp
-    lines(mp, y2, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
-    axis(side=4, at=at.y, labels=format(lab.y, scientific=F), hadj=0,
-         las=1, cex.axis=0.7, col='grey50', col.ticks='grey50',
-         col.axis='grey50')
-    legend(x=mean(mp), y=max(y2), xjust=0.5, yjust=0, 
-           legend=levels(meta1$pango.group), 
-           bty='n', xpd=NA, cex=0.7, fill=pal2, ncol=5,
-           x.intersp=0.5, y.intersp=1, border=NA)
-  }
-}
+dat <- lapply(unique(meta1$province), function(x) {
+  as.data.frame.matrix(table(meta1$week[meta1$province==x],
+                             meta1$pango.group[meta1$province==x]))
+})
+names(dat) <- unique(meta1$province)
 
-plot.variants()
-plot.variants(scaled=T)
+tab <- as.data.frame.matrix(table(meta1$week, meta1$pango.group))
+dat[['Canada']] <- tab
+
+r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
+     elementId="barplot-element")
 ```
 
 
@@ -232,88 +195,62 @@ These analyses are subject to change given new data.
 With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021, and thus switched to targeted testing of priority groups (e.g. hospitalized patients, health care workers, and people in high-risk settings).
 Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
 
+
 ### BC
 #### British Columbia  
 Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized).
 Additional up-to-date covid data for this province can be found here:  
 http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
-```{r provinceplot_British_Columbia, fig.show="hold", out.width="50%"}
-plot.variants(region='British Columbia')
-plot.variants(region='British Columbia', scaled=T)
-```
+
 
 ### AB
 #### Alberta
 Additional up-to-date COVID data for this province can be found here:  
 https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
-```{r provinceplot_Alberta, fig.show="hold", out.width="50%"}
-plot.variants(region='Alberta')
-plot.variants(region='Alberta', scaled=T)
-```
+
 
 ### SK
 #### Saskatchewan
 Additional up-to-date COVID data for this province can be found here:  
 https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
-```{r provinceplot_Saskatchewan, fig.show="hold", out.width="50%"}
-plot.variants(region='Saskatchewan')
-plot.variants(region='Saskatchewan', scaled=T)
-```
+
 
 ### MB
 #### Manitoba
 Additional up-to-date COVID data for this province can be found here:  
 https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
-```{r provinceplot_Manitoba, fig.show="hold", out.width="50%"}
-plot.variants(region='Manitoba')
-plot.variants(region='Manitoba', scaled=T)
-```
+
 
 ### ON
 #### Ontario
 Additional up-to-date COVID data for this province can be found here:  
 https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
-```{r provinceplot_Ontario, fig.show="hold", out.width="50%"}
-plot.variants(region='Ontario')
-plot.variants(region='Ontario', scaled=T)
-```
+
 
 ### QC
 #### Quebec
 Provincial random sequencing has been temporarily suspended as of Feb 8th, 2021. Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
 Additiona up-to-date COVID data for this province can be found here:  
 https://www.inspq.qc.ca/covid-19/donnees/variants
-```{r provinceplot_Quebec, fig.show="hold", out.width="50%"}
-plot.variants(region='Quebec')
-plot.variants(region='Quebec', scaled=T)
-```
+
 
 ### NS
 #### Nova Scotia
 Additional up-to-date COVID data for this province can be found here:  
 https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
-```{r provinceplot_Nova_Scotia, fig.show="hold", out.width="50%"}
-plot.variants(region='Nova Scotia')
-plot.variants(region='Nova Scotia', scaled=T)
-```
+
 
 ### NB
 #### New Brunswick
 Additional up-to-date COVID data for this province can be found here:  
 https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
-```{r provinceplot_New_Brunswick, fig.show="hold", out.width="50%"}
-plot.variants(region='New Brunswick')
-plot.variants(region='New Brunswick', scaled=T)
-```
+
 
 ### NL
 #### Newfoundland and Labrador
 Additional up-to-date COVID data for this province can be found here:  
 https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
-```{r provinceplot_Newfoundland_and_Labrador, fig.show="hold", out.width="50%"}
-plot.variants(region='Newfoundland and Labrador')
-plot.variants(region='Newfoundland and Labrador', scaled=T)
-```
+
 
 
 ## Canadian trees {.tabset}  

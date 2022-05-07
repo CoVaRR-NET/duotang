@@ -22,7 +22,6 @@ const opts = [
   {name: "streamgraph", value: "d3.stackOffsetWiggle", selected: true}
 ];
 
-
 var selectlabel = div.append('label').text("Layout: ");
 
 var selector = selectlabel.append('select')
@@ -112,15 +111,17 @@ legend.selectAll("mylabels")
       .style("font-size", "8pt");
       
 // append an SVG element to the div
-var svg = div.append("svg")
-        .attr("width", div.attr("width"))
-        .attr("height", div.attr("height"));
+var plotheight = 480,
+    svg = div.append("svg")
+        .attr("width", width+"px")        
+        .attr("height", plotheight+"px")
 
 // append a new group to SVG with nice margins (where axis labels are drawn)
 var margin = {top: 0, right: 50, bottom: 20, left: 50},
     width = width - margin.left - margin.right,
-    height = height - margin.top - margin.bottom,
+    height = plotheight - margin.top - margin.bottom,
     g = svg.append("g")
+           .attr("height", plotheight+"px")
            .attr("id", "barplot-group")
            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -156,7 +157,7 @@ var weeks = data["Canada"].map(x => new Date(x._row)),
     week;
 
 // allow browser to resize height of this section to accommodate SVGs
-d3.select("#barplot-element").style("height", "auto");
+//d3.select("#barplot-element").style("height", "600px");
 
 
 function absolutePosition(el) {
