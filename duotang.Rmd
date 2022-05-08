@@ -67,6 +67,20 @@ These analyses can spur further research within or across pillars, be used for r
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
 
+**Important caveats and disclaimers:**  
+These plots show the changing composition of sequences posted to the VirusSeq Portal by PANGO lineage/variant designation.
+Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time.
+Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories.
+Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
+Thus, interpretation of these plots and comparisons between health regions should be done with caution.
+
+**Disclaimer:**   
+All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
+For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
+When possible, these differences in sampling strategies are mentioned but they are not always known.
+With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
+Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
+These analyses are subject to change given new data and updated lineage designations.
 
 ```{r load_data}
 
@@ -137,14 +151,6 @@ meta$week <- cut(meta$sample.collection.date, 'week')
 
 ## Variants in Canada over time
 
-**Important caveat:**  
-These plots show the changing composition of sequences posted to the VirusSeq Portal by PANGO lineage/variant designation.
-Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time.
-Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories.
-Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
-Thus, interpretation of these plots and comparisons between health regions should be done with caution.
-
-
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
@@ -164,7 +170,7 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
 ```
 
 
-Sequence counts for all Canadian data in VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in green for comparison, given that sequencing coverage varies over time.  
+Sequence counts for all Canadian data in VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.  
 
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
@@ -173,28 +179,24 @@ The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constitut
 Omicron arrived in November of 2021 and currently the three main lineages in Canada are BA.1, BA.1.1, and BA.2, with multiple sub-lineages within each clade, *e.g.*, BA.2.12.
 See below for jurisdictional differences of these plots.    
 
-There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176.
-
-Other lineages of Canadian interest:  
+There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
  
+Variants of current interest, due to their potential growth advantage, or mutations of potential functional significance:
+
+* BA.4, BA.5
+* BA.2.12.1, BA.2.12 (with S:L452Q)
+* Other variants with mutations in the Spike at position 452.
+* BA.2.21 (mainly in Quebec at present)
+* S:N148T in BA.2 and others (mainly in Ontario at present)
+* BA.2.38 and other BA.2* with S:K417T  
 
 ## Provinces {.tabset}
 
 Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/  
-
-**Disclaimer:**   
-All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
-For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
-When possible, these differences in sampling strategies are mentioned but they are not always known.
-These analyses are subject to change given new data.  
-
-With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021, and thus switched to targeted testing of priority groups (e.g. hospitalized patients, health care workers, and people in high-risk settings).
-Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
-
 
 ### BC
 #### British Columbia  
