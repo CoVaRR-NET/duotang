@@ -1,5 +1,5 @@
 #' Original implementation in Mathematica by Sarah Otto
-#' First port into R by Carmen Murall
+#' First port into R by Carmen Murall and Sarah Otto
 #' Refactored by Art Poon
 suppressMessages({
   require(bbmle, quietly=T)
@@ -34,6 +34,8 @@ alpha <- function(col, alpha) {
   # handle special values for prov
   if (region[1] == "East provinces (NL+NS+NB)") {
     prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
+  } else if (region[1] == "Canada") {
+    prov <- unique(meta$geo_loc_name..state.province.territory.)
   } else if (region[1] == "Canada (no AB)") {
     provinces <- unique(meta$geo_loc_name..state.province.territory.)
     prov <- provinces[provinces != 'Alberta']
@@ -251,7 +253,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   par(mar=c(5,5,1,1))
   
   # display counts
-  plot(toplot$date, toplot$n2/toplot$tot, ylim=c(0, 1), 
+  plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
        ylab=paste0("Proportion in ", est$region))
@@ -297,7 +299,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   par(mar=c(5,5,1,1))
   
   plot(toplot$date, toplot$n2/toplot$n1, pch=21,
-       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, ylim=c(0.001, 1000), 
+       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0.001, 1000), 
        xlab='Sample collection date',
        ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
   axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
