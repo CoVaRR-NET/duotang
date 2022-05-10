@@ -496,6 +496,17 @@ col <- c(pal["Omicron BA.1.1"], pal["Omicron BA.2"])
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-01") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator.R")
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+showlineages<-sublineagedata %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages<-showlineages %>% filter(n>50)
+#We'll use BA.2 as the reference and drop it:
+showlineages<-showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
 #source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
@@ -573,6 +584,38 @@ plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate,
                         mutants=list(name3), col=col)
 ```
 
+## BA.2 sublineage selection {.tabset}
+
+```{r function, echo=FALSE, wanring=FALSE, message=FALSE}
+catHeader <- function(text = "", level = 3) {
+    cat(paste0("\n\n", 
+               paste(rep("#", level), collapse = ""), 
+               " ", text, "\n"))
+}
+source("scripts/plot_selection_estimator_test.R")
+```
+
+```{r create sublineage selection plots,echo=FALSE, message=FALSE,warning=FALSE}
+pl_list<-list()
+for(i in includelineages){
+  name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+  name2 <- i
+  name1 <- name1[!(name1 %in% c(name2))]
+  myplots<-lapply(i,plot.selection.estimate_test(region="Canada", startdate=startdate, startpar=startpar2,
+                       reference=c(name1), mutants=list(name2), col=col))
+  #pl_list[[i]] <- list(sec_plot,i)
+}
+```
+
+```{r plot selection sublineage in tabs,results='asis',echo=FALSE, warning=FALSE,fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+for(i in seq_along(pl_list)){
+    tmp <- pl_list[[i]]
+    # As you want to use tabset level here has to be lower than 
+    # parent level (ie, parent is 2, so here you have to use 3)
+    catHeader(tmp[[3]], 3)
+    lapply(tmp[1:2], print)
+}
+```
 
 ## Root-to-tip analyses  
 
