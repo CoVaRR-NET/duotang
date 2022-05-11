@@ -220,8 +220,8 @@ alpha <- function(col, alpha) {
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
-plot.selection.estimate_test <- function(region, startdate, reference, mutants, startpar, 
-                           col=c('red', 'blue'), method='BFGS') {
+plot.selection.files <- function(region, startdate, reference, mutants, startpar, 
+                           col=c('red', 'blue'), method='BFGS', file=NA) {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -234,7 +234,7 @@ plot.selection.estimate_test <- function(region, startdate, reference, mutants, 
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
-  if (!is.na(fit$sample)) {  
+  if (any(!is.na(fit$sample))) {  
     # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
       row <- as.numeric(x)
@@ -250,10 +250,16 @@ plot.selection.estimate_test <- function(region, startdate, reference, mutants, 
     hi95 <- qcurve(0.975)  
   }
   
-  par(mar=c(5,5,1,1))
+  # write to a specific file
+  if (!is.na(file)) {
+    res <- 150
+    png(file, width=10*res, height=5*res, res=res)
+  }
+  
+  par(mfrow=c(1,2), mar=c(5,5,1,1))
   
   # display counts
-  sig<-plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
+  plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
        ylab=paste0("Proportion in ", est$region))
@@ -298,7 +304,7 @@ plot.selection.estimate_test <- function(region, startdate, reference, mutants, 
   #options(scipen=5)  # use scientific notation for numbers exceeding 5 digits
   par(mar=c(5,5,1,1))
   
-  logit<-plot(toplot$date, toplot$n2/toplot$n1, pch=21,
+  plot(toplot$date, toplot$n2/toplot$n1, pch=21,
        bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0.001, 1000), 
        xlab='Sample collection date',
        ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
@@ -314,8 +320,9 @@ plot.selection.estimate_test <- function(region, startdate, reference, mutants, 
     lines(toplot$date, scurves[,3] / scurves[,1])
     text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
   }
-  return(c(sig=sig,
-         logit=logit))
+  
+  if (!is.na(file)) dev.off()
+  
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 
