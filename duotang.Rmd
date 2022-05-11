@@ -85,20 +85,28 @@ These analyses are subject to change given new data and updated lineage designat
 #Download metadata from VirusSeq, put the date here:
 
 VirusSeq_date="2022-04-28"
-pangoversion="3.1.20"
+pangoversion="4.0.6 (Viral AI)"
 
 
 # this can be made more compact for faster loading
 meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
+
+# amend our PANGO lineage classifications with those from ViralAI
+#vai <- read.csv("data_needed/viralai.csv")
+#idx <- match(meta$isolate, vai$isolate)
+# all(meta$isolate == vai$isolate[idx], na.rm=T)
+#meta$lineage <- vai$lineage[idx]
+#write.csv(meta, "data_needed/virusseq.metadata.csv", row.names=F)
+
 meta$sample.collection.date <- as.Date(meta$sample.collection.date)
 meta$province <- meta$geo_loc_name..state.province.territory.
 
 
-# FIXME: restore pangolearn calls overriden by scorpio - issue #46
-plearn <- gsub(".+assignment ([A-Z]+\\.[0-9.]*).*", "\\1",
-               meta$note[meta$lineage=="None"])
-plearn[which(grepl("_", plearn))] <- "None"
-meta$lineage[meta$lineage=="None"] <- plearn
+# restore pangolearn calls overriden by scorpio - issue #46
+#plearn <- gsub(".+assignment ([A-Z]+\\.[0-9.]*).*", "\\1",
+#               meta$note[meta$lineage=="None"])
+#plearn[which(grepl("_", plearn))] <- "None"
+#meta$lineage[meta$lineage=="None"] <- plearn
 
 #make a pango.group column
 VOCVOI <- data.frame(
@@ -167,7 +175,7 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
      elementId="barplot-element")
 ```
 
-These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango v. `r pangolineage`), up to `r epidate`.
+These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
 Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.  
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
