@@ -45,5 +45,5 @@ The following steps should be applied to all three replicates from the preceding
 |---------|-------------|---------|---------------|
 | `wget -O data_needed/ncov-open.2022-05-12.fasta.xz https://data.nextstrain.org/files/ncov/open/sequences.fasta.xz` | retrieve Genbank sequences from NextStrain (about 1GB) | xz-compressed FASTA file | ~2 minutes |
 | `wget -O data_needed/ncov-open.2022-05-12.tsv.gz https://data.nextstrain.org/files/ncov/open/metadata.tsv.gz` | retrieve Genbank metadata from NextStrain (about 500 MB) | gzip-compressed TSV file | ~1 minute |
-| `python3 scripts/get-mutations.py data_needed/virusseq.fasta.xz BA.1 data_needed/virusseq.metadata.csv.gz data_needed/raphgraph/canada-BA1.var` | Generate a frequency table of nucleotides at all positions for genomes of user-specified lineage, aligned against the reference | `canada-BA1.var` | ~1 minute |
-
+| `python3 scripts/get-mutations.py data_needed/virusseq.fasta.xz BA.1 data_needed/virusseq.metadata.csv.gz data_needed/raphgraph/canada-BA1.var` | Generate a frequency table of nucleotides at all positions for Canadian genomes of user-specified lineage, aligned against the reference | `canada-BA1.var` | ~1 minute |
+| `python3 scripts/get-mutations.py --seqname strain --delimiter "\t" --pango pango_lineage data_needed/ncov-open.2022-05-12.fasta.xz BA.1 data_needed/ncov-open.2022-05-12.tsv.gz data_needed/raphgraph/global-BA1.var` | Generate the corresponding nucleotide frequency table for global data set | `global-BA1.var` |  |
