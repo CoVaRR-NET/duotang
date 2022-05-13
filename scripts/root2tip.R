@@ -34,7 +34,11 @@ get.dates <- function(phy, delimiter='_', pos=-1, format='%Y-%m-%d') {
 tip.dates <- get.dates(phy, delimiter, pos, format)
 
 # root tree by root-to-tip regression
-rooted <- rtt(phy, as.integer(tip.dates), ncpu=2, objective="rms")
+#rooted <- rtt(phy, as.integer(tip.dates), ncpu=2, objective="rms")
+
+# root tree on WH1
+rooted <- root(phy, outgroup="NC_045512.2")
+rooted <- drop.tip(rooted, tip="NC_045512.2")
 
 # extract new divergence and date vectors
 div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
@@ -52,10 +56,10 @@ if (FALSE) {
   par(mar=c(5,5,1,1))
   plot(tip.dates, div, pch=19, cex=0.5, col=rgb(0.5,0,0,0.2), bty='n')
   abline(fit, lwd=2)
-  abline(a=fit$coef[1]+3*stderr, b=fit$coef[2], lty=2)
-  abline(a=fit$coef[1]-3*stderr, b=fit$coef[2], lty=2)
-  idx <- grepl("BA\\.1", rooted$tip.label)
-  points(tip.dates[idx], div[idx])  
+  abline(a=fit$coef[1]+4*stderr, b=fit$coef[2], lty=2)
+  abline(a=fit$coef[1]-4*stderr, b=fit$coef[2], lty=2)
+  #idx <- grepl("BA\\.2", rooted$tip.label)
+  #points(tip.dates[idx], div[idx])  
 }
 
 outliers <- which(abs(residuals(fit)) > 4*stderr)
