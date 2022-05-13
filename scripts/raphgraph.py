@@ -95,20 +95,20 @@ def get_positions(tablelist, percent_min=0, add_missing=False):
     return totalposlist
 
 
-def bighist(tablelist, poslist, y_names, min_val_AAlabel=15):
+def bighist(namelist, tablelist, poslist, min_val_AAlabel=15):
     """
     Generate histogram data
     :param tablelist:  list of pd.DataFrame objects
     :param poslist:  list, positions to report
-    :param y_names:  list, filenames
     :param min_val_AAlabel:  int, cutoff to output
     :return:
     """
+    result = []
     for i, tab in enumerate(tablelist):
         nb_sample = sum(tab.iloc[0][["A", "C", "G", "T", "."]])
 
         all_pos_toplot = tab.iloc[poslist]
-        missingvalues = all_pos_toplot["."] / nb_sample * 100
+        # missingvalues = all_pos_toplot["."] / nb_sample * 100
 
         # loop over all 12 substitutions:
         for ref in ["A", "C", "G", "T"]:
@@ -122,37 +122,47 @@ def bighist(tablelist, poslist, y_names, min_val_AAlabel=15):
                         if values.iloc[j] > min_val_AAlabel:
                             pos = all_pos_toplot.iloc[j]["POS"]
                             idx = pos.astype(str)+ref+">"+alt
-                            print(namelist[i], j, values.iloc[j], nucsub_AAname.get(idx, ""))
+                            result.append({
+                                'name': namelist[i],
+                                'index': j,
+                                'percent': values.iloc[j],
+                                'substitution': nucsub_AAname.get(idx, "")
+                            })
+    return result
 
 
 if __name__ == "__main__":
     import argparse
+    from csv import DictWriter
+    import os
+
     parser = argparse.ArgumentParser("generate plot of mutation frequencies")
+
+    parser.add_argument("pathlist", nargs="+", help="one or more files to process")
+
     parser.add_argument("--mutnames", default="data_needed/raphgraph/Mut_Nuc_AA_ORF.dic",
                         help="Path to file containing map of nucleotide to amino acid "
                              "mutations")
-    parser.add_argument("-p", "--prefix", default="data_needed/raphgraph/msa_0327_",
-                        help="Path to .var files to process")
-    parser.add_argument("--pmin", default=75, help="percent of alt alleles to add mutation label")
-    parser.add_argument("--outfile", type=str, help="file to write image to",
-                        default="raphgraph.png")
+    parser.add_argument("--pmin", default=75,
+                        help="percent of alt alleles to add mutation label")
+    parser.add_argument("--outfile", type=argparse.FileType('w'),
+                        help="file to write CSV output", default="raphgraph.csv")
     parser.add_argument("--min-val-label", type=int, default=15,
-                        help=" % of alt alleles to add amino acide label")
+                        help="percentage of alt alleles to add amino acid label")
     parser.add_argument("--add-missing", action="store_true", help="Add missing positions?")
     args = parser.parse_args()
 
     # File containing label
     # Default is AminoAcid labels for non synonymous mutations
     nucsub_AAname = load_mut_names(args.mutnames)
-    
-    namelist = ["Canada.BA.1", "final.BA.1", "Canada.BA.1.1", "final.BA.1.1",
-                "Canada.BA.2", "final.BA.2", "final.BA.3"]
-    pathlist = [args.prefix+i+".var" for i in namelist]
 
-    namelist = [i.replace("_", "\n") for i in namelist]
-    tablelist = import_tables(pathlist)
-    
+    tablelist = import_tables(args.pathlist)
+    namelist = [os.path.basename(path) for path in args.pathlist]
     poslist = get_positions(tablelist, percent_min=args.pmin, add_missing=args.add_missing)
     poslist = [i for i in poslist if 50 < i < 29950]
-    bighist(tablelist, poslist, namelist, min_val_AAlabel=args.min_val_label)
+    rows = bighist(namelist, tablelist, poslist, min_val_AAlabel=args.min_val_label)
 
+    writer = DictWriter(args.outfile, fieldnames=['name', 'index', 'percent', 'substitution'])
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)

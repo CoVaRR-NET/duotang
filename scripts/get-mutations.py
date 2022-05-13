@@ -166,10 +166,11 @@ if __name__ == "__main__":
     if len(headers) == 0:
         print(f"ERROR: Metadata does not contain any samples of lineage {args.lineage}.")
         sys.exit()
+    print(f"Aligning {len(headers)} genomes of lineage {args.lineage}")
 
     handle = lzma.open(args.infile, 'rt')
-    batcher = batcher(filter_fasta(handle, headers))
-    aligned = aligner(batcher, refpath=args.reffile)
+    batch = batcher(filter_fasta(handle, headers))
+    aligned = aligner(batch, refpath=args.reffile)
     counts = count_bases(aligned, reflen=reflen)
 
     # write results to file
