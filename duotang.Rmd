@@ -544,7 +544,7 @@ plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=sta
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
-plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar,
+plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar3,
                          reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
@@ -575,9 +575,8 @@ plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar3
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
-plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, 
-                        startpar=startpar2, reference=c(name1, name2), 
-                        mutants=list(name3), col=col)
+plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, startpar=startpar3,
+                         reference=name1, mutants=list(name2, name3), col=col)
 ```
 
 
