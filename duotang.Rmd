@@ -7,6 +7,7 @@ author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
+    keep_md: true
     code_folding: hide
     theme: cerulean
     toc: true
@@ -503,6 +504,8 @@ col <- c(pal["Omicron BA.1.1"], pal["Omicron BA.2"])
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-01") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator.R")
+
+
 #source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
@@ -577,6 +580,51 @@ plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar3
 #plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
 plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, startpar=startpar3,
                          reference=name1, mutants=list(name2, name3), col=col)
+```
+
+
+## BA.2 sublineage selection {.tabset}
+
+Here we show the trends of the various BA.2# sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 cases). Data is pooled across provinces in order to have enough data for these sublineages. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+```{r function, echo=FALSE, warning=FALSE, message=FALSE}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>50)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+
+source("scripts/plot_selection_estimator_test.R")
+
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+# generate the plots
+filenames <- lapply(includelineages, function(name2) {
+  fn <- paste("duotang_files/figure-html/plot-selection-sublineage-", name2, ".png", sep="")
+  plot.selection.files(file=fn, region="Canada", startdate=startdate, 
+                       startpar=startpar2, reference=c(name1), 
+                       mutants=list(name2), col=col)
+  fn
+})
+names(filenames) <- includelineages
+```
+
+
+
+
+```{r plot selection sublineage in tabs, results='asis', echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+
+for (name2 in includelineages) {
+  cat("###", name2, "\n")
+  cat("<img src=\"", filenames[[name2]], "\" width=\"100%\" />\n\n", sep="")
+}
 ```
 
 
