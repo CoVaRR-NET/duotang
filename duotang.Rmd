@@ -579,6 +579,8 @@ plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate,
 
 ## BA.2 sublineage selection {.tabset}
 
+Here we show the trends of the various BA.2# sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 cases). Data is pooled across provinces in order to have enough data for these sublineages. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
 ```{r function, echo=FALSE, warning=FALSE, message=FALSE}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
