@@ -69,18 +69,15 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 Only representations of aggregate data will be posted here.
 
 **Important caveats and disclaimers:**  
-These plots show the changing composition of sequences posted to the VirusSeq Portal by PANGO lineage/variant designation.
-Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time.
-Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all of those are posted to public facing repositories.
-Sequencing volumes and priority have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
-Thus, interpretation of these plots and comparisons between health regions should be done with caution.
+These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing repositories.
+Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
-**Disclaimer:**   
-All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
 For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
 When possible, these differences in sampling strategies are mentioned but they are not always known.
 With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
 Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
+
+Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to change given new data and updated lineage designations.
 
 ```{r load_data}
@@ -89,19 +86,28 @@ These analyses are subject to change given new data and updated lineage designat
 #Download metadata from VirusSeq, put the date here:
 
 VirusSeq_date="2022-04-28"
+pangoversion="4.0.6 (Viral AI)"
 
 
 # this can be made more compact for faster loading
 meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
+
+# amend our PANGO lineage classifications with those from ViralAI
+#vai <- read.csv("data_needed/viralai.csv")
+#idx <- match(meta$isolate, vai$isolate)
+# all(meta$isolate == vai$isolate[idx], na.rm=T)
+#meta$lineage <- vai$lineage[idx]
+#write.csv(meta, "data_needed/virusseq.metadata.csv", row.names=F)
+
 meta$sample.collection.date <- as.Date(meta$sample.collection.date)
 meta$province <- meta$geo_loc_name..state.province.territory.
 
 
-# FIXME: restore pangolearn calls overriden by scorpio - issue #46
-plearn <- gsub(".+assignment ([A-Z]+\\.[0-9.]*).*", "\\1",
-               meta$note[meta$lineage=="None"])
-plearn[which(grepl("_", plearn))] <- "None"
-meta$lineage[meta$lineage=="None"] <- plearn
+# restore pangolearn calls overriden by scorpio - issue #46
+#plearn <- gsub(".+assignment ([A-Z]+\\.[0-9.]*).*", "\\1",
+#               meta$note[meta$lineage=="None"])
+#plearn[which(grepl("_", plearn))] <- "None"
+#meta$lineage[meta$lineage=="None"] <- plearn
 
 #make a pango.group column
 VOCVOI <- data.frame(
@@ -170,9 +176,8 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
      elementId="barplot-element")
 ```
 
-
-Sequence counts for all Canadian data in VirusSeq Portal, up to `r epidate`. Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.  
-
+These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
+Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.  
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
@@ -190,14 +195,16 @@ Variants of current interest, due to their potential growth advantage, or mutati
 
 * BA.4, BA.5
 * BA.2.12.1, BA.2.12 (with S:L452Q)
-* Other variants with mutations in the Spike at position 452.
-* BA.2.21 (mainly in Quebec at present)
-* S:N148T in BA.2 and others (mainly in Ontario at present)
-* BA.2.38 and other BA.2* with S:K417T  
+* Other BA.1/BA.2 variants with mutations in the Spike at position 452
+* BA.2.9 / orf3a:H78Y
+* BA.2.21
+* S:N148T in BA.2, BA.3 and others
+* BA.2.38 and other BA.2* with S:K417T
+* XE and other potential recombinants
 
 ## Provinces {.tabset}
 
-Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/  
+Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
 
 ### BC
 #### British Columbia  
@@ -419,7 +426,7 @@ Tabulation of the most predominant mutational changes in Omicron, with adjacent 
 
 ![](raphgraph.png)
 
-Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_date`.
+Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_date`).
 
 
 <!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
@@ -427,7 +434,7 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 <!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
 
 
-## Omicron sublineages in Canada {.tabset} 
+## Major Omicron sublineages in Canada {.tabset} 
 
 Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
 
@@ -463,7 +470,7 @@ plot.subvariants(sublineage=c(name3),scale=T)
 ```
 
 
-## Selection on omicron sublineages {.tabset}  
+## Selection on Omicron sublineages {.tabset}  
 
 Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
 Here we examine the major sublineages currently in Canada and their relative rate of spread. 
@@ -478,7 +485,7 @@ SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day ov
 **Caveat:**
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection.
 Canada-wide estimates, thus, do not include this province.
-Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database
+Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
 
 ```{r setting function for selection estimator}
 #name1 <- "BA.1"; name2 <- "BA.1.1"; name3 <- "BA.2"
@@ -540,7 +547,7 @@ plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=sta
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
-plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar,
+plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar3,
                          reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
@@ -571,9 +578,8 @@ plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar3
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
-plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, 
-                        startpar=startpar2, reference=c(name1, name2), 
-                        mutants=list(name3), col=col)
+plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, startpar=startpar3,
+                         reference=name1, mutants=list(name2, name3), col=col)
 ```
 
 
