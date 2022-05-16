@@ -177,7 +177,8 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
 ```
 
 These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
-Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.  
+Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
+<!-- Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.   -->
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
@@ -202,9 +203,9 @@ Variants of current interest, due to their potential growth advantage, or mutati
 * BA.2.38 and other BA.2* with S:K417T
 * XE and other potential recombinants
 
-## Provinces {.tabset}
+## Data notes by province {.tabset}
 
-Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
+All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
 
 ### BC
 #### British Columbia  
@@ -266,6 +267,7 @@ https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 ## Canadian trees {.tabset}  
 
 Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
+<!-- SUGGESTION: it might be nice to colour the Omicron tree by Pango sublineage names (e.g., BA.2.12.1) -->
 
 ```{r message=FALSE}
 
@@ -470,10 +472,10 @@ plot.subvariants(sublineage=c(name3),scale=T)
 ```
 
 
-## Selection on Omicron sublineages {.tabset}  
+## Selection on Omicron {.tabset}  
 
 Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
-Here we examine the major sublineages currently in Canada and their relative rate of spread. 
+Here we examine the major sublineages of Omicron currently in Canada and their relative rate of spread. 
 
 Currently, the major variants circulating are Omicron sublineages BA.1 (including BA.1.2, etc.), BA.1.1 (including BA.1.1.\*), and BA.2 (including BA.2.\*).
 Sub-lineage BA.1 was initially prevalent, but Omicron sublineages BA.1.1 and BA.2 have been spreading, as illustrated in the plots below.
@@ -481,6 +483,7 @@ Left plot: y-axis is the proportion of sub-lineages BA.1.1 and BA.2 among Omicro
 
 For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
 SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+<!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
 
 **Caveat:**
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection.
