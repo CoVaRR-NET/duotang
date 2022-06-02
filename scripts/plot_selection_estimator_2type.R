@@ -24,7 +24,7 @@ alpha <- function(col, alpha) {
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
       day=sample.collection.date, n=sum(n), time=time, lineage=lineage
-    )))
+      )))
   df$lineage <- df$lineage[1]
   distinct(df)
 }
@@ -49,7 +49,7 @@ alpha <- function(col, alpha) {
     geo_loc_name..state.province.territory. %in% prov,
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
-  ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
   
   # set final date
   lastdate <- max(mydata$sample.collection.date)
@@ -62,7 +62,7 @@ alpha <- function(col, alpha) {
   refdata <- .combine.lineages(filter(mydata, lineage %in% reference))
   mutdata <- lapply(mutants, function(mut) {
     .combine.lineages(filter(mydata, lineage%in% mut))
-  })
+    })
   
   # generate time series
   timestart <- as.integer(startdate-lastdate)
@@ -82,7 +82,7 @@ alpha <- function(col, alpha) {
   # or 1, then the likelihood surface is very flat.
   v <- apply(toplot[,-1], 1, function(ns) { 
     ifelse(sum(ns)>0, prod(ns) / sum(ns)^length(ns), 0) 
-  })
+    })
   
   refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
@@ -152,7 +152,7 @@ alpha <- function(col, alpha) {
 .ll.binom <- function(p1, s1, refdata, mutdata) {
   suppressWarnings(
     .llfunc(p=p1, s=s1, refdata=refdata, mutdata=mutdata)
-  )
+    )
 }
 
 
@@ -220,8 +220,8 @@ alpha <- function(col, alpha) {
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
-plot.selection.files <- function(region, startdate, reference, mutants, startpar, 
-                                 col=c('red', 'blue'), method='BFGS', file=NA) {
+plot.selection <- function(region, startdate, reference, mutants, startpar, 
+                           col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -250,13 +250,7 @@ plot.selection.files <- function(region, startdate, reference, mutants, startpar
     hi95 <- qcurve(0.975)  
   }
   
-  # write to a specific file
-  if (!is.na(file)) {
-    res <- 150
-    png(file, width=10*res, height=5*res, res=res)
-  }
-  
-  par(mfrow=c(1,2), mar=c(5,5,1,1))
+  par(mfrow=c(1,1), mar=c(5,5,1,1))
   
   # display counts
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
@@ -267,7 +261,7 @@ plot.selection.files <- function(region, startdate, reference, mutants, startpar
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
   }
-  
+
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
@@ -296,36 +290,34 @@ plot.selection.files <- function(region, startdate, reference, mutants, startpar
                     format(round(fit$fit[["s2"]], 3), nsmall=3), 
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
-    text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
-  }
+    text(x=toplot$date[1], y=0.85, str3, col=col[2], pos=4, cex = 1)
+}
   
   
   # second plot - logit transform
   #options(scipen=5)  # use scientific notation for numbers exceeding 5 digits
-  par(mar=c(5,5,1,1))
+  #par(mar=c(5,5,1,1))
   
-  plot(toplot$date, toplot$n2/toplot$n1, pch=21,
-       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0.001, 1000), 
-       xlab='Sample collection date',
-       ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
-  axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
+  #plot(toplot$date, toplot$n2/toplot$n1, pch=21,
+   #    bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0.001, 1000), 
+    #   xlab='Sample collection date',
+    #   ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
+ # axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
   
-  lines(toplot$date, scurves[,2] / scurves[,1])
-  text(x=toplot$date[1], y=500, str2, col=col[1], pos=4, cex=1)
+ # lines(toplot$date, scurves[,2] / scurves[,1])
+ # text(x=toplot$date[1], y=500, str2, col=col[1], pos=4, cex=1)
   
-  if (!is.null(toplot$n3)) {
+ # if (!is.null(toplot$n3)) {
     # draw second series
-    points(toplot$date, toplot$n3/toplot$n1, pch=21,
-           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/3)
-    lines(toplot$date, scurves[,3] / scurves[,1])
-    text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
+  #  points(toplot$date, toplot$n3/toplot$n1, pch=21,
+  #        bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/3)
+  #  lines(toplot$date, scurves[,3] / scurves[,1])
+  #  text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
   }
-  
-  if (!is.na(file)) dev.off()
-  
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 
-}
+
+
 
 
