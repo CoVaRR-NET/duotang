@@ -588,9 +588,11 @@ plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate,
 
 ## BA.2 sublineage selection {.tabset}
 
-Here we show the trends of the various BA.2# sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 cases). Data is pooled across provinces in order to have enough data for these sublineages. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.2# sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
-```{r function, echo=FALSE, warning=FALSE, message=FALSE}
+### Canada
+#### Canada (n>50)
+```{r function and selection estimator Canada, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
     geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
@@ -604,32 +606,185 @@ showlineages <- showlineages %>% filter(n>50)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 
-source("scripts/plot_selection_estimator_test.R")
+source("scripts/plot_selection_estimator_2type.R")
 
 name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
 
-# generate the plots
-filenames <- lapply(includelineages, function(name2) {
-  fn <- paste("duotang_files/figure-html/plot-selection-sublineage-", name2, ".png", sep="")
-  plot.selection.files(file=fn, region="Canada", startdate=startdate, 
-                       startpar=startpar2, reference=c(name1), 
-                       mutants=list(name2), col=col)
-  fn
-})
-names(filenames) <- includelineages
-```
-
-
-
-
-```{r plot selection sublineage in tabs, results='asis', echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-
 for (name2 in includelineages) {
-  cat("###", name2, "\n")
-  cat("<img src=\"", filenames[[name2]], "\" width=\"100%\" />\n\n", sep="")
+  plot.selection(region="Canada",startdate=startdate, reference=name1, mutants=name2, startpar=startpar2)
 }
 ```
 
+### BC
+#### British Columbia (n>20)
+```{r function and selection estimator BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="British Columbia", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Ontario
+#### Ontario (n>20)
+```{r function and selection estimator ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Ontario", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Quebec
+#### Quebec (n>20)
+```{r function and selection estimator QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Quebec")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Quebec", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Saskatchawan
+#### Saskatchawan (n>20)
+```{r function and selection estimator SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Saskatchawan")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Saskatchawan", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Manitoba
+#### Manitoba (n>20)
+```{r function and selection estimator MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Manitoba")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Manitoba", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+
+
+### Eastern Provinces
+#### Eastern provinces (n>20)
+```{r function and selection estimator NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="East provinces (NL+NS+NB)", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+ }
+
+```
 
 ## Root-to-tip analyses  
 
