@@ -593,6 +593,8 @@ Here we show the trends of the various BA.2# sublineages over time, relative to 
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator Canada, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+startpar2 <- list(p=0.5, s=0.1)
+startdate<-as.Date("2021-12-01") 
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
     geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
@@ -608,7 +610,7 @@ includelineages <- as.list(showlineages$lineage)
 
 source("scripts/plot_selection_estimator_2type.R")
 
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <- "BA.2"
 
 for (name2 in includelineages) {
   plot.selection(region="Canada",startdate=startdate, reference=name1, mutants=name2, startpar=startpar2)
@@ -632,7 +634,7 @@ showlineages <- showlineages %>% filter(n>20)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <- "BA.2"
 
 if (length(includelineages)<1){
   print("Not enough data available")
@@ -660,7 +662,7 @@ showlineages <- showlineages %>% filter(n>20)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <- "BA.2"
 
 if (length(includelineages)<1){
   print("Not enough data available")
@@ -688,7 +690,7 @@ showlineages <- showlineages %>% filter(n>20)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <-"BA.2"
 
 if (length(includelineages)<1){
   print("Not enough data available")
@@ -716,7 +718,7 @@ showlineages <- showlineages %>% filter(n>20)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <- "BA.2"
 
 if (length(includelineages)<1){
   print("Not enough data available")
@@ -744,7 +746,7 @@ showlineages <- showlineages %>% filter(n>20)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <- "BA.2"
 
 if (length(includelineages)<1){
   print("Not enough data available")
@@ -774,7 +776,7 @@ showlineages <- showlineages %>% filter(n>20)
 showlineages <- showlineages %>% filter(lineage!="BA.2")
 includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
-name1 <- unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)])
+name1 <- "BA.2"
 
 if (length(includelineages)<1){
   print("Not enough data available")
