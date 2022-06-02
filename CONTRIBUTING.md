@@ -11,8 +11,9 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 # To set up a development/test environment
 
 ## Dependencies
-* [Python 3.6+](https://www.python.org/downloads/)
+* [Python 3.9+](https://www.python.org/downloads/)
   * [BioPython](https://biopython.org/)
+  * [dnastack](https://docs.viral.ai/analysis/)
 * [R 4.0.2+](https://cran.r-project.org/)
   * [ape](https://cran.r-project.org/web/packages/ape/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
