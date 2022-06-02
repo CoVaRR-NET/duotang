@@ -1,9 +1,9 @@
-# download tarball from VirusSeq
-wget -O virusseq.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all
 #get the good tar command depending of bash or macos
 tarcmd=$(case "$(uname -s)" in Darwin)  echo 'gtar';;  Linux) echo 'tar';; esac)
 #get the timestamp for file name
 datestamp=$(date --utc +%Y-%m-%dT%H_%M_%S)
+# download tarball from VirusSeq
+wget -O virusseq.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all
 # scan tarball for filenames
 tar -ztf virusseq.tar.gz > .list_filenames
 # stream FASTA data into xz-compressed file
