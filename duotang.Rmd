@@ -7,6 +7,7 @@ author: "Pillar 6"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
+    keep_md: true
     code_folding: hide
     theme: cerulean
     toc: true
@@ -176,7 +177,8 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
 ```
 
 These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
-Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.  
+Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
+<!-- Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.   -->
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
@@ -201,9 +203,9 @@ Variants of current interest, due to their potential growth advantage, or mutati
 * BA.2.38 and other BA.2* with S:K417T
 * XE and other potential recombinants
 
-## Provinces {.tabset}
+## Data notes by province {.tabset}
 
-Here we show the same plots but for each province. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. All analyses below draw on the most recent publicly available viral sequence data and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories.
+All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
 
 ### BC
 #### British Columbia  
@@ -265,6 +267,7 @@ https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 ## Canadian trees {.tabset}  
 
 Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
+<!-- SUGGESTION: it might be nice to colour the Omicron tree by Pango sublineage names (e.g., BA.2.12.1) -->
 
 ```{r message=FALSE}
 
@@ -469,10 +472,10 @@ plot.subvariants(sublineage=c(name3),scale=T)
 ```
 
 
-## Selection on Omicron sublineages {.tabset}  
+## Selection on Omicron {.tabset}  
 
 Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
-Here we examine the major sublineages currently in Canada and their relative rate of spread. 
+Here we examine the major sublineages of Omicron currently in Canada and their relative rate of spread. 
 
 Currently, the major variants circulating are Omicron sublineages BA.1 (including BA.1.2, etc.), BA.1.1 (including BA.1.1.\*), and BA.2 (including BA.2.\*).
 Sub-lineage BA.1 was initially prevalent, but Omicron sublineages BA.1.1 and BA.2 have been spreading, as illustrated in the plots below.
@@ -480,6 +483,7 @@ Left plot: y-axis is the proportion of sub-lineages BA.1.1 and BA.2 among Omicro
 
 For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
 SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+<!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
 
 **Caveat:**
 Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection.
@@ -503,6 +507,8 @@ col <- c(pal["Omicron BA.1.1"], pal["Omicron BA.2"])
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-as.Date("2021-12-01") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator.R")
+
+
 #source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
@@ -544,7 +550,7 @@ plot.selection.estimate(region="Saskatchewan", startdate=startdate, startpar=sta
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("Manitoba",startdate,name1,name2,col2)
-plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar,
+plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar3,
                          reference=c(name1), mutants=list(name2, name3), col=col)
 ```
 
@@ -575,11 +581,212 @@ plot.selection.estimate(region="Quebec", startdate=startdate, startpar=startpar3
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #plot_selection_estimator2("East provinces (NL+NS+NB)",startdate,name1,name2,col2)
-plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, 
-                        startpar=startpar2, reference=c(name1, name2), 
-                        mutants=list(name3), col=col)
+plot.selection.estimate(region="East provinces (NL+NS+NB)", startdate=startdate, startpar=startpar3,
+                         reference=name1, mutants=list(name2, name3), col=col)
 ```
 
+
+## BA.2 sublineage selection {.tabset}
+
+Here we show the trends of the various BA.2# sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+### Canada
+#### Canada (n>50)
+```{r function and selection estimator Canada, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+startpar2 <- list(p=0.5, s=0.1)
+startdate<-as.Date("2021-12-01") 
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>50)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+
+source("scripts/plot_selection_estimator_2type.R")
+
+name1 <- "BA.2"
+
+for (name2 in includelineages) {
+  plot.selection(region="Canada",startdate=startdate, reference=name1, mutants=name2, startpar=startpar2)
+}
+```
+
+### BC
+#### British Columbia (n>20)
+```{r function and selection estimator BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- "BA.2"
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="British Columbia", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Ontario
+#### Ontario (n>20)
+```{r function and selection estimator ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- "BA.2"
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Ontario", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Quebec
+#### Quebec (n>20)
+```{r function and selection estimator QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Quebec")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <-"BA.2"
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Quebec", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Saskatchawan
+#### Saskatchawan (n>20)
+```{r function and selection estimator SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Saskatchawan")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- "BA.2"
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Saskatchawan", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+### Manitoba
+#### Manitoba (n>20)
+```{r function and selection estimator MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Manitoba")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- "BA.2"
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="Manitoba", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+}
+```
+
+
+
+### Eastern Provinces
+#### Eastern provinces (n>20)
+```{r function and selection estimator NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+sublineagedata <- meta %>% filter(
+    lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
+showlineages <- showlineages %>% filter(n>20)
+#We'll use BA.2 as the reference and drop it:
+showlineages <- showlineages %>% filter(lineage!="BA.2")
+includelineages <- as.list(showlineages$lineage)
+source("scripts/plot_selection_estimator_2type.R")
+name1 <- "BA.2"
+
+if (length(includelineages)<1){
+  print("Not enough data available")
+ } else {
+    for (name2 in includelineages) {
+      plot.selection(region="East provinces (NL+NS+NB)", startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
+  }
+ }
+
+```
 
 ## Root-to-tip analyses  
 

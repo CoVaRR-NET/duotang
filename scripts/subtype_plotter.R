@@ -43,7 +43,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     pal2 <- pal[match(levels(varmeta1$pango.group), names(pal))]
     barplot(tab2, col=pal2, 
             border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-            ylab="Sequenced cases per week (%)") -> mp
+            ylab="Sequenced cases per week (fraction)") -> mp
     legend(x=max(mp)+1, y=1, legend=rev(levels(varmeta1$pango.group)), 
            bty='n', xpd=NA, cex=0.7, fill=rev(pal2), 
            x.intersp=0.5, y.intersp=1, border=NA)
