@@ -12,10 +12,9 @@ comm = MPI.COMM_WORLD
 my_rank = comm.Get_rank()
 nprocs = comm.Get_size()
 tempdir = tempfile.gettempdir()
-fieldnames = ['taxon', 'lineage', 'conflict', 'ambiguity_score', 'scorpio_call', 
-    'scorpio_support', 'scorpio_conflict', 'scorpio_notes', 'version', 
-    'pangolin_version', 'scorpio_version', 'constellation_version', 
-    'is_designated', 'qc_status', 'qc_notes', 'note']
+fieldnames = ['taxon', 'lineage', 'conflict', 'ambiguity_score', 'scorpio_call',
+    'scorpio_support', 'scorpio_conflict', 'version', 'pangolin_version',
+    'pangoLEARN_version', 'pango_version', 'status', 'note']
 
 
 def pangolin(fasta):
@@ -26,7 +25,7 @@ def pangolin(fasta):
     tmpfile.close()
 
     outfile = os.path.join(tempdir, 'mango{}.csv'.format(my_rank))
-    subprocess.check_call(['pangolin', '--analysis-mode', 'pangolearn', tmpfile.name, '--outfile', outfile],
+    subprocess.check_call(['pangolin', tmpfile.name, '--outfile', outfile],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # import results
