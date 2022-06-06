@@ -13,12 +13,9 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 ## Dependencies
 * [Python 3.6+](https://www.python.org/downloads/)
   * [BioPython](https://biopython.org/)
+  * [dnastack](https://docs.viral.ai/analysis/)
 * [R 4.0.2+](https://cran.r-project.org/)
   * [ape](https://cran.r-project.org/web/packages/ape/index.html)
-* [miniconda](https://docs.conda.io/en/latest/miniconda.html)
-* [Pangolin](https://github.com/cov-lineages/pangolin)
-* [OpenMPI](https://www.open-mpi.org/)
-* [mpi4py](https://mpi4py.readthedocs.io/en/stable/)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
