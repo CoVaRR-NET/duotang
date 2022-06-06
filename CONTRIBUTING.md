@@ -33,10 +33,9 @@ Note `<datetime>` is a placeholder for the date and time associated with downloa
 | `bash download.sh` | download data release from VirusSeq, separate and re-compress | `virusseq.fasta.xz`, `virusseq.metadata.tsv.gz` | 10 minutes |
 | `dnastack collections query virusseq "SELECT isolate, lineage FROM publisher_data.virusseq.samples" --format csv > viralai.csv` | retrieve PANGO lineage classifications from Viral AI database | 1 minute |
 | `cd ..` | back up to parent directory |  |  |
-| `python3 scripts/pango2vseq.py data_needed/virusseq.metadata.tsv.gz data_needed/viralai.csv data_needed/virusseq.metadata.csv.gz` | append PANGO lineages to VirusSeq metadata | `virusseq.csv.gz` | 10 seconds |
-| `python3 scripts/alignment.py virusseq.fasta.xz virusseq.csv.gz sample.fasta` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample.fasta` | ~2 minutes |
+| `python3 scripts/pango2vseq.py data_needed/virusseq.<datetime>.metadata.tsv.gz data_needed/viralai.csv data_needed/virusseq.metadata.csv.gz` | append PANGO lineages to VirusSeq metadata | `virusseq.csv.gz` | 10 seconds |
+| `for i in 1 2 3; do python3 scripts/alignment.py data_needed/virusseq.<datetime>.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/sample$i.fasta; done` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample.fasta` | ~2 minutes |
 
-Repeat `alignment.py` three times to generate replicate samples: `sample[123].fasta`
 
 ## To generate phylogenies (ML and time-scaled)
 
