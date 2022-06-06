@@ -5,15 +5,15 @@ import sys
 
 parser = argparse.ArgumentParser("Append Pangolin outputs to VirusSeq metadata")
 parser.add_argument("metadata", type=str, help="<input> VirusSeq metadata TSV file (can be .gz)")
-parser.add_argument("pangolin_csv", type=str, help="<input> Pangolin output CSV")
+parser.add_argument("lineages", type=str, help="<input> CSV containing Pangolin lineages from Viral AI")
 parser.add_argument("output", type=str, help="<output> file to write combined CSV (.gz)")
 args = parser.parse_args()
 
 # import Pangolin results
 pangolin = {}
-rows = csv.DictReader(open(args.pangolin_csv))
+rows = csv.DictReader(open(args.lineages))
 for row in rows:
-    pangolin.update({row['taxon']: row})
+    pangolin.update({row['isolate']: row['lineage']})
 
 # handle gzip file if indicated by filename extension
 if args.metadata.endswith('.gz'):
@@ -27,8 +27,7 @@ for row in rows:
     lineage = pangolin.get(label, None)
     if lineage is None:
         print(f"ERROR: Failed to retrieve Pangolin output for {label}")
-        sys.exit()
-    row.update(lineage)
+    row.update({'lineage': lineage})
 
 fieldnames = list(rows[0].keys())
 outfile = gzip.open(args.output, 'wt')

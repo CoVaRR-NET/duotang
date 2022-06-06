@@ -239,6 +239,7 @@ if __name__ == "__main__":
     with open(args.reffile) as handle:
         header, seq = next(iter_fasta(handle))
         reflen = len(seq)
+        args.outfile.write(f">{header}\n{seq}\n")
 
     progress("loading metadata")
     metadata = load_metadata(args.metadata)
