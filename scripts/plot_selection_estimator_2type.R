@@ -234,7 +234,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
-  if (any(!is.na(fit$sample))) {  
+  #if (any(!is.na(fit$sample))) {  
     # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
       row <- as.numeric(x)
@@ -248,7 +248,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
     } 
     lo95 <- qcurve(0.025)
     hi95 <- qcurve(0.975)  
-  }
+  #}
   
   par(mfrow=c(1,1), mar=c(5,5,1,1))
   
@@ -268,7 +268,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
     lines(toplot$date, scurves[,3])
   }
   
-  if (!is.na(fit$sample)) {
+  #if (!is.na(fit$sample)) {
     # display confidence intervals
     polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
             col=alpha(col[1], 0.5))
@@ -276,7 +276,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
       polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
               col=alpha(col[2], 0.5))
     }
-  }
+  #}
   
   # report parameter estimates on plot
   str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],

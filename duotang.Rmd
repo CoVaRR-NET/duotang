@@ -85,7 +85,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-04-28"
+VirusSeq_date="2022-06-06"
 pangoversion="4.0.6 (Viral AI)"
 
 
@@ -275,7 +275,7 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
 require(lubridate)
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-03-01'), by='3 month')
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-06-01'), by='3 month')
 
 stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
 
@@ -312,7 +312,7 @@ listPTs <- listPTs[order(listPTs)]
 getpal2 <- colorRampPalette(brewer.pal(length(listPTs), "Spectral")) #"Set3
 pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
-
+packageVersion("ggtree")
 ### time tree
 mrdate <- max(na.omit(metasub1$sample.collection.date))
 
@@ -509,7 +509,6 @@ startdate<-as.Date("2021-12-01") #Using a later date with less sampling noise
 source("scripts/plot_selection_estimator.R")
 
 
-#source("scripts/plot_selection_estimator2.R")
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
