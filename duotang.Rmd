@@ -275,7 +275,7 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
 require(lubridate)
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-03-01'), by='3 month')
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-04-01'), by='3 month')
 
 stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
 
@@ -312,7 +312,7 @@ listPTs <- listPTs[order(listPTs)]
 getpal2 <- colorRampPalette(brewer.pal(length(listPTs), "Spectral")) #"Set3
 pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
-
+packageVersion("ggtree")
 ### time tree
 mrdate <- max(na.omit(metasub1$sample.collection.date))
 
