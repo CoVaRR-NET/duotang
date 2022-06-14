@@ -149,10 +149,21 @@ epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
+epidataCANall$previousvalue=0
+#small loop to get the numtoday column from previous versions of this file from the cumulative cases
+for(row in 1:nrow(epidataCANall)) {
+  p=epidataCANall[row, "prname"]
+  subdf=epidataCANall[which( (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) ),]
+  if(nrow(subdf)!=0){
+    nextrow=which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow,"previousvalue"]=epidataCANall[row, "numcases_total"]
+  }
+}
+epidataCANall$numtoday=epidataCANall$numcases_total-epidataCANall$previousvalue
+
 # for barplots
 meta$week <- cut(meta$sample.collection.date, 'week')
 ```
-
 
 # SARS-CoV-2 in Canada
 
