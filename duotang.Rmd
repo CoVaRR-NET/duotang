@@ -44,6 +44,10 @@ library(MASS)
 library(r2d3)
 library(jsonlite)
 
+#Those libraries are required by the plot_selection_estimator scripts
+library(bbmle)
+library(HelpersMG)
+
 theme_set(theme_classic())
 
 # You would need to change this folder to be wherever you wanted the html file to be written.
@@ -85,7 +89,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-06-06"
+VirusSeq_date="2022-07-12"
 pangoversion="4.0.6 (Viral AI)"
 
 
@@ -99,8 +103,8 @@ meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
 #meta$lineage <- vai$lineage[idx]
 #write.csv(meta, "data_needed/virusseq.metadata.csv", row.names=F)
 
-meta$sample.collection.date <- as.Date(meta$sample.collection.date)
-meta$province <- meta$geo_loc_name..state.province.territory.
+meta$Sample.Collection.Date <- as.Date(meta$Sample.Collection.Date)
+meta$province <- meta$Geo_loc_name..State.province.territory.
 
 
 # restore pangolearn calls overriden by scorpio - issue #46
@@ -119,7 +123,7 @@ VOCVOI <- data.frame(
             '^C\\.37|^C\\.37\\.1',
             '^B\\.1\\.1\\.529|^BA\\.1$|^BA\\.1\\.[1-9][0-9]|BA\\.1\\.[2-9]$', 
             '^BA\\.1\\.1$|^BA\\.1\\.1\\.[0-9]+$', 
-            '^BA\\.2', 
+            '^BA\\.2.*', 
             '^B\\.1\\.621', 
             '^A\\.23\\.1', '^B\\.1\\.438\\.1'),
   color=c('#B29C71', '#F08C3A', '#444444', '#A6CEE3', '#61A6A0',
@@ -162,7 +166,7 @@ for(row in 1:nrow(epidataCANall)) {
 epidataCANall$numtoday=epidataCANall$numcases_total-epidataCANall$previousvalue
 
 # for barplots
-meta$week <- cut(meta$sample.collection.date, 'week')
+meta$week <- cut(meta$Sample.Collection.Date, 'week')
 ```
 
 # SARS-CoV-2 in Canada
@@ -171,7 +175,7 @@ meta$week <- cut(meta$sample.collection.date, 'week')
 
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
-meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-12-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
 dat <- lapply(unique(meta1$province), function(x) {
@@ -286,7 +290,7 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
 require(lubridate)
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-06-01'), by='3 month')
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-07-01'), by='3 month')
 
 stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
 
@@ -301,7 +305,7 @@ MLtree_sub1$tip.label <- get.tipnames(MLtree_sub1$tip.label)
 ttree_sub1$tip.label <- get.tipnames(ttree_sub1$tip.label)
 #epis <- sapply(strsplit(tips,"\\|"),`[`,1)
 #metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]
-metasub1 <- meta[meta$fasta.header.name %in% ttree_sub1$tip.label, ]
+metasub1 <- meta[meta$Fasta.Header.Name %in% ttree_sub1$tip.label, ]
 #stopifnot(nrow(metasub1) == Ntip(ttree_sub1))
 
 #scale to number of mutations
@@ -314,7 +318,7 @@ listpangogp <- unique(metasub1$pango.group)
 listpangogp <- sort(listpangogp)
 # division colours for heatmap
 df_PTs <- data.frame(divisions=metasub1$province) #make df for heatmaps
-rownames(df_PTs) <- metasub1$specimen.collector.sample.ID  #needs row names for heatmaps
+rownames(df_PTs) <- metasub1$Specimen.Collector.Sample.ID  #needs row names for heatmaps
 
 #division colours
 listPTs <- unique(metasub1$province)
@@ -323,12 +327,12 @@ listPTs <- listPTs[order(listPTs)]
 getpal2 <- colorRampPalette(brewer.pal(length(listPTs), "Spectral")) #"Set3
 pal2 <- getpal2(length(listPTs))
 names(pal2) <- listPTs
-packageVersion("ggtree")
+#packageVersion("ggtree")
 ### time tree
-mrdate <- max(na.omit(metasub1$sample.collection.date))
+mrdate <- max(na.omit(metasub1$Sample.Collection.Date))
 
 p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+%
-  metasub1[ , c("fasta.header.name", "pango.group"), 
+  metasub1[ , c("Fasta.Header.Name", "pango.group"), 
             drop=FALSE] + 
   geom_tippoint(color="black", size=1) +
   geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
@@ -349,7 +353,7 @@ plot1 <- p1  #don't plot provinces
 
 ### diversity ML tree
 p2 <- ggtree(MLtree_sub1) %<+% 
-  metasub1[ , c("fasta.header.name", "pango.group"), drop=FALSE] + 
+  metasub1[ , c("Fasta.Header.Name", "pango.group"), drop=FALSE] + 
   geom_tippoint(color="black", size=1) +
   geom_tippoint(aes(color = pango.group), size=1) + 
   scale_color_manual(breaks=listpangogp, values = pal) +
@@ -369,11 +373,11 @@ metasub_omi <- metasub1[metasub1$pango.group %in% c("Omicron BA.1", "Omicron BA.
 #omi_epis<-metasub_omi$Accession_ID
 #ref<-"EPI_ISL_402124"
 #all_omi<-c(omi_epis,ref)
-all_omi <- metasub_omi$fasta.header.name
+all_omi <- metasub_omi$Fasta.Header.Name
 ttree_omi<-keep.tip(ttree_sub1, all_omi)
 
 p3 <- ggtree(ttree_omi, mrsd = as.Date(mrdate)) %<+%
-  metasub_omi[ , c("fasta.header.name", "pango.group"), 
+  metasub_omi[ , c("Fasta.Header.Name", "pango.group"), 
                drop=FALSE] + 
   geom_tippoint(color="black", size=1) +
   geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
@@ -396,7 +400,7 @@ plot3 <- gheatmap(p3, df_PTs[, "divisions", drop = FALSE],
 MLtree_omi<-keep.tip(MLtree_sub1, all_omi)
 
 p4 <- ggtree(MLtree_omi) %<+% 
-  metasub_omi[ , c("fasta.header.name", "pango.group"), 
+  metasub_omi[ , c("Fasta.Header.Name", "pango.group"), 
                drop=FALSE] + 
   geom_tippoint(color="black", size=1) +
   geom_tippoint(aes(color = pango.group), size=1) + 
@@ -607,10 +611,10 @@ startpar2 <- list(p=0.5, s=0.1)
 startdate<-as.Date("2021-12-01") 
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date) %>% dplyr::count(lineage)
 
 showlineages <- sublineagedata %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>50)
@@ -632,12 +636,12 @@ for (name2 in includelineages) {
 ```{r function and selection estimator BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date,Geo_loc_name..State.province.territory.) %>% dplyr::count(lineage)
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
+showlineages <- sublineagedata %>% filter(Geo_loc_name..State.province.territory.=="British Columbia")
 showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>20)
 #We'll use BA.2 as the reference and drop it:
@@ -660,12 +664,12 @@ if (length(includelineages)<1){
 ```{r function and selection estimator ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date,Geo_loc_name..State.province.territory.) %>% dplyr::count(lineage)
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
+showlineages <- sublineagedata %>% filter(Geo_loc_name..State.province.territory.=="Ontario")
 showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>20)
 #We'll use BA.2 as the reference and drop it:
@@ -688,12 +692,12 @@ if (length(includelineages)<1){
 ```{r function and selection estimator QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date,Geo_loc_name..State.province.territory.) %>% dplyr::count(lineage)
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Quebec")
+showlineages <- sublineagedata %>% filter(Geo_loc_name..State.province.territory.=="Quebec")
 showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>20)
 #We'll use BA.2 as the reference and drop it:
@@ -716,12 +720,12 @@ if (length(includelineages)<1){
 ```{r function and selection estimator SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date,Geo_loc_name..State.province.territory.) %>% dplyr::count(lineage)
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Saskatchawan")
+showlineages <- sublineagedata %>% filter(Geo_loc_name..State.province.territory.=="Saskatchawan")
 showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>20)
 #We'll use BA.2 as the reference and drop it:
@@ -744,12 +748,12 @@ if (length(includelineages)<1){
 ```{r function and selection estimator MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date,Geo_loc_name..State.province.territory.) %>% dplyr::count(lineage)
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Manitoba")
+showlineages <- sublineagedata %>% filter(Geo_loc_name..State.province.territory.=="Manitoba")
 showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>20)
 #We'll use BA.2 as the reference and drop it:
@@ -758,7 +762,7 @@ includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
 name1 <- "BA.2"
 
-if (length(includelineages)<1){
+if (length(includelineages)<3){
   print("Not enough data available")
  } else {
     for (name2 in includelineages) {
@@ -774,12 +778,12 @@ if (length(includelineages)<1){
 ```{r function and selection estimator NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("BA\\.2$|BA\\.2\\.[0-9]|BA\\.2\\.[0-9][0-9]", meta$lineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% unique(meta$Geo_loc_name..State.province.territory.),
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date,Geo_loc_name..State.province.territory.) %>% dplyr::count(lineage)
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+showlineages <- sublineagedata %>% filter(Geo_loc_name..State.province.territory.=="New Brunswick"|Geo_loc_name..State.province.territory.=="Nova Scotia" | Geo_loc_name..State.province.territory.=="Newfoundland and Labrador")
 showlineages <- showlineages %>% group_by(lineage) %>% summarise(n = sum(n))
 showlineages <- showlineages %>% filter(n>20)
 #We'll use BA.2 as the reference and drop it:
@@ -788,7 +792,7 @@ includelineages <- as.list(showlineages$lineage)
 source("scripts/plot_selection_estimator_2type.R")
 name1 <- "BA.2"
 
-if (length(includelineages)<1){
+if (length(includelineages)<3){
   print("Not enough data available")
  } else {
     for (name2 in includelineages) {
@@ -818,6 +822,7 @@ fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
 ### Molecular clock estimates (based on three independant subsamples)
 
 ```{r}
+if(!is.null(fit1)){
 est1 <- get.ci(fit1); est1$rep <- 'Rep1'
 est2 <- get.ci(fit2); est2$rep <- 'Rep2'
 est3 <- get.ci(fit3); est3$rep <- 'Rep3'
@@ -838,6 +843,7 @@ ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) +
                 position=position_dodge(1)) +
   labs(y="Substitutions / Genome / Day",
        x="Lineage", fill="Subsample")
+}
 ```
 
 
