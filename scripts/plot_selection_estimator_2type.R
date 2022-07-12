@@ -23,7 +23,7 @@ alpha <- function(col, alpha) {
 .combine.lineages <- function(df) {
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
-      day=sample.collection.date, n=sum(n), time=time, lineage=lineage
+      day=Sample.Collection.Date, n=sum(n), time=time, lineage=lineage
       )))
   df$lineage <- df$lineage[1]
   distinct(df)
@@ -35,9 +35,9 @@ alpha <- function(col, alpha) {
   if (region[1] == "East provinces (NL+NS+NB)") {
     prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
-    prov <- unique(meta$geo_loc_name..state.province.territory.)
+    prov <- unique(meta$Geo_loc_name..State.province.territory.)
   } else if (region[1] == "Canada (no AB)") {
-    provinces <- unique(meta$geo_loc_name..state.province.territory.)
+    provinces <- unique(meta$Geo_loc_name..State.province.territory.)
     prov <- provinces[provinces != 'Alberta']
   } else {
     prov <- region
@@ -46,16 +46,15 @@ alpha <- function(col, alpha) {
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
-    geo_loc_name..state.province.territory. %in% prov,
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% prov,
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date) %>% dplyr::count(lineage)
   
   # set final date
-  lastdate <- max(mydata$sample.collection.date)
-  
+  lastdate <- max(mydata$Sample.Collection.Date)
   # convert time to negative integers for fitting model (0 = last date)
-  mydata$time <- as.numeric(difftime(mydata$sample.collection.date, lastdate, 
+  mydata$time <- as.numeric(difftime(mydata$Sample.Collection.Date, lastdate, 
                                      units='days'))
   
   # separate by reference and mutant lineage(s)
@@ -68,7 +67,6 @@ alpha <- function(col, alpha) {
   timestart <- as.integer(startdate-lastdate)
   toplot <- data.frame(time=seq.int(from=timestart, to=0))
   toplot$n1 <- refdata$n[match(toplot$time, refdata$time)]
-  
   temp <- lapply(mutdata, function(md) md$n[match(toplot$time, md$time)])  
   toplot <- cbind(toplot, temp)
   names(toplot) <- c('time', 'n1', paste('n', 1:length(mutdata)+1, sep=''))
@@ -261,7 +259,6 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
   }
-
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
@@ -291,9 +288,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
     text(x=toplot$date[1], y=0.85, str3, col=col[2], pos=4, cex = 1)
-}
-  
-  
+  }
   # second plot - logit transform
   #options(scipen=5)  # use scientific notation for numbers exceeding 5 digits
   #par(mar=c(5,5,1,1))
@@ -313,7 +308,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
   #        bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/3)
   #  lines(toplot$date, scurves[,3] / scurves[,1])
   #  text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
-  }
+}
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 
