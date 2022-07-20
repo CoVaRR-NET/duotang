@@ -131,26 +131,21 @@ VOCVOI <- data.frame(
           '#BB4513', '#9AD378', '#3EA534',
           '#900D09', '#BC544B')
 ) 
-VOCVOI$pattern=gsub("\\.","\\\\.",VOCVOI$pangodesignation)
-VOCVOI$pattern=gsub("^","^",VOCVOI$pattern)
-VOCVOI$jstrick=apply( VOCVOI[ , c("name","color") ] , 1 , paste , collapse = "-" )
-VOCVOI$jstrick=gsub("#","|",VOCVOI$jstrick)
+VOCVOI$pattern <- gsub("\\.","\\\\.",VOCVOI$pangodesignation)
+VOCVOI$pattern <- gsub("^","^",VOCVOI$pattern)
+#VOCVOI$jstrick <- apply( VOCVOI[ , c("name","color") ], 1, paste, collapse="")
+#VOCVOI$jstrick <- gsub("#","|",VOCVOI$jstrick)
 
 variants <- sapply(VOCVOI$pattern, function(p) 
   grepl(p, meta$lineage, perl=T))
-paste(VOCVOI$pattern,gsub(VOCVOI$color))
+#paste(VOCVOI$pattern, gsub(VOCVOI$color))
 
 # verify that every row matches either 0 or 1 patterns
 # table(apply(variants, 1, sum))
 
-meta$jstrick <- 'other|grey'
-meta$jstrick[apply(variants, 1, sum)==1] <- VOCVOI$jstrick[unlist(apply(variants, 1, which))]
-meta$jstrick <- as.factor(meta$jstrick)
-
-
 meta$pango.group <- 'other'
 meta$pango.group[apply(variants, 1, sum)==1] <- VOCVOI$name[unlist(apply(variants, 1, which))]
-meta$pango.group <- as.factor(meta$jstrick)
+meta$pango.group <- as.factor(meta$pango.group)
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
@@ -190,7 +185,7 @@ meta$week <- cut(meta$sample.collection.date, 'week')
 # focus on emergence of VoCs in Canada
 meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
-meta1$pango.group <- meta1$jstrick 
+#meta1$pango.group <- meta1$jstrick 
 
 dat <- lapply(unique(meta1$province), function(x) {
   as.data.frame.matrix(table(meta1$week[meta1$province==x],
@@ -200,6 +195,11 @@ names(dat) <- unique(meta1$province)
 
 tab <- as.data.frame.matrix(table(meta1$week, meta1$pango.group))
 dat[['Canada']] <- tab
+
+# pass colour legend to JavaScript layer
+dat[['legend']] <- as.list(VOCVOI$color)
+names(dat[['legend']]) <- VOCVOI$name
+dat[['legend']]$other <- 'grey'
 
 r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
      elementId="barplot-element")

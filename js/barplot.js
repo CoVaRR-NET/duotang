@@ -70,27 +70,9 @@ var selectlabel2 = div.append('label').text("  Region: "),
                         .attr("selected", function(d) {return d.selected; });
 
 // draw legend box
-const palette = {  // mapped to variants in alphabetical order
-      "A.23.1": "#9AD378", 
-      "Alpha": "#B29C71", 
-      "B.1.438.1": "#3EA534", 
-      "Beta": "#F08C3A", 
-      "Delta": "#A6CEE3", 
-      "Delta AY.25": "#61A6A0", 
-      "Delta AY.27": "#438FC0", 
-      "Gamma": "#444444", 
-      "Lambda": "#CD950C", 
-      "Mu": "#BB4513", 
-      "Omicron BA.1": "#8B0000", 
-      "Omicron BA.1.1": "#FA8072",
-      "Omicron BA.2": "#FF0000", 
-      "Omicron BA.4": "#900D09", 
-      "Omicron BA.5": "#BC544B",
-      "other|grey": "grey"
-    };
-
-
 // https://d3-graph-gallery.com/graph/custom_legend.html
+const palette = data["legend"];
+delete(data.legend);
 var legend = div.append("svg")
                 .attr("width", div.attr("width"))
                 .attr("height", "70px");
