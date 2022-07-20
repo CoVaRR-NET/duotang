@@ -84,6 +84,8 @@ const palette = {  // mapped to variants in alphabetical order
       "Omicron BA.1": "#8B0000", 
       "Omicron BA.1.1": "#FA8072",
       "Omicron BA.2": "#FF0000", 
+      "Omicron BA.4": "#900D09", 
+      "Omicron BA.5": "#BC544B",
       "other": "#888888"
     };
 

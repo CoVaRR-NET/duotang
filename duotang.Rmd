@@ -177,7 +177,7 @@ meta$week <- cut(meta$sample.collection.date, 'week')
 
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
-meta1 <- meta[as.Date(meta$week) > as.Date('2022-04-01'), ]
+meta1 <- meta[as.Date(meta$week) > as.Date('2020-11-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 
 dat <- lapply(unique(meta1$province), function(x) {
