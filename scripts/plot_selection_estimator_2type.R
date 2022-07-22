@@ -23,7 +23,7 @@ alpha <- function(col, alpha) {
 .combine.lineages <- function(df) {
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
-      day=Sample.Collection.Date, n=sum(n), time=time, lineage=lineage
+      day=sample.collection.date, n=sum(n), time=time, lineage=lineage
       )))
   df$lineage <- df$lineage[1]
   distinct(df)
@@ -35,9 +35,9 @@ alpha <- function(col, alpha) {
   if (region[1] == "East provinces (NL+NS+NB)") {
     prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
-    prov <- unique(meta$Geo_loc_name..State.province.territory.)
+    prov <- unique(meta$geo_loc_name..state.province.territory.)
   } else if (region[1] == "Canada (no AB)") {
-    provinces <- unique(meta$Geo_loc_name..State.province.territory.)
+    provinces <- unique(meta$geo_loc_name..state.province.territory.)
     prov <- provinces[provinces != 'Alberta']
   } else {
     prov <- region
@@ -46,15 +46,15 @@ alpha <- function(col, alpha) {
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
-    Geo_loc_name..State.province.territory. %in% prov,
-    !is.na(Sample.Collection.Date),
-    Sample.Collection.Date >= startdate
-    ) %>% group_by(Sample.Collection.Date) %>% dplyr::count(lineage)
+    geo_loc_name..state.province.territory. %in% prov,
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
   
   # set final date
-  lastdate <- max(mydata$Sample.Collection.Date)
+  lastdate <- max(mydata$sample.collection.date)
   # convert time to negative integers for fitting model (0 = last date)
-  mydata$time <- as.numeric(difftime(mydata$Sample.Collection.Date, lastdate, 
+  mydata$time <- as.numeric(difftime(mydata$sample.collection.date, lastdate, 
                                      units='days'))
   
   # separate by reference and mutant lineage(s)

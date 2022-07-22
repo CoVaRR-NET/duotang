@@ -1,7 +1,10 @@
 #get the good tar command depending of bash or macos
 tarcmd=$(case "$(uname -s)" in Darwin)  echo 'gtar';;  Linux) echo 'tar';; esac)
+
 #get the timestamp for file name
 datestamp=$(date --utc +%Y-%m-%dT%H_%M_%S)
+
+(
 # download tarball from VirusSeq
 wget -O virusseq.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all
 # scan tarball for filenames
@@ -12,5 +15,6 @@ $tarcmd -axf virusseq.tar.gz -O $(cat .list_filenames | grep fasta$) | xz > viru
 $tarcmd -axf virusseq.tar.gz -O $(cat .list_filenames | grep tsv$) | gzip > virusseq.$datestamp.metadata.tsv.gz
 # delete tarball
 rm virusseq.tar.gz .list_filenames
+)&
 
 
