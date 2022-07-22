@@ -598,26 +598,13 @@ source("scripts/fit-rtt.R")
 fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
 ```
 
-```
-## [1] "some samples in the tree do not have sampling dates inthe metadatas"
-```
+![](duotang_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 
 
 ```r
 fit2 <- fit.rtt("data_needed/sample2.rtt.nwk", plot=FALSE)
-```
-
-```
-## [1] "some samples in the tree do not have sampling dates inthe metadatas"
-```
-
-```r
 fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
-```
-
-```
-## [1] "some samples in the tree do not have sampling dates inthe metadatas"
 ```
 
 
@@ -648,6 +635,8 @@ ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) +
        x="Lineage", fill="Subsample")
 }
 ```
+
+![](duotang_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 ## Future development
