@@ -126,7 +126,7 @@ var n = variants.length,  // number of categories
     m = data["Canada"].length;  // number of observations (time points)
 
 // generate stacked series from data
-var stack = d3.stack().keys(variants).offset(d3.stackOffsetWiggle),
+var stack = d3.stack().keys(variants).offset(d3.stackOffsetSilhouette),
     series = stack(data["Canada"]);
 
 // vertical limits

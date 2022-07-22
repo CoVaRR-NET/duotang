@@ -1,9 +1,12 @@
+require(lubridate)
+
 #' generate stacked barplot of a subset of lineages
 #' @param region:  char, can be used to select samples for a specific province
 #' @param sublineage:  char, vector of lineage names for subsetting
 #' @param scaled:  bool, display absolute or relative frequencies per week
+#' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
-                             scaled=FALSE, col=NA) {
+                             scaled=FALSE, col=NA, mindate=as.Date('2021-11-30')) {
   if (is.na(col)) {
     col <- rainbow(length(sublineage))  # default colour palette
   }
@@ -23,7 +26,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   #print(varmeta1$sample.collection.date)
   
   varmeta1$week <- cut(varmeta1$sample.collection.date, 'week')
-  varmeta1 <- varmeta1[as.Date(varmeta1$week) > as.Date('2021-11-30'), ]
+  varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
   varmeta1$week <- as.factor(as.character(varmeta1$week))
   
   pal <- VOCVOI1$color
@@ -53,11 +56,13 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   else {
     par(mar=c(5,5,3,5), adj=0)
     epi <- epidataCANall[epidataCANall$prname==region, ]
-    epi$week <- cut(as.Date(epi$date), 'week')
-    cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
+    #epi$week <- cut(as.Date(epi$date), 'week')
+    #cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
+    cases.wk <- epi$numtotal_last7
     
     # match case counts to variant freq data and rescale as 2nd axis
-    idx <- match(names(cases.wk), levels(varmeta1$week))
+    idx <- match(floor_date(epi$date, "weeks", week_start=1), 
+                 floor_date(as.Date(levels(varmeta1$week)), "weeks", week_start=1))
     y <- cases.wk[!is.na(idx)]
     lab.y <- pretty(y)  # for drawing axis
     max.count <- max(apply(tab, 2, sum))
