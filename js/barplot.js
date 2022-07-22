@@ -96,7 +96,7 @@ legend.selectAll("mylabels")
       
 // append an SVG element to the div
 var plotheight = 480,
-    svg = div.append("svg")
+    bpsvg = div.append("svg")
         .attr("width", width+"px")        
         .attr("height", plotheight+"px")
 
@@ -104,7 +104,7 @@ var plotheight = 480,
 var margin = {top: 0, right: 50, bottom: 20, left: 50},
     width = width - margin.left - margin.right,
     height = plotheight - margin.top - margin.bottom,
-    g = svg.append("g")
+    g = bpsvg.append("g")
            .attr("height", plotheight+"px")
            .attr("id", "barplot-group")
            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -170,8 +170,10 @@ var xScale = d3.scaleTime()
           .range([height, 0]),
     bandwidth = xScale(weeks[1]) - xScale(weeks[0]),
     xtime,
-    yoffset = absolutePosition(svg.node());
+    yoffset = absolutePosition(bpsvg.node());
 
+console.log(bpsvg);
+console.log(yoffset);
 
 var color = d3.scaleOrdinal()
     .domain(variants)
@@ -192,7 +194,7 @@ var barplot = g.selectAll("path")
                  .attr("fill", function(d, i) { return color(i); });
 
 // http://bl.ocks.org/WillTurman/4631136
-svg.selectAll(".layer")
+bpsvg.selectAll(".layer")
     .attr("opacity", 1)
     .on("mouseover", function(event, datum) {
       d3.select(this)
@@ -200,7 +202,7 @@ svg.selectAll(".layer")
         .attr("stroke", "#000000")
         .attr("stroke-width", "0.5px");
         
-      svg.selectAll(".layer").transition()
+      bpsvg.selectAll(".layer").transition()
          .duration(250)
          .attr("opacity", function(d, j) {
            return j != datum.index ? 0.5 : 1;
@@ -208,6 +210,7 @@ svg.selectAll(".layer")
     })
     .on("mousemove", function(event, datum) {
       coords = d3.pointer(event);
+      console.log(coords);
       //xtime = xScale.invert(event.x);
       xtime = xScale.invert(coords[0]);
       week = d3.bisect(weeks, xtime);
@@ -223,7 +226,7 @@ svg.selectAll(".layer")
         .attr("stroke-width", "0");
       tooltip.style("visibility", "hidden");
         
-      svg.selectAll(".layer")
+      bpsvg.selectAll(".layer")
          .transition()
          .duration(100)
          .attr("opacity", "1");
@@ -282,10 +285,10 @@ function updateBarplot() {
   yScale = d3.scaleLinear().domain([ymin, ymax])
           .range([height, 0]);
   
-  svg.select("g.yl_axis").transition()
+  bpsvg.select("g.yl_axis").transition()
      .duration(500)
      .call(d3.axisLeft(yScale));
-  svg.select("g.yr_axis").transition()
+  bpsvg.select("g.yr_axis").transition()
      .duration(500)
      .call(d3.axisRight(yScale));
   
