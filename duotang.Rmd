@@ -437,9 +437,7 @@ p4 <- ggtree(MLtree_omi) %<+%
   theme(legend.position = "right", legend.title = element_blank(), 
         legend.text = element_text(size =12))
 
-plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], 
-                  width= 0.1, color = F, colnames = F, 
-                  legend_title = F) +
+plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
   scale_fill_manual(breaks=listPTs, values = pal2)
 
 # table(metasub1$pango.group)
