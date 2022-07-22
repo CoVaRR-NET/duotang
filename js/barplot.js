@@ -18,8 +18,8 @@ console = d3.window(div.node()).console;
 const opts = [
   {name: "basic", value: "d3.stackOffsetNone"},
   {name: "percent", value: "d3.stackOffsetExpand"},
-  {name: "silhouette", value: "d3.stackOffsetSilhouette"},
-  {name: "streamgraph", value: "d3.stackOffsetWiggle", selected: true}
+  {name: "silhouette", value: "d3.stackOffsetSilhouette", selected: true},
+  {name: "streamgraph", value: "d3.stackOffsetWiggle"}
 ];
 
 var selectlabel = div.append('label').text("Layout: ");
