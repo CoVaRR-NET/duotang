@@ -10,10 +10,12 @@ parser.add_argument("output", type=str, help="<output> file to write combined CS
 args = parser.parse_args()
 
 # import Pangolin results
-pangolin = {}
+pangolin_alias = {}
+pangolin_raw = {}
 rows = csv.DictReader(open(args.lineages))
 for row in rows:
-    pangolin.update({row['isolate']: row['lineage']})
+    pangolin_alias.update({row['isolate']: row['lineage']})
+    pangolin_raw.update({row['isolate']: row['rawlineage']})
 
 # handle gzip file if indicated by filename extension
 if args.metadata.endswith('.gz'):
@@ -24,10 +26,12 @@ else:
 rows = list(csv.DictReader(handle, delimiter='\t'))
 for row in rows:
     label = row["fasta header name"]
-    lineage = pangolin.get(label, None)
+    lineage = pangolin_raw.get(label, None)
     if lineage is None:
         print(f"ERROR: Failed to retrieve Pangolin output for {label}")
-    row.update({'lineage': lineage})
+    else:
+        row.update({'rawlineage': lineage})
+        row.update({'lineage': pangolin_alias.get(label, None)})
 
 fieldnames = list(rows[0].keys())
 outfile = gzip.open(args.output, 'wt')

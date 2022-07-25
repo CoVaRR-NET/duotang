@@ -35,7 +35,7 @@ def filter_fasta(handle, headers):
         yield h, sequence  # handle last record
 
 
-def get_headers(path, lineage, lineage_field='lineage', header_field="fasta header name",
+def get_headers(path, lineage, lineage_field='rawlineage', header_field="fasta header name",
                 delimiter=','):
     """
     Load metadata from gzip-compressed CSV file and extract FASTA headers
@@ -48,9 +48,10 @@ def get_headers(path, lineage, lineage_field='lineage', header_field="fasta head
     :return:  dict, fasta header names, no values
     """
     handle = gzip.open(path, 'rt')
-    result = {}
+    result = {} 
+    l=len(lineage)
     for row in csv.DictReader(handle, delimiter=delimiter):
-        if row[lineage_field] != lineage:
+        if row[lineage_field][:l] != lineage:
             continue
         result.update({row[header_field]: None})
     return result
