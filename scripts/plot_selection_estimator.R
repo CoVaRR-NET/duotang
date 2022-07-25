@@ -23,7 +23,7 @@ alpha <- function(col, alpha) {
 .combine.lineages <- function(df) {
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
-      day=sample.collection.date, n=sum(n), time=time, lineage=lineage
+      day=Sample.Collection.Date, n=sum(n), time=time, lineage=lineage
       )))
   df$lineage <- df$lineage[1]
   distinct(df)
@@ -35,9 +35,9 @@ alpha <- function(col, alpha) {
   if (region[1] == "East provinces (NL+NS+NB)") {
     prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
-    prov <- unique(meta$geo_loc_name..state.province.territory.)
+    prov <- unique(meta$Geo_loc_name..State.province.territory.)
   } else if (region[1] == "Canada (no AB)") {
-    provinces <- unique(meta$geo_loc_name..state.province.territory.)
+    provinces <- unique(meta$Geo_loc_name..State.province.territory.)
     prov <- provinces[provinces != 'Alberta']
   } else {
     prov <- region
@@ -46,16 +46,16 @@ alpha <- function(col, alpha) {
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
-    geo_loc_name..state.province.territory. %in% prov,
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+    Geo_loc_name..State.province.territory. %in% prov,
+    !is.na(Sample.Collection.Date),
+    Sample.Collection.Date >= startdate
+    ) %>% group_by(Sample.Collection.Date) %>% dplyr::count(lineage)
   
   # set final date
-  lastdate <- max(mydata$sample.collection.date)
+  lastdate <- max(mydata$Sample.Collection.Date)
   
   # convert time to negative integers for fitting model (0 = last date)
-  mydata$time <- as.numeric(difftime(mydata$sample.collection.date, lastdate, 
+  mydata$time <- as.numeric(difftime(mydata$Sample.Collection.Date, lastdate, 
                                      units='days'))
   
   # separate by reference and mutant lineage(s)
@@ -234,7 +234,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
-  if (!is.na(fit$sample)) {  
+  #if (!is.na(fit$sample)) {  
     # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
       row <- as.numeric(x)
@@ -248,7 +248,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
     } 
     lo95 <- qcurve(0.025)
     hi95 <- qcurve(0.975)  
-  }
+  #}
   
   par(mar=c(5,5,1,1))
   
@@ -268,7 +268,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
     lines(toplot$date, scurves[,3])
   }
   
-  if (!is.na(fit$sample)) {
+  #if (!is.na(fit$sample)) {
     # display confidence intervals
     polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
             col=alpha(col[1], 0.5))
@@ -276,7 +276,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
       polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
               col=alpha(col[2], 0.5))
     }
-  }
+  #}
   
   # report parameter estimates on plot
   str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],

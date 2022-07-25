@@ -24,7 +24,7 @@ alpha <- function(col, alpha) {
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
       day=sample.collection.date, n=sum(n), time=time, lineage=lineage
-      )))
+    )))
   df$lineage <- df$lineage[1]
   distinct(df)
 }
@@ -49,7 +49,7 @@ alpha <- function(col, alpha) {
     geo_loc_name..state.province.territory. %in% prov,
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+  ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
   
   # set final date
   lastdate <- max(mydata$sample.collection.date)
@@ -62,7 +62,7 @@ alpha <- function(col, alpha) {
   refdata <- .combine.lineages(filter(mydata, lineage %in% reference))
   mutdata <- lapply(mutants, function(mut) {
     .combine.lineages(filter(mydata, lineage%in% mut))
-    })
+  })
   
   # generate time series
   timestart <- as.integer(startdate-lastdate)
@@ -82,7 +82,7 @@ alpha <- function(col, alpha) {
   # or 1, then the likelihood surface is very flat.
   v <- apply(toplot[,-1], 1, function(ns) { 
     ifelse(sum(ns)>0, prod(ns) / sum(ns)^length(ns), 0) 
-    })
+  })
   
   refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
@@ -152,7 +152,7 @@ alpha <- function(col, alpha) {
 .ll.binom <- function(p1, s1, refdata, mutdata) {
   suppressWarnings(
     .llfunc(p=p1, s=s1, refdata=refdata, mutdata=mutdata)
-    )
+  )
 }
 
 
@@ -221,7 +221,7 @@ alpha <- function(col, alpha) {
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 plot.selection.files <- function(region, startdate, reference, mutants, startpar, 
-                           col=c('red', 'blue'), method='BFGS', file=NA) {
+                                 col=c('red', 'blue'), method='BFGS', file=NA) {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -267,7 +267,7 @@ plot.selection.files <- function(region, startdate, reference, mutants, startpar
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
   }
-
+  
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
@@ -327,6 +327,5 @@ plot.selection.files <- function(region, startdate, reference, mutants, startpar
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 
 }
-
 
 

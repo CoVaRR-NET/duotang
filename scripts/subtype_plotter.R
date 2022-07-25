@@ -20,7 +20,9 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   varmeta1$pango.group <- varmeta1$lineage
   varmeta1$pango.group <- as.factor(varmeta1$pango.group)
   
-  varmeta1$week <- cut(varmeta1$sample.collection.date, 'week')
+  #print(varmeta1$Sample.Collection.Date)
+  
+  varmeta1$week <- cut(varmeta1$Sample.Collection.Date, 'week')
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > as.Date('2021-11-30'), ]
   varmeta1$week <- as.factor(as.character(varmeta1$week))
   
@@ -43,7 +45,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     pal2 <- pal[match(levels(varmeta1$pango.group), names(pal))]
     barplot(tab2, col=pal2, 
             border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-            ylab="Sequenced cases per week (%)") -> mp
+            ylab="Sequenced cases per week (fraction)") -> mp
     legend(x=max(mp)+1, y=1, legend=rev(levels(varmeta1$pango.group)), 
            bty='n', xpd=NA, cex=0.7, fill=rev(pal2), 
            x.intersp=0.5, y.intersp=1, border=NA)
