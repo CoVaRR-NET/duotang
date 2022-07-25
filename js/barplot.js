@@ -18,8 +18,8 @@ console = d3.window(div.node()).console;
 const opts = [
   {name: "basic", value: "d3.stackOffsetNone"},
   {name: "percent", value: "d3.stackOffsetExpand"},
-  {name: "silhouette", value: "d3.stackOffsetSilhouette"},
-  {name: "streamgraph", value: "d3.stackOffsetWiggle", selected: true}
+  {name: "silhouette", value: "d3.stackOffsetSilhouette", selected: true},
+  {name: "streamgraph", value: "d3.stackOffsetWiggle"}
 ];
 
 var selectlabel = div.append('label').text("Layout: ");
@@ -70,25 +70,9 @@ var selectlabel2 = div.append('label').text("  Region: "),
                         .attr("selected", function(d) {return d.selected; });
 
 // draw legend box
-const palette = {  // mapped to variants in alphabetical order
-      "A.23.1": "#9AD378", 
-      "Alpha": "#B29C71", 
-      "B.1.438.1": "#3EA534", 
-      "Beta": "#F08C3A", 
-      "Delta": "#A6CEE3", 
-      "Delta AY.25": "#61A6A0", 
-      "Delta AY.27": "#438FC0", 
-      "Gamma": "#444444", 
-      "Lambda": "#CD950C", 
-      "Mu": "#BB4513", 
-      "Omicron BA.1": "#8B0000", 
-      "Omicron BA.1.1": "#FA8072",
-      "Omicron BA.2": "#FF0000", 
-      "other": "#888888"
-    };
-
-
 // https://d3-graph-gallery.com/graph/custom_legend.html
+const palette = data["legend"];
+delete(data.legend);
 var legend = div.append("svg")
                 .attr("width", div.attr("width"))
                 .attr("height", "70px");
@@ -112,7 +96,7 @@ legend.selectAll("mylabels")
       
 // append an SVG element to the div
 var plotheight = 480,
-    svg = div.append("svg")
+    bpsvg = div.append("svg")
         .attr("width", width+"px")        
         .attr("height", plotheight+"px")
 
@@ -120,7 +104,7 @@ var plotheight = 480,
 var margin = {top: 0, right: 50, bottom: 20, left: 50},
     width = width - margin.left - margin.right,
     height = plotheight - margin.top - margin.bottom,
-    g = svg.append("g")
+    g = bpsvg.append("g")
            .attr("height", plotheight+"px")
            .attr("id", "barplot-group")
            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -142,7 +126,7 @@ var n = variants.length,  // number of categories
     m = data["Canada"].length;  // number of observations (time points)
 
 // generate stacked series from data
-var stack = d3.stack().keys(variants).offset(d3.stackOffsetWiggle),
+var stack = d3.stack().keys(variants).offset(d3.stackOffsetSilhouette),
     series = stack(data["Canada"]);
 
 // vertical limits
@@ -186,8 +170,10 @@ var xScale = d3.scaleTime()
           .range([height, 0]),
     bandwidth = xScale(weeks[1]) - xScale(weeks[0]),
     xtime,
-    yoffset = absolutePosition(svg.node());
+    yoffset = absolutePosition(bpsvg.node());
 
+console.log(bpsvg);
+console.log(yoffset);
 
 var color = d3.scaleOrdinal()
     .domain(variants)
@@ -208,7 +194,7 @@ var barplot = g.selectAll("path")
                  .attr("fill", function(d, i) { return color(i); });
 
 // http://bl.ocks.org/WillTurman/4631136
-svg.selectAll(".layer")
+bpsvg.selectAll(".layer")
     .attr("opacity", 1)
     .on("mouseover", function(event, datum) {
       d3.select(this)
@@ -216,7 +202,7 @@ svg.selectAll(".layer")
         .attr("stroke", "#000000")
         .attr("stroke-width", "0.5px");
         
-      svg.selectAll(".layer").transition()
+      bpsvg.selectAll(".layer").transition()
          .duration(250)
          .attr("opacity", function(d, j) {
            return j != datum.index ? 0.5 : 1;
@@ -224,6 +210,7 @@ svg.selectAll(".layer")
     })
     .on("mousemove", function(event, datum) {
       coords = d3.pointer(event);
+      console.log(coords);
       //xtime = xScale.invert(event.x);
       xtime = xScale.invert(coords[0]);
       week = d3.bisect(weeks, xtime);
@@ -239,7 +226,7 @@ svg.selectAll(".layer")
         .attr("stroke-width", "0");
       tooltip.style("visibility", "hidden");
         
-      svg.selectAll(".layer")
+      bpsvg.selectAll(".layer")
          .transition()
          .duration(100)
          .attr("opacity", "1");
@@ -298,10 +285,10 @@ function updateBarplot() {
   yScale = d3.scaleLinear().domain([ymin, ymax])
           .range([height, 0]);
   
-  svg.select("g.yl_axis").transition()
+  bpsvg.select("g.yl_axis").transition()
      .duration(500)
      .call(d3.axisLeft(yScale));
-  svg.select("g.yr_axis").transition()
+  bpsvg.select("g.yr_axis").transition()
      .duration(500)
      .call(d3.axisRight(yScale));
   
