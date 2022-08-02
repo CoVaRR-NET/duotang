@@ -10,10 +10,10 @@ echo version will be stamped as : $datestamp
   wget -O data_needed/virusseq.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all  > /dev/null 2>&1
   # scan tarball for filenames
   tar -ztf data_needed/virusseq.tar.gz > .list_filenames
-  # stream FASTA data into xz-compressed file
-  $tarcmd -axf data_needed/virusseq.tar.gz -O $(cat .list_filenames | grep fasta$) | xz > data_needed/virusseq.$datestamp.fasta.xz
   # stream metadata into gz-compressed file
   $tarcmd -axf data_needed/virusseq.tar.gz -O $(cat .list_filenames | grep tsv$) | gzip > data_needed/virusseq.$datestamp.metadata.tsv.gz
+  # stream FASTA data into xz-compressed file
+  $tarcmd -axf data_needed/virusseq.tar.gz -O $(cat .list_filenames | grep fasta$) | xz > data_needed/virusseq.$datestamp.fasta.xz
   # delete tarball
   rm data_needed/virusseq.tar.gz .list_filenames
 )&
