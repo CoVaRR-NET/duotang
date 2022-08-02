@@ -178,10 +178,10 @@ for(row in 1:nrow(epidataCANall)) {
   subdf=epidataCANall[which( (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) ),]
   if(nrow(subdf)!=0){
     nextrow=which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
-    epidataCANall[nextrow,"previousvalue"]=epidataCANall[row, "numtotal"]
+    epidataCANall[nextrow,"previousvalue"]=epidataCANall[row, "totalcases"]
   }
 }
-epidataCANall$numtoday=epidataCANall$numtotal-epidataCANall$previousvalue
+epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 
 # for barplots
 meta$week <- cut(meta$sample.collection.date, 'week')
@@ -480,7 +480,7 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
 
 ```{r setting function for subtype plotter}
-#name1 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.1$|B\\.1\\.1\\.529\\.1\\.", meta$rawlineage)]) # "BA.1"
+name1 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.1$|B\\.1\\.1\\.529\\.1\\.", meta$rawlineage)]) # "BA.1"
 name2 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.", meta$rawlineage)])  # "BA.2" 
 name3 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)])  # "BA.4" 
 name4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)])  # "BA.5" 
@@ -488,6 +488,13 @@ name4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\."
 source("scripts/subtype_plotter.R")
 ```
 
+
+### BA.1
+#### Sublineage BA.1
+```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+plot.subvariants(sublineage=c(name1))
+plot.subvariants(sublineage=c(name1),scale=T)
+```
 
 
 ### BA.2
