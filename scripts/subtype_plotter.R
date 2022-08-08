@@ -81,3 +81,5 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   }
   return(rarelineages_names)
 }
+
+
