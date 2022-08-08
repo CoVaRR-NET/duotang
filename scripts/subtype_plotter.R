@@ -7,20 +7,22 @@ require(lubridate)
 #' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
                              scaled=FALSE, col=NA, mindate=as.Date('2021-11-30')) {
-  if (is.na(col)) {
-    col <- rainbow(length(sublineage))  # default colour palette
-  }
-  VOCVOI1 <- data.frame(
-    name=sublineage,
-    pattern=sublineage,
-    color=col
-  )
+
   varmeta1 <- meta %>% filter(lineage %in% sublineage)
   #length(varmeta1$lineage)
   
-  variants1 <- sapply(VOCVOI1$pattern, function(p) 
-    grepl(p, varmeta1$lineage, perl=T))
   varmeta1$pango.group <- varmeta1$lineage
+  
+  lineagecount=varmeta1 %>% group_by(lineage) %>% count()
+  if(nrow(lineagecount)>21)
+  { 
+    lineagecount=as_data_frame(lineagecount)
+    rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-20) #filter(n<0.01*nrow(varmeta1))
+    rarelineages_names=sapply(list(rarelineages$lineage), paste, collapse = " ")
+    varmeta1$pango.group<-replace(varmeta1$pango.group, varmeta1$pango.group  %in% rarelineages$lineage, "rare lineages")
+  }
+  else{rarelineages_names=""}
+  
   varmeta1$pango.group <- as.factor(varmeta1$pango.group)
   
   #print(varmeta1$sample.collection.date)
@@ -29,9 +31,12 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
   varmeta1$week <- as.factor(as.character(varmeta1$week))
   
-  pal <- VOCVOI1$color
-  names(pal) <- VOCVOI1$name
-  pal["other"] <- 'grey'  # named character vector
+  if (is.na(col)) {
+    col <- rainbow(length(unique(varmeta1$pango.group)))  # default colour palette
+  }
+  pal <- col
+  names(pal) <- unique(varmeta1$pango.group)
+  pal["rare lineages"] <- 'grey'  # named character vector
   
   if (region=='Canada') {
     tab <- table(varmeta1$pango.group, varmeta1$week)  
@@ -77,4 +82,5 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
          las=1, cex.axis=0.7, col='grey50', col.ticks='grey50',
          col.axis='grey50')
   }
+  return(rarelineages_names)
 }

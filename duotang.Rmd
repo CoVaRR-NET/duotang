@@ -500,74 +500,36 @@ source("scripts/subtype_plotter.R")
 ### BA.1
 #### Sublineage BA.1
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-plot.subvariants(sublineage=c(name1))
-plot.subvariants(sublineage=c(name1),scale=T)
+rarelineages_names=plot.subvariants(sublineage=c(name1))
+rarelineages_names=plot.subvariants(sublineage=c(name1),scale=T)
 ```
+The grey zone represent rare lineages (not in top 20) : `r rarelineages_names`
 
 
 ### BA.2
 #### Sublineage BA.2
 ```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-plot.subvariants(sublineage=c(name2))
-sublineage=c(name2)
-
-col <- rainbow(length(sublineage))  # default colour palette
-VOCVOI1 <- data.frame(
-  name=sublineage,
-  pattern=sublineage,
-  color=col
-)
-varmeta1 <- meta %>% filter(lineage %in% sublineage)
-#length(varmeta1$lineage)
-
-variants1 <- sapply(VOCVOI1$pattern, function(p) 
-  grepl(p, varmeta1$lineage, perl=T))
-
-#print(varmeta1$sample.collection.date)
-mindate='2021-11-30'
-varmeta1$week <- cut(varmeta1$sample.collection.date, 'week')
-varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
-varmeta1$week <- as.factor(as.character(varmeta1$week))
-test <- varmeta1 %>% group_by(lineage) %>% count()
-a= test %>% filter(n<0.0001*nrow(varmeta1))
-print(nrow(a))
-print(nrow(test))
-
-
-varmeta1$pango.group <- varmeta1$lineage
-varmeta1$pango.group <- as.factor(varmeta1$pango.group)
-
-pal <- VOCVOI1$color
-names(pal) <- VOCVOI1$name
-pal["other"] <- 'grey'  # named character vector
-region='Canada'
-if (region=='Canada') {
-  tab <- table(varmeta1$pango.group, varmeta1$week)  
-} else {
-  varmeta2 <- varmeta1[varmeta1$geo_loc_name..state.province.territory.==region, ]
-  tab <- table(varmeta2$pango.group, varmeta2$week)  
-}
-  
-plot.subvariants(sublineage=c(name2),scale=T)
+rarelineages_names=plot.subvariants(sublineage=c(name2))
+rarelineages_names=plot.subvariants(sublineage=c(name2),scale=T)
 ```
-
+The grey zone represent rare lineages (not in top 20) : `r rarelineages_names`
 
 ### BA.4
 #### Sublineage BA.4
 ```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-plot.subvariants(sublineage=c(name3))
-plot.subvariants(sublineage=c(name3),scale=T)
+rarelineages_names=plot.subvariants(sublineage=c(name3))
+rarelineages_names=plot.subvariants(sublineage=c(name3),scale=T)
 ```
-
+The grey zone represent rare lineages (not in top 20) : `r rarelineages_names`
 
 
 ### BA.5
 #### Sublineage BA.5
 ```{r subtype plotter BA.5, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-plot.subvariants(sublineage=c(name4))
-plot.subvariants(sublineage=c(name4),scale=T)
+rarelineages_names=plot.subvariants(sublineage=c(name4))
+rarelineages_names=plot.subvariants(sublineage=c(name4),scale=T)
 ```
-
+The grey zone represent rare lineages (not in top 20) : `r rarelineages_names`
 
 ## Selection on Omicron {.tabset}  
 
