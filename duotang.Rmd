@@ -675,8 +675,8 @@ multi.plot.selection <- function(sublineagedata,region, name1,maxnumberofsequenc
   includelineages <- as.list(showlineages$lineage)
   if (length(includelineages)<1){print("Not enough data available")}
   else {
-    test=unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2.3$|B\\.1\\.1\\.529\\.2\\.3.", meta$rawlineage)])
-    plot.selection(region=region, startdate=startdate, reference=name1, mutants=test, startpar=startpar2) 
+    #test=unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2.3$|B\\.1\\.1\\.529\\.2\\.3.", meta$rawlineage)])
+    #plot.selection(region=region, startdate=startdate, reference=name1, mutants=test, startpar=startpar2) 
     for (name2 in includelineages) {
       plot.selection(region=region, startdate=startdate, reference=name1, mutants=name2, startpar=startpar2) 
     }
