@@ -235,12 +235,12 @@ if __name__ == "__main__":
     parser.add_argument("--before", type=int, default=1,
                         help="int, number of genomes to sample per lineage "
                              "per week per province, before cutoff date")
-    parser.add_argument("--after", type=int, default=4,
+    parser.add_argument("--after", type=int, default=3,
                         help="int, number of genomes to sample per lineage "
                              "per week per province, before cutoff date")
     parser.add_argument("--year", type=int, default=2022,
                         help="int, year number for cutoff date")
-    parser.add_argument("--epiweek", type=int, default=20,
+    parser.add_argument("--epiweek", type=int, default=25,
                         help="int, week number for cutoff date")
 
     args = parser.parse_args()
