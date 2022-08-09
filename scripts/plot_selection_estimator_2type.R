@@ -21,11 +21,18 @@ alpha <- function(col, alpha) {
 #' combine multiple PANGO lineages in a data set, summing counts
 #' TODO: let user specify a regular expression?
 .combine.lineages <- function(df) {
+  top=list((df %>% group_by(lineage) %>% summarise(n=sum(n)) %>% slice_max(n,n=2))$lineage)
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
       day=sample.collection.date, n=sum(n), time=time, lineage=lineage
       )))
-  df$lineage <- df$lineage[1]
+  if(lengths(top)==2){
+    name=sapply(c(top,"..."), paste, collapse = " ")
+  }
+  else{
+    name=df$lineage[1]
+  }
+  df$lineage <- name
   distinct(df)
 }
 
@@ -59,10 +66,11 @@ alpha <- function(col, alpha) {
   
   # separate by reference and mutant lineage(s)
   refdata <- .combine.lineages(filter(mydata, lineage %in% reference))
+
+  
   mutdata <- lapply(mutants, function(mut) {
     .combine.lineages(filter(mydata, lineage%in% mut))
     })
-  
   # generate time series
   timestart <- as.integer(startdate-lastdate)
   toplot <- data.frame(time=seq.int(from=timestart, to=0))
@@ -90,6 +98,7 @@ alpha <- function(col, alpha) {
   
   # apply same time scale to original datasets
   refdata$time <- refdata$time + (timeend-timestart)-refdate
+
   for (i in 1:length(mutdata)) {
     mutdata[[i]]$time <- mutdata[[i]]$time + (timeend-timestart)-refdate  
   }
@@ -274,14 +283,13 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
               col=alpha(col[2], 0.5))
     }
   #}
-  
+    
   # report parameter estimates on plot
   str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],
                   format(round(fit$fit[["s1"]],3), nsmall=3), 
                   format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
                   format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
   text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
-  
   if (length(mutants) > 1) {
     str3 <- sprintf("%s: %s {%s, %s}", est$mutdata[[2]]$lineage[1],
                     format(round(fit$fit[["s2"]], 3), nsmall=3), 
