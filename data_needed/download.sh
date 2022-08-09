@@ -11,9 +11,9 @@ echo version will be stamped as : $datestamp
   # scan tarball for filenames
   tar -ztf data_needed/virusseq.tar.gz > .list_filenames$datestamp
   # stream metadata into gz-compressed file
-  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames | grep tsv$) | gzip > data_needed/virusseq.$datestamp.metadata.tsv.gz
+  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames$datestamp | grep tsv$) | gzip > data_needed/virusseq.$datestamp.metadata.tsv.gz
   # stream FASTA data into xz-compressed file
-  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames | grep fasta$) | xz > data_needed/virusseq.$datestamp.fasta.xz
+  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames$datestamp | grep fasta$) | xz > data_needed/virusseq.$datestamp.fasta.xz
   # delete tarball
   rm data_needed/virusseq.$datestamp.tar.gz .list_filenames$datestamp
 )&
