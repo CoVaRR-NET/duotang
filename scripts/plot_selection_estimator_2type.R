@@ -323,10 +323,10 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
 
 
 #' generate a stacked barplot per lineage from a subset of lineages
+#' @param sublineagedata: a table used for selecting the sublinaeges to plot
 #' @param region:  char, can be used to select samples for a specific province
-#' @param sublineage:  char, vector of lineage names for subsetting
-#' @param scaled:  bool, display absolute or relative frequencies per week
-#' @param mindate:  Date, exclude counts preceding this date
+#' @param namereference:  a string : name of the reference to plot against
+#' @param maxnumberofsequence:  max n sequence that the sublineage should have in the last 100 days before VirusSeq update
 multi.plot.selection <- function(sublineagedata,region, namereference, maxnumberofsequence) {
   showlineages <- sublineagedata %>%
     filter(sample.collection.date>date(VirusSeq_date)-days(100)) %>%
