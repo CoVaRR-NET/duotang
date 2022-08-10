@@ -166,8 +166,6 @@ alpha <- function(col, alpha) {
 .fit.model <- function(est, startpar, method="BFGS") {
   refdata <- est$refdata
   mutdata <- est$mutdata
-  print(refdata)
-  print(mutdata)
   if (length(startpar$s) == 1) {
     bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
                  data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
