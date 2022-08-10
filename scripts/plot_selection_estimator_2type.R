@@ -322,5 +322,28 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
   # often due to NPI measures. 
 
 
+#' generate a stacked barplot per lineage from a subset of lineages
+#' @param region:  char, can be used to select samples for a specific province
+#' @param sublineage:  char, vector of lineage names for subsetting
+#' @param scaled:  bool, display absolute or relative frequencies per week
+#' @param mindate:  Date, exclude counts preceding this date
+multi.plot.selection <- function(sublineagedata,region, namereference, maxnumberofsequence) {
+  showlineages <- sublineagedata %>%
+    filter(sample.collection.date>date(VirusSeq_date)-days(100)) %>%
+    group_by(lineage) %>% summarise(n = sum(n)) %>% 
+    filter(n>maxnumberofsequence) 
+  includelineages <- as.list(showlineages$lineage)
+  
+  if((length(includelineages)>1)&(namereference %in% includelineages)){
+    includelineages <- as.list((showlineages %>% filter(lineage!=namereference))$lineage )
+    for (name2 in includelineages) {
+      plot.selection(region=region, startdate=startdate, reference=namereference, mutants=name2, startpar=startpar2) 
+    }
+  }
+  else{
+    print("Not enough data available")
+  }
+}
+
 
 

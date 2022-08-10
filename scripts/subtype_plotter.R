@@ -1,5 +1,7 @@
 require(lubridate)
 
+
+
 #' generate stacked barplot of a subset of lineages
 #' @param region:  char, can be used to select samples for a specific province
 #' @param sublineage:  char, vector of lineage names for subsetting
