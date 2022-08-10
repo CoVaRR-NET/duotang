@@ -21,19 +21,19 @@ alpha <- function(col, alpha) {
 #' combine multiple PANGO lineages in a data set, summing counts
 #' TODO: let user specify a regular expression?
 .combine.lineages <- function(df) {
-  top=list((df %>% group_by(lineage) %>% summarise(n=sum(n)) %>% slice_max(n,n=2))$lineage)
-  df <- as.data.frame(
+  df2 <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
       day=sample.collection.date, n=sum(n), time=time, lineage=lineage
       )))
+  top=list((df %>% group_by(lineage) %>% summarise(n=sum(n)) %>% slice_max(n,n=2))$lineage)
   if(lengths(top)==2){
-    name=sapply(c(top,"..."), paste, collapse = " ")
+    name=sapply(top, paste, collapse = " ")
   }
   else{
-    name=df$lineage[1]
+    name=df2$lineage[1]
   }
-  df$lineage <- name
-  distinct(df)
+  df2$lineage <- name
+  distinct(df2)
 }
 
 

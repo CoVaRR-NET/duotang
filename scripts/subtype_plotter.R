@@ -39,7 +39,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   pal <- col
   names(pal) <- levels(varmeta1$pango.group)
   pal["other lineages"] <- 'grey'  # named character vector
-  
+  pal <- pal[match(levels(varmeta1$pango.group), names(pal))]
   if (region=='Canada') {
     tab <- table(varmeta1$pango.group, varmeta1$week)  
   } else {

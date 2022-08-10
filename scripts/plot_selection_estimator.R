@@ -166,7 +166,8 @@ alpha <- function(col, alpha) {
 .fit.model <- function(est, startpar, method="BFGS") {
   refdata <- est$refdata
   mutdata <- est$mutdata
-  
+  print(refdata)
+  print(mutdata)
   if (length(startpar$s) == 1) {
     bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
                  data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
@@ -219,9 +220,10 @@ alpha <- function(col, alpha) {
 #' startdate <- as.Date("2021-12-15")
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
+#' mutant_names <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
-plot.selection.estimate <- function(region, startdate, reference, mutants, startpar, 
-                           col=c('red', 'blue'), method='BFGS') {
+plot.selection.estimate <- function(region, startdate, reference, mutants, names=list(NA),
+                                    startpar, col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -279,14 +281,18 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   #}
   
   # report parameter estimates on plot
-  str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],
+  if(is.na(names[[1]])){name=est$mutdata[[1]]$lineage[1]}
+  else{name=names[[1]]}
+  str2 <- sprintf("%s: %s {%s, %s}", name,
                   format(round(fit$fit[["s1"]],3), nsmall=3), 
                   format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
                   format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
   text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
   
   if (length(mutants) > 1) {
-    str3 <- sprintf("%s: %s {%s, %s}", est$mutdata[[2]]$lineage[1],
+    if(is.na(names[[1]])){name=est$mutdata[[2]]$lineage[1]}
+    else{name=names[[2]]}
+    str3 <- sprintf("%s: %s {%s, %s}", name,
                     format(round(fit$fit[["s2"]], 3), nsmall=3), 
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
