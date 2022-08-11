@@ -80,9 +80,12 @@ alpha <- function(col, alpha) {
   # to the midpoint (p=0.5), to make sure that the alleles are segregating at 
   # the reference date.  If we set t=0 when p (e.g., n1/(n1+n2+n3)) is near 0 
   # or 1, then the likelihood surface is very flat.
-  v <- apply(toplot[,-1], 1, function(ns) { 
-    ifelse(sum(ns)>0, prod(ns) / sum(ns)^length(ns), 0) 
-    })
+  #v <- apply(toplot[,-1], 1, function(ns) { 
+  #  ifelse(sum(ns)>0, prod(ns) / sum(ns)^length(ns), 0) 
+  #  })
+  v <- apply(toplot[,-1], 1, function(ns) {
+    ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0)
+  })
   
   refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
@@ -166,7 +169,6 @@ alpha <- function(col, alpha) {
 .fit.model <- function(est, startpar, method="BFGS") {
   refdata <- est$refdata
   mutdata <- est$mutdata
-  
   if (length(startpar$s) == 1) {
     bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
                  data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
@@ -219,9 +221,10 @@ alpha <- function(col, alpha) {
 #' startdate <- as.Date("2021-12-15")
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
+#' mutant_names <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
-plot.selection.estimate <- function(region, startdate, reference, mutants, startpar, 
-                           col=c('red', 'blue'), method='BFGS') {
+plot.selection.estimate <- function(region, startdate, reference, mutants, names=list(NA),
+                                    startpar, col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -234,7 +237,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
-  if (!is.na(fit$sample)) {  
+  #if (!is.na(fit$sample)) {  
     # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
       row <- as.numeric(x)
@@ -248,7 +251,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
     } 
     lo95 <- qcurve(0.025)
     hi95 <- qcurve(0.975)  
-  }
+  #}
   
   par(mar=c(5,5,1,1))
   
@@ -268,7 +271,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
     lines(toplot$date, scurves[,3])
   }
   
-  if (!is.na(fit$sample)) {
+  #if (!is.na(fit$sample)) {
     # display confidence intervals
     polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
             col=alpha(col[1], 0.5))
@@ -276,17 +279,21 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, start
       polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
               col=alpha(col[2], 0.5))
     }
-  }
+  #}
   
   # report parameter estimates on plot
-  str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],
+  if(is.na(names[[1]])){name=est$mutdata[[1]]$lineage[1]}
+  else{name=names[[1]]}
+  str2 <- sprintf("%s: %s {%s, %s}", name,
                   format(round(fit$fit[["s1"]],3), nsmall=3), 
                   format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
                   format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
   text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
   
   if (length(mutants) > 1) {
-    str3 <- sprintf("%s: %s {%s, %s}", est$mutdata[[2]]$lineage[1],
+    if(is.na(names[[1]])){name=est$mutdata[[2]]$lineage[1]}
+    else{name=names[[2]]}
+    str3 <- sprintf("%s: %s {%s, %s}", name,
                     format(round(fit$fit[["s2"]], 3), nsmall=3), 
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    

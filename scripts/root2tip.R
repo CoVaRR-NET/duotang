@@ -37,8 +37,8 @@ tip.dates <- get.dates(phy, delimiter, pos, format)
 #rooted <- rtt(phy, as.integer(tip.dates), ncpu=2, objective="rms")
 
 # root tree on WH1
-rooted <- root(phy, outgroup="NC_045512.2")
-rooted <- drop.tip(rooted, tip="NC_045512.2")
+rooted <- root(phy, outgroup="reference")  #"NC_045512.2")
+rooted <- drop.tip(rooted, tip="reference")  #tip="NC_045512.2")
 
 # extract new divergence and date vectors
 div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]

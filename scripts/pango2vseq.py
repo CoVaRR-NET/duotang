@@ -5,15 +5,17 @@ import sys
 
 parser = argparse.ArgumentParser("Append Pangolin outputs to VirusSeq metadata")
 parser.add_argument("metadata", type=str, help="<input> VirusSeq metadata TSV file (can be .gz)")
-parser.add_argument("pangolin_csv", type=str, help="<input> Pangolin output CSV")
+parser.add_argument("lineages", type=str, help="<input> CSV containing Pangolin lineages from Viral AI")
 parser.add_argument("output", type=str, help="<output> file to write combined CSV (.gz)")
 args = parser.parse_args()
 
 # import Pangolin results
-pangolin = {}
-rows = csv.DictReader(open(args.pangolin_csv))
+pangolin_alias = {}
+pangolin_raw = {}
+rows = csv.DictReader(open(args.lineages))
 for row in rows:
-    pangolin.update({row['taxon']: row})
+    pangolin_alias.update({row['isolate']: row['lineage']})
+    pangolin_raw.update({row['isolate']: row['rawlineage']})
 
 # handle gzip file if indicated by filename extension
 if args.metadata.endswith('.gz'):
@@ -24,11 +26,12 @@ else:
 rows = list(csv.DictReader(handle, delimiter='\t'))
 for row in rows:
     label = row["fasta header name"]
-    lineage = pangolin.get(label, None)
+    lineage = pangolin_raw.get(label, None)
     if lineage is None:
         print(f"ERROR: Failed to retrieve Pangolin output for {label}")
-        sys.exit()
-    row.update(lineage)
+    else:
+        row.update({'rawlineage': lineage})
+        row.update({'lineage': pangolin_alias.get(label, None)})
 
 fieldnames = list(rows[0].keys())
 outfile = gzip.open(args.output, 'wt')
