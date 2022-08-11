@@ -610,10 +610,11 @@ print("Not enough data available")
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-print("Not enough data available")
-plot.selection.estimate(region="Ontario", startdate=startdate, startpar=list(p=c(0.4, 0.5), s=c(0.05, 0.05)),
-                        reference=c(sublineages_BA2), mutants=list(sublineages_BA4,sublineages_BA5),
-                        names=list("BA.4*",""), col=col)
+#print("Not enough data available")
+plot.selection.estimate(region="Ontario", startdate=startdate, startpar=startpar3,
+                        reference=c(sublineages_BA2), mutants=list(sublineages_BA4, sublineages_BA5),
+                        names=list("BA.4*","BA.5*"), col=col)
+
 ```
 
 
@@ -641,7 +642,7 @@ print("Not enough data available")
 
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
-```{r general settings for selection estimator BA.2 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+```{r general settings for selection estimator BA.2}
 startpar2 <- list(p=0.05, s=0.05)
 startdate<-as.Date("2022-01-01") 
 sublineagedata <- meta %>% filter(
@@ -653,10 +654,7 @@ sublineagedata <- meta %>% filter(
 source("scripts/plot_selection_estimator_2type.R")
 namereference <- "BA.2"
 
-```
 
-
-```{r testing functions to get lineages}
 getsublineagelist <- function(mainlineage) {
   togrep=paste(mainlineage,"$|",mainlineage,".",sep="")
   list_of_lineage=unique((meta %>% filter(lineage %in% unique(meta$lineage[grepl(gsub("\\.", "\\\\.",togrep), meta$rawlineage)])))$lineage)
@@ -677,6 +675,12 @@ l="B.1.1.529.5.2"
 
 #getsublineagelist(l)
 #getsublineagesiblings(l)
+#print(getsublineagelist("B.1.1.529.2.3"))
+#plot.selection(region=region, startdate=startdate, reference=namereference, mutants="BA.2.3", #startpar=startpar2) 
+#plot.selection(region=region, startdate=startdate, reference=namereference, mutants="BA.2.3", startpar=startpar2) 
+#plot.selection(region=region, startdate=startdate, reference=getsublineagesiblings("B.1.1.529.2.3"), mutants="BA.2.3", startpar=startpar2) 
+#plot.selection(region=region, startdate=startdate, reference=namereference, mutants=getsublineagelist("B.1.1.529.2.3"), startpar=startpar2) 
+
 ```
 
 
@@ -684,15 +688,10 @@ l="B.1.1.529.5.2"
 #### Canada (n>50)
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-  # often due to NPI measures. 
-
-
 source("scripts/plot_selection_estimator_2type.R")
+multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
-#multi.plot.selection(sublineagedata,"Canada",namereference,50)
-#print(getsublineagelist("B.1.1.529.2.3"))
-#plot.selection(region=region, startdate=startdate, reference=namereference, mutants="BA.2.3", #startpar=startpar2) 
-#plot.selection(region=region, startdate=startdate, reference=namereference, #mutants=getsublineagelist("B.1.1.529.2.3"), startpar=startpar2) 
+
 
 ```
 

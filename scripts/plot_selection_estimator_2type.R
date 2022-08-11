@@ -52,7 +52,7 @@ alpha <- function(col, alpha) {
   
   # filter metadata
   mydata <- meta %>% filter(
-    lineage %in% c(reference, unlist(mutants)), 
+    lineage %in% c(unlist(reference), unlist(mutants)), 
     geo_loc_name..state.province.territory. %in% prov,
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
@@ -263,7 +263,7 @@ plot.selection <- function(region, startdate, reference, mutants, startpar,
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0("Proportion in ", est$region))
+       ylab=paste0("Freq of ",est$mutdata[[1]]$lineage[1]," compared to ",namereference," (stricto) in ", est$region))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
