@@ -26,7 +26,7 @@ Note `<datetime>` is a placeholder for the date and time associated with downloa
 
 | Command | Description | Outputs | Expected time |
 |---------|-------------|---------|---------------|
-| `sh data_needed/download.sh` |  download data release from VirusSeq, separate and re-compress, download also also data from ncov viralai and add pango designations | `ncov-open.$datestamp.fasta.xz`     `viralai.$datestamp.withalias.csv` `virusseq.$datestamp.fasta.xz` `\nncov-open.$datestamp.withalias.tsv.gz` `virusseq.$datestamp.metadata.tsv.gz` |  ~ 20 minutes |
+| `sh data_needed/download.sh` |  download data release from VirusSeq, separate and re-compress, download also also data from ncov viralai and add pango designations | `ncov-open.$datestamp.fasta.xz`     `viralai.$datestamp.withalias.csv` `virusseq.$datestamp.fasta.xz` `ncov-open.$datestamp.withalias.tsv.gz` `virusseq.$datestamp.metadata.tsv.gz` |  ~20 minutes |
 | `datestamp=$(ls data_needed/virusseq.*fasta.xz \| tail -1 \| cut -d. -f2)` | set the `datestamp` variable | | 1 second |
   | `python3 scripts/pango2vseq.py data_needed/virusseq.$datestamp.metadata.tsv.gz data_needed/viralai.$datestamp.withalias.csv data_needed/virusseq.metadata.csv.gz` | append PANGO lineages to VirusSeq metadata | `virusseq.metadata.csv.gz` | 10 seconds |
 | `for i in 1 2 3; do python3 scripts/alignment.py data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/sample$i.fasta; done` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample1.fasta` `sample2.fasta` `sample3.fasta` | ~2 minutes |
@@ -38,10 +38,10 @@ The following steps should be applied to all three replicates from the preceding
 
 | Command | Description | Outputs | Expected time |
 |---------|-------------|---------|---------------|
-| `iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s data_needed/sample1.fasta -m GTR -ninit 10 -n 4` | Use COVID-version of IQ-TREE to reconstruct ML tree | File containing Newick tree string, `sample1.fasta.treefile` | ~1 hour each |
-| `Rscript scripts/root2tip.R data_needed/sample1.fasta.treefile data_needed/sample1.rtt.nwk data_needed/sample1.dates.tsv` | Root the ML tree using reference genome as "outgroup", fit root-to-tip regression, prune tips with outlying sequences (±4 s.d. of molecular clock prediction) and export files for TreeTime | `sample1.rtt.nwk` and `sample1.dates.tsv` | ~1 minute |
-| `treetime --tree data_needed/sample2.rtt.nwk --dates data_needed/sample2.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root` | Generate time-scaled tree, allowing re-estimation of the root | Folder with `_treetime` suffix, containing `timetree.nexus` file | ~10 minutes |
-| `python3 scripts/nex2nwk.py data_needed/2022-04-04_treetime/timetree.nexus data_needed/sample1.timetree.nwk` | Converts NEXUS to Newick format, excluding comment fields from internal nodes | file containing Newick tree string, `sample1.timetree.nwk` | ~5 minutes |
+| `for i in 1 2 3; do iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s data_needed/sample$i.fasta -m GTR -ninit 10 -n 4; done` | Use COVID-version of IQ-TREE to reconstruct ML tree | File containing Newick tree string, `sample[123].fasta.treefile` | ~3 hour |
+| `for i in 1 2 3; do Rscript scripts/root2tip.R data_needed/sample$i.fasta.treefile data_needed/sample$i.rtt.nwk data_needed/sample$i.dates.tsv; done` | Root the ML tree using reference genome as "outgroup", fit root-to-tip regression, prune tips with outlying sequences (±4 s.d. of molecular clock prediction) and export files for TreeTime | `sample[123].rtt.nwk` and `sample[123].dates.tsv` | ~1 minute |
+| `for i in 1 2 3; do treetime --tree data_needed/sample$i.rtt.nwk --dates data_needed/sample$i.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root --outdir data_needed/sample$i.treetime_dir ;done` | Generate time-scaled tree, allowing re-estimation of the root | Folder `data_needed/sample[123].treetime_dir`, containing `timetree.nexus` file | ~10 minutes |
+| `for i in 1 2 3; do python3 scripts/nex2nwk.py data_needed/sample$i.treetime_dir/timetree.nexus data_needed/sample$i.timetree.nwk; done` | Converts NEXUS to Newick format, excluding comment fields from internal nodes | file containing Newick tree string, `sample[1]123].timetree.nwk` | ~5 minutes |
 
 ## To generate mutation plot ("raphgraph")
 
