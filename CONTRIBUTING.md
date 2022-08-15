@@ -26,12 +26,10 @@ Note `<datetime>` is a placeholder for the date and time associated with downloa
 
 | Command | Description | Outputs | Expected time |
 |---------|-------------|---------|---------------|
-| `cd data_needed` | change directories |  |  |
-| `bash download.sh` | download data release from VirusSeq, separate and re-compress | `virusseq.fasta.xz`, `virusseq.metadata.tsv.gz` | 10 minutes |
-| `dnastack collections query virusseq "SELECT isolate, lineage FROM publisher_data.virusseq.samples" --format csv > viralai.csv` | retrieve PANGO lineage classifications from Viral AI database | 1 minute |
-| `cd ..` | back up to parent directory |  |  |
-| `python3 scripts/pango2vseq.py data_needed/virusseq.<datetime>.metadata.tsv.gz data_needed/viralai.csv data_needed/virusseq.metadata.csv.gz` | append PANGO lineages to VirusSeq metadata | `virusseq.csv.gz` | 10 seconds |
-| `for i in 1 2 3; do python3 scripts/alignment.py data_needed/virusseq.<datetime>.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/sample$i.fasta; done` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample.fasta` | ~2 minutes |
+| `sh data_needed/download.sh` |  download data release from VirusSeq, separate and re-compress, download also also data from ncov viralai and add pango designations | `ncov-open.$datestamp.fasta.xz` `viralai.$datestamp.withalias.csv` `virusseq.$datestamp.fasta.xz` `ncov-open.$datestamp.withalias.tsv.gz` `virusseq.$datestamp.metadata.tsv.gz` |  ~ 20 minutes |
+| `datestamp=$(ls data_needed/virusseq.*fasta.xz | tail -1 | cut -d. -f2)` | set the `datestamp` variable | | 1 second |
+  | `python3 scripts/pango2vseq.py data_needed/virusseq.$datestamp.metadata.tsv.gz data_needed/viralai.$datestamp.withalias.csv data_needed/virusseq.metadata.csv.gz` | append PANGO lineages to VirusSeq metadata | `virusseq.metadata.csv.gz` | 10 seconds |
+| `for i in 1 2 3; do python3 scripts/alignment.py data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/sample$i.fasta; done` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample1.fasta` `sample2.fasta` `sample3.fasta` | ~2 minutes |
 
 
 ## To generate phylogenies (ML and time-scaled)
