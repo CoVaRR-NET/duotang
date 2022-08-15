@@ -173,7 +173,7 @@ def load_metadata(path):
     return metadata
 
 
-def sampling(metadata, before=2, after=4, cutoff=(2022, 20)):
+def sampling(metadata, before, after, cutoff): #before=2, after=4, cutoff=(2022, 20)):
     """
     Random sampling of sequences (FASTA header name, collection date) by lineage
     and week of sample collection.
@@ -186,9 +186,19 @@ def sampling(metadata, before=2, after=4, cutoff=(2022, 20)):
     """
     result = {}
     for lineage, byweek in metadata.items():
-        for yearweek, rows in byweek.items():
-            sampsize = min(len(rows), before) if yearweek < cutoff else min(len(rows), after)
-            sample = random.sample(rows, sampsize)
+        nsample=sum([len(byweek[i]) for i in byweek])
+        if(max(byweek) > cutoff or nsample > 200):
+            for yearweek, rows in byweek.items():
+                sampsize = min(len(rows), before) if yearweek < cutoff else min(len(rows), after)
+                sample = random.sample(rows, sampsize)
+                for seqname, coldate in sample:
+                    result.update({seqname: (lineage, coldate)})
+        else:
+            sampsize=int(nsample/100)+1
+            all=[]
+            for i in byweek:
+                all.extend(byweek[i])
+            sample = random.sample(all,sampsize)
             for seqname, coldate in sample:
                 result.update({seqname: (lineage, coldate)})
     return result
@@ -235,12 +245,12 @@ if __name__ == "__main__":
     parser.add_argument("--before", type=int, default=1,
                         help="int, number of genomes to sample per lineage "
                              "per week per province, before cutoff date")
-    parser.add_argument("--after", type=int, default=3,
+    parser.add_argument("--after", type=int, default=1,
                         help="int, number of genomes to sample per lineage "
                              "per week per province, before cutoff date")
     parser.add_argument("--year", type=int, default=2022,
                         help="int, year number for cutoff date")
-    parser.add_argument("--epiweek", type=int, default=25,
+    parser.add_argument("--epiweek", type=int, default=15,
                         help="int, week number for cutoff date")
 
     args = parser.parse_args()
