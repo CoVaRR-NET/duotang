@@ -9,7 +9,7 @@ echo version will be stamped as : $datestamp
   # download tarball from VirusSeq
   wget -O data_needed/virusseq.$datestamp.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all  > /dev/null 2>&1
   # scan tarball for filenames
-  tar -ztf data_needed/virusseq.tar.gz > .list_filenames$datestamp
+  tar -ztf data_needed/virusseq.$datestamp.tar.gz > .list_filenames$datestamp
   # stream metadata into gz-compressed file
   $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames$datestamp | grep tsv$) | gzip > data_needed/virusseq.$datestamp.metadata.tsv.gz
   # stream FASTA data into xz-compressed file
