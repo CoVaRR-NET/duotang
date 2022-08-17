@@ -873,8 +873,7 @@ namereference <- "BA.5"
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-temp <- sublineagedata  %>% filter(lineage!= "BA.5.1.7")
-multi.plot.selection(temp,"Canada",namereference,50)
+multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
@@ -883,7 +882,6 @@ multi.plot.selection(temp,"Canada",namereference,50)
 ```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
-
 multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
 
