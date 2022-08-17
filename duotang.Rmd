@@ -89,7 +89,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-08-09"
+VirusSeq_date="2022-08-16"
 pangoversion="4.1.2 (Viral AI)"
 
 
@@ -926,7 +926,7 @@ fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
 ```
 
 
-### Molecular clock estimates (based on three independant subsamples)
+### Molecular clock estimates (based on three independent subsamples)
 
 ```{r}
 
