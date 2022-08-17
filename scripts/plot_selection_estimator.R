@@ -224,7 +224,7 @@ alpha <- function(col, alpha) {
 #' mutant_names <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 plot.selection.estimate <- function(region, startdate, reference, mutants, names=list(NA),
-                                    startpar, col=c('red', 'blue'), method='BFGS') {
+                                    startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -254,9 +254,11 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   #}
   
   par(mar=c(5,5,1,1))
-  
+  if(is.na(maxdate)){
+    maxdate=max(toplot$date)
+  }
   # display counts
-  plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
+  plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), maxdate), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
        ylab=paste0("Proportion in ", est$region))
@@ -306,7 +308,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   par(mar=c(5,5,1,1))
   
   plot(toplot$date, toplot$n2/toplot$n1, pch=21,
-       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0.001, 1000), 
+       bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), maxdate), ylim=c(0.001, 1000), 
        xlab='Sample collection date',
        ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
   axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
@@ -321,7 +323,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
     lines(toplot$date, scurves[,3] / scurves[,1])
     text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
   }
-  
+  return(max(toplot$date))
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 
