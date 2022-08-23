@@ -9,19 +9,20 @@ echo version will be stamped as : $datestamp
   # download tarball from VirusSeq
   wget -O data_needed/virusseq.$datestamp.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all  > /dev/null 2>&1
   # scan tarball for filenames
-  tar -ztf data_needed/virusseq.$datestamp.tar.gz > .list_filenames$datestamp
+  tar -ztf data_needed/virusseq.$datestamp.tar.gz > data_needed/.list_filenames$datestamp
   # stream metadata into gz-compressed file
-  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames$datestamp | grep tsv$) | gzip > data_needed/virusseq.$datestamp.metadata.tsv.gz
+  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat data_needed/.list_filenames$datestamp | grep tsv$) | gzip > data_needed/virusseq.$datestamp.metadata.tsv.gz
   # stream FASTA data into xz-compressed file
-  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat .list_filenames$datestamp | grep fasta$) | perl -p -e "s/\r//g" | xz > data_needed/virusseq.$datestamp.fasta.xz
+  $tarcmd -axf data_needed/virusseq.$datestamp.tar.gz -O $(cat data_needed/.list_filenames$datestamp | grep fasta$) | perl -p -e "s/\r//g" | xz > data_needed/virusseq.$datestamp.fasta.xz
   # delete tarball
-  rm data_needed/virusseq.$datestamp.tar.gz .list_filenames$datestamp
+  rm data_needed/virusseq.$datestamp.tar.gz data_needed/.list_filenames$datestamp
 )&
 
 (
   #get the json contain
-  wget -O .temp https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  > /dev/null 2>&1
-  cat .temp | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print "alias",$1,$2}' > data_needed/pango_designation_alias_key.json 
+  wget -O data_needed/alias_key.json https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  > /dev/null 2>&1
+  cat data_needed/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print "alias",$1,$2}' > data_needed/pango_designation_alias_key.json 
+  rm data_needed/alias_key.json
   
   #download pangolin calls from DNAstack and create a column with raw names (eg: BA.5 is B.1.1.529.5)
   dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM publisher_data.virusseq.samples" --format csv > data_needed/viralai.$datestamp.csv
