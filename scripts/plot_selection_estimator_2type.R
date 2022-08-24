@@ -87,7 +87,7 @@ alpha <- function(col, alpha) {
   # the reference date.  If we set t=0 when p (e.g., n1/(n1+n2+n3)) is near 0 
   # or 1, then the likelihood surface is very flat.
   v <- apply(toplot[,-1], 1, function(ns) { 
-    ifelse(sum(ns)>0, prod(ns) / sum(ns)^length(ns), 0) 
+    ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0) 
     })
   
   refdate <- which.max(smooth.spline(v[!is.na(v)])$y)

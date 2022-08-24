@@ -15,7 +15,6 @@ output:
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
-
 #coding and data
 library(tidyverse) # wrangling and everything really
 library(knitr) # Needed to set root directory
@@ -89,7 +88,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-08-16"
+VirusSeq_date="2022-08-22"
 pangoversion="4.1.2 (Viral AI)"
 
 
@@ -553,7 +552,7 @@ startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
   
 #color for each lineage
-col <- c(pal["Omicron BA.1.1"], pal["Omicron BA.2"])
+col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
@@ -844,9 +843,9 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.4 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
-multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+print("Not enough data available")
+#showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+#multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
 
 
@@ -882,6 +881,7 @@ multi.plot.selection(sublineagedata,"Canada",namereference,50)
 ```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
+
 multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
 
