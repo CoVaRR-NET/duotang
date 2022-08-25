@@ -20,7 +20,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   { 
     lineagecount=as_data_frame(lineagecount)
     rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-15) #filter(n<0.01*nrow(varmeta1))
-    rarelineages_names=sapply(list(rarelineages$lineage), paste, collapse = " ")
+    rarelineages_names=sapply(list(paste(rarelineages$lineage,"(",rarelineages$n,")",sep="")), paste, collapse = ", ")
     varmeta1$pango.group<-replace(varmeta1$pango.group, varmeta1$pango.group  %in% rarelineages$lineage, "other lineages")
   }
   else{rarelineages_names=""}
