@@ -175,8 +175,16 @@ alpha <- function(col, alpha) {
   mutdata <- est$mutdata
   
   if (length(startpar$s) == 1) {
-    bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
-                 data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
+    tryCatch({
+              bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
+                 data=list(refdata=refdata, mutdata=mutdata[1]), method=method)
+              },
+             error=function(cond) {
+               print(cond)
+               # Choose a return value in case of error
+               return(NA)
+             }
+    )
   } 
   else if (length(startpar$s) == 2) {
     bbml <- mle2(.ll.trinom, 

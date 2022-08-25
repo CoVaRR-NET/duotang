@@ -88,7 +88,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-08-22"
+VirusSeq_date="2022-08-23"
 pangoversion="4.1.2 (Viral AI)"
 
 
@@ -236,14 +236,11 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
  
 Variants of current interest, due to their potential growth advantage, or mutations of potential functional significance:
 
-* BA.2.74
-* BA.2.75
-* BA.4.6
-* BA.5.1
-* BA.5.2
-* BA.5.2.1
-* BA.5.6
-* Possibly BF.1 and BF.5 (low numbers)
+*BA.5.1
+*BA.5.2
+*BA.5.2.1
+*BA.5.6
+*Variants with mutation S:R346T (includes some BA.5.2.1 and BA.4.6)
 
 ## Data notes by province {.tabset}
 
@@ -526,6 +523,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5
 #### Sublineage BA.5
 ```{r subtype plotter BA.5, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+
 rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA5))
 rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA5),scale=T)
 ```
@@ -664,7 +662,7 @@ local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.2}
-startpar2 <- list(p=0.05, s=0.05)
+startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-01-01") 
 sublineagedata <- meta %>% filter(
     lineage %in% unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.", meta$rawlineage)]), 
@@ -763,8 +761,9 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
-multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+print("Not enough data available")
+#showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+#multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
 
 
@@ -773,7 +772,7 @@ multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of BA.4 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.4 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-startpar2 <- list(p=0.05, s=0.05)
+startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-01") 
 sublineagedata <- meta %>% filter(
   lineage %in% unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)]), 
@@ -851,10 +850,10 @@ print("Not enough data available")
 
 ## BA.5 sublineage selection {.tabset}
 
-Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of BA.5 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.5 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of BA.5.1 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.5.1 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.5 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-startpar2 <- list(p=0.05, s=0.05)
+startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-06-01") 
 sublineagedata <- meta %>% filter(
   lineage %in% unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)]), 
@@ -863,7 +862,7 @@ sublineagedata <- meta %>% filter(
   sample.collection.date >= startdate
 ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
 source("scripts/plot_selection_estimator_2type.R")
-namereference <- "BA.5"
+namereference <- "BA.5.1"
 
 
 ```
@@ -888,9 +887,8 @@ multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-print("Not enough data available")
-#showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
-#multi.plot.selection(showlineages,"Ontario",namereference,20)
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
+multi.plot.selection(showlineages,"Ontario",namereference,20)
 ```
 
 ### Quebec
@@ -960,7 +958,7 @@ sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
-pal["other"] <- "grey"
+pal["other"] <- "white"
 
 ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
   geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
