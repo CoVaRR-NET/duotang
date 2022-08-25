@@ -176,11 +176,8 @@ alpha <- function(col, alpha) {
   
   if (length(startpar$s) == 1) {
     tryCatch({
-      #print(refdata)
-      #print(mutdata[1])
               bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
                  data=list(refdata=refdata, mutdata=mutdata[1]), method=method)
-              print(bbml)
               },
              error=function(cond) {
                print(cond)
