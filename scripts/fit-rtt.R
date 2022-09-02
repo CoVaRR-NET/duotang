@@ -21,6 +21,7 @@ fit.rtt <- function(path, plot=FALSE) {
   }
   date <- metadataRTT$sample.collection.date[index1]
   pg <- metadataRTT$pango.group[index1]
+  #print(metadataRTT[metadataRTT$pango.group=="other",]$lineage)
   date <- as.Date(date)
   # total branch length from root to each tip
   div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
