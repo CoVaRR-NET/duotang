@@ -126,7 +126,7 @@ VOCVOI <- data.frame(
             'B.1.1.529.2|B.1.1.529.2.*', 'B.1.1.529.4|B.1.1.529.4.*', 'B.1.1.529.5|B.1.1.529.5.*',
             'A.23.1|A.23.1.*', 'B.1.438.1|B.1.438.1.*', 'X*'),
             #'B.1.621|B.1.621.*', 'A.23.1|A.23.1.*', 'B.1.438.1|B.1.438.1.*'),
-  color=c('#B29C71', '#F08C3A', '#444444',
+  color=c('#B29C71', '#F08C3A', '#0000FF',
           '#A6CEE3',
           '#FFFF00', '#8B0000',
           '#FF0000', '#BC544B','#CC66FF',
@@ -885,7 +885,6 @@ multi.plot.selection(showlineages,"British Columbia",namereference,20)
 #### Ontario (n>20)
 ```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
-showlineages <- showlineages %>% filter(lineage!="BE.3")
 multi.plot.selection(showlineages,"Ontario",namereference,20)
 ```
 
@@ -953,10 +952,11 @@ est3 <- get.ci(fit3); est3$rep <- 'Rep3'
 sec.frame <- rbind(est1, est2, est3)
 sec.frame$est[sec.frame$est < 0] <- 0
 sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
+sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
+sec.frame=sec.frame[sec.frame$Lineage != "others",]
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
-pal["other"] <- "white"
 
 ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
   geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
