@@ -25,7 +25,7 @@ else:
 
 rows = list(csv.DictReader(handle, delimiter='\t'))
 for row in rows:
-    label = row["fasta header name"]
+    label = row["isolate"]
     lineage = pangolin_raw.get(label, None)
     if lineage is None:
         print(f"ERROR: Failed to retrieve Pangolin output for {label}")
