@@ -107,6 +107,8 @@ alpha <- function(col, alpha) {
   dateconverter <- data.frame(time=toplot$time, date=as.Date(dateseq))
   toplot$date <- dateconverter$date
   
+  toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+  
   list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot)
 }
 
@@ -235,13 +237,15 @@ alpha <- function(col, alpha) {
 #' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
-plot.selection <- function(region, startdate, reference, mutants, startpar, 
-                           col=c('red', 'blue'), method='BFGS') {
+estimate.selection <- function(region, startdate, reference, mutants, startpar, method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
-  toplot <- est$toplot
-  toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
-  fit <- .fit.model(est, startpar, method=method)
   
+  fit <- .fit.model(est, startpar, method=method)
+  list(mut=mutants,est=est,fit=fit)
+}
+  
+plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), est=est, fit=fit) {
+  toplot=est$toplot
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -344,8 +348,16 @@ multi.plot.selection <- function(sublineagedata,region, namereference, maxnumber
   
   if((length(includelineages)>1)&(namereference %in% includelineages)){
     includelineages <- as.list((showlineages %>% filter(lineage!=namereference))$lineage )
-    for (name2 in includelineages) {
-      plot.selection(region=region, startdate=startdate, reference=namereference, mutants=name2, startpar=startpar2) 
+    all_plot_param=c()
+    value_to_order=c()
+    for (mut in includelineages) {
+      plot_param=estimate.selection(region=region, startdate=startdate, reference=namereference, mutants=mut, startpar=startpar2) 
+      all_plot_param=append(all_plot_param,list(plot_param))
+      value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
+    }
+    for (i in order(value_to_order, decreasing = TRUE)) {
+      plot_param=all_plot_param[[i]]
+      plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
     }
   }
   else{
