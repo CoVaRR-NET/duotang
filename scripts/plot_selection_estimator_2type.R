@@ -351,6 +351,7 @@ multi.plot.selection <- function(sublineagedata,region, namereference, maxnumber
     all_plot_param=c()
     value_to_order=c()
     for (mut in includelineages) {
+      #print(mut)
       plot_param=estimate.selection(region=region, startdate=startdate, reference=namereference, mutants=mut, startpar=startpar2) 
       all_plot_param=append(all_plot_param,list(plot_param))
       value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
