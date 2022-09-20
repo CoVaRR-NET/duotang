@@ -141,7 +141,6 @@ VOCVOI$pattern <- gsub("([^\\*])\\|","\\1$|",VOCVOI$pattern)
 VOCVOI$pattern <- gsub("([^\\*])$","\\1$",VOCVOI$pattern)
 VOCVOI$pattern <- gsub("([\\*])$",".*",VOCVOI$pattern)
 VOCVOI$pattern <- gsub("([\\*])\\|",".*|",VOCVOI$pattern)
-VOCVOI$pattern[4]="^(?!B\\.1\\.617\\.2\\.25$|^B\\.1\\.617\\.2\\.25\\..*|B\\.1\\.617\\.2\\.27$|^B\\.1\\.617\\.2\\.27\\..*)(B\\.1\\.617\\.2|B\\.1\\.617\\.2\\.[0-9\\.]+)$"
 
 variants <- sapply(VOCVOI$pattern, function(p) 
   grepl(p, meta$rawlineage, perl=T))
@@ -228,6 +227,7 @@ The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constitut
 Omicron arrived in November of 2021 and currently the three main lineages in Canada are BA.1, BA.1.1, and BA.2, with multiple sub-lineages within each clade, *e.g.*, BA.2.12.
 See below for jurisdictional differences of these plots.    
 
+
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
@@ -236,11 +236,11 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
  
 Variants of current interest, due to their potential growth advantage, or mutations of potential functional significance:
 
-*BA.5.1
-*BA.5.2
-*BA.5.2.1
-*BA.5.6
-*Variants with mutation S:R346T (includes some BA.5.2.1 and BA.4.6)
+* BA.5.1
+* BA.5.2
+* BA.5.2.1
+* BA.5.6
+* Variants with mutations known to  evade antibodies, such as S:R346T (includes some BA.5.2.1 and BA.4.6, as well as BA.2.75.2 [Sheward et al.](https://www.biorxiv.org/content/10.1101/2022.09.16.508299v2).
 
 ## Data notes by province {.tabset}
 
@@ -764,7 +764,7 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-print("Not enough data available")
+#print("Not enough data available")
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
 multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
@@ -941,6 +941,7 @@ A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulat
 ```{r, dpi=300}
 source("scripts/fit-rtt.R")
 fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
+
 ```
 
 
@@ -961,6 +962,8 @@ est3 <- get.ci(fit3); est3$rep <- 'Rep3'
 sec.frame <- rbind(est1, est2, est3)
 sec.frame$est[sec.frame$est < 0] <- 0
 sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
+sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
+sec.frame=sec.frame[sec.frame$Lineage != "others",]
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
