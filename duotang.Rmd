@@ -88,7 +88,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-08-31"
+VirusSeq_date="2022-09-14"
 pangoversion="4.1.2 (Viral AI)"
 
 
@@ -227,6 +227,7 @@ The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constitut
 Omicron arrived in November of 2021 and currently the three main lineages in Canada are BA.1, BA.1.1, and BA.2, with multiple sub-lineages within each clade, *e.g.*, BA.2.12.
 See below for jurisdictional differences of these plots.    
 
+
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
@@ -234,11 +235,12 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
 * B.1.160 - an European lineages that spread well in Canada  
  
 Variants of current interest, due to their potential growth advantage, or mutations of potential functional significance:
+
 * BA.5.1
 * BA.5.2
 * BA.5.2.1
 * BA.5.6
-* Variants with mutation S:R346T (includes some BA.5.2.1 and BA.4.6)
+* Variants with mutations known to  evade antibodies, such as S:R346T (includes some BA.5.2.1 and BA.4.6, as well as BA.2.75.2 [Sheward et al.](https://www.biorxiv.org/content/10.1101/2022.09.16.508299v2).
 
 ## Data notes by province {.tabset}
 
@@ -707,9 +709,8 @@ l="B.1.1.529.5.2"
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 source("scripts/plot_selection_estimator_2type.R")
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
-
-
+showlineages <- sublineagedata %>% filter(lineage!="BA.2.75")
+multi.plot.selection(showlineages,"Canada",namereference,50)
 
 ```
 
@@ -727,6 +728,10 @@ multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
+showlineages <- showlineages %>% filter(lineage!="BG.2")
+showlineages <- showlineages %>% filter(lineage!="BA.2.9")
+showlineages <- showlineages %>% filter(lineage!="BA.2.76")
+showlineages <- showlineages %>% filter(lineage!="BA.2.75")
 multi.plot.selection(showlineages,"Ontario",namereference,20)
 ```
 
@@ -760,6 +765,7 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
+#print("Not enough data available")
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
 multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
@@ -917,9 +923,12 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 ### Eastern Provinces
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.5 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-print("Not enough data available")
-#showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
-#multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+source("scripts/plot_selection_estimator_2type.R")
+showlineages <- showlineages %>% filter(lineage!="BA.5.1.7")
+showlineages <- showlineages %>% filter(lineage!="BF.7")
+multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
 
 
@@ -932,6 +941,7 @@ A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulat
 ```{r, dpi=300}
 source("scripts/fit-rtt.R")
 fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
+
 ```
 
 

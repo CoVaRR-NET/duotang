@@ -55,6 +55,7 @@ fit.rtt <- function(path, plot=FALSE) {
     
     if (plot) {
       blobs(x, y, col=VOCVOI$color[i], cex=0.8)
+      if (variant == "Recombinants") {next}
       dlines(fit$x[,2], predict(fit), col=VOCVOI$color[i])  
     }
   }
