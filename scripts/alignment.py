@@ -272,6 +272,7 @@ if __name__ == "__main__":
 
     progress(f"aligning {len(sample)} samples")
     aligner = align(args.infile, refpath=args.reffile, sample=sample, limit=args.limit)
+    #aligner = align(args.infile, refpath=args.reffile, sample=None, limit=args.limit)
     for header, seq in aligner:
         args.outfile.write(f">{header}\n{seq}\n")
 

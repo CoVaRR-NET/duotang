@@ -88,7 +88,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-09-14"
+VirusSeq_date="2022-09-22"
 pangoversion="4.1.2 (Viral AI)"
 
 
@@ -240,7 +240,7 @@ Variants of current interest, due to their potential growth advantage, or mutati
 * BA.5.2
 * BA.5.2.1
 * BA.5.6
-* Variants with mutations known to  evade antibodies, such as S:R346T (includes some BA.5.2.1 and BA.4.6, as well as BA.2.75.2 [Sheward et al.](https://www.biorxiv.org/content/10.1101/2022.09.16.508299v2).
+* Variants with mutations known to  evade antibodies, such as S:R346T (includes some BA.5.2.1 and BA.4.6, as well as BA.2.75.2 [Sheward et al.](https://www.biorxiv.org/content/10.1101/2022.09.16.508299v2))
 
 ## Data notes by province {.tabset}
 
@@ -647,13 +647,13 @@ local_maxdate=plot.selection.estimate(region="Quebec",
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
+#                                      startdate=startdate, startpar=startpar3,
+#                                      reference=c(sublineages_BA2),
+#                                      mutants=list(sublineages_BA4,sublineages_BA5),
+#                                      names=list("BA.4*","BA.5*"),
+#                                      maxdate=maxdate, col=col)
 ```
 
 
@@ -727,9 +727,6 @@ multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
-showlineages <- showlineages %>% filter(lineage!="BG.2")
-showlineages <- showlineages %>% filter(lineage!="BA.2.9")
-showlineages <- showlineages %>% filter(lineage!="BA.2.76")
 showlineages <- showlineages %>% filter(lineage!="BA.2.75")
 multi.plot.selection(showlineages,"Ontario",namereference,20)
 ```
@@ -953,6 +950,8 @@ fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
 
 ### Molecular clock estimates (based on three independent subsamples)
 
+Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest, with their 95% confidence interval.
+
 ```{r}
 
 if(!is.null(fit1)){
@@ -963,18 +962,17 @@ sec.frame <- rbind(est1, est2, est3)
 sec.frame$est[sec.frame$est < 0] <- 0
 sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
 sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
-sec.frame=sec.frame[sec.frame$Lineage != "others",]
+sec.frame=sec.frame[sec.frame$Lineage != "other",]
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- "white"
-
 ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
   geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
   scale_fill_manual(values=pal) + 
   theme(axis.text.x = element_text(size=9, angle=45, hjust=1, vjust=0.95),
         legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
-  geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.2,
+  geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.7,
                 position=position_dodge(1)) +
   labs(y="Substitutions / Genome / Day",
        x="Lineage", fill="Subsample")
