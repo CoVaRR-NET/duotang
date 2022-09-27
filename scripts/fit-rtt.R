@@ -31,8 +31,6 @@ fit.rtt <- function(path, plot=FALSE) {
   
   if (plot) {
     par(mar=c(5,5,0,1))
-    #print(min(date))
-    #print(max(date))
     plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
          xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
     xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
