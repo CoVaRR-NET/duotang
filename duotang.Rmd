@@ -612,7 +612,8 @@ local_maxdate=plot.selection.estimate(region="Saskatchewan",
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 print("Not enough data available")
 #plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar2,
-#                        reference=c(sublineages_BA2), mutants=list(sublineages_BA4, sublineages_BA5),
+#                        reference=c(sublineages_BA2),
+#                        mutants=list(sublineages_BA4,sublineages_BA5),
 #                        names=list("BA.4*","BA.5*"), maxdate=maxdate, col=col)
 ```
 
@@ -880,7 +881,6 @@ multi.plot.selection(sublineagedata,"Canada",namereference,50)
 ```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
-
 multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
 
