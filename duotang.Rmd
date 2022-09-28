@@ -967,7 +967,10 @@ sec.frame=sec.frame[sec.frame$Lineage != "other",]
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- "white"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 80141fea4366b1f092970850b8ed32e2cbba8d1c
 ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
   geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
   scale_fill_manual(values=pal) + 
