@@ -718,7 +718,6 @@ multi.plot.selection(sublineagedata,"Canada",namereference,50)
 ```{r function and selection estimator BA.2 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
-
 multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
 
