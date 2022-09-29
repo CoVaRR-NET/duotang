@@ -658,23 +658,10 @@ print("Not enough data available")
 ```
 
 
-## BA.2 sublineage selection {.tabset}
+```{r general settings for selection estimator}
 
-Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of BA.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-```{r general settings for selection estimator BA.2}
-startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-01-01") 
-sublineagedata <- meta %>% filter(
-    lineage %in% unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.", meta$rawlineage)]), 
-    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
 source("scripts/plot_selection_estimator_2type.R")
-namereference <- "BA.2"
-
-
+namereference <- "BA.5.2"
 getsublineagelist <- function(mainlineage) {
   togrep=paste(mainlineage,"$|",mainlineage,".",sep="")
   list_of_lineage=unique((meta %>% filter(lineage %in% unique(meta$lineage[grepl(gsub("\\.", "\\\\.",togrep), meta$rawlineage)])))$lineage)
@@ -703,12 +690,28 @@ l="B.1.1.529.5.2"
 
 ```
 
+## BA.2 sublineage selection {.tabset}
+
+Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r namereference` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r namereference` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+```{r general settings for selection estimator BA.2}
+startpar2 <- list(p=0.5, s=0.05)
+startdate<-as.Date("2022-05-05") 
+lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.", meta$rawlineage)]))
+sublineagedata <- meta %>% filter(
+    lineage %in% lineagelist, 
+    geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+
+```
+
 
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-source("scripts/plot_selection_estimator_2type.R")
 multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
@@ -760,27 +763,25 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-#print("Not enough data available")
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
-multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+print("Not enough data available")
+#showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+#multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
 
 
 ## BA.4 sublineage selection {.tabset}
 
-Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of BA.4 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of `r namereference` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r namereference` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.4 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-01") 
+lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)]))
 sublineagedata <- meta %>% filter(
-  lineage %in% unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)]), 
+  lineage %in% lineagelist, 
   geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
   !is.na(sample.collection.date),
   sample.collection.date >= startdate
 ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
-source("scripts/plot_selection_estimator_2type.R")
-namereference <- "BA.4"
 
 
 ```
@@ -841,9 +842,10 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.4 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-print("Not enough data available")
-#showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
-#multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+#print("Not enough data available")
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
+showlineages <- showlineages %>% filter(lineage !="BA.4.2")
+multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
 
 
@@ -853,16 +855,14 @@ Here we show the trends of the various BA.5# sublineages over time, relative to 
 
 ```{r general settings for selection estimator BA.5 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-06-01") 
+startdate<-as.Date("2022-05-05")
+lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)]))
 sublineagedata <- meta %>% filter(
-  lineage %in% unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)]), 
+  lineage %in% lineagelist, 
   geo_loc_name..state.province.territory. %in% unique(meta$geo_loc_name..state.province.territory.),
   !is.na(sample.collection.date),
   sample.collection.date >= startdate
 ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
-source("scripts/plot_selection_estimator_2type.R")
-namereference <- "BA.5.2"
-
 
 ```
 
@@ -960,7 +960,6 @@ sec.frame <- rbind(est1, est2, est3)
 sec.frame$est[sec.frame$est < 0] <- 0
 sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
 sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
-sec.frame=sec.frame[sec.frame$Lineage != "other",]
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
