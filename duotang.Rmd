@@ -28,6 +28,8 @@ library(tidytree)
 #library(phangorn)
 library(phytools)
 
+library(DT)
+
 #plotting and tables
 library(ggplot2) # Work-horse plotting package
 library(ggtree) #All things phylogenetic visualization
@@ -662,6 +664,10 @@ print("Not enough data available")
 
 source("scripts/plot_selection_estimator_2type.R")
 namereference <- "BA.5.2"
+
+
+
+###for a cleaner scan of the sublineages (not in use now)
 getsublineagelist <- function(mainlineage) {
   togrep=paste(mainlineage,"$|",mainlineage,".",sep="")
   list_of_lineage=unique((meta %>% filter(lineage %in% unique(meta$lineage[grepl(gsub("\\.", "\\\\.",togrep), meta$rawlineage)])))$lineage)
@@ -690,6 +696,67 @@ l="B.1.1.529.5.2"
 
 ```
 
+## Selection estimation tables
+
+Here we show all the subvariants with a positive selection estimate.
+
+```{r overview of the selection estimator}
+
+source("scripts/plot_selection_estimator_2type.R")
+
+startpar2 <- list(p=0.5, s=0.05)
+startdate<-as.Date("2022-05-01") 
+sublineagedata <- meta %>% filter(
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate
+    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+r=multi.plot.selection(sublineagedata,"Canada",namereference,10,makeplot=FALSE)
+
+d = data.frame(lineage = character(),
+               sel_coeff = numeric(),
+               low_CI = numeric(),
+               high_CI = numeric(),
+               n = numeric(),
+               sequence_count = character())
+
+for(i in 1:length(r)){
+  sel_coeff=(r[[i]]$fit)$fit[["s1"]]
+  low_CI = (r[[i]]$fit)$confint["s1", "2.5 %"]
+  high_CI = (r[[i]]$fit)$confint["s1", "97.5 %"]
+  if(high_CI>0){
+    s=sum(r[[i]]$est$toplot$n2)
+    d[nrow(d)+1, ] <-c(lineage = r[[i]]$mut,
+                       sel_coeff=sel_coeff*100,
+                       low_CI = low_CI*100,
+                       high_CI =high_CI*100,
+                       size = s,
+                       sequence_count=paste(toString(10^round(log10(s)-0.5)),toString(10^round(log10(s)+0.5)),sep="-"))
+  }
+}
+d$sel_coeff=as.numeric(d$sel_coeff)
+d$low_CI=as.numeric(d$low_CI)
+d$high_CI=as.numeric(d$high_CI)
+d$sequence_count=as.factor(d$sequence_count)
+
+d %>%  arrange(sel_coeff) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+mutate(lineage=factor(lineage, levels=lineage)) %>% 
+ggplot(aes(x=lineage, y=sel_coeff, colour=sequence_count))+
+geom_point(size=4)+
+geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
+geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 20% per day to mark 1st Omicron wave growth+
+annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 0, ymax = 5,
+           alpha = .08,fill = "blue")+
+annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 5, ymax = 10,
+           alpha = .08,fill = "purple")+
+annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 10, ymax = max(d$high_CI,11),
+           alpha = .08,fill = "red")+
+coord_flip()+ scale_color_brewer(palette = "Dark2")+
+ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage (% per day) relative to", namereference))+theme_bw()
+
+DT::datatable(d)
+
+```
+
 ## BA.2 sublineage selection {.tabset}
 
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r namereference` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r namereference` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
@@ -705,6 +772,7 @@ sublineagedata <- meta %>% filter(
     sample.collection.date >= startdate
     ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
 
+
 ```
 
 
@@ -712,7 +780,8 @@ sublineagedata <- meta %>% filter(
 #### Canada (n>50)
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
+source("scripts/plot_selection_estimator_2type.R")
+rba2=multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
@@ -791,7 +860,7 @@ sublineagedata <- meta %>% filter(
 #### Canada (n>50)
 ```{r function and selection estimator BA.4 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
+rba4=multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
@@ -870,7 +939,7 @@ sublineagedata <- meta %>% filter(
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
+rba5=multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
