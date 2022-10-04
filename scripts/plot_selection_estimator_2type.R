@@ -360,11 +360,13 @@ multi.plot.selection <- function(sublineagedata,region, namereference, maxnumber
         plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
       }
     }
+    else{
+      return(all_plot_param)
+    }
   }
   else{
     print("Not enough data available")
   }
-  return(all_plot_param)
 }
 
 

@@ -90,7 +90,7 @@ These analyses are subject to change given new data and updated lineage designat
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
 
-VirusSeq_date="2022-09-26"
+VirusSeq_date="2022-10-03"
 pangoversion="4.1.2 (Viral AI)"
 
 
@@ -238,11 +238,18 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
  
 Variants of current interest, due to their potential growth advantage, or mutations of potential functional significance:
 
-* BA.5.1
-* BA.5.2
-* BA.5.2.1
-* BA.5.6
-* Variants with mutations known to  evade antibodies, such as S:R346T (includes some BA.5.2.1 and BA.4.6, as well as BA.2.75.2 [Sheward et al.](https://www.biorxiv.org/content/10.1101/2022.09.16.508299v2))
+
+Variants of current interest, due to their potential growth advantage, or mutations of potential functional significance:
+* BA.2.3.20
+* BA.2.75.2
+* BA.4.6
+* BF.7
+* BQ.1
+* BQ.1.1
+* CA.1
+* XBB
+* and other variants with immune evasion mutations, such as S:R346T (edited)
+
 
 ## Data notes by province {.tabset}
 
@@ -660,12 +667,12 @@ print("Not enough data available")
 ```
 
 
-```{r general settings for selection estimator}
+```{r general settings for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 
 source("scripts/plot_selection_estimator_2type.R")
 namereference <- "BA.5.2"
-
-
+startpar2 <- list(p=0.5, s=0.05)
+startdate<-as.Date("2022-05-01") 
 
 ###for a cleaner scan of the sublineages (not in use now)
 getsublineagelist <- function(mainlineage) {
@@ -696,19 +703,25 @@ l="B.1.1.529.5.2"
 
 ```
 
-## Selection estimation tables
+## Lineages showing the most growth in Canada {.tabset}
 
-Here we show all the subvariants with a positive selection estimate.
 
-```{r overview of the selection estimator}
+Here we show all the selection estimates and their 95% confidence intervals of the various pangolin lineages with more than 10 sequences after `r startdate`. We are show here with a positive upper bound of the confidence interval. Each estimate is done relative to `r namereference` stricto and the lineage. The graphs illustrating those estimates can be found below.
 
-source("scripts/plot_selection_estimator_2type.R")
+### Plot
+#### Plot
 
-startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-01") 
+Blue area show 0-5% ->modest growth (doubling time > two weeks)
+Purple area show 5%-10% -> rapid growth likely to displace currently common strains (one to two week doubling times)
+Red area 10%+ -> growth advantage characteristic of a variant of concern (over one week doubling time).
+
+```{r overview of the selection estimator plot}
+
 sublineagedata <- meta %>% filter(
     !is.na(sample.collection.date),
-    sample.collection.date >= startdate
+    sample.collection.date >= startdate,
+    lineage != "BA.4.1.1",
+    lineage != "BF.2"
     ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
 r=multi.plot.selection(sublineagedata,"Canada",namereference,10,makeplot=FALSE)
 
@@ -753,6 +766,16 @@ annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 10, ymax = max(d$high_CI,11)
 coord_flip()+ scale_color_brewer(palette = "Dark2")+
 ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage (% per day) relative to", namereference))+theme_bw()
 
+
+```
+
+
+
+### Table
+#### Table
+
+```{r overview of the selection estimator table}
+
 DT::datatable(d)
 
 ```
@@ -781,7 +804,7 @@ sublineagedata <- meta %>% filter(
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 source("scripts/plot_selection_estimator_2type.R")
-rba2=multi.plot.selection(sublineagedata,"Canada",namereference,50)
+multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
@@ -798,7 +821,6 @@ multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Ontario")
-showlineages <- showlineages %>% filter(lineage!="BA.2.75")
 multi.plot.selection(showlineages,"Ontario",namereference,20)
 ```
 
@@ -860,7 +882,7 @@ sublineagedata <- meta %>% filter(
 #### Canada (n>50)
 ```{r function and selection estimator BA.4 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-rba4=multi.plot.selection(sublineagedata,"Canada",namereference,50)
+multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
@@ -869,7 +891,6 @@ rba4=multi.plot.selection(sublineagedata,"Canada",namereference,50)
 ```{r function and selection estimator BA.4 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="British Columbia")
-
 multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
 
@@ -939,7 +960,7 @@ sublineagedata <- meta %>% filter(
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-rba5=multi.plot.selection(sublineagedata,"Canada",namereference,50)
+multi.plot.selection(sublineagedata,"Canada",namereference,50)
 
 ```
 
@@ -978,7 +999,9 @@ multi.plot.selection(showlineages,"Saskatchawan",namereference,20)
 #### Manitoba (n>20)
 ```{r function and selection estimator BA.5 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Manitoba")
+showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="Manitoba",
+                                          lineage !="BF.10",
+                                          lineage !="BA.5.5")
 multi.plot.selection(showlineages,"Manitoba",namereference,20)
 ```
 
@@ -990,7 +1013,7 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 
 showlineages <- sublineagedata %>% filter(geo_loc_name..state.province.territory.=="New Brunswick"|geo_loc_name..state.province.territory.=="Nova Scotia" | geo_loc_name..state.province.territory.=="Newfoundland and Labrador")
 source("scripts/plot_selection_estimator_2type.R")
-showlineages <- showlineages %>% filter(lineage!="BA.5.1.7")
+#showlineages <- showlineages %>% filter(lineage!="BA.5.1.7")
 showlineages <- showlineages %>% filter(lineage!="BF.7")
 multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 ```
