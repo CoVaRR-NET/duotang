@@ -243,12 +243,12 @@ Variants of current interest, due to their potential growth advantage, or mutati
 * BA.2.3.20
 * BA.2.75.2
 * BA.4.6
-* BF.7
 * BQ.1
 * BQ.1.1
 * CA.1
 * XBB
-* and other variants with immune evasion mutations, such as S:R346T (edited)
+* BF.7, containong immune evasion mutationS:R346T 
+* and other variants with immune evasion mutations
 
 
 ## Data notes by province {.tabset}
@@ -706,14 +706,17 @@ l="B.1.1.529.5.2"
 ## Lineages showing the most growth in Canada {.tabset}
 
 
-Here we show all the selection estimates and their 95% confidence intervals of the various pangolin lineages with more than 10 sequences after `r startdate`. We are show here with a positive upper bound of the confidence interval. Each estimate is done relative to `r namereference` stricto and the lineage. The graphs illustrating those estimates can be found below.
+Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r namereference` stricto. Plots of the frequency over time are given below for those lineages with more than 50 sequences.
+
+
 
 ### Plot
 #### Plot
 
-Blue area show 0-5% ->modest growth (doubling time > two weeks)
-Purple area show 5%-10% -> rapid growth likely to displace currently common strains (one to two week doubling times)
-Red area 10%+ -> growth advantage characteristic of a variant of concern (over one week doubling time).
+
+Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (0<s<10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
 ```{r overview of the selection estimator plot}
 
@@ -751,18 +754,20 @@ d$low_CI=as.numeric(d$low_CI)
 d$high_CI=as.numeric(d$high_CI)
 d$sequence_count=as.factor(d$sequence_count)
 
-d %>%  arrange(sel_coeff) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
-mutate(lineage=factor(lineage, levels=lineage)) %>% 
-ggplot(aes(x=lineage, y=sel_coeff, colour=sequence_count))+
+d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
+
+ggplot(d, aes(x=lineage, y=sel_coeff, colour=sequence_count))+
 geom_point(size=4)+
 geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
 geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 20% per day to mark 1st Omicron wave growth+
-annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 0, ymax = 5,
-           alpha = .08,fill = "blue")+
+annotate("rect", xmin = 0, xmax = nrow(d)
+         +1, ymin = 0, ymax = 5,
+           alpha = .05,fill = "blue")+
 annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 5, ymax = 10,
-           alpha = .08,fill = "purple")+
+           alpha = .2,fill = "pink")+
 annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 10, ymax = max(d$high_CI,11),
-           alpha = .08,fill = "red")+
+           alpha = .2,fill = "orange")+
+scale_y_continuous(breaks=seq((round(min(d$sel_coeff)/5))*5,round(max(d$high_CI,11)/5)*5,5))+
 coord_flip()+ scale_color_brewer(palette = "Dark2")+
 ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage (% per day) relative to", namereference))+theme_bw()
 
