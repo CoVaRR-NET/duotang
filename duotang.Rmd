@@ -691,56 +691,6 @@ getsublineagesiblings <- function(mainlineage) {
 
 l="B.1.1.529.5.2"
 
-
-
-
-plot_growing_lineage <- function(r){
-  d = data.frame(lineage = character(),
-                 sel_coeff = numeric(),
-                 low_CI = numeric(),
-                 high_CI = numeric(),
-                 n = numeric(),
-                 sequence_count = character())
-  
-  for(i in 1:length(r)){
-    sel_coeff=(r[[i]]$fit)$fit[["s1"]]
-    low_CI = (r[[i]]$fit)$confint["s1", "2.5 %"]
-    high_CI = (r[[i]]$fit)$confint["s1", "97.5 %"]
-    if(high_CI>0){
-      s=sum(r[[i]]$est$toplot$n2)
-      d[nrow(d)+1, ] <-c(lineage = r[[i]]$mut,
-                         sel_coeff= round(sel_coeff*100000)/1000,
-                         low_CI = round(low_CI*100000)/1000,
-                         high_CI =round(high_CI*100000)/1000,
-                         size = s,
-                         sequence_count=paste(toString(10^round(log10(s)-0.5)),toString(10^round(log10(s)+0.5)),sep="-"))
-    }
-  }
-  d$sel_coeff=as.numeric(d$sel_coeff)
-  d$low_CI=as.numeric(d$low_CI)
-  d$high_CI=as.numeric(d$high_CI)
-  d$sequence_count=as.factor(d$sequence_count)
-  
-  d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
-  p <- ggplot(d, aes(x=lineage, y=sel_coeff, colour=sequence_count))+
-  geom_point(size=4)+
-  geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
-  geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 20% per day to mark 1st Omicron wave growth+
-  annotate("rect", xmin = 0, xmax = nrow(d)
-           +1, ymin = 0, ymax = 5,
-             alpha = .05,fill = "blue")+
-  annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 5, ymax = 10,
-             alpha = .2,fill = "pink")+
-  annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 10, ymax = max(d$high_CI,11),
-             alpha = .2,fill = "orange")+
-  scale_y_continuous(breaks=seq((round(min(d$sel_coeff)/5))*5,round(max(d$high_CI,11)/5)*5,5))+
-  coord_flip()+ scale_color_brewer(palette = "Dark2")+
-  ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage (% per day) relative to", namereference, "and 95% confidence interval"))+theme_bw()
-  plot(p)
-  return(d)
-}
-
-
 #getsublineagelist(l)
 #getsublineagesiblings(l)
 #print(getsublineagelist("B.1.1.529.2.3"))
@@ -766,19 +716,21 @@ Background shading illustrates sub-variants that we need to keep an eye on in bl
 
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
-```{r overview of the selection estimator plot}
 
-source("scripts/plot_selection_estimator_2type.R")
+```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE}
+source("scripts/plot_growing_lineages.R")
 sublineagedata <- meta %>% filter(
     !is.na(sample.collection.date),
     sample.collection.date >= startdate,
     lineage != "BA.4.1.1",
     lineage != "BF.2"
-    ) %>% group_by(sample.collection.date,geo_loc_name..state.province.territory.) %>% dplyr::count(lineage)
+    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
 r=multi.plot.selection(sublineagedata,"Canada",namereference,10,makeplot=FALSE)
 
+#test <- meta %>% filter(!is.na(sample.collection.date),sample.collection.date >= startdate) %>% dplyr::count(rawlineage)
 
 d = plot_growing_lineage(r)
+
 
 ```
 
