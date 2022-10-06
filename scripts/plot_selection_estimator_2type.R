@@ -242,7 +242,7 @@ estimate.selection <- function(region, startdate, reference, mutants, startpar, 
   fit <- .fit.model(est, startpar, method=method)
   list(mut=mutants,est=est,fit=fit)
 }
-  
+
 plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), est=est, fit=fit) {
   toplot=est$toplot
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
@@ -338,26 +338,30 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
 #' @param region:  char, can be used to select samples for a specific province
 #' @param namereference:  a string : name of the reference to plot against
 #' @param maxnumberofsequence:  max n sequence that the sublineage should have in the last 100 days before VirusSeq update
-multi.plot.selection <- function(sublineagedata,region, namereference, maxnumberofsequence) {
+multi.plot.selection <- function(sublineagedata,region, namereference, maxnumberofsequence, makeplot=TRUE) {
   showlineages <- sublineagedata %>%
     filter(sample.collection.date>date(VirusSeq_date)-days(100)) %>%
     group_by(lineage) %>% summarise(n = sum(n)) %>% 
     filter(n>maxnumberofsequence) 
   includelineages <- as.list(showlineages$lineage)
-  
+  all_plot_param=c()
   if((length(includelineages)>1)&(namereference %in% includelineages)){
     includelineages <- as.list((showlineages %>% filter(lineage!=namereference))$lineage )
-    all_plot_param=c()
     value_to_order=c()
-    for (mut in includelineages) {
+    for (mut in includelineages){
       #print(mut)
       plot_param=estimate.selection(region=region, startdate=startdate, reference=namereference, mutants=mut, startpar=startpar2) 
       all_plot_param=append(all_plot_param,list(plot_param))
       value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
     }
-    for (i in order(value_to_order, decreasing = TRUE)) {
-      plot_param=all_plot_param[[i]]
-      plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
+    if(makeplot){
+      for (i in order(value_to_order, decreasing = TRUE)) {
+        plot_param=all_plot_param[[i]]
+        plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
+      }
+    }
+    else{
+      return(all_plot_param)
     }
   }
   else{
