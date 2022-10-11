@@ -25,14 +25,13 @@ library(lubridate) # dates are special
 library(treeio)  # https://bioconductor.org/packages/release/bioc/html/treeio.html
 library(phylotools)
 library(tidytree)
-#library(phangorn)
 library(phytools)
 
-library(DT)
 
 #plotting and tables
 library(ggplot2) # Work-horse plotting package
 library(ggtree) #All things phylogenetic visualization
+library(DT) # showing a interactive table
 
 #colors
 library(RColorBrewer)
@@ -245,8 +244,8 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
 * BQ.1.1
 * CA.1
 * XBB
-* BF.7, containing immune evasion mutation S:R346T 
-* and other variants with immune evasion mutations
+* BF.7
+* and other variants with immune evasion mutations (e.g: S:R346T)
 
 
 ## Data notes by province {.tabset}
