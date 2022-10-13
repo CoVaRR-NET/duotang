@@ -357,11 +357,13 @@ multi.plot.selection <- function(sublineagedata,region, namereference, maxnumber
     if(makeplot){
       for (i in order(value_to_order, decreasing = TRUE)) {
         plot_param=all_plot_param[[i]]
-        if(is.na(plot_param$sample)){
-          print("plot_param$sample have no length")
+        if(any(is.na((plot_param$fit)$sample))){
+          print("plot_param$sample have NA")
           print(plot_param$mut)
         }
-        plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
+        else{
+          plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
+        }
       }
     }
     else{
