@@ -274,7 +274,7 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0("Freq of ",est$mutdata[[1]]$lineage[1]," compared to ",namereference," (stricto) in ", est$region))
+       ylab=paste0(est$mutdata[[1]]$lineage[1]," growth advantage (s% per day)\nrelative to ",namereference," (stricto) in ", est$region, ", with 95% CI bars"))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
@@ -357,7 +357,13 @@ multi.plot.selection <- function(sublineagedata,region, namereference, maxnumber
     if(makeplot){
       for (i in order(value_to_order, decreasing = TRUE)) {
         plot_param=all_plot_param[[i]]
-        plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
+        if(any(is.na((plot_param$fit)$sample))){
+          print("plot_param$sample have NA")
+          print(plot_param$mut)
+        }
+        else{
+          plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
+        }
       }
     }
     else{

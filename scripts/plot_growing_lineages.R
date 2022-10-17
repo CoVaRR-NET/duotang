@@ -9,7 +9,7 @@ plot_growing_lineage <- function(r){
     sel_coeff=(r[[i]]$fit)$fit[["s1"]]
     low_CI = (r[[i]]$fit)$confint["s1", "2.5 %"]
     high_CI = (r[[i]]$fit)$confint["s1", "97.5 %"]
-    if(high_CI>0){
+    if(sel_coeff>0){
       s=sum(r[[i]]$est$toplot$n2)
       d[nrow(d)+1, ] <-c(lineage = r[[i]]$mut,
                          sel_coeff= round(sel_coeff*100000)/1000,

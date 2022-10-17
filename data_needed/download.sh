@@ -25,7 +25,7 @@ echo version will be stamped as : $datestamp
   rm data_needed/alias_key.json
   
   #download pangolin calls from DNAstack and create a column with raw names (eg: BA.5 is B.1.1.529.5)
-  dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM publisher_data.virusseq.samples" --format csv > data_needed/viralai.$datestamp.csv
+  dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.public_samples" --format csv > data_needed/viralai.$datestamp.csv
   ( cat data_needed/pango_designation_alias_key.json;cat data_needed/viralai.$datestamp.csv | tr ',' ' ')|
     awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
     tr ' ' ',' | sed 's/lineage,lineage/rawlineage,lineage/g'> data_needed/viralai.$datestamp.withalias.csv
