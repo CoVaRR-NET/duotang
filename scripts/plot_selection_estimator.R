@@ -35,9 +35,9 @@ alpha <- function(col, alpha) {
   if (region[1] == "East provinces (NL+NS+NB)") {
     prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
-    prov <- unique(meta$geo_loc_name..state.province.territory.)
+    prov <- unique(meta$province)
   } else if (region[1] == "Canada (no AB)") {
-    provinces <- unique(meta$geo_loc_name..state.province.territory.)
+    provinces <- unique(meta$province)
     prov <- provinces[provinces != 'Alberta']
   } else {
     prov <- region
@@ -46,7 +46,7 @@ alpha <- function(col, alpha) {
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
-    geo_loc_name..state.province.territory. %in% prov,
+    province %in% prov,
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
     ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
@@ -262,11 +262,11 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
        ylab=paste0("Proportion in ", est$region))
+  #lab=paste0("Growth advantage (s% per day) relative\nto BA.5.2 with 95% CI bars in ", est$region))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
   }
-
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
@@ -300,7 +300,9 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
     text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
-  }
+  }  
+  str4=sprintf("Relative to %s*","BA.2")
+  text(x=toplot$date[1], y=0.81,str4, col="black", pos=4, cex = 1)
   
   
   # second plot - logit transform

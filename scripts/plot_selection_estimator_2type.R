@@ -42,9 +42,9 @@ alpha <- function(col, alpha) {
   if (region[1] == "East provinces (NL+NS+NB)") {
     prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
-    prov <- unique(meta$geo_loc_name..state.province.territory.)
+    prov <- unique(meta$province)
   } else if (region[1] == "Canada (no AB)") {
-    provinces <- unique(meta$geo_loc_name..state.province.territory.)
+    provinces <- unique(meta$province)
     prov <- provinces[provinces != 'Alberta']
   } else {
     prov <- region
@@ -53,7 +53,7 @@ alpha <- function(col, alpha) {
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(unlist(reference), unlist(mutants)), 
-    geo_loc_name..state.province.territory. %in% prov,
+    province %in% prov,
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
     ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
@@ -274,7 +274,7 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0(est$mutdata[[1]]$lineage[1]," growth advantage (s% per day)\nrelative to ",namereference," (stricto) in ", est$region, ", with 95% CI bars"))
+       ylab=paste0("growth advantage (s% per day) relative to ",namereference," (stricto)\nin ", est$region, ", with 95% CI bars"))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
@@ -340,7 +340,7 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
 #' @param maxnumberofsequence:  max n sequence that the sublineage should have in the last 100 days before VirusSeq update
 multi.plot.selection <- function(sublineagedata,region, namereference, maxnumberofsequence, makeplot=TRUE) {
   showlineages <- sublineagedata %>%
-    filter(sample.collection.date>date(VirusSeq_date)-days(100)) %>%
+    filter(sample.collection.date>date(VirusSeq_release)-days(100)) %>%
     group_by(lineage) %>% summarise(n = sum(n)) %>% 
     filter(n>maxnumberofsequence) 
   includelineages <- as.list(showlineages$lineage)
