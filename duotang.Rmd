@@ -1,4 +1,18 @@
 
+---
+title: |
+  ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
+subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
+author: "Pillar 6"
+date: '`r format(as.Date("2022-10-17"), "%B %d, %Y")`'
+output:
+  html_document:
+    keep_md: true
+    code_folding: hide
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
 
 
 ```{r variables, include=FALSE, warning=FALSE}
@@ -32,23 +46,6 @@ pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey'  # named character vector
 ```
-
-
-
----
-title: |
-  ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
-subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
-author: "Pillar 6"
-date: '`r format(as.Date(VirusSeq_release), "%B %d, %Y")`'
-output:
-  html_document:
-    keep_md: true
-    code_folding: hide
-    theme: cerulean
-    toc: true
-    toc_float: true
----
 
 
 
