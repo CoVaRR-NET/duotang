@@ -43,7 +43,7 @@ plot_growing_lineage <- function(r){
              alpha = .2,fill = "orange")+
   scale_y_continuous(breaks=seq((round(min(d$sel_coeff)/5))*5,round(max(d$high_CI,11)/5)*5,5))+
   coord_flip()+ scale_color_brewer(palette = "Green")+
-  ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage, s, (% per day)\n relative to", namereference, "and 95% CI"))+theme_bw()
+  ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", namereference, " with 95% CI bars"))+theme_bw()
   plot(p)
   return(d)
 }
