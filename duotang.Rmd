@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(as.Date("2022-10-17"), "%B %d, %Y")`'
+date: '`r format(as.Date("2022-10-20"), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -16,9 +16,29 @@ output:
 
 
 ```{r variables, include=FALSE, warning=FALSE}
-#Global variables
+############################
+##### GLOBAL VARIABLES #####
+############################
 
-VirusSeq_release="2022-10-17"
+#Date of the VirusSeq release
+VirusSeq_release="2022-10-20"
+
+############################
+########### ^ ##############
+########## /|\ #############
+######### / | \ ############
+########    |    ###########
+########### | ##############
+########### | ##############
+############################
+####### DO NOT FORGET ######
+####### TO UPDATE ##########
+####### THE DATE  ##########
+####### IN THE #############
+####### TITLE ##############
+############################
+############################
+
 pangoversion="4.1.3 (Viral AI)"
 
 VOCVOI = data.frame(name=character(),
@@ -50,6 +70,10 @@ pal["other"] <- 'grey'  # named character vector
 
 
 ```{r setup, include=FALSE, warning=FALSE}
+############################
+#### LIBRARIES LOADING #####
+############################
+
 #coding and data
 library(tidyverse) # wrangling and everything really
 library(knitr) # Needed to set root directory
@@ -128,13 +152,12 @@ These analyses are subject to change given new data and updated lineage designat
 meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
 
 meta$sample.collection.date <- as.Date(meta$sample.collection.date)
+meta$week <- cut(meta$sample.collection.date, 'week')
 meta$province <- meta$geo_loc_name..state.province.territory.
 
 #Select on ly the column we want to use later
-meta <- meta[,c("fasta.header.name","sample.collection.date", "province", "rawlineage", "lineage")]
+meta <- meta[,c("fasta.header.name","sample.collection.date","week",  "province", "rawlineage", "lineage")]
 
-
-meta$week <- cut(meta$sample.collection.date, 'week')
 
 
 VOCVOI$pattern <- gsub("\\.","\\\\.",VOCVOI$pangodesignation)
@@ -212,10 +235,8 @@ Because sampling and sequencing procedures vary by region and time, this does no
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
-The Delta wave grew late summer with Delta sublineages AY.25 and AY.27 constituting sizable proportions of this wave.
-Omicron arrived in November of 2021 and currently the three main lineages in Canada are BA.1, BA.1.1, and BA.2, with multiple sub-lineages within each clade, *e.g.*, BA.2.12.
-See below for jurisdictional differences of these plots.    
-
+The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
+See below for jurisdictional differences of these plots.   
 
 There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
 
@@ -462,7 +483,6 @@ sublineages_BA2 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.5
 sublineages_BA4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)])  # "BA.4" 
 sublineages_BA5 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)])  # "BA.5" 
 
-
 source("scripts/subtype_plotter.R")
 ```
 
@@ -496,7 +516,6 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5
 #### Sublineage BA.5
 ```{r subtype plotter BA.5, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-
 rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA5))
 rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA5),scale=T)
 ```
@@ -690,6 +709,8 @@ source("scripts/plot_growing_lineages.R")
       
 sublineagedata <- meta %>% filter(
     !is.na(sample.collection.date),
+    lineage!="BA.2.18",
+    lineage!="BA.2.3.20",
     sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
 
 r=multi.plot.selection(sublineagedata,"Canada",namereference,10,makeplot=FALSE)
@@ -878,11 +899,11 @@ startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-05")
 lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)]))
 sublineagedata <- meta %>% filter(
-  lineage %in% lineagelist, 
-  province %in% unique(meta$province),
+  lineage %in% lineagelist,
   !is.na(sample.collection.date),
   sample.collection.date >= startdate
-) %>% group_by(sample.collection.date,province) %>% dplyr::count(lineage)
+) %>% group_by(lineage,province) %>% summarise(count = n(), 
+            lastsampledate = max(sample.collection.date))
 
 ```
 
@@ -890,7 +911,21 @@ sublineagedata <- meta %>% filter(
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
+source("scripts/plot_selection_estimator_2type.R")
+multi.plot.selection(sublineagedata,"Canada",namereference,500)
+
+
+sublineagedata <- sublineagedata[order(sublineagedata$sample.collection.date, decreasing = TRUE), ]
+
+data_new1 <- Reduce(rbind,                                 # Top N highest values by group
+                    by(sublineagedata,
+                       sublineagedata["lineage"],
+                       head,
+                       n = 1))
+
+print(1)
+showlineages <- sublineagedata %>% group_by(lineage) %>% summarise(n = sum(n)) 
+print(showlineages)
 
 ```
 
@@ -901,7 +936,6 @@ multi.plot.selection(sublineagedata,"Canada",namereference,50)
 showlineages <- sublineagedata %>% filter(province=="British Columbia")
 multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
-
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
@@ -944,10 +978,12 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 ```{r function and selection estimator BA.5 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
 showlineages <- sublineagedata %>% filter(province=="New Brunswick"|province=="Nova Scotia" | province=="Newfoundland and Labrador")
+showlineages <- showlineages %>% filter(lineage!="BA.5.2.21")
+showlineages <- showlineages %>% filter(lineage!="BA.5.2.20")
 showlineages <- showlineages %>% filter(lineage!="BA.5.2.2")
 showlineages <- showlineages %>% filter(lineage!="BA.5.2.9")
 showlineages <- showlineages %>% filter(lineage!="BE.1.1")
-showlineages <- showlineages %>% filter(lineage!="BF.5")
+#showlineages <- showlineages %>% filter(lineage!="BF.5")
 showlineages <- showlineages %>% filter(lineage!="BF.7")
 #showlineages <- showlineages %>% filter(lineage!="BF.28")
 multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)

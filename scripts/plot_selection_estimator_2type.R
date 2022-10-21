@@ -338,18 +338,18 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
 #' @param region:  char, can be used to select samples for a specific province
 #' @param namereference:  a string : name of the reference to plot against
 #' @param maxnumberofsequence:  max n sequence that the sublineage should have in the last 100 days before VirusSeq update
-multi.plot.selection <- function(sublineagedata,region, namereference, maxnumberofsequence, makeplot=TRUE) {
+multi.plot.selection <- function(sublineagedata,region, namereference, minnumberofsequence, makeplot=TRUE) {
   showlineages <- sublineagedata %>%
     filter(sample.collection.date>date(VirusSeq_release)-days(100)) %>%
-    group_by(lineage) %>% summarise(n = sum(n)) %>% 
-    filter(n>maxnumberofsequence) 
+    group_by(lineage) %>%  dplyr::count(lineage) %>% 
+    filter(n>minnumberofsequence) 
   includelineages <- as.list(showlineages$lineage)
   all_plot_param=c()
   if((length(includelineages)>1)&(namereference %in% includelineages)){
     includelineages <- as.list((showlineages %>% filter(lineage!=namereference))$lineage )
     value_to_order=c()
-    for (mut in includelineages){
-      #print(mut)
+    for (mut in showlineages$lineage){
+      print(mut)
       plot_param=estimate.selection(region=region, startdate=startdate, reference=namereference, mutants=mut, startpar=startpar2) 
       all_plot_param=append(all_plot_param,list(plot_param))
       value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
