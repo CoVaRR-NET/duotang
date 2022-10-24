@@ -1,4 +1,4 @@
-name: duotangtest
+name: duotang
 channels:
   - bioconda
   - conda-forge
