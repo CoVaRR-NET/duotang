@@ -18,67 +18,45 @@ alpha <- function(col, alpha) {
 }
 
 
-#' combine multiple PANGO lineages in a data set, summing counts
-#' TODO: let user specify a regular expression?
-.combine.lineages <- function(df) {
-  df2 <- as.data.frame(
-    unique(df %>% group_by(time) %>% transmute(
-      day=sample.collection.date, n=sum(n), time=time, lineage=lineage
-      )))
-  top=list((df %>% group_by(lineage) %>% summarise(n=sum(n)) %>% slice_max(n,n=2))$lineage)
-  if(lengths(top)==2){
-    name=sapply(top, paste, collapse = " ")
-  }
-  else{
-    name=df2$lineage[1]
-  }
-  df2$lineage <- name
-  distinct(df2)
-}
-
-
-.make.estimator <- function(region, startdate, reference, mutants) {
+get.province.list <- function(region){
   # handle special values for prov
   if (region[1] == "East provinces (NL+NS+NB)") {
-    prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
+    provlist <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
-    prov <- unique(meta$province)
-  } else if (region[1] == "Canada (no AB)") {
-    provinces <- unique(meta$province)
-    prov <- provinces[provinces != 'Alberta']
+    provlist <- unique(meta$province)
+    #provlist <- provlist[provlist != 'Alberta']
   } else {
-    prov <- region
+    provlist <- region
   }
-  
+  return(provlist)
+}
+
+.make.estimator <- function(region, startdate, reference, mutants) {
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(unlist(reference), unlist(mutants)), 
-    province %in% prov,
+    province %in% get.province.list("Canada"),
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+  )
+  # separate by reference (n1) and mutant lineage(s) (n2)
+  mydata$lineage = mydata$lineage %in% reference
+  mydata <- mydata %>% group_by(sample.collection.date) %>% dplyr::count(lineage, name = "n")
+  mydata$lineage <- lapply(mydata$lineage, function(isref) if(isref){"n1"}else{"n2"} )
   
-  # set final date
-  lastdate <- max(mydata$sample.collection.date)
+  
+  widetable = pivot_wider(mydata, names_from = lineage, values_from = n, values_fill = 0 )
+  names(widetable)[names(widetable) == "sample.collection.date"] <- "date"
+  
+  
+  alltime=seq.Date(as.Date(startdate), as.Date(max(widetable$date)), "days") 
+  missingrows  <- data.frame (date = alltime[!alltime %in% widetable$date])
+  
+  toplot=rbind(widetable,missingrows)
+  
   # convert time to negative integers for fitting model (0 = last date)
-  mydata$time <- as.numeric(difftime(mydata$sample.collection.date, lastdate, 
-                                     units='days'))
-  
-  # separate by reference and mutant lineage(s)
-  refdata <- .combine.lineages(filter(mydata, lineage %in% reference))
-
-  
-  mutdata <- lapply(mutants, function(mut) {
-    .combine.lineages(filter(mydata, lineage%in% mut))
-    })
-  # generate time series
-  timestart <- as.integer(startdate-lastdate)
-  toplot <- data.frame(time=seq.int(from=timestart, to=0))
-  toplot$n1 <- refdata$n[match(toplot$time, refdata$time)]
-  temp <- lapply(mutdata, function(md) md$n[match(toplot$time, md$time)])  
-  toplot <- cbind(toplot, temp)
-  names(toplot) <- c('time', 'n1', paste('n', 1:length(mutdata)+1, sep=''))
-  
+  toplot$time <- as.numeric(difftime(toplot$date, max(toplot$date), units='days'))
+  toplot <-toplot[order(toplot$time),]
   # Any NA's refer to no variant of that type on a day, set to zero
   toplot[is.na(toplot)] <- 0 
   
@@ -86,30 +64,16 @@ alpha <- function(col, alpha) {
   # to the midpoint (p=0.5), to make sure that the alleles are segregating at 
   # the reference date.  If we set t=0 when p (e.g., n1/(n1+n2+n3)) is near 0 
   # or 1, then the likelihood surface is very flat.
-  v <- apply(toplot[,-1], 1, function(ns) { 
+  v <- apply(toplot[c("n1","n2")], 1, function(ns) { 
     ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0) 
     })
-  
+  # Once the refdate is chose, it should be set at 0
   refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
-  #refdate <- which(v==max(v, na.rm=TRUE))[1]
-  timeend <- -(timestart+refdate)
-  timestart <- -refdate
-  toplot$time <- seq.int(timestart,timeend)
-  
-  # apply same time scale to original datasets
-  refdata$time <- refdata$time + (timeend-timestart)-refdate
-
-  for (i in 1:length(mutdata)) {
-    mutdata[[i]]$time <- mutdata[[i]]$time + (timeend-timestart)-refdate  
-  }
-  
-  dateseq <- seq.Date(as.Date(startdate), as.Date(lastdate), "days")
-  dateconverter <- data.frame(time=toplot$time, date=as.Date(dateseq))
-  toplot$date <- dateconverter$date
+  toplot$time <- toplot$time-min(toplot$time)-refdate
   
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
-  list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot)
+  return(toplot)
 }
 
 
@@ -131,36 +95,28 @@ alpha <- function(col, alpha) {
 #' @param p:  vector of mutant frequencies at reference time point
 #' @param s:  vector of selection coefficients for mutants relative 
 #'            to reference (wildtype)
-.llfunc <- function(p, s, refdata, mutdata) {
-  stopifnot(length(mutdata) == length(p) & length(p) == length(s))
-  
-  # ensure that all counts use the same time sequence
-  ts <- unique(c(refdata$time, unlist(sapply(mutdata, function(md) md$time))))
+.llfunc <- function(p, s, toplot) {
+  # compute the probabilities for the time serie
+  ts=toplot[toplot$tot!=0,]$time
   pr.vecs <- .scurves(p, s, ts)
   
-  # convert counts into a matrix
-  counts <- matrix(0, nrow=length(ts), ncol=1+length(p))
-  counts[match(refdata$time, ts), 1] <- refdata$n
-  for (j in 1:length(mutdata)) {
-    counts[match(mutdata[[j]]$time, ts), j+1] <- mutdata[[j]]$n
-  }
-  
+  counts=as.matrix(toplot[toplot$tot!=0,c("n1","n2")])
   # calculate log-likelihood (negative sign because optimizer minimizes)
-  -sum(counts * log(pr.vecs))
+    -sum(counts * log(pr.vecs))
 }
 
 
 # I had to write these wrapper functions because mle2 doesn't like vector 
 # parameters >:(
-.ll.trinom <- function(p1, p2, s1, s2, refdata, mutdata) {
+.ll.trinom <- function(p1, p2, s1, s2, toplot) {
   suppressWarnings(
-    .llfunc(p=c(p1, p2), s=c(s1, s2), refdata=refdata, mutdata=mutdata)
+    .llfunc(p=c(p1, p2), s=c(s1, s2), toplot=toplot)
   )
 }
 
-.ll.binom <- function(p1, s1, refdata, mutdata) {
+.ll.binom <- function(p1, s1, toplot) {
   suppressWarnings(
-    .llfunc(p=p1, s=s1, refdata=refdata, mutdata=mutdata)
+    .llfunc(p=p1, s=s1, toplot=toplot)
     )
 }
 
@@ -172,18 +128,17 @@ alpha <- function(col, alpha) {
 #' @return  list, fit = object of class 'mle2'
 #'                confint = matrix returned from confint
 #'                sample = data frame from RandomHessianOrMCMC
-.fit.model <- function(est, startpar, method="BFGS") {
-  refdata <- est$refdata
-  mutdata <- est$mutdata
+.fit.model <- function(toplot, startpar, method="Nelder-Mead") {
+  #print(toplot[toplot$n2!=0,])
   
   if (length(startpar$s) == 1) {
     bbml <- tryCatch({
               mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
-                 data=list(refdata=refdata, mutdata=mutdata[1]), method=method)
+                 data=list(toplot=toplot), method=method, skip.hessian=FALSE)
               },
              error=function(cond) {
                mle2(.ll.binom, start=list(p1=startpar$p[1]/10, s1=startpar$s[1]), 
-                            data=list(refdata=refdata, mutdata=mutdata[1]), method=method)
+                    data=list(toplot=toplot), method=method)
              }
     )
   } 
@@ -191,7 +146,7 @@ alpha <- function(col, alpha) {
     bbml <- mle2(.ll.trinom, 
                  start=list(p1=startpar$p[1], p2=startpar$p[2], 
                             s1=startpar$s[1], s2=startpar$s[2]), 
-                 data=list(refdata=refdata, mutdata=mutdata), method=method)
+                 data=toplot, method=method)
   }
   else {
     stop("ERROR: function does not currently support more than three types!")
@@ -237,14 +192,20 @@ alpha <- function(col, alpha) {
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 estimate.selection <- function(region, startdate, reference, mutants, startpar, method='BFGS') {
-  est <- .make.estimator(region, startdate, reference, mutants)
-  
-  fit <- .fit.model(est, startpar, method=method)
-  list(mut=mutants,est=est,fit=fit)
+  toplot <- .make.estimator(region, startdate, reference, mutants)
+
+  fit <- .fit.model(toplot, startpar, method=method)
+  list(toplot=toplot,fit=fit,mut=mutants,ref=reference, region=region)
 }
 
-plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), est=est, fit=fit) {
-  toplot=est$toplot
+
+
+
+
+
+plot.selection <- function(plotparam, col=c('red', 'blue')) {
+  toplot=plotparam$toplot
+  fit=plotparam$fit
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -253,19 +214,19 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   
   #if (any(!is.na(fit$sample))) {  
-    # calculate 95% confidence intervals from sampled parameters
-    s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
-      row <- as.numeric(x)
-      s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
+  # calculate 95% confidence intervals from sampled parameters
+  s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
+    row <- as.numeric(x)
+    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
+  })
+  qcurve <- function(q) {
+    sapply(1:ncol(scurves), function(i) {
+      apply(sapply(s95, function(x) x[,i]), 1, 
+            function(y) quantile(y, q)) 
     })
-    qcurve <- function(q) {
-      sapply(1:ncol(scurves), function(i) {
-        apply(sapply(s95, function(x) x[,i]), 1, 
-              function(y) quantile(y, q)) 
-      })
-    } 
-    lo95 <- qcurve(0.025)
-    hi95 <- qcurve(0.975)  
+  } 
+  lo95 <- qcurve(0.025)
+  hi95 <- qcurve(0.975)  
   #}
   
   par(mfrow=c(1,1), mar=c(5,5,1,1))
@@ -274,7 +235,7 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0("growth advantage (s% per day) relative to ",namereference," (stricto)\nin ", est$region, ", with 95% CI bars"))
+       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$reference[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
            bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
@@ -286,51 +247,40 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
   }
   
   #if (!is.na(fit$sample)) {
-    # display confidence intervals
-    polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
-            col=alpha(col[1], 0.5))
-    if(ncol(lo95) > 2) {
-      polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
-              col=alpha(col[2], 0.5))
-    }
+  # display confidence intervals
+  polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
+          col=alpha(col[1], 0.5))
+  if(ncol(lo95) > 2) {
+    polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
+            col=alpha(col[2], 0.5))
+  }
   #}
-    
+  
   # report parameter estimates on plot
-  str2 <- sprintf("%s: %s {%s, %s}", est$mutdata[[1]]$lineage[1],
+  str2 <- sprintf("%s: %s {%s, %s}", plotparam$mut[[1]],
                   format(round(fit$fit[["s1"]],3), nsmall=3), 
                   format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
                   format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
   text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
-  if (length(mutants) > 1) {
-    str3 <- sprintf("%s: %s {%s, %s}", est$mutdata[[2]]$lineage[1],
-                    format(round(fit$fit[["s2"]], 3), nsmall=3), 
-                    format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
-                    format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
-    text(x=toplot$date[1], y=0.85, str3, col=col[2], pos=4, cex = 1)
-  }
-  # second plot - logit transform
-  #options(scipen=5)  # use scientific notation for numbers exceeding 5 digits
-  #par(mar=c(5,5,1,1))
-  
-  #plot(toplot$date, toplot$n2/toplot$n1, pch=21,
-   #    bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/3, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0.001, 1000), 
-    #   xlab='Sample collection date',
-    #   ylab=paste0("Logit in ", est$region), log='y', yaxt='n')
- # axis(2, at=10^(-3:3), label=10^(-3:3), las=1, cex.axis=0.7)
-  
- # lines(toplot$date, scurves[,2] / scurves[,1])
- # text(x=toplot$date[1], y=500, str2, col=col[1], pos=4, cex=1)
-  
- # if (!is.null(toplot$n3)) {
-    # draw second series
-  #  points(toplot$date, toplot$n3/toplot$n1, pch=21,
-  #        bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/3)
-  #  lines(toplot$date, scurves[,3] / scurves[,1])
-  #  text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
 }
-  # Bends suggest a changing selection over time (e.g., due to the impact of 
-  # vaccinations differentially impacting the variants). Sharper turns are more 
-  # often due to NPI measures. 
+# Bends suggest a changing selection over time (e.g., due to the impact of 
+# vaccinations differentially impacting the variants). Sharper turns are more 
+# often due to NPI measures . 
+
+
+chooselineagestoplot <- function(togrep,region,namereference,startdate,lastseenafter,minnumberofsequence){
+  submeta <- meta %>% filter(
+    lineage %in% c(unique(meta$lineage[grepl(togrep, meta$rawlineage)])),
+    !lineage %in% namereference,
+    !is.na(sample.collection.date),
+    sample.collection.date >= startdate,
+    province %in% get.province.list(region)
+  ) %>%
+    group_by(lineage) %>% summarise(count = n(), lastsampledate = max(sample.collection.date)) %>%
+    filter(lastsampledate>lastseenafter,
+           count>minnumberofsequence)
+  return(unique(submeta$lineage))
+}
 
 
 #' generate a stacked barplot per lineage from a subset of lineages
@@ -338,40 +288,29 @@ plot.selection <- function(startdate, reference, mutants, col=c('red', 'blue'), 
 #' @param region:  char, can be used to select samples for a specific province
 #' @param namereference:  a string : name of the reference to plot against
 #' @param maxnumberofsequence:  max n sequence that the sublineage should have in the last 100 days before VirusSeq update
-multi.plot.selection <- function(sublineagedata,region, namereference, minnumberofsequence, makeplot=TRUE) {
-  showlineages <- sublineagedata %>%
-    filter(sample.collection.date>date(VirusSeq_release)-days(100)) %>%
-    group_by(lineage) %>%  dplyr::count(lineage) %>% 
-    filter(n>minnumberofsequence) 
-  includelineages <- as.list(showlineages$lineage)
+multi.plot.selection <- function(lineagelist, reference, region, makeplot=TRUE) {
   all_plot_param=c()
-  if((length(includelineages)>1)&(namereference %in% includelineages)){
-    includelineages <- as.list((showlineages %>% filter(lineage!=namereference))$lineage )
-    value_to_order=c()
-    for (mut in showlineages$lineage){
-      print(mut)
-      plot_param=estimate.selection(region=region, startdate=startdate, reference=namereference, mutants=mut, startpar=startpar2) 
-      all_plot_param=append(all_plot_param,list(plot_param))
-      value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
-    }
-    if(makeplot){
-      for (i in order(value_to_order, decreasing = TRUE)) {
-        plot_param=all_plot_param[[i]]
-        if(any(is.na((plot_param$fit)$sample))){
-          print("plot_param$sample have NA")
-          print(plot_param$mut)
-        }
-        else{
-          plot.selection(startdate=startdate, reference=namereference, mutants=plot_param$mut, est=plot_param$est, fit=plot_param$fit)
-        }
+  value_to_order=c()
+  for (mut in lineagelist){
+    #print(paste(mut,region))
+    plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2) 
+    all_plot_param=append(all_plot_param,list(plot_param))
+    value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
+  }
+  if(makeplot){
+    for (i in order(value_to_order, decreasing = TRUE)) {
+      plot_param=all_plot_param[[i]]
+      if(any(is.na((plot_param$fit)$sample))){
+        print("plot_param$sample have NA")
+        print(plot_param$mut)
       }
-    }
-    else{
-      return(all_plot_param)
+      else{
+        plot.selection(plotparam=plot_param)
+      }
     }
   }
   else{
-    print("Not enough data available")
+    return(all_plot_param)
   }
 }
 

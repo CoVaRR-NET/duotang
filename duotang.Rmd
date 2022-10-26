@@ -65,6 +65,8 @@ VOCVOI=addVOCVOI("Recombinants","X*",'black')
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey'  # named character vector
+
+maxnumberofgraphperselectionplot=6
 ```
 
 
@@ -650,46 +652,39 @@ print("Not enough data available")
 ```
 
 
-```{r general settings for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-
+```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
-namereference <- "BA.5.2"
+reference <- list("BA.5.2")
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-01") 
+startdate<-as.Date("2022-05-05") 
 
-###for a cleaner scan of the sublineages (not in use now)
-getsublineagelist <- function(mainlineage) {
-  togrep=paste(mainlineage,"$|",mainlineage,".",sep="")
-  list_of_lineage=unique((meta %>% filter(lineage %in% unique(meta$lineage[grepl(gsub("\\.", "\\\\.",togrep), meta$rawlineage)])))$lineage)
-  return(list_of_lineage)
+
+allparams=c()
+for( region in c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada")){
+  lineagelist=chooselineagestoplot(togrep=".",
+                  region=region,
+                  namereference=reference,
+                  startdate=as.Date(startdate),
+                  lastseenafter=date(VirusSeq_release)-days(100),
+                  minnumberofsequence=10)
+  if(region=="Canada"){
+    canadabug=c("BA.2.13","BA.2.18","BA.1","BA.2.3.20","BA.2.40.1","BA.2.7","BA.5.1.4")
+    lineagelist=lineagelist[! lineagelist %in% canadabug]
+  }
+  if(region=="Ontario"){
+    lineagelist=lineagelist[lineagelist!="BA.2.18"]
+  }
+  allparams=c(allparams,multi.plot.selection(lineagelist,reference,region,makeplot=FALSE))
 }
 
-getsublineagesiblings <- function(mainlineage) {
-  decompose=(strsplit(mainlineage, "\\."))[[1]]
-  parent=sapply(list(head(decompose,-1)), paste, collapse = ".")
-  grepmainlineage=paste(mainlineage,"$|",mainlineage,".",sep="")
-  greparent=paste(parent,"|",parent,".",sep="")
-  togrep=paste("^(?!",grepmainlineage,")(",greparent,")",sep="")
-  list_of_lineage=unique((meta %>% filter(lineage %in% unique(meta$lineage[grepl(gsub("\\.", "\\\\.",togrep), meta$rawlineage, perl=T)])))$lineage)
-  return(list_of_lineage)
-}
+allparams=allparams[order(sapply(allparams, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
   
-l="B.1.1.529.5.2"
-
-#getsublineagelist(l)
-#getsublineagesiblings(l)
-#print(getsublineagelist("B.1.1.529.2.3"))
-#plot.selection(region=region, startdate=startdate, reference=namereference, mutants="BA.2.3", #startpar=startpar2) 
-#plot.selection(region=region, startdate=startdate, reference=namereference, mutants="BA.2.3", startpar=startpar2) 
-#plot.selection(region=region, startdate=startdate, reference=getsublineagesiblings("B.1.1.529.2.3"), mutants="BA.2.3", startpar=startpar2) 
-#plot.selection(region=region, startdate=startdate, reference=namereference, mutants=getsublineagelist("B.1.1.529.2.3"), startpar=startpar2) 
-
 ```
 
 ## Most growing lineages in Canada {.tabset}
 
 
-Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r namereference` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
 
 
@@ -704,18 +699,8 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 
 ```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
 source("scripts/plot_growing_lineages.R")
-
-
-      
-sublineagedata <- meta %>% filter(
-    !is.na(sample.collection.date),
-    lineage!="BA.2.18",
-    lineage!="BA.2.3.20",
-    sample.collection.date >= startdate) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
-
-r=multi.plot.selection(sublineagedata,"Canada",namereference,10,makeplot=FALSE)
-
-d = plot_growing_lineage(r)
+paramselected=allparams[sapply(allparams,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0})]
+d = plot_growing_lineage(paramselected)
 
 
 ```
@@ -727,25 +712,35 @@ d = plot_growing_lineage(r)
 
 ```{r overview of the selection estimator table}
 
+paramselected=allparams[sapply(allparams,function(x){(x$fit)$fit[["s1"]]>0})]
+d = plot_growing_lineage(paramselected,makeplot=FALSE)
 DT::datatable(d)
 
 ```
 
 ## BA.2 sublineage selection {.tabset}
 
-Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r namereference` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r namereference` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.2}
-startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-05") 
-lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.|XBB", meta$rawlineage)]))
-sublineagedata <- meta %>% filter(
-    lineage %in% lineagelist, 
-    province %in% unique(meta$province),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date,province) %>% dplyr::count(lineage)
-
+plotba2 <- function(region,min){
+  lineagelist=chooselineagestoplot(
+    togrep="B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.|XBB",
+    region=region,
+    namereference=reference,
+    startdate=as.Date(startdate),
+    lastseenafter=date(VirusSeq_release)-days(100),
+    minnumberofsequence=min)
+  countgraph=0
+  for(p in allparams) {
+    if(p$region==region & p$mut %in% lineagelist){
+      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
+        plot.selection(plotparam=p)
+        countgraph=countgraph+1
+      }
+    }
+  }
+}
 
 ```
 
@@ -753,49 +748,39 @@ sublineagedata <- meta %>% filter(
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
+plotba2("Canada",50)
 
 ```
 
 ### BC
 #### British Columbia (n>20)
 ```{r function and selection estimator BA.2 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="British Columbia")
-multi.plot.selection(showlineages,"British Columbia",namereference,20)
+plotba2("British Columbia",20)
 ```
 
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Ontario",20)
 
-showlineages <- sublineagedata %>% filter(province=="Ontario")
-multi.plot.selection(showlineages,"Ontario",namereference,20)
 ```
 
 ### Quebec
 #### Quebec (n>20)
 ```{r function and selection estimator BA.2 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Quebec")
-multi.plot.selection(showlineages,"Quebec",namereference,20)
+plotba2("Quebec",20)
 ```
 
 ### Saskatchawan
 #### Saskatchawan (n>20)
 ```{r function and selection estimator BA.2 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Saskatchawan")
-multi.plot.selection(showlineages,"Saskatchawan",namereference,20)
+plotba2("Saskatchawan",20)
 ```
 
 ### Manitoba
 #### Manitoba (n>20)
 ```{r function and selection estimator BA.2 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Manitoba")
-multi.plot.selection(showlineages,"Manitoba",namereference,20)
+plotba2("Manitoba",20)
 ```
 
 
@@ -803,27 +788,34 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 ### Eastern Provinces
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-print("Not enough data available")
-#showlineages <- sublineagedata %>% filter(province=="New Brunswick"|province=="Nova Scotia" | province=="Newfoundland and Labrador")
-#multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+plotba2("East provinces (NL+NS+NB)",20)
 ```
 
 
 ## BA.4 sublineage selection {.tabset}
 
-Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of `r namereference` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r namereference` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.4 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-startpar2 <- list(p=0.5, s=0.05)
-lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)]))
-sublineagedata <- meta %>% filter(
-  lineage %in% lineagelist, 
-  province %in% unique(meta$province),
-  !is.na(sample.collection.date),
-  sample.collection.date >= startdate
-) %>% group_by(sample.collection.date,province) %>% dplyr::count(lineage)
 
+plotba4 <- function(region,min){
+  lineagelist=chooselineagestoplot(
+    togrep="B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.",
+    region=region,
+    namereference=reference,
+    startdate=as.Date(startdate),
+    lastseenafter=date(VirusSeq_release)-days(100),
+    minnumberofsequence=min)
+  countgraph=0
+  for(p in allparams) {
+    if(p$region==region & p$mut %in% lineagelist){
+      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
+        plot.selection(plotparam=p)
+        countgraph=countgraph+1
+      }
+    }
+  }
+}
 
 ```
 
@@ -832,48 +824,40 @@ sublineagedata <- meta %>% filter(
 #### Canada (n>50)
 ```{r function and selection estimator BA.4 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
-multi.plot.selection(sublineagedata,"Canada",namereference,50)
+plotba4("Canada",50)
+
 
 ```
 
 ### BC
 #### British Columbia (n>20)
 ```{r function and selection estimator BA.4 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("British Columbia",20)
 
-showlineages <- sublineagedata %>% filter(province=="British Columbia")
-multi.plot.selection(showlineages,"British Columbia",namereference,20)
 ```
 
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.4 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Ontario")
-multi.plot.selection(showlineages,"Ontario",namereference,20)
+plotba4("Ontario",20)
 ```
 
 ### Quebec
 #### Quebec (n>20)
 ```{r function and selection estimator BA.4 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Quebec")
-multi.plot.selection(showlineages,"Quebec",namereference,20)
+plotba4("Quebec",20)
 ```
 
 ### Saskatchawan
 #### Saskatchawan (n>20)
 ```{r function and selection estimator BA.4 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Saskatchawan")
-multi.plot.selection(showlineages,"Saskatchawan",namereference,20)
+plotba4("Saskatchawan",20)
 ```
 
 ### Manitoba
 #### Manitoba (n>20)
 ```{r function and selection estimator BA.4 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Manitoba")
-multi.plot.selection(showlineages,"Manitoba",namereference,20)
+plotba4("Manitoba",20)
 ```
 
 
@@ -881,12 +865,7 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 ### Eastern Provinces
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.4 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-#print("Not enough data available")
-showlineages <- sublineagedata %>% filter(province=="New Brunswick"|province=="Nova Scotia" | province=="Newfoundland and Labrador")
-showlineages <- showlineages %>% filter(lineage !="BA.2.12.1")
-showlineages <- showlineages %>% filter(lineage !="BA.4.2")
-multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+plotba4("East provinces (NL+NS+NB)",20)
 ```
 
 
@@ -895,80 +874,61 @@ multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
 Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of BA.5.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.5.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.5 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-05")
-lineagelist=c(namereference,unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)]))
-sublineagedata <- meta %>% filter(
-  lineage %in% lineagelist,
-  !is.na(sample.collection.date),
-  sample.collection.date >= startdate
-) %>% group_by(lineage,province) %>% summarise(count = n(), 
-            lastsampledate = max(sample.collection.date))
 
+plotba5 <- function(region,min){
+  lineagelist=chooselineagestoplot(
+    togrep="B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.",
+    region=region,
+    namereference=reference,
+    startdate=as.Date(startdate),
+    lastseenafter=date(VirusSeq_release)-days(100),
+    minnumberofsequence=min)
+  countgraph=0
+  for(p in allparams) {
+    if(p$region==region & p$mut %in% lineagelist){
+      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
+        plot.selection(plotparam=p)
+        countgraph=countgraph+1
+      }
+    }
+  }
+}
 ```
-
 
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-source("scripts/plot_selection_estimator_2type.R")
-multi.plot.selection(sublineagedata,"Canada",namereference,500)
-
-
-sublineagedata <- sublineagedata[order(sublineagedata$sample.collection.date, decreasing = TRUE), ]
-
-data_new1 <- Reduce(rbind,                                 # Top N highest values by group
-                    by(sublineagedata,
-                       sublineagedata["lineage"],
-                       head,
-                       n = 1))
-
-print(1)
-showlineages <- sublineagedata %>% group_by(lineage) %>% summarise(n = sum(n)) 
-print(showlineages)
+plotba5("Canada",50)
 
 ```
 
 ### BC
 #### British Columbia (n>20)
 ```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="British Columbia")
-multi.plot.selection(showlineages,"British Columbia",namereference,20)
+plotba5("British Columbia",20)
 ```
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-showlineages <- sublineagedata %>% filter(province=="Ontario")
-multi.plot.selection(showlineages,"Ontario",namereference,20)
+plotba5("Ontario",20)
 ```
 
 ### Quebec
 #### Quebec (n>20)
 ```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Quebec")
-multi.plot.selection(showlineages,"Quebec",namereference,20)
+plotba5("Quebec",20)
 ```
 
 ### Saskatchawan
 #### Saskatchawan (n>20)
 ```{r function and selection estimator BA.5 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Saskatchawan")
-multi.plot.selection(showlineages,"Saskatchawan",namereference,20)
+plotba5("Saskatchawan",20)
 ```
 
 ### Manitoba
 #### Manitoba (n>20)
 ```{r function and selection estimator BA.5 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="Manitoba",
-                                          lineage !="BF.10",
-#                                          lineage !="BA.5.2.1",
-                                          lineage !="BA.5.5",
-                                          lineage !="BA.5.1")
-multi.plot.selection(showlineages,"Manitoba",namereference,20)
+plotba5("Manitoba",20)
 ```
 
 
@@ -976,17 +936,7 @@ multi.plot.selection(showlineages,"Manitoba",namereference,20)
 ### Eastern Provinces
 #### Eastern provinces (n>20)
 ```{r function and selection estimator BA.5 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-showlineages <- sublineagedata %>% filter(province=="New Brunswick"|province=="Nova Scotia" | province=="Newfoundland and Labrador")
-showlineages <- showlineages %>% filter(lineage!="BA.5.2.21")
-showlineages <- showlineages %>% filter(lineage!="BA.5.2.20")
-showlineages <- showlineages %>% filter(lineage!="BA.5.2.2")
-showlineages <- showlineages %>% filter(lineage!="BA.5.2.9")
-showlineages <- showlineages %>% filter(lineage!="BE.1.1")
-#showlineages <- showlineages %>% filter(lineage!="BF.5")
-showlineages <- showlineages %>% filter(lineage!="BF.7")
-#showlineages <- showlineages %>% filter(lineage!="BF.28")
-multi.plot.selection(showlineages,"East provinces (NL+NS+NB)",namereference,20)
+plotba5("East provinces (NL+NS+NB)",20)
 ```
 
 
