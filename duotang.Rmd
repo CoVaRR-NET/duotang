@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(as.Date("2022-10-20"), "%B %d, %Y")`'
+date: '`r format(as.Date("2022-10-28"), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -21,7 +21,7 @@ output:
 ############################
 
 #Date of the VirusSeq release
-VirusSeq_release="2022-10-20"
+VirusSeq_release="2022-10-28"
 
 ############################
 ########### ^ ##############
@@ -778,9 +778,6 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 
 source("scripts/plot_growing_lineages.R")
 paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>49})]
-for(p in paramselected){
-  print(paste(p$mut[1],sum(p$toplot$n2)))
-}
 d = plot_growing_lineage(paramselected)
 
 
@@ -891,7 +888,7 @@ plotba4 <- function(region,min){
     minnumberofsequence=min)
   countgraph=0
   for(p in allparams) {
-    if(p$region==region & p$mut %in% lineagelist){
+    if(p$region==region & p$mut[1] %in% lineagelist){
       if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
         plot.selection(plotparam=p)
         countgraph=countgraph+1
@@ -906,9 +903,7 @@ plotba4 <- function(region,min){
 ### Canada
 #### Canada (n>50)
 ```{r function and selection estimator BA.4 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
 plotba4("Canada",50)
-
 
 ```
 
@@ -968,7 +963,7 @@ plotba5 <- function(region,min){
     minnumberofsequence=min)
   countgraph=0
   for(p in allparams) {
-    if(p$region==region & p$mut %in% lineagelist){
+    if(p$region==region & p$mut[1] %in% lineagelist){
       if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
         plot.selection(plotparam=p)
         countgraph=countgraph+1
