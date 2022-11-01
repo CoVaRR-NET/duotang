@@ -35,7 +35,7 @@ get.province.list <- function(region){
   # filter metadata
   mydata <- meta %>% filter(
     lineage %in% c(unlist(reference), unlist(mutants)), 
-    province %in% get.province.list("Canada"),
+    province %in% get.province.list(region),
     !is.na(sample.collection.date),
     sample.collection.date >= startdate
   )
@@ -204,6 +204,10 @@ estimate.selection <- function(region, startdate, reference, mutants, startpar, 
 
 
 plot.selection <- function(plotparam, col=c('red', 'blue')) {
+  if(any(is.na((plot_param$fit)$sample))){
+    print("plot_param$sample have NA")
+    print(plot_param$mut)
+  }
   toplot=plotparam$toplot
   fit=plotparam$fit
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
@@ -236,10 +240,6 @@ plot.selection <- function(plotparam, col=c('red', 'blue')) {
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
        ylab=paste0("growth advantage (s% per day) relative to ",plotparam$reference[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
-  if(!is.null(toplot$n3)) {
-    points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
-           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
-  }
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {

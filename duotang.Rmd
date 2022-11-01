@@ -479,13 +479,17 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
 
 ```{r setting function for subtype plotter}
+source("scripts/subtype_plotter.R")
 sublineages_BA1 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.1$|B\\.1\\.1\\.529\\.1\\.", meta$rawlineage)]) # "BA.1"
 sublineages_BA2 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.", meta$rawlineage)])  # "BA.2" 
-#nameBA3 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.3$|B\\.1\\.1\\.529\\.3\\.", meta$rawlineage)])  # "BA.3" 
 sublineages_BA4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)])  # "BA.4" 
+sublineages_BA51 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5\\.1$|B\\.1\\.1\\.529\\.5\\.1\\.", meta$rawlineage)])  # "BA.5.1" 
+sublineages_BA52 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5\\.2$|B\\.1\\.1\\.529\\.5\\.2\\.", meta$rawlineage)])  # "BA.5.2" 
 sublineages_BA5 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)])  # "BA.5" 
+restofBA5=sublineages_BA5[!sublineages_BA5 %in% c(sublineages_BA51,sublineages_BA52)]
+rest <- unique(meta$lineage)
+rest=rest[!rest %in% c(sublineages_BA4,sublineages_BA2,sublineages_BA1,sublineages_BA5)]
 
-source("scripts/subtype_plotter.R")
 ```
 
 
@@ -494,6 +498,7 @@ source("scripts/subtype_plotter.R")
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA1))
 rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA1),scale=T)
+
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -515,13 +520,41 @@ rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA4),scale=T)
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 
-### BA.5
-#### Sublineage BA.5
-```{r subtype plotter BA.5, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA5))
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA5),scale=T)
+### BA.5.1
+#### Sublineage BA.5.1
+```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA51))
+rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA51),scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### BA.5.2
+#### Sublineage BA.5.2
+```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA52))
+rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA52),scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### others BA.5
+#### Sublineage BA.5 without BA.1 and BA.2
+```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+rarelineages_names=plot.subvariants(sublineage=c(restofBA5))
+rarelineages_names=plot.subvariants(sublineage=c(restofBA5),scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### Recombinant and divergent lineages
+#### Recombinant and divergent lineages
+```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+rarelineages_names=plot.subvariants(sublineage=c(rest),mindate=as.Date(VirusSeq_release)-days(200))
+rarelineages_names=plot.subvariants(sublineage=c(rest),mindate=as.Date(VirusSeq_release)-days(200),scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
 
 ## Selection on Omicron {.tabset}  
 
@@ -535,14 +568,16 @@ SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day ov
 <!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
 
 **Caveat:**
-Selection coefficients are not estimated for Alberta, which is currently taking a variant-specific sequencing strategy, based on an initial PCR screen, which would skew estimates of selection.
-Canada-wide estimates, thus, do not include this province.
 Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
 
 ```{r setting function for selection estimator}
 startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
-  
+
+
+
+sublineages_BA4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)])  # "BA.4" 
+sublineages_BA5 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.54\\.", meta$rawlineage)])  # "BA.5" 
 #color for each lineage
 col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
 
@@ -561,10 +596,9 @@ source("scripts/plot_selection_estimator.R")
 
 
 ### Canada
-#### Canada without Alberta
+#### Canada
 
-```{r selection estimator Canada, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-source("scripts/plot_selection_estimator.R")
+```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
 maxdate=plot.selection.estimate(region="Canada (no AB)",
                                       startdate=startdate, startpar=startpar3,
                                       reference=c(sublineages_BA2),
@@ -590,13 +624,14 @@ local_maxdate=plot.selection.estimate(region="British Columbia",
 ### SK
 #### Saskatchewan
 
-```{r selection estimator SK, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="Saskatchewan",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+print("Not enough data available")
+#local_maxdate=plot.selection.estimate(region="Saskatchewan",
+#                                      startdate=startdate, startpar=startpar3,
+#                                      reference=c(sublineages_BA2),
+#                                      mutants=list(sublineages_BA4,sublineages_BA5),
+#                                      names=list("BA.4*","BA.5*"),
+#                                      maxdate=maxdate, col=col)
 ```
 
 
@@ -651,15 +686,27 @@ print("Not enough data available")
 #                                      maxdate=maxdate, col=col)
 ```
 
-
+  
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
+source("scripts/scanlineages.R")
 reference <- list("BA.5.2")
 startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-05") 
+fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>startdate]))
 
+allparamnonstricto=list()
+for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
+  lineagelist=getsublineagesfromnode(l)
+  if(length(intersect(reference,lineagelist))==0){
+    if(! l %in% list("B.1.1.529.2.10*")){
+      p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+      allparamnonstricto=append(allparamnonstricto,list(p))
+    }
+  }
+}
 
-allparams=c()
+allparamstricto=c()
 for( region in c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada")){
   lineagelist=chooselineagestoplot(togrep=".",
                   region=region,
@@ -667,18 +714,27 @@ for( region in c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec",
                   startdate=as.Date(startdate),
                   lastseenafter=date(VirusSeq_release)-days(100),
                   minnumberofsequence=10)
-  if(region=="Canada"){
-    canadabug=c("BA.2.13","BA.2.18","BA.1","BA.2.3.20","BA.2.40.1","BA.2.7","BA.5.1.4")
-    lineagelist=lineagelist[! lineagelist %in% canadabug]
+  #if(region=="Ontario"){
+  #  lineagelist=lineagelist[lineagelist!="BA.2.18"]
+  #  lineagelist=lineagelist[lineagelist!="BA.2.75"]
+  #}
+  for (mut in lineagelist){
+    #print(paste(mut,region))
+    plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2)
+    if(any(is.na((plot_param$fit)$sample))){
+      print("plot_param$sample have NA")
+      print(plot_param$mut)
+    }else{
+      allparamstricto=append(allparamstricto,list(plot_param))
+    }
   }
-  if(region=="Ontario"){
-    lineagelist=lineagelist[lineagelist!="BA.2.18"]
-  }
-  allparams=c(allparams,multi.plot.selection(lineagelist,reference,region,makeplot=FALSE))
 }
 
-allparams=allparams[order(sapply(allparams, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-  
+  #sort by decreasing selection estimate
+allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
+allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
+
+
 ```
 
 ## Most growing lineages in Canada {.tabset}
@@ -688,8 +744,29 @@ Here we show the selection estimates and their 95% confidence intervals for pang
 
 
 
-### Plot
-#### Plot
+### Plot (stricto)
+#### Plot single lineages
+      
+
+Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+
+```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=7}
+
+source("scripts/plot_growing_lineages.R")
+paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>49})]
+d = plot_growing_lineage(paramselected)
+
+
+```
+
+
+
+
+### Plot (non stricto)
+#### Plot monophyletic groups of lineages
       
 
 Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
@@ -698,8 +775,12 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 
 
 ```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
+
 source("scripts/plot_growing_lineages.R")
-paramselected=allparams[sapply(allparams,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0})]
+paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>49})]
+for(p in paramselected){
+  print(paste(p$mut[1],sum(p$toplot$n2)))
+}
 d = plot_growing_lineage(paramselected)
 
 
@@ -712,11 +793,13 @@ d = plot_growing_lineage(paramselected)
 
 ```{r overview of the selection estimator table}
 
+allparams=c(allparamnonstricto,allparamstricto)
 paramselected=allparams[sapply(allparams,function(x){(x$fit)$fit[["s1"]]>0})]
 d = plot_growing_lineage(paramselected,makeplot=FALSE)
 DT::datatable(d)
 
 ```
+
 
 ## BA.2 sublineage selection {.tabset}
 
@@ -733,7 +816,7 @@ plotba2 <- function(region,min){
     minnumberofsequence=min)
   countgraph=0
   for(p in allparams) {
-    if(p$region==region & p$mut %in% lineagelist){
+    if((p$region==region) & (p$mut[1] %in% lineagelist)){
       if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
         plot.selection(plotparam=p)
         countgraph=countgraph+1
@@ -893,6 +976,7 @@ plotba5 <- function(region,min){
     }
   }
 }
+
 ```
 
 ### Canada
