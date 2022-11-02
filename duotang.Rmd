@@ -538,8 +538,8 @@ rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA52),scale=T)
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 
-### others BA.5
-#### Sublineage BA.5 without BA.1 and BA.2
+### Other BA.5
+#### Sublineage BA.5 without BA.5.1 and BA.5.2
 ```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 rarelineages_names=plot.subvariants(sublineage=c(restofBA5))
 rarelineages_names=plot.subvariants(sublineage=c(restofBA5),scale=T)
@@ -737,7 +737,7 @@ allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(
 
 ```
 
-## Most growing lineages in Canada {.tabset}
+## Fastest growing lineages in Canada {.tabset}
 
 
 Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
@@ -768,8 +768,9 @@ d = plot_growing_lineage(paramselected)
 ### Plot (non stricto)
 #### Plot monophyletic groups of lineages
       
+This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
 
-Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
 
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
