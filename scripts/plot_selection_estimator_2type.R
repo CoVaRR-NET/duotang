@@ -204,10 +204,6 @@ estimate.selection <- function(region, startdate, reference, mutants, startpar, 
 
 
 plot.selection <- function(plotparam, col=c('red', 'blue')) {
-  if(any(is.na((plot_param$fit)$sample))){
-    print("plot_param$sample have NA")
-    print(plot_param$mut)
-  }
   toplot=plotparam$toplot
   fit=plotparam$fit
   # Once we get the set of {p,s} values, we can run them through the s-shaped 

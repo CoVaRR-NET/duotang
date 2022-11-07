@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(as.Date("2022-10-28"), "%B %d, %Y")`'
+date: '`r format(as.Date("2022-11-03"), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -21,7 +21,7 @@ output:
 ############################
 
 #Date of the VirusSeq release
-VirusSeq_release="2022-10-28"
+VirusSeq_release="2022-11-03"
 
 ############################
 ########### ^ ##############
@@ -246,17 +246,21 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
 
-**Variants of current interest**, due to their potential growth advantage, or mutations of potential functional significance:
+**Variants of current interest**, due to their potential growth advantage, or mutations of potential functional significance (with sublineages of many of these also of interest, such as all BQ*). See also the plot below of "Recently designated lineages showing most growth":
 
-* BA.2.3.20
-* BA.2.75.2
+* BA.5.2.24
+* BA.5.2.25
 * BA.4.6
+* BE.1.2.1
+* BF.7
 * BQ.1
 * BQ.1.1
 * CA.1
+* CK.2.1.1
+* CZ.1 and other BQ.1.1 descendants
 * XBB
-* BF.7
-* and other variants with immune evasion mutations (e.g: S:R346T)
+* XBB.1
+* and other variants with immune evasion mutations (e.g: S:R346T), particularly those variants with sets of 7 or more of such mutations of interest.
 
 
 ## Data notes by province {.tabset}
@@ -695,11 +699,21 @@ startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-05") 
 fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>startdate]))
 
+
+is_not_knitr = function() {
+        is.null(knitr::opts_knit$get("out.format"))
+}
+is_not_knitr()
+
+
 allparamnonstricto=list()
-for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
+for( l in fullpangotree[grepl("\\*",fullpangotree)]){
   lineagelist=getsublineagesfromnode(l)
   if(length(intersect(reference,lineagelist))==0){
-    if(! l %in% list("B.1.1.529.2.10*")){
+  if(is_not_knitr()){
+   print(paste(mut,"non stricto Canada")) 
+  }
+    if(! l %in% list("B.1.1.529.2.38.3*")){
       p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
       allparamnonstricto=append(allparamnonstricto,list(p))
     }
@@ -707,28 +721,36 @@ for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
 }
 
 allparamstricto=c()
-for( region in c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada")){
+for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
   lineagelist=chooselineagestoplot(togrep=".",
                   region=region,
                   namereference=reference,
                   startdate=as.Date(startdate),
                   lastseenafter=date(VirusSeq_release)-days(100),
                   minnumberofsequence=10)
-  #if(region=="Ontario"){
-  #  lineagelist=lineagelist[lineagelist!="BA.2.18"]
-  #  lineagelist=lineagelist[lineagelist!="BA.2.75"]
-  #}
+  if(region=="Quebec"){
+    lineagelist=lineagelist[lineagelist!="BA.1.1"]
+  }
+  if(region=="Canada"){
+    lineagelist=lineagelist[lineagelist!="BA.2.10.1"]
+    lineagelist=lineagelist[lineagelist!="BF.3"]
+  }
   for (mut in lineagelist){
-    #print(paste(mut,region))
+    if(is_not_knitr()){
+     print(paste(mut,region)) 
+    }
     plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2)
     if(any(is.na((plot_param$fit)$sample))){
-      print("plot_param$sample have NA")
-      print(plot_param$mut)
+      if(is_not_knitr()){
+        print("plot_param$sample have NA")
+        print(plot_param$mut)
+      }
     }else{
       allparamstricto=append(allparamstricto,list(plot_param))
     }
   }
 }
+
 
   #sort by decreasing selection estimate
 allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
@@ -753,10 +775,10 @@ Background shading illustrates sub-variants that we need to keep an eye on in bl
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
 
-```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=7}
+```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=12}
 
 source("scripts/plot_growing_lineages.R")
-paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>49})]
+paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
 d = plot_growing_lineage(paramselected)
 
 
@@ -777,8 +799,7 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 
 ```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
 
-source("scripts/plot_growing_lineages.R")
-paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>49})]
+paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
 d = plot_growing_lineage(paramselected)
 
 
@@ -816,6 +837,7 @@ plotba2 <- function(region,min){
   for(p in allparams) {
     if((p$region==region) & (p$mut[1] %in% lineagelist)){
       if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
+        print(p$mut)
         plot.selection(plotparam=p)
         countgraph=countgraph+1
       }

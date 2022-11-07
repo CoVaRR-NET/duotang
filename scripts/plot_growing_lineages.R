@@ -26,13 +26,13 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
   d$size=as.numeric(d$size)
   
   if(makeplot){
-    bins=c(0,50,100,200,500,10000000)
+    bins=c(round(min(d$size)-0.5),20,40,80,100,200,500,10000000)
     labelsstart <- head(gsub("(?<!^)(\\d{3})$", ",\\1", bins+1, perl=T),-1)
     labelsend <- tail(gsub("(?<!^)(\\d{3})$", ",\\1", bins, perl=T),-1)
     rangelabels <- paste(labelsstart, labelsend, sep="-")
     rangelabels[length(rangelabels)]="501 and more"
     d$sequence_count=as.factor(cut(d$size,bins,rangelabels,left = FALSE))
-    couleur=rev(heat.colors(length(levels(d$sequence_count)), alpha=1))
+    couleur=brewer.pal(n = length(levels(d$sequence_count))+1, name = "BuGn")[-1]
     names(couleur)=levels(d$sequence_count)
     colScale=scale_colour_manual(name="sequence_count",values=couleur)
     d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
