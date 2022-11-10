@@ -10,7 +10,7 @@ require(lubridate)
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
                              scaled=FALSE, col=NA, mindate=as.Date('2021-11-02')) {
 
-  varmeta1 <- meta %>% filter(lineage %in% sublineage)
+  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample.collection.date>mindate)
   #length(varmeta1$lineage)
   
   varmeta1$pango.group <- varmeta1$lineage
