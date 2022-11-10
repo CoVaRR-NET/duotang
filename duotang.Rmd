@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(as.Date("2022-11-03"), "%B %d, %Y")`'
+date: '`r format(as.Date("2022-11-07"), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -21,7 +21,7 @@ output:
 ############################
 
 #Date of the VirusSeq release
-VirusSeq_release="2022-11-03"
+VirusSeq_release="2022-11-07"
 
 ############################
 ########### ^ ##############
@@ -67,6 +67,12 @@ names(pal) <- VOCVOI$name
 pal["other"] <- 'grey'  # named character vector
 
 maxnumberofgraphperselectionplot=6
+
+printest <-function(x){
+  if(is.null(knitr::opts_knit$get("out.format"))){
+    print(x)
+  }
+}
 ```
 
 
@@ -134,7 +140,8 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 Only representations of aggregate data will be posted here.
 
 **Important caveats and disclaimers:**  
-These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing repositories.
+These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing repositfa
+tories.
 Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
 For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
@@ -484,15 +491,7 @@ Here we take a closer look, sub-dividing the three major Omicron sub-lineages cu
 
 ```{r setting function for subtype plotter}
 source("scripts/subtype_plotter.R")
-sublineages_BA1 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.1$|B\\.1\\.1\\.529\\.1\\.", meta$rawlineage)]) # "BA.1"
-sublineages_BA2 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.", meta$rawlineage)])  # "BA.2" 
-sublineages_BA4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)])  # "BA.4" 
-sublineages_BA51 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5\\.1$|B\\.1\\.1\\.529\\.5\\.1\\.", meta$rawlineage)])  # "BA.5.1" 
-sublineages_BA52 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5\\.2$|B\\.1\\.1\\.529\\.5\\.2\\.", meta$rawlineage)])  # "BA.5.2" 
-sublineages_BA5 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.", meta$rawlineage)])  # "BA.5" 
-restofBA5=sublineages_BA5[!sublineages_BA5 %in% c(sublineages_BA51,sublineages_BA52)]
-rest <- unique(meta$lineage)
-rest=rest[!rest %in% c(sublineages_BA4,sublineages_BA2,sublineages_BA1,sublineages_BA5)]
+source("scripts/scanlineages.R")
 
 ```
 
@@ -500,8 +499,9 @@ rest=rest[!rest %in% c(sublineages_BA4,sublineages_BA2,sublineages_BA1,sublineag
 ### BA.1
 #### Sublineage BA.1
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA1))
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA1),scale=T)
+set=getsublineagesfromnode("BA.1*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
@@ -510,16 +510,18 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.2
 #### Sublineage BA.2
 ```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA2))
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA2),scale=T)
+set=getsublineagesfromnode("BA.2*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 ### BA.4
 #### Sublineage BA.4
 ```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA4))
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA4),scale=T)
+set=getsublineagesfromnode("BA.4*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -527,8 +529,9 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5.1
 #### Sublineage BA.5.1
 ```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA51))
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA51),scale=T)
+set=getsublineagesfromnode("BA.5.1*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -536,8 +539,9 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5.2
 #### Sublineage BA.5.2
 ```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA52))
-rarelineages_names=plot.subvariants(sublineage=c(sublineages_BA52),scale=T)
+set=getsublineagesfromnode("BA.5.2*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -545,8 +549,10 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### Other BA.5
 #### Sublineage BA.5 without BA.5.1 and BA.5.2
 ```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(restofBA5))
-rarelineages_names=plot.subvariants(sublineage=c(restofBA5),scale=T)
+set=getsublineagesfromnode("BA.5*")
+set=set[!set %in% append(getsublineagesfromnode("BA.5.1*"),getsublineagesfromnode("BA.5.2*"))]
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -554,8 +560,10 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### Recombinant and divergent lineages
 #### Recombinant and divergent lineages
 ```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-rarelineages_names=plot.subvariants(sublineage=c(rest),mindate=as.Date(VirusSeq_release)-days(200))
-rarelineages_names=plot.subvariants(sublineage=c(rest),mindate=as.Date(VirusSeq_release)-days(200),scale=T)
+set=getsublineagesfromnode("*")
+set=set[!set %in% c(getsublineagesfromnode("BA.1*"),getsublineagesfromnode("BA.2*"),getsublineagesfromnode("BA.4*"),getsublineagesfromnode("BA.5*"))]
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200))
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200),scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -579,9 +587,9 @@ startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
 
 
-
-sublineages_BA4 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.", meta$rawlineage)])  # "BA.4" 
-sublineages_BA5 <- unique(meta$lineage[grepl("B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.54\\.", meta$rawlineage)])  # "BA.5" 
+sublineages_BA2 <- getsublineagesfromnode("BA.2*")
+sublineages_BA4 <- getsublineagesfromnode("BA.4*")
+sublineages_BA5 <- getsublineagesfromnode("BA.5*")
 #color for each lineage
 col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
 
@@ -609,7 +617,7 @@ maxdate=plot.selection.estimate(region="Canada (no AB)",
                                       mutants=list(sublineages_BA4,sublineages_BA5),
                                       names=list("BA.4*","BA.5*"),
                                       maxdate=NA, col=col)
-#plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar2,
+  #plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar2,
 #                         reference=c(name1, name2), mutants=list(name3), col=col)
 ```
 
@@ -693,68 +701,61 @@ print("Not enough data available")
   
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
-source("scripts/scanlineages.R")
+#reference <- getsublineagesfromnode("B.1.1.529.5.2*")
 reference <- list("BA.5.2")
 startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-05") 
 fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>startdate]))
 
 
-is_not_knitr = function() {
-        is.null(knitr::opts_knit$get("out.format"))
-}
-is_not_knitr()
-
 
 allparamnonstricto=list()
 for( l in fullpangotree[grepl("\\*",fullpangotree)]){
   lineagelist=getsublineagesfromnode(l)
   if(length(intersect(reference,lineagelist))==0){
-  if(is_not_knitr()){
-   print(paste(mut,"non stricto Canada")) 
-  }
-    if(! l %in% list("B.1.1.529.2.38.3*")){
+   printest(paste(l,"non stricto Canada (",rawtoreallineage(l),")")) 
+    if(! l %in% list("B.1.1.529.2.75.3.4.1*","B.1.1.529.5.2.1.3*")){
       p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
       allparamnonstricto=append(allparamnonstricto,list(p))
     }
   }
 }
 
+chooselineagestoplot(togrep=".",
+                  region="Canada",
+                  namereference=reference,
+                  startdate=date(VirusSeq_release)-days(60),
+                  lastseenafter=date(VirusSeq_release)-days(30),
+                  minnumberofsequence=10)
+
 allparamstricto=c()
 for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
   lineagelist=chooselineagestoplot(togrep=".",
                   region=region,
                   namereference=reference,
-                  startdate=as.Date(startdate),
-                  lastseenafter=date(VirusSeq_release)-days(100),
+                  startdate=date(VirusSeq_release)-days(60),
+                  lastseenafter=date(VirusSeq_release)-days(30),
                   minnumberofsequence=10)
-  if(region=="Quebec"){
-    lineagelist=lineagelist[lineagelist!="BA.1.1"]
-  }
   if(region=="Canada"){
     lineagelist=lineagelist[lineagelist!="BA.2.10.1"]
-    lineagelist=lineagelist[lineagelist!="BF.3"]
+  #  lineagelist=lineagelist[lineagelist!="BF.3"]
   }
   for (mut in lineagelist){
-    if(is_not_knitr()){
-     print(paste(mut,region)) 
-    }
+    printest(paste(mut,region))
     plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2)
     if(any(is.na((plot_param$fit)$sample))){
-      if(is_not_knitr()){
-        print("plot_param$sample have NA")
-        print(plot_param$mut)
-      }
+      printest("plot_param$sample have NA")
+      printest(plot_param$mut)
     }else{
       allparamstricto=append(allparamstricto,list(plot_param))
     }
   }
 }
 
-
-  #sort by decreasing selection estimate
+#sort by decreasing selection estimate
 allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
 allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
+
 
 
 ```
@@ -799,10 +800,10 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 
 ```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
 
-paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
+allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
+paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>-1 & sum(x$toplot$n2)>10})]
 d = plot_growing_lineage(paramselected)
-
-
+  
 ```
 
 
@@ -837,14 +838,16 @@ plotba2 <- function(region,min){
   for(p in allparams) {
     if((p$region==region) & (p$mut[1] %in% lineagelist)){
       if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        print(p$mut)
+        printest(p$mut)
         plot.selection(plotparam=p)
         countgraph=countgraph+1
       }
     }
   }
+  if(countgraph==0){
+    print("Not enough data available")
+  }
 }
-
 ```
 
 
@@ -918,6 +921,9 @@ plotba4 <- function(region,min){
       }
     }
   }
+  if(countgraph==0){
+    print("Not enough data available")
+  }
 }
 
 ```
@@ -972,7 +978,7 @@ plotba4("East provinces (NL+NS+NB)",20)
 
 ## BA.5 sublineage selection {.tabset}
 
-Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of BA.5.2 by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among BA.5.2 (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.5 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 
@@ -992,6 +998,9 @@ plotba5 <- function(region,min){
         countgraph=countgraph+1
       }
     }
+  }
+  if(countgraph==0){
+    print("Not enough data available")
   }
 }
 

@@ -26,7 +26,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
   d$size=as.numeric(d$size)
   
   if(makeplot){
-    bins=c(round(min(d$size)-0.5),20,40,80,100,200,500,10000000)
+    bins=c(0,20,40,80,100,200,500,10000000)
     labelsstart <- head(gsub("(?<!^)(\\d{3})$", ",\\1", bins+1, perl=T),-1)
     labelsend <- tail(gsub("(?<!^)(\\d{3})$", ",\\1", bins, perl=T),-1)
     rangelabels <- paste(labelsstart, labelsend, sep="-")
