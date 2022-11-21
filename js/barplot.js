@@ -16,9 +16,9 @@ console = d3.window(div.node()).console;
 
 // create drop-down menu to select stacked plot offset
 const opts = [
-  {name: "basic", value: "d3.stackOffsetNone"},
+  {name: "basic", value: "d3.stackOffsetNone", selected: true},
   {name: "percent", value: "d3.stackOffsetExpand"},
-  {name: "silhouette", value: "d3.stackOffsetSilhouette", selected: true},
+  {name: "silhouette", value: "d3.stackOffsetSilhouette"},
   {name: "streamgraph", value: "d3.stackOffsetWiggle"}
 ];
 
