@@ -1008,6 +1008,7 @@ plotba5("Canada",50)
 ```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba5("British Columbia",20)
 ```
+
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
