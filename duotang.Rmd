@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(as.Date("2022-11-07"), "%B %d, %Y")`'
+date: '`r format(as.Date("2022-11-17"), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -21,7 +21,7 @@ output:
 ############################
 
 #Date of the VirusSeq release
-VirusSeq_release="2022-11-07"
+VirusSeq_release="2022-11-17"
 
 ############################
 ########### ^ ##############
@@ -710,36 +710,26 @@ fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>s
 
 
 allparamnonstricto=list()
-for( l in fullpangotree[grepl("\\*",fullpangotree)]){
+for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
   lineagelist=getsublineagesfromnode(l)
   if(length(intersect(reference,lineagelist))==0){
    printest(paste(l,"non stricto Canada (",rawtoreallineage(l),")")) 
-    if(! l %in% list("B.1.1.529.2.75.3.4.1*","B.1.1.529.5.2.1.3*")){
+    if(! l %in% list("B.1.1.529.2.10.1*","B.1.1.529.2.75.9*","B.1.1.529.2.75.3.4.1*")){
       p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
       allparamnonstricto=append(allparamnonstricto,list(p))
     }
   }
 }
 
-chooselineagestoplot(togrep=".",
-                  region="Canada",
-                  namereference=reference,
-                  startdate=date(VirusSeq_release)-days(60),
-                  lastseenafter=date(VirusSeq_release)-days(30),
-                  minnumberofsequence=10)
 
 allparamstricto=c()
 for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
   lineagelist=chooselineagestoplot(togrep=".",
                   region=region,
                   namereference=reference,
-                  startdate=date(VirusSeq_release)-days(60),
-                  lastseenafter=date(VirusSeq_release)-days(30),
+                  startdate=date(VirusSeq_release)-days(80),
+                  lastseenafter=date(VirusSeq_release)-days(40),
                   minnumberofsequence=10)
-  if(region=="Canada"){
-    lineagelist=lineagelist[lineagelist!="BA.2.10.1"]
-  #  lineagelist=lineagelist[lineagelist!="BF.3"]
-  }
   for (mut in lineagelist){
     printest(paste(mut,region))
     plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2)
@@ -751,7 +741,7 @@ for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Queb
     }
   }
 }
-
+plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
 #sort by decreasing selection estimate
 allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
 allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
@@ -1018,6 +1008,7 @@ plotba5("Canada",50)
 ```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba5("British Columbia",20)
 ```
+
 ### Ontario
 #### Ontario (n>20)
 ```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
