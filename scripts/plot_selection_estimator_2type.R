@@ -24,7 +24,6 @@ get.province.list <- function(region){
     provlist <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
     provlist <- unique(meta$province)
-    #provlist <- provlist[provlist != 'Alberta']
   } else {
     provlist <- region
   }
