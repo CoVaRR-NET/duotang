@@ -22,7 +22,7 @@ output:
 
 
 #Date of the VirusSeq release
-VirusSeq_release="2022-11-17"
+VirusSeq_release="2022-11-21"
 
 pangoversion="4.1.3 (Viral AI)"
 
@@ -211,11 +211,11 @@ fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>s
 
 
 allparamnonstricto=list()
-for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
+for( l in fullpangotree[grepl("\\*",fullpangotree)]){
   lineagelist=getsublineagesfromnode(l)
   if(length(intersect(reference,lineagelist))==0){
    printest(paste(l,"non stricto Canada (",rawtoreallineage(l),")")) 
-    if(! l %in% list("B.1.1.529.2.10.1*","B.1.1.529.2.75.9*","B.1.1.529.2.75.3.4.1*")){
+    if(! l %in% list("...")){
       p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
       allparamnonstricto=append(allparamnonstricto,list(p))
     }
@@ -242,7 +242,8 @@ for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba"
     }
   }
 }
-  plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
+
+plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
 #sort by decreasing selection estimate
 allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
 allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
