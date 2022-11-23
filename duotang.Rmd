@@ -224,7 +224,7 @@ for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
 
 
 allparamstricto=c()
-for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
+for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
   lineagelist=chooselineagestoplot(togrep=".",
                   region=region,
                   namereference=reference,
@@ -242,7 +242,7 @@ for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Queb
     }
   }
 }
-plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
+  plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
 #sort by decreasing selection estimate
 allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
 allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
@@ -475,6 +475,20 @@ local_maxdate=plot.selection.estimate(region="British Columbia",
                                       maxdate=maxdate, col=col)
 ```
 
+### AL
+#### Alberta
+
+```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+#print("Not enough data available")
+local_maxdate=plot.selection.estimate(region="Alberta",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
+```
+
+
 ### SK
 #### Saskatchewan
 
@@ -541,16 +555,17 @@ print("Not enough data available")
 ```
 
 
-### {-}
+## {-}
+
 ### BA.2 sublineage selection {.tabset}
 
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.2}
 
-plotba2 <- function(region,min){
+plotsubvariant <- function(region,min,togrep){
   lineagelist=chooselineagestoplot(
-    togrep="B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.|XBB",
+    togrep=togrep,
     region=region,
     namereference=reference,
     startdate=as.Date(startdate),
@@ -571,48 +586,18 @@ plotba2 <- function(region,min){
   }
 }
 
-plotba4 <- function(region,min){
-  lineagelist=chooselineagestoplot(
-    togrep="B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.",
-    region=region,
-    namereference=reference,
-    startdate=as.Date(startdate),
-    lastseenafter=date(VirusSeq_release)-days(100),
-    minnumberofsequence=min)
-  countgraph=0
-  for(p in allparams) {
-    if(p$region==region & p$mut[1] %in% lineagelist){
-      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        plot.selection(plotparam=p)
-        countgraph=countgraph+1
-      }
-    }
-  }
-  if(countgraph==0){
-    print("Not enough data available")
-  }
+plotba2 <- function(region,min){
+  plotsubvariant(region,min,"B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.|XBB")
 }
 
+
+plotba4 <- function(region,min){
+  plotsubvariant(region,min,"B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.")
+}
+
+
 plotba5 <- function(region,min){
-  lineagelist=chooselineagestoplot(
-    togrep="B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.",
-    region=region,
-    namereference=reference,
-    startdate=as.Date(startdate),
-    lastseenafter=date(VirusSeq_release)-days(100),
-    minnumberofsequence=min)
-  countgraph=0
-  for(p in allparams) {
-    if(p$region==region & p$mut[1] %in% lineagelist){
-      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        plot.selection(plotparam=p)
-        countgraph=countgraph+1
-      }
-    }
-  }
-  if(countgraph==0){
-    print("Not enough data available")
-  }
+  plotsubvariant(region,min,"B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.")
 }
 
 ```
@@ -631,34 +616,40 @@ plotba2("Canada",50)
 plotba2("British Columbia",20)
 ```
 
-#### Ontario
+
+#### AL
+##### Alberta (n>20)
+```{r function and selection estimator BA.2 AL, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Alberta",20)
+```
+
+
+#### SK
+##### Saskatchawan (n>20)
+```{r function and selection estimator BA.2 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Saskatchawan",20)
+```
+
+#### MB
+##### Manitoba (n>20)
+```{r function and selection estimator BA.2 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Manitoba",20)
+```
+
+#### ON
 ##### Ontario (n>20)
 ```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba2("Ontario",20)
 
 ```
 
-#### Quebec
+#### QC
 ##### Quebec (n>20)
 ```{r function and selection estimator BA.2 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba2("Quebec",20)
 ```
 
-#### Saskatchawan
-##### Saskatchawan (n>20)
-```{r function and selection estimator BA.2 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Saskatchawan",20)
-```
-
-#### Manitoba
-##### Manitoba (n>20)
-```{r function and selection estimator BA.2 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Manitoba",20)
-```
-
-
-
-#### Eastern Provinces
+#### East
 ##### Eastern provinces (n>20)
 ```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba2("East provinces (NL+NS+NB)",20)
@@ -684,31 +675,39 @@ plotba4("British Columbia",20)
 
 ```
 
-#### Ontario
-##### Ontario (n>20)
-```{r function and selection estimator BA.4 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Ontario",20)
+
+#### AL
+##### Alberta (n>20)
+```{r function and selection estimator BA.4 AL, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Alberta",20)
 ```
 
-#### Quebec
-##### Quebec (n>20)
-```{r function and selection estimator BA.4 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Quebec",20)
-```
 
-#### Saskatchawan
+#### SK
 ##### Saskatchawan (n>20)
 ```{r function and selection estimator BA.4 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba4("Saskatchawan",20)
 ```
 
-#### Manitoba
+#### MB
 ##### Manitoba (n>20)
 ```{r function and selection estimator BA.4 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba4("Manitoba",20)
 ```
 
-#### Eastern Provinces
+#### ON
+##### Ontario (n>20)
+```{r function and selection estimator BA.4 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Ontario",20)
+```
+
+#### QC
+##### Quebec (n>20)
+```{r function and selection estimator BA.4 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Quebec",20)
+```
+
+#### East
 ##### Eastern provinces (n>20)
 ```{r function and selection estimator BA.4 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba4("East provinces (NL+NS+NB)",20)
@@ -732,33 +731,40 @@ plotba5("Canada",50)
 plotba5("British Columbia",20)
 ```
 
-#### Ontario
-##### Ontario (n>20)
-```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Ontario",20)
+
+#### AL
+##### Alberta (n>20)
+```{r function and selection estimator BA.5 AL, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Alberta",20)
 ```
 
-#### Quebec
-##### Quebec (n>20)
-```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Quebec",20)
-```
 
-#### Saskatchawan
+#### SK
 ##### Saskatchawan (n>20)
 ```{r function and selection estimator BA.5 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba5("Saskatchawan",20)
 ```
 
-#### Manitoba
+#### MB
 ##### Manitoba (n>20)
 ```{r function and selection estimator BA.5 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba5("Manitoba",20)
 ```
 
 
+#### ON
+##### Ontario (n>20)
+```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Ontario",20)
+```
 
-#### Eastern Provinces
+#### QC
+##### Quebec (n>20)
+```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Quebec",20)
+```
+
+#### East
 ##### Eastern provinces (n>20)
 ```{r function and selection estimator BA.5 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 plotba5("East provinces (NL+NS+NB)",20)
