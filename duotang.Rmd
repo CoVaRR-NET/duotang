@@ -250,8 +250,6 @@ allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(
 
 allparams=c(allparamnonstricto,allparamstricto)
 
-getsublineagesfromnode("BR*")
-meta %>% filter(lineage == "BR.1")
 ```
 
 
