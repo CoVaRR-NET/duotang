@@ -62,6 +62,12 @@ printest <-function(x){
 
 
 
+```{js}
+document.addEventListener("DOMContentLoaded", function() {
+  $(".leave-tabset").removeClass("tab-pane tabbed-pane");
+}, false);
+```
+
 ```{r setup, include=FALSE, warning=FALSE}
 ############################
 #### LIBRARIES LOADING #####
@@ -211,11 +217,11 @@ fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>s
 
 
 allparamnonstricto=list()
-for( l in fullpangotree[grepl("\\*",fullpangotree)]){
+for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
   lineagelist=getsublineagesfromnode(l)
   if(length(intersect(reference,lineagelist))==0){
    printest(paste(l,"non stricto Canada (",rawtoreallineage(l),")")) 
-    if(! l %in% list("...")){
+    if(! l %in% list("B.1.1.529.2.75.3.4.1*","B.1.1.529.2.10.1*","B.1.1.529.2.75.9*")){
       p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
       allparamnonstricto=append(allparamnonstricto,list(p))
     }
@@ -251,8 +257,8 @@ allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(
 
 allparams=c(allparamnonstricto,allparamstricto)
 
-
-
+getsublineagesfromnode("BR*")
+meta %>% filter(lineage == "BR.1")
 ```
 
 
@@ -263,7 +269,7 @@ allparams=c(allparamnonstricto,allparamstricto)
 ....
 
 
-## Major Omicron sublineages in Canada {.tabset} 
+## Omicron sublineages in Canada {.tabset} 
 
 Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
 
@@ -556,7 +562,7 @@ print("Not enough data available")
 ```
 
 
-## {-}
+## {- .leave-tabset}
 
 ### BA.2 sublineage selection {.tabset}
 
