@@ -61,13 +61,6 @@ printest <-function(x){
 ```
 
 
-
-```{js}
-document.addEventListener("DOMContentLoaded", function() {
-  $(".leave-tabset").removeClass("tab-pane tabbed-pane");
-}, false);
-```
-
 ```{r setup, include=FALSE, warning=FALSE}
 ############################
 #### LIBRARIES LOADING #####
@@ -460,6 +453,7 @@ source("scripts/plot_selection_estimator.R")
 #### Canada
 
 ```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+source("scripts/plot_selection_estimator.R")
 maxdate=plot.selection.estimate(region="Canada (no AB)",
                                       startdate=startdate, startpar=startpar3,
                                       reference=c(sublineages_BA2),
@@ -562,7 +556,7 @@ print("Not enough data available")
 ```
 
 
-## {- .leave-tabset}
+## {.unlisted .unnumbered}
 
 ### BA.2 sublineage selection {.tabset}
 
@@ -582,7 +576,7 @@ plotsubvariant <- function(region,min,togrep){
   for(p in allparams) {
     if((p$region==region) & (p$mut[1] %in% lineagelist)){
       if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        printest(p$mut)
+        printest(p$mut[[1]])
         plot.selection(plotparam=p)
         countgraph=countgraph+1
       }
@@ -613,8 +607,8 @@ plotba5 <- function(region,min){
 #### Canada
 ##### Canada (n>50)
 ```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+source("scripts/plot_selection_estimator_2type.R")
 plotba2("Canada",50)
-
 ```
 
 #### BC

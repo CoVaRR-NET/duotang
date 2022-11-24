@@ -234,7 +234,7 @@ plot.selection <- function(plotparam, col=c('red', 'blue')) {
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$reference[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
+       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$ref[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
