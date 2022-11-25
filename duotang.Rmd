@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(as.Date("2022-11-17"), "%B %d, %Y")`'
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -20,24 +20,9 @@ output:
 ##### GLOBAL VARIABLES #####
 ############################
 
-#Date of the VirusSeq release
-VirusSeq_release="2022-11-17"
 
-############################
-########### ^ ##############
-########## /|\ #############
-######### / | \ ############
-########    |    ###########
-########### | ##############
-########### | ##############
-############################
-####### DO NOT FORGET ######
-####### TO UPDATE ##########
-####### THE DATE  ##########
-####### IN THE #############
-####### TITLE ##############
-############################
-############################
+#Date of the VirusSeq release
+VirusSeq_release="2022-11-24"
 
 pangoversion="4.1.3 (Viral AI)"
 
@@ -66,15 +51,12 @@ pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey'  # named character vector
 
-maxnumberofgraphperselectionplot=6
-
 printest <-function(x){
   if(is.null(knitr::opts_knit$get("out.format"))){
     print(x)
   }
 }
 ```
-
 
 
 ```{r setup, include=FALSE, warning=FALSE}
@@ -208,10 +190,556 @@ for(row in 1:nrow(epidataCANall)) {
 }
 epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 
+```
+
+```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+source("scripts/plot_selection_estimator_2type.R")
+source("scripts/scanlineages.R")
+reference <- list("BA.5.2.1")
+startpar2 <- list(p=0.5, s=0.05)
+startdate<-as.Date("2022-05-05")
+fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-08-31") ]))
+
+allparams=list()
+for( l in fullpangotree){
+  lineagelist=getsublineagesfromnode(l)
+  for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
+    if(length(intersect(reference,lineagelist))==0){
+      p=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+      allparams=append(allparams,list(p))
+    }
+  }
+}
+allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
+
 
 ```
 
 # SARS-CoV-2 in Canada
+
+## Current Situation
+
+....
+
+
+## Omicron sublineages in Canada {.tabset} 
+
+Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
+
+### BA.1
+#### Sublineage BA.1
+```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+source("scripts/subtype_plotter.R")
+set=getsublineagesfromnode("BA.1*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+printest(rarelineages_names)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### BA.2
+#### Sublineage BA.2
+```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getsublineagesfromnode("BA.2*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+### BA.4
+#### Sublineage BA.4
+```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getsublineagesfromnode("BA.4*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### BA.5.1
+#### Sublineage BA.5.1
+```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getsublineagesfromnode("BA.5.1*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### BA.5.2
+#### Sublineage BA.5.2
+```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getsublineagesfromnode("BA.5.2*")
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### Other BA.5
+#### Sublineage BA.5 without BA.5.1 and BA.5.2
+```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getsublineagesfromnode("BA.5*")
+set=set[!set %in% append(getsublineagesfromnode("BA.5.1*"),getsublineagesfromnode("BA.5.2*"))]
+rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### Recombinant and divergent lineages
+#### Recombinant and divergent lineages
+```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getsublineagesfromnode("*")
+set=set[!set %in% c(getsublineagesfromnode("BA.1*"),getsublineagesfromnode("BA.2*"),getsublineagesfromnode("BA.4*"),getsublineagesfromnode("BA.5*"))]
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200))
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200),scale=T)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+
+## Fastest growing lineages in Canada {.tabset}
+
+
+Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+
+
+
+### Plot (stricto)
+#### Plot single lineages
+      
+
+Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+
+```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=12}
+
+source("scripts/plot_growing_lineages.R")
+#paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
+
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  p$region=="Canada"&
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10&
+  substr(x, nchar(x), nchar(x))!="*"
+  }else{FALSE}})]
+  
+d = plot_growing_lineage(paramselected)
+
+```
+
+
+
+
+### Plot (non stricto)
+#### Plot monophyletic groups of lineages
+      
+This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
+
+Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+
+```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
+
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  p$region=="Canada"&
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10&
+  substr(x, nchar(x), nchar(x))=="*"
+  }else{FALSE}})]
+  
+d = plot_growing_lineage(paramselected)
+
+  
+```
+
+
+
+### Table
+#### Table
+
+```{r overview of the selection estimator table}
+
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  p$region=="Canada"&
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10
+  }else{FALSE}})]
+DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE))
+
+```
+
+
+
+## Mutational composition of Omicron
+
+Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally.
+
+![](raphgraph.png)
+
+Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_release`).
+
+
+
+## Selection on Omicron {.tabset}  
+
+Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
+Here we examine the major sublineages of Omicron currently in Canada and their relative rate of spread. 
+
+Currently, the major variants circulating are Omicron sublineages BA.2 (including BG), BA.4, and BA.5 (including BE and BF). BA.4 and BA.5 are spreading in Canada, as illustrated below. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.4 or BA.5)/freq(BA.2)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
+
+For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
+SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+<!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
+
+**Caveat:**
+Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
+
+```{r setting function for selection estimator}
+startpar2 <- list(p=0.5, s=0.1)
+startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
+
+
+sublineages_BA2 <- getsublineagesfromnode("BA.2*")
+sublineages_BA4 <- getsublineagesfromnode("BA.4*")
+sublineages_BA5 <- getsublineagesfromnode("BA.5*")
+#color for each lineage
+col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
+
+#Set a starting date
+#Note that the startdate shouldn't be too much before both alleles become common
+#or rare migration events that die off could throw off the estimation procedure 
+#(so that the parameter estimates account for the presence of those alleles long in the past).
+startdate<-as.Date("2022-05-01") #Using a later date with less sampling noise
+source("scripts/plot_selection_estimator.R")
+
+
+#####################################################
+# tabs for displaying in notebook
+#each PT tab should have curve plot and breakpoint plot side by side
+```
+
+
+### Canada
+#### Canada
+
+```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+source("scripts/plot_selection_estimator.R")
+maxdate=plot.selection.estimate(region="Canada (no AB)",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=NA, col=col)
+  #plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar2,
+#                         reference=c(name1, name2), mutants=list(name3), col=col)
+```
+
+### BC
+#### British Columbia
+
+```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+local_maxdate=plot.selection.estimate(region="British Columbia",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
+```
+
+### AL
+#### Alberta
+
+```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+#print("Not enough data available")
+local_maxdate=plot.selection.estimate(region="Alberta",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
+```
+
+
+### SK
+#### Saskatchewan
+
+```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+print("Not enough data available")
+#local_maxdate=plot.selection.estimate(region="Saskatchewan",
+#                                      startdate=startdate, startpar=startpar3,
+#                                      reference=c(sublineages_BA2),
+#                                      mutants=list(sublineages_BA4,sublineages_BA5),
+#                                      names=list("BA.4*","BA.5*"),
+#                                      maxdate=maxdate, col=col)
+```
+
+
+### MB
+#### Manitoba
+
+```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+print("Not enough data available")
+#plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar2,
+#                        reference=c(sublineages_BA2),
+#                        mutants=list(sublineages_BA4,sublineages_BA5),
+#                        names=list("BA.4*","BA.5*"), maxdate=maxdate, col=col)
+```
+
+### ON
+#### Ontario
+
+```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+#print("Not enough data available")
+local_maxdate=plot.selection.estimate(region="Ontario",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
+
+```
+
+
+### QC
+#### Quebec
+
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+local_maxdate=plot.selection.estimate(region="Quebec",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
+```
+
+### East
+#### East provinces
+
+```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+print("Not enough data available")
+#local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
+#                                      startdate=startdate, startpar=startpar3,
+#                                      reference=c(sublineages_BA2),
+#                                      mutants=list(sublineages_BA4,sublineages_BA5),
+#                                      names=list("BA.4*","BA.5*"),
+#                                      maxdate=maxdate, col=col)
+```
+
+
+## {.unlisted .unnumbered}
+
+### BA.2 sublineage selection {.tabset}
+
+Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+```{r general settings for selection estimator BA.2}
+
+plotsubvariant <- function(region,min,node){
+  gg=getsublineagesfromnode(node)
+  for(p in allparams) {
+    if(!any(is.na(p$fit))){
+      if(p$region==region && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
+          printest(p$mut[[1]])
+          plot.selection(plotparam=p)
+      }
+    }
+  }
+}
+
+plotba2 <- function(region,min){
+  plotsubvariant(region,min,"BA.2*")
+}
+
+
+plotba4 <- function(region,min){
+  plotsubvariant(region,min,"BA.4*")
+}
+
+
+plotba5 <- function(region,min){
+  plotsubvariant(region,min,"BA.5*")
+}
+
+```
+
+
+#### Canada
+##### Canada (n>50)
+```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+source("scripts/plot_selection_estimator_2type.R")
+plotba2("Canada",50)
+```
+
+#### BC
+##### British Columbia (n>20)
+```{r function and selection estimator BA.2 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("British Columbia",20)
+```
+
+
+#### AL
+##### Alberta (n>20)
+```{r function and selection estimator BA.2 AL, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Alberta",20)
+```
+
+
+#### SK
+##### Saskatchawan (n>20)
+```{r function and selection estimator BA.2 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Saskatchawan",20)
+```
+
+#### MB
+##### Manitoba (n>20)
+```{r function and selection estimator BA.2 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Manitoba",20)
+```
+
+#### ON
+##### Ontario (n>20)
+```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Ontario",20)
+
+```
+
+#### QC
+##### Quebec (n>20)
+```{r function and selection estimator BA.2 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("Quebec",20)
+```
+
+#### East
+##### Eastern provinces (n>20)
+```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba2("East provinces (NL+NS+NB)",20)
+```
+
+
+### BA.4 sublineage selection {.tabset}
+
+Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+
+#### Canada
+##### Canada (n>50)
+```{r function and selection estimator BA.4 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Canada",50)
+
+```
+
+#### BC
+##### British Columbia (n>20)
+```{r function and selection estimator BA.4 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("British Columbia",20)
+
+```
+
+
+#### AL
+##### Alberta (n>20)
+```{r function and selection estimator BA.4 AL, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Alberta",20)
+```
+
+
+#### SK
+##### Saskatchawan (n>20)
+```{r function and selection estimator BA.4 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Saskatchawan",20)
+```
+
+#### MB
+##### Manitoba (n>20)
+```{r function and selection estimator BA.4 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Manitoba",20)
+```
+
+#### ON
+##### Ontario (n>20)
+```{r function and selection estimator BA.4 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Ontario",20)
+```
+
+#### QC
+##### Quebec (n>20)
+```{r function and selection estimator BA.4 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("Quebec",20)
+```
+
+#### East
+##### Eastern provinces (n>20)
+```{r function and selection estimator BA.4 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba4("East provinces (NL+NS+NB)",20)
+```
+
+
+### BA.5 sublineage selection {.tabset}
+
+Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+#### Canada
+##### Canada (n>50)
+```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Canada",50)
+
+```
+
+#### BC
+##### British Columbia (n>20)
+```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("British Columbia",20)
+```
+
+
+#### AL
+##### Alberta (n>20)
+```{r function and selection estimator BA.5 AL, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Alberta",20)
+```
+
+
+#### SK
+##### Saskatchawan (n>20)
+```{r function and selection estimator BA.5 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Saskatchawan",20)
+```
+
+#### MB
+##### Manitoba (n>20)
+```{r function and selection estimator BA.5 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Manitoba",20)
+```
+
+
+#### ON
+##### Ontario (n>20)
+```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Ontario",20)
+```
+
+#### QC
+##### Quebec (n>20)
+```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("Quebec",20)
+```
+
+#### East
+##### Eastern provinces (n>20)
+```{r function and selection estimator BA.5 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+plotba5("East provinces (NL+NS+NB)",20)
+```
+
 
 ## Variants in Canada over time
 
@@ -268,66 +796,6 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
 * XBB
 * XBB.1
 * and other variants with immune evasion mutations (e.g: S:R346T), particularly those variants with sets of 7 or more of such mutations of interest.
-
-
-## Data notes by province {.tabset}
-
-All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
-
-### BC
-#### British Columbia  
-Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized).
-Additional up-to-date covid data for this province can be found here:  
-http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
-
-
-### AB
-#### Alberta
-Additional up-to-date COVID data for this province can be found here:  
-https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
-
-
-### SK
-#### Saskatchewan
-Additional up-to-date COVID data for this province can be found here:  
-https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
-
-
-### MB
-#### Manitoba
-Additional up-to-date COVID data for this province can be found here:  
-https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
-
-
-### ON
-#### Ontario
-Additional up-to-date COVID data for this province can be found here:  
-https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
-
-
-### QC
-#### Quebec
-Provincial random sequencing has been temporarily suspended as of Feb 8th, 2021. Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
-Additiona up-to-date COVID data for this province can be found here:  
-https://www.inspq.qc.ca/covid-19/donnees/variants
-
-
-### NS
-#### Nova Scotia
-Additional up-to-date COVID data for this province can be found here:  
-https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
-
-
-### NB
-#### New Brunswick
-Additional up-to-date COVID data for this province can be found here:  
-https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
-
-
-### NL
-#### Newfoundland and Labrador
-Additional up-to-date COVID data for this province can be found here:  
-https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 
 
 
@@ -471,575 +939,9 @@ plot4 <- p4
 ```
 
 
-## Mutational composition of Omicron
-
-Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally.
-
-![](raphgraph.png)
-
-Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on all genomes available on VirusSeq on `r VirusSeq_release`).
-
-
 <!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
 
 <!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
-
-
-## Major Omicron sublineages in Canada {.tabset} 
-
-Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
-
-```{r setting function for subtype plotter}
-source("scripts/subtype_plotter.R")
-source("scripts/scanlineages.R")
-
-```
-
-
-### BA.1
-#### Sublineage BA.1
-```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.1*")
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.2
-#### Sublineage BA.2
-```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.2*")
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-### BA.4
-#### Sublineage BA.4
-```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.4*")
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.5.1
-#### Sublineage BA.5.1
-```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.5.1*")
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.5.2
-#### Sublineage BA.5.2
-```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.5.2*")
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### Other BA.5
-#### Sublineage BA.5 without BA.5.1 and BA.5.2
-```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.5*")
-set=set[!set %in% append(getsublineagesfromnode("BA.5.1*"),getsublineagesfromnode("BA.5.2*"))]
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### Recombinant and divergent lineages
-#### Recombinant and divergent lineages
-```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("*")
-set=set[!set %in% c(getsublineagesfromnode("BA.1*"),getsublineagesfromnode("BA.2*"),getsublineagesfromnode("BA.4*"),getsublineagesfromnode("BA.5*"))]
-rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200))
-rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200),scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-## Selection on Omicron {.tabset}  
-
-Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
-Here we examine the major sublineages of Omicron currently in Canada and their relative rate of spread. 
-
-Currently, the major variants circulating are Omicron sublineages BA.2 (including BG), BA.4, and BA.5 (including BE and BF). BA.4 and BA.5 are spreading in Canada, as illustrated below. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.4 or BA.5)/freq(BA.2)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
-
-For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
-SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
-<!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
-
-**Caveat:**
-Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
-
-```{r setting function for selection estimator}
-startpar2 <- list(p=0.5, s=0.1)
-startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
-
-
-sublineages_BA2 <- getsublineagesfromnode("BA.2*")
-sublineages_BA4 <- getsublineagesfromnode("BA.4*")
-sublineages_BA5 <- getsublineagesfromnode("BA.5*")
-#color for each lineage
-col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
-
-#Set a starting date
-#Note that the startdate shouldn't be too much before both alleles become common
-#or rare migration events that die off could throw off the estimation procedure 
-#(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-as.Date("2022-05-01") #Using a later date with less sampling noise
-source("scripts/plot_selection_estimator.R")
-
-
-#####################################################
-# tabs for displaying in notebook
-#each PT tab should have curve plot and breakpoint plot side by side
-```
-
-
-### Canada
-#### Canada
-
-```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-maxdate=plot.selection.estimate(region="Canada (no AB)",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=NA, col=col)
-  #plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar2,
-#                         reference=c(name1, name2), mutants=list(name3), col=col)
-```
-
-### BC
-#### British Columbia
-
-```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="British Columbia",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
-```
-
-### SK
-#### Saskatchewan
-
-```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-print("Not enough data available")
-#local_maxdate=plot.selection.estimate(region="Saskatchewan",
-#                                      startdate=startdate, startpar=startpar3,
-#                                      reference=c(sublineages_BA2),
-#                                      mutants=list(sublineages_BA4,sublineages_BA5),
-#                                      names=list("BA.4*","BA.5*"),
-#                                      maxdate=maxdate, col=col)
-```
-
-
-### MB
-#### Manitoba
-
-```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-print("Not enough data available")
-#plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar2,
-#                        reference=c(sublineages_BA2),
-#                        mutants=list(sublineages_BA4,sublineages_BA5),
-#                        names=list("BA.4*","BA.5*"), maxdate=maxdate, col=col)
-```
-
-### ON
-#### Ontario
-
-```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="Ontario",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
-
-```
-
-
-### QC
-#### Quebec
-
-```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="Quebec",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
-```
-
-### East
-#### East provinces
-
-```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-print("Not enough data available")
-#local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
-#                                      startdate=startdate, startpar=startpar3,
-#                                      reference=c(sublineages_BA2),
-#                                      mutants=list(sublineages_BA4,sublineages_BA5),
-#                                      names=list("BA.4*","BA.5*"),
-#                                      maxdate=maxdate, col=col)
-```
-
-  
-```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-source("scripts/plot_selection_estimator_2type.R")
-#reference <- getsublineagesfromnode("B.1.1.529.5.2*")
-reference <- list("BA.5.2")
-startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-05") 
-fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>startdate]))
-
-
-
-allparamnonstricto=list()
-for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
-  lineagelist=getsublineagesfromnode(l)
-  if(length(intersect(reference,lineagelist))==0){
-   printest(paste(l,"non stricto Canada (",rawtoreallineage(l),")")) 
-    if(! l %in% list("B.1.1.529.2.10.1*","B.1.1.529.2.75.9*","B.1.1.529.2.75.3.4.1*")){
-      p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
-      allparamnonstricto=append(allparamnonstricto,list(p))
-    }
-  }
-}
-
-
-allparamstricto=c()
-for( region in rev(c("East provinces (NL+NS+NB)","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
-  lineagelist=chooselineagestoplot(togrep=".",
-                  region=region,
-                  namereference=reference,
-                  startdate=date(VirusSeq_release)-days(80),
-                  lastseenafter=date(VirusSeq_release)-days(40),
-                  minnumberofsequence=10)
-  for (mut in lineagelist){
-    printest(paste(mut,region))
-    plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2)
-    if(any(is.na((plot_param$fit)$sample))){
-      printest("plot_param$sample have NA")
-      printest(plot_param$mut)
-    }else{
-      allparamstricto=append(allparamstricto,list(plot_param))
-    }
-  }
-}
-plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
-#sort by decreasing selection estimate
-allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-
-
-
-```
-
-## Fastest growing lineages in Canada {.tabset}
-
-
-Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
-
-
-
-### Plot (stricto)
-#### Plot single lineages
-      
-
-Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
-
-Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
-
-
-```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=12}
-
-source("scripts/plot_growing_lineages.R")
-paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
-d = plot_growing_lineage(paramselected)
-
-
-```
-
-
-
-
-### Plot (non stricto)
-#### Plot monophyletic groups of lineages
-      
-This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
-
-Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
-
-Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
-
-
-```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
-
-allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>-1 & sum(x$toplot$n2)>10})]
-d = plot_growing_lineage(paramselected)
-  
-```
-
-
-
-### Table
-#### Table
-
-```{r overview of the selection estimator table}
-
-allparams=c(allparamnonstricto,allparamstricto)
-paramselected=allparams[sapply(allparams,function(x){(x$fit)$fit[["s1"]]>0})]
-d = plot_growing_lineage(paramselected,makeplot=FALSE)
-DT::datatable(d)
-
-```
-
-
-## BA.2 sublineage selection {.tabset}
-
-Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-```{r general settings for selection estimator BA.2}
-plotba2 <- function(region,min){
-  lineagelist=chooselineagestoplot(
-    togrep="B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.|XBB",
-    region=region,
-    namereference=reference,
-    startdate=as.Date(startdate),
-    lastseenafter=date(VirusSeq_release)-days(100),
-    minnumberofsequence=min)
-  countgraph=0
-  for(p in allparams) {
-    if((p$region==region) & (p$mut[1] %in% lineagelist)){
-      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        printest(p$mut)
-        plot.selection(plotparam=p)
-        countgraph=countgraph+1
-      }
-    }
-  }
-  if(countgraph==0){
-    print("Not enough data available")
-  }
-}
-```
-
-
-### Canada
-#### Canada (n>50)
-```{r function and selection estimator BA.2 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Canada",50)
-
-```
-
-### BC
-#### British Columbia (n>20)
-```{r function and selection estimator BA.2 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("British Columbia",20)
-```
-
-### Ontario
-#### Ontario (n>20)
-```{r function and selection estimator BA.2 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Ontario",20)
-
-```
-
-### Quebec
-#### Quebec (n>20)
-```{r function and selection estimator BA.2 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Quebec",20)
-```
-
-### Saskatchawan
-#### Saskatchawan (n>20)
-```{r function and selection estimator BA.2 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Saskatchawan",20)
-```
-
-### Manitoba
-#### Manitoba (n>20)
-```{r function and selection estimator BA.2 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("Manitoba",20)
-```
-
-
-
-### Eastern Provinces
-#### Eastern provinces (n>20)
-```{r function and selection estimator BA.2 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba2("East provinces (NL+NS+NB)",20)
-```
-
-
-## BA.4 sublineage selection {.tabset}
-
-Here we show the trends of the various BA.4# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-```{r general settings for selection estimator BA.4 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-plotba4 <- function(region,min){
-  lineagelist=chooselineagestoplot(
-    togrep="B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.",
-    region=region,
-    namereference=reference,
-    startdate=as.Date(startdate),
-    lastseenafter=date(VirusSeq_release)-days(100),
-    minnumberofsequence=min)
-  countgraph=0
-  for(p in allparams) {
-    if(p$region==region & p$mut[1] %in% lineagelist){
-      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        plot.selection(plotparam=p)
-        countgraph=countgraph+1
-      }
-    }
-  }
-  if(countgraph==0){
-    print("Not enough data available")
-  }
-}
-
-```
-
-
-### Canada
-#### Canada (n>50)
-```{r function and selection estimator BA.4 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Canada",50)
-
-```
-
-### BC
-#### British Columbia (n>20)
-```{r function and selection estimator BA.4 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("British Columbia",20)
-
-```
-
-### Ontario
-#### Ontario (n>20)
-```{r function and selection estimator BA.4 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Ontario",20)
-```
-
-### Quebec
-#### Quebec (n>20)
-```{r function and selection estimator BA.4 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Quebec",20)
-```
-
-### Saskatchawan
-#### Saskatchawan (n>20)
-```{r function and selection estimator BA.4 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Saskatchawan",20)
-```
-
-### Manitoba
-#### Manitoba (n>20)
-```{r function and selection estimator BA.4 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("Manitoba",20)
-```
-
-
-
-### Eastern Provinces
-#### Eastern provinces (n>20)
-```{r function and selection estimator BA.4 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba4("East provinces (NL+NS+NB)",20)
-```
-
-
-## BA.5 sublineage selection {.tabset}
-
-Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-```{r general settings for selection estimator BA.5 , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-
-plotba5 <- function(region,min){
-  lineagelist=chooselineagestoplot(
-    togrep="B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.",
-    region=region,
-    namereference=reference,
-    startdate=as.Date(startdate),
-    lastseenafter=date(VirusSeq_release)-days(100),
-    minnumberofsequence=min)
-  countgraph=0
-  for(p in allparams) {
-    if(p$region==region & p$mut[1] %in% lineagelist){
-      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        plot.selection(plotparam=p)
-        countgraph=countgraph+1
-      }
-    }
-  }
-  if(countgraph==0){
-    print("Not enough data available")
-  }
-}
-
-```
-
-### Canada
-#### Canada (n>50)
-```{r function and selection estimator BA.5 Canada , echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Canada",50)
-
-```
-
-### BC
-#### British Columbia (n>20)
-```{r function and selection estimator BA.5 BC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("British Columbia",20)
-```
-
-### Ontario
-#### Ontario (n>20)
-```{r function and selection estimator BA.5 ON, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Ontario",20)
-```
-
-### Quebec
-#### Quebec (n>20)
-```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Quebec",20)
-```
-
-### Saskatchawan
-#### Saskatchawan (n>20)
-```{r function and selection estimator BA.5 SK, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Saskatchawan",20)
-```
-
-### Manitoba
-#### Manitoba (n>20)
-```{r function and selection estimator BA.5 MN, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Manitoba",20)
-```
-
-
-
-### Eastern Provinces
-#### Eastern provinces (n>20)
-```{r function and selection estimator BA.5 NB+NF+NS, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("East provinces (NL+NS+NB)",20)
-```
 
 
 
@@ -1094,7 +996,8 @@ ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) +
 ```
 
 
-## Future development
+
+# Future development
 
 We are in the process of adding or would like to develop code for some of the following analyses:   
 
@@ -1105,7 +1008,6 @@ We are in the process of adding or would like to develop code for some of the fo
 
 With anonymized data on vaccination status, severity/outcome, reason for sequencing (*e.g.*, outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving.
 Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
-
 
 
 # Methodology {.tabset} 
@@ -1159,6 +1061,67 @@ Provinces with sampling strategies that are variant specific are removed, unless
 ### Rates
 #### Root-to-tip estimates of substitution rate
 Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
+
+
+
+# Data notes by province {.tabset}
+
+All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
+
+## BC
+### British Columbia  
+Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized).
+Additional up-to-date covid data for this province can be found here:  
+http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
+
+
+## AB
+### Alberta
+Additional up-to-date COVID data for this province can be found here:  
+https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
+
+
+## SK
+### Saskatchewan
+Additional up-to-date COVID data for this province can be found here:  
+https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
+
+
+## MB
+### Manitoba
+Additional up-to-date COVID data for this province can be found here:  
+https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
+
+
+## ON
+### Ontario
+Additional up-to-date COVID data for this province can be found here:  
+https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
+
+
+## QC
+### Quebec
+Provincial random sequencing has been temporarily suspended as of Feb 8th, 2021. Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
+Additiona up-to-date COVID data for this province can be found here:  
+https://www.inspq.qc.ca/covid-19/donnees/variants
+
+
+## NS
+### Nova Scotia
+Additional up-to-date COVID data for this province can be found here:  
+https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
+
+
+## NB
+### New Brunswick
+Additional up-to-date COVID data for this province can be found here:  
+https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
+
+
+## NL
+### Newfoundland and Labrador
+Additional up-to-date COVID data for this province can be found here:  
+https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 
 
 # List of useful tools

@@ -42,6 +42,9 @@ get.province.list <- function(region){
   mydata$lineage = mydata$lineage %in% reference
   mydata <- mydata %>% group_by(sample.collection.date) %>% dplyr::count(lineage, name = "n")
   mydata$lineage <- lapply(mydata$lineage, function(isref) if(isref){"n1"}else{"n2"} )
+  if(length(unique(mydata$lineage)) !=2 ){
+    return(NA)
+  }
   
   
   widetable = pivot_wider(mydata, names_from = lineage, values_from = n, values_fill = 0 )
@@ -129,46 +132,42 @@ get.province.list <- function(region){
 #'                sample = data frame from RandomHessianOrMCMC
 .fit.model <- function(toplot, startpar, method="Nelder-Mead") {
   #print(toplot[toplot$n2!=0,])
-  
-  if (length(startpar$s) == 1) {
-    bbml <- tryCatch({
-              mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
-                 data=list(toplot=toplot), method=method, skip.hessian=FALSE)
-              },
-             error=function(cond) {
-               mle2(.ll.binom, start=list(p1=startpar$p[1]/10, s1=startpar$s[1]), 
-                    data=list(toplot=toplot), method=method)
-             }
-    )
-  } 
-  else if (length(startpar$s) == 2) {
-    bbml <- mle2(.ll.trinom, 
-                 start=list(p1=startpar$p[1], p2=startpar$p[2], 
-                            s1=startpar$s[1], s2=startpar$s[2]), 
-                 data=toplot, method=method)
-  }
-  else {
-    stop("ERROR: function does not currently support more than three types!")
-  }
-  
-  
-  # based on the quadratic approximation at the maximum likelihood estimate
-  myconf <- confint(bbml, method="quad")
-  
-  # draw random parameters for confidence interval
-  bbfit <- bbml@details$par
-  bbhessian <- bbml@details$hessian  # matrix of 2nd order partial derivatives
-  dimnames(bbhessian) <- list(names(bbfit), names(bbfit))
-  
-  if (any(is.nan(bbhessian))) {
-    df <- NA
-  } else {
-    # draw random parameter values from Hessian to determine variation in {p, s}
-    df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
-                                  method="Hessian", replicates=1000, silent=T)$random  
-  }
-  
-  return(list(fit=bbfit, confint=myconf, sample=df))
+  tryCatch(
+    {
+      if (length(startpar$s) == 1) {
+        bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
+                     data=list(toplot=toplot), method=method, skip.hessian=FALSE)
+      }
+      else if (length(startpar$s) == 2) {
+        bbml <- mle2(.ll.trinom, 
+                     start=list(p1=startpar$p[1], p2=startpar$p[2], 
+                                s1=startpar$s[1], s2=startpar$s[2]), 
+                     data=toplot, method=method)
+      }
+      else {
+        stop("ERROR: function does not currently support more than three types!")
+      }
+      
+      # based on the quadratic approximation at the maximum likelihood estimate
+      myconf <- confint(bbml, method="quad")
+
+      # draw random parameters for confidence interval
+      bbfit <- bbml@details$par
+      bbhessian <- bbml@details$hessian  # matrix of 2nd order partial derivatives
+      dimnames(bbhessian) <- list(names(bbfit), names(bbfit))
+      
+      if (any(is.nan(bbhessian))) {
+        df <- NA
+      } else {
+        # draw random parameter values from Hessian to determine variation in {p, s}
+        df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
+                                      method="Hessian", replicates=1000, silent=T)$random  
+      }
+      return(list(fit=bbfit, confint=myconf, sample=df, modelerror=FALSE))
+    },
+    error=function(cond) {
+      return(list(fit=NA, confint=NA, sample=NA, modelerror=TRUE))
+    })
 }
 
 
@@ -192,9 +191,11 @@ get.province.list <- function(region){
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 estimate.selection <- function(region, startdate, reference, mutants, startpar, method='BFGS') {
   toplot <- .make.estimator(region, startdate, reference, mutants)
-
+  if(any(is.na(toplot))){
+    return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
+  }
   fit <- .fit.model(toplot, startpar, method=method)
-  list(toplot=toplot,fit=fit,mut=mutants,ref=reference, region=region)
+  return(list(toplot=toplot,fit=fit,mut=mutants,ref=reference, region=region))
 }
 
 
@@ -234,7 +235,7 @@ plot.selection <- function(plotparam, col=c('red', 'blue')) {
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$reference[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
+       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$ref[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
@@ -261,53 +262,4 @@ plot.selection <- function(plotparam, col=c('red', 'blue')) {
 # Bends suggest a changing selection over time (e.g., due to the impact of 
 # vaccinations differentially impacting the variants). Sharper turns are more 
 # often due to NPI measures . 
-
-
-chooselineagestoplot <- function(togrep,region,namereference,startdate,lastseenafter,minnumberofsequence){
-  submeta <- meta %>% filter(
-    lineage %in% c(unique(meta$lineage[grepl(togrep, meta$rawlineage)])),
-    !lineage %in% namereference,
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate,
-    province %in% get.province.list(region)
-  ) %>%
-    group_by(lineage) %>% summarise(count = n(), lastsampledate = max(sample.collection.date)) %>%
-    filter(lastsampledate>lastseenafter,
-           count>minnumberofsequence)
-  return(unique(submeta$lineage))
-}
-
-
-#' generate a stacked barplot per lineage from a subset of lineages
-#' @param sublineagedata: a table used for selecting the sublinaeges to plot
-#' @param region:  char, can be used to select samples for a specific province
-#' @param namereference:  a string : name of the reference to plot against
-#' @param maxnumberofsequence:  max n sequence that the sublineage should have in the last 100 days before VirusSeq update
-multi.plot.selection <- function(lineagelist, reference, region, makeplot=TRUE) {
-  all_plot_param=c()
-  value_to_order=c()
-  for (mut in lineagelist){
-    #print(paste(mut,region))
-    plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2) 
-    all_plot_param=append(all_plot_param,list(plot_param))
-    value_to_order=append(value_to_order,(plot_param$fit)$fit[["s1"]])
-  }
-  if(makeplot){
-    for (i in order(value_to_order, decreasing = TRUE)) {
-      plot_param=all_plot_param[[i]]
-      if(any(is.na((plot_param$fit)$sample))){
-        print("plot_param$sample have NA")
-        print(plot_param$mut)
-      }
-      else{
-        plot.selection(plotparam=plot_param)
-      }
-    }
-  }
-  else{
-    return(all_plot_param)
-  }
-}
-
-
 

@@ -13,7 +13,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
     if(sel_coeff>0){
       s=sum(r[[i]]$toplot$n2)
       d[nrow(d)+1, ] <-c(lineage = r[[i]]$mut[1],
-                         sel_coeff= round(sel_coeff*100000)/1000,
+                         sel_coeff= round(sel_coeff*100000000)/1000000,
                          low_CI = round(low_CI*100000)/1000,
                          high_CI =round(high_CI*100000)/1000,
                          size = s,
@@ -24,15 +24,14 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
   d$low_CI=as.numeric(d$low_CI)
   d$high_CI=as.numeric(d$high_CI)
   d$size=as.numeric(d$size)
-  
   if(makeplot){
     bins=c(0,20,40,80,100,200,500,10000000)
     labelsstart <- head(gsub("(?<!^)(\\d{3})$", ",\\1", bins+1, perl=T),-1)
     labelsend <- tail(gsub("(?<!^)(\\d{3})$", ",\\1", bins, perl=T),-1)
+    labelsend[[length(labelsend)]]=""
     rangelabels <- paste(labelsstart, labelsend, sep="-")
-    rangelabels[length(rangelabels)]="501 and more"
     d$sequence_count=as.factor(cut(d$size,bins,rangelabels,left = FALSE))
-    couleur=brewer.pal(n = length(levels(d$sequence_count))+1, name = "BuGn")[-1]
+    couleur=rev(hcl.colors(length(levels(d$sequence_count)), "Red-Blue"))
     names(couleur)=levels(d$sequence_count)
     colScale=scale_colour_manual(name="sequence_count",values=couleur)
     d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)

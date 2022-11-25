@@ -6,16 +6,18 @@ makepangotree <- function(rawlineagelist){
     toadd=list()
     if(! e  %in% fulltree){
       toadd=list(e)
-      n=e
+      #Function to check if an internal node is (1) a leaf (2)  abifurcation (3) already exist
       internalnode <- function(pathfromroot){
-        return(fulltree[grepl(gsub("\\.", "\\\\.",pathfromroot),fulltree)] )
+        togrep=paste(pathfromroot,"$|",pathfromroot,".|",pathfromroot,"\\*$",sep="")
+        togrep=gsub("\\.", "\\\\.",togrep)
+        return(fulltree[grepl(togrep,fulltree)] )
       }
       #find the first existing potential internal node 
-      while(length(internalnode(n))==0 & n!=""){
-        n=sapply(list(head((strsplit(n, "\\."))[[1]],-1)), paste, collapse = ".")
+      while(length(internalnode(e))==0 & e!=""){
+        e=sapply(list(head((strsplit(e, "\\."))[[1]],-1)), paste, collapse = ".")
       }
-      if(n!=""){
-        bifurcation=paste(n,"*",sep="")
+      if(e!=""){
+        bifurcation=paste(e,"*",sep="")
         if(! bifurcation %in% fulltree){
           toadd <- append(toadd,bifurcation)
         }
@@ -28,38 +30,6 @@ makepangotree <- function(rawlineagelist){
   }
   return(fulltree)
 }
-
-getsublineagesfromnode <- function(x) {
-  if(x=="*"){
-    return(unique(meta$lineage))
-  }
-  if(substr(x, nchar(x), nchar(x))!="*"){
-    print("error getsublineagefromnode")
-  }else{
-    nostar=substr(x, 0, nchar(x)-1)
-  }
-  firstpart=strsplit(nostar, "\\.")[[1]][1]
-  if(any(firstpart==dico$surname)){
-    nostar=sapply(list(c(dico$fullname[dico$surname==firstpart],strsplit(nostar, "\\.")[[1]][-1])), paste, collapse = ".")
-  }
-  togrep=paste(nostar,"$|",nostar,".",sep="")
-  togrep=gsub("\\.", "\\\\.",togrep)
-  l=unique(meta$lineage[grepl(togrep,meta$rawlineage)])
-  if(length(l)>1){
-    l=append(rawtoreallineage(x),l)
-  }
-  return(l)
-}
-
-
-rawtoreallineage <- function(l){
-  t=dico[sapply(dico$fullname,function(x){grepl(x,l)}),]
-  if(nrow(t>0)){
-    l=str_replace(l,t[1,"fullname"], t[1,"surname"])
-  }
-  return(l)
-}
-
 
 
 makepangolindico <- function(){
@@ -75,3 +45,38 @@ makepangolindico <- function(){
 }
 
 dico=makepangolindico()
+
+rawtoreallineage <- function(l){
+  t=dico[sapply(dico$fullname,function(x){grepl(x,l)}),]
+  if(nrow(t>0)){
+    l=str_replace(l,t[1,"fullname"], t[1,"surname"])
+  }
+  return(l)
+}
+
+realtorawlineage <- function(l){
+  firstpart=strsplit(l, "\\.")[[1]][1]
+  if(any(firstpart==dico$surname)){
+    l=sapply(list(c(dico$fullname[dico$surname==firstpart],strsplit(l, "\\.")[[1]][-1])), paste, collapse = ".")
+  }
+  return(l)
+}
+
+
+
+
+getsublineagesfromnode <- function(x) {
+  if(substr(x, nchar(x), nchar(x))!="*"){
+    return(list(rawtoreallineage(x)))
+  }else{
+    raw=realtorawlineage(x)
+    raw=substr(raw, 0, nchar(raw)-1) #remove star
+    togrep=paste(raw,"$|",raw,".",sep="")
+    togrep=gsub("\\.", "\\\\.",togrep)
+    l=unique(meta$lineage[grepl(togrep,meta$rawlineage)])
+    if(length(l)>1){
+      l=append(rawtoreallineage(x),l)
+    }
+    return(l)
+  }
+}

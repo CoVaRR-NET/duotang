@@ -259,13 +259,13 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   }
   # display counts
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), maxdate), ylim=c(0, 1), 
-       pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
+       pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/10, 
        xlab="Sample collection date", 
        ylab=paste0("Proportion in ", est$region))
   #lab=paste0("Growth advantage (s% per day) relative\nto BA.5.2 with 95% CI bars in ", est$region))
   if(!is.null(toplot$n3)) {
     points(toplot$date, toplot$n3/toplot$tot, pch=21, col='black', 
-           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/5)
+           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/10)
   }
   # show trendlines
   lines(toplot$date, scurves[,2])
@@ -321,7 +321,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   if (!is.null(toplot$n3)) {
     # draw second series
     points(toplot$date, toplot$n3/toplot$n1, pch=21,
-           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/3)
+           bg=alpha(col[2], 0.7), cex=sqrt(toplot$n3)/10)
     lines(toplot$date, scurves[,3] / scurves[,1])
     text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
   }
