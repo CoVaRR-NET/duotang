@@ -22,7 +22,7 @@ output:
 
 
 #Date of the VirusSeq release
-VirusSeq_release="2022-11-21"
+VirusSeq_release="2022-11-24"
 
 pangoversion="4.1.3 (Viral AI)"
 
@@ -50,8 +50,6 @@ VOCVOI=addVOCVOI("Recombinants","X*",'black')
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey'  # named character vector
-
-maxnumberofgraphperselectionplot=6
 
 printest <-function(x){
   if(is.null(knitr::opts_knit$get("out.format"))){
@@ -192,66 +190,31 @@ for(row in 1:nrow(epidataCANall)) {
 }
 epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 
-
 ```
-
-
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/subtype_plotter.R")
 source("scripts/scanlineages.R")
-#reference <- getsublineagesfromnode("B.1.1.529.5.2*")
 reference <- list("BA.5.2")
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-05") 
-fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>startdate]))
+startdate<-as.Date("2022-05-05")
+fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-08-31") ]))
 
-
-
-allparamnonstricto=list()
-for( l in rev(fullpangotree[grepl("\\*",fullpangotree)])){
+allparams=list()
+for( l in fullpangotree){
   lineagelist=getsublineagesfromnode(l)
-  if(length(intersect(reference,lineagelist))==0){
-   printest(paste(l,"non stricto Canada (",rawtoreallineage(l),")")) 
-    if(! l %in% list("B.1.1.529.2.75.3.4.1*","B.1.1.529.2.10.1*","B.1.1.529.2.75.9*")){
-      p=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
-      allparamnonstricto=append(allparamnonstricto,list(p))
+  for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
+    if(length(intersect(reference,lineagelist))==0){
+      p=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+      allparams=append(allparams,list(p))
     }
   }
 }
+allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
 
-
-allparamstricto=c()
-for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
-  lineagelist=chooselineagestoplot(togrep=".",
-                  region=region,
-                  namereference=reference,
-                  startdate=date(VirusSeq_release)-days(80),
-                  lastseenafter=date(VirusSeq_release)-days(40),
-                  minnumberofsequence=10)
-  for (mut in lineagelist){
-    printest(paste(mut,region))
-    plot_param=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=list(mut), startpar=startpar2)
-    if(any(is.na((plot_param$fit)$sample))){
-      printest("plot_param$sample have NA")
-      printest(plot_param$mut)
-    }else{
-      allparamstricto=append(allparamstricto,list(plot_param))
-    }
-  }
-}
-
-plot_param=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=list("BA.2.10.1"), startpar=startpar2)
-#sort by decreasing selection estimate
-allparamstricto=allparamstricto[order(sapply(allparamstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-
-
-allparams=c(allparamnonstricto,allparamstricto)
 
 ```
-
 
 # SARS-CoV-2 in Canada
 
@@ -356,9 +319,17 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 ```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=12}
 
 source("scripts/plot_growing_lineages.R")
-paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
-d = plot_growing_lineage(paramselected)
+#paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
 
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  p$region=="Canada"&
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10&
+  substr(x, nchar(x), nchar(x))!="*"
+  }else{FALSE}})]
+  
+d = plot_growing_lineage(paramselected)
 
 ```
 
@@ -377,9 +348,16 @@ Estimating selection of sub-variants with low sequence counts (10-100 dots) is p
 
 ```{r overview of the selection estimator plot, fig.retina = 2, warning=FALSE, fig.height=7}
 
-allparamnonstricto=allparamnonstricto[order(sapply(allparamnonstricto, function(p){(p$fit)$fit[["s1"]]}), decreasing = TRUE)]
-paramselected=allparamnonstricto[sapply(allparamnonstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>-1 & sum(x$toplot$n2)>10})]
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  p$region=="Canada"&
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10&
+  substr(x, nchar(x), nchar(x))=="*"
+  }else{FALSE}})]
+  
 d = plot_growing_lineage(paramselected)
+
   
 ```
 
@@ -390,9 +368,13 @@ d = plot_growing_lineage(paramselected)
 
 ```{r overview of the selection estimator table}
 
-paramselected=allparams[sapply(allparams,function(x){(x$fit)$fit[["s1"]]>0})]
-d = plot_growing_lineage(paramselected,makeplot=FALSE)
-DT::datatable(d)
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  p$region=="Canada"&
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10
+  }else{FALSE}})]
+DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE))
 
 ```
 
@@ -562,41 +544,30 @@ Here we show the trends of the various BA.2.* sublineages over time, relative to
 
 ```{r general settings for selection estimator BA.2}
 
-plotsubvariant <- function(region,min,togrep){
-  lineagelist=chooselineagestoplot(
-    togrep=togrep,
-    region=region,
-    namereference=reference,
-    startdate=as.Date(startdate),
-    lastseenafter=date(VirusSeq_release)-days(100),
-    minnumberofsequence=min)
-  countgraph=0
+plotsubvariant <- function(region,min,node){
+  gg=getsublineagesfromnode(node)
   for(p in allparams) {
-    if((p$region==region) & (p$mut[1] %in% lineagelist)){
-      if((countgraph<maxnumberofgraphperselectionplot) | (p$fit)$fit[["s1"]]>0){
-        printest(p$mut[[1]])
-        plot.selection(plotparam=p)
-        countgraph=countgraph+1
+    if(!any(is.na(p$fit))){
+      if(p$region==region && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
+          printest(p$mut[[1]])
+          plot.selection(plotparam=p)
       }
     }
-  }
-  if(countgraph==0){
-    print("Not enough data available")
   }
 }
 
 plotba2 <- function(region,min){
-  plotsubvariant(region,min,"B\\.1\\.1\\.529\\.2$|B\\.1\\.1\\.529\\.2\\.|XBB")
+  plotsubvariant(region,min,"BA.2*")
 }
 
 
 plotba4 <- function(region,min){
-  plotsubvariant(region,min,"B\\.1\\.1\\.529\\.4$|B\\.1\\.1\\.529\\.4\\.")
+  plotsubvariant(region,min,"BA.4*")
 }
 
 
 plotba5 <- function(region,min){
-  plotsubvariant(region,min,"B\\.1\\.1\\.529\\.5$|B\\.1\\.1\\.529\\.5\\.")
+  plotsubvariant(region,min,"BA.5*")
 }
 
 ```
