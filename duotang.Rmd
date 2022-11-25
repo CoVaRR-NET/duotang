@@ -194,9 +194,8 @@ epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
-source("scripts/subtype_plotter.R")
 source("scripts/scanlineages.R")
-reference <- list("BA.5.2")
+reference <- list("BA.5.2.1")
 startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-05")
 fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-08-31") ]))
@@ -230,10 +229,11 @@ Here we take a closer look, sub-dividing the three major Omicron sub-lineages cu
 ### BA.1
 #### Sublineage BA.1
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+source("scripts/subtype_plotter.R")
 set=getsublineagesfromnode("BA.1*")
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-
+printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -283,7 +283,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 set=getsublineagesfromnode("BA.5*")
 set=set[!set %in% append(getsublineagesfromnode("BA.5.1*"),getsublineagesfromnode("BA.5.2*"))]
 rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set)
+rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
