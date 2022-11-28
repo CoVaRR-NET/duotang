@@ -90,6 +90,7 @@ library(viridis)
 library(MASS)
 
 # used for passing data to JavaScript D3 framework
+library(ggfree)
 library(r2d3)
 library(jsonlite)
 
@@ -806,135 +807,78 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 
 ```{r message=FALSE}
 ### metadata and trees
-MLtree_sub1 <- read.tree("./data_needed/sample1.rtt.nwk")
-ttree_sub1 <- read.tree("./data_needed/sample1.timetree.nwk")
+
+source("scripts/tree.r")
+
+meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
+meta$sample.collection.date <- as.Date(meta$sample.collection.date)
+meta$week <- cut(meta$sample.collection.date, 'week')
+meta$province <- meta$geo_loc_name..state.province.territory
+meta$pango.group <- 'other'
+variants <- sapply(VOCVOI$pattern, function(p) 
+  grepl(p, meta$rawlineage, perl=T))
+meta$pango.group[apply(variants, 1, sum)==1] <- VOCVOI$name[unlist(apply(variants, 1, which))]
+meta$pango.group <- as.factor(meta$pango.group)
+
+# load trees from files
+mltree <- read.tree("./data_needed/sample1.rtt.nwk")
+ttree <- read.tree("./data_needed/sample1.timetree.nwk")
+stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-11-01'), by='3 month')
-stopifnot(all(sort(MLtree_sub1$tip.label) == sort(ttree_sub1$tip.label)))
-get.tipnames <- function(tip.label) {
-sapply(tip.label, function(x) {
-  tokens <- strsplit(x, "_")[[1]]
-  ntok <- length(tokens)
-  paste(tokens[1:(ntok-2)], collapse='_')
-  })
-}
-MLtree_sub1$tip.label <- get.tipnames(MLtree_sub1$tip.label)
-ttree_sub1$tip.label <- get.tipnames(ttree_sub1$tip.label)
-#epis <- sapply(strsplit(tips,"\\|"),`[`,1)
-#metasub1<-metaCANall[metaCANall$Accession_ID %in% epis,]
-metasub1 <- meta[meta$fasta.header.name %in% ttree_sub1$tip.label, ]
-#stopifnot(nrow(metasub1) == Ntip(ttree_sub1))
+
+# tips are labeled with [fasta name]_[lineage]_[coldate]
+# extracting just the first part makes it easier to link to metadata
+mltree$tip.label <- reduce.tipnames(mltree$tip.label)
+ttree$tip.label <- reduce.tipnames(ttree$tip.label)
+
+fieldnames<- c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
+                                                    "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing",
+                                                    "lineage", "pango.group")
+# extract rows from metadata table that correspond to this tree
+metasub1 <- meta[meta$fasta.header.name %in% ttree$tip.label, fieldnames]
+# sort rows to match tip labels in tree
+metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta.header.name), ]
+metasub_omi <- metasub1[grepl("Omicron",metasub1$pango.group ), ]
+
 #scale to number of mutations
-MLtree_sub1$edge.length <- MLtree_sub1$edge.length*29903
-### needed for plotting
-pango_frame <- meta[c("lineage", "pango.group")]
-pango_col <- pango_frame %>% distinct()  #make a lookup table for all lineages to pango.group
-listpangogp <- unique(metasub1$pango.group)
-listpangogp <- sort(listpangogp)
-# division colours for heatmap
-df_PTs <- data.frame(divisions=metasub1$province) #make df for heatmaps
-rownames(df_PTs) <- metasub1$Specimen.Collector.Sample.ID  #needs row names for heatmaps
-#division colours
-listPTs <- unique(metasub1$province)
-listPTs <- listPTs[order(listPTs)]
-#listPTs <- listPTs[-11]  # remove hubei
-getpal2 <- colorRampPalette(brewer.pal(length(listPTs), "Spectral")) #"Set3
-pal2 <- getpal2(length(listPTs))
-names(pal2) <- listPTs
-#packageVersion("ggtree")
-### time tree
-mrdate <- max(na.omit(metasub1$sample.collection.date))
-p1 <- ggtree(ttree_sub1, mrsd = as.Date(mrdate)) %<+%
-  metasub1[ , c("fasta.header.name", "pango.group"), 
-            drop=FALSE] + 
-  geom_tippoint(color="black", size=1) +
-  geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
-  scale_color_manual(breaks=listpangogp, values=pal) +
-  #ggtitle("Time tree - Canada - downsample1")+
-  coord_cartesian(clip = 'off') + 
-  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
-  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
-  scale_x_continuous(
-    breaks = Date2decimal(dateseq),
-    labels = format(dateseq, c("%b", "%Y", "%b", "%b"))) +  
-  theme(legend.position = "right", legend.title = element_blank(), 
-        legend.text = element_text(size =12))
-plot1 <- p1  #don't plot provinces
-#plot1 <- gheatmap(p1, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) + 
-#  scale_fill_manual(breaks=listPTs, values = pal2)
-### diversity ML tree
-p2 <- ggtree(MLtree_sub1) %<+% 
-  metasub1[ , c("fasta.header.name", "pango.group"), drop=FALSE] + 
-  geom_tippoint(color="black", size=1) +
-  geom_tippoint(aes(color = pango.group), size=1) + 
-  scale_color_manual(breaks=listpangogp, values = pal) +
-  #ggtitle("ML tree - Canada - subsample1, n = 8K")+
-  coord_cartesian(clip = 'off') + 
-  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
-  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
-  theme(legend.position = "right", legend.title = element_blank(), 
-        legend.text = element_text(size =12))
-plot2 <- p2
-#plot2 <- gheatmap(p2, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
-#  scale_fill_manual(breaks=listPTs, values = pal2)
-### omicron time tree
-metasub_omi <- metasub1[grepl("B\\.1\\.1\\.529\\.", metasub1$rawlineage),]
-#omi_epis<-metasub_omi$Accession_ID
-#ref<-"EPI_ISL_402124"
-#all_omi<-c(omi_epis,ref)
-all_omi <- metasub_omi$fasta.header.name
-ttree_omi<-keep.tip(ttree_sub1, all_omi)
-p3 <- ggtree(ttree_omi, mrsd = as.Date(mrdate)) %<+%
-  metasub_omi[ , c("fasta.header.name", "pango.group"), 
-               drop=FALSE] + 
-  geom_tippoint(color="black", size=1) +
-  geom_tippoint(aes(color = pango.group), size=1) + #, shape= lab
-  scale_color_manual(breaks=listpangogp,values=pal) +
-  #ggtitle("Time tree - Canada - downsample1")+
-  coord_cartesian(clip = 'off') + 
-  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
-  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
-  scale_x_continuous(breaks = Date2decimal(dateseq),
-                     labels = format(dateseq, c("%b", "%Y", "%b", "%b"))) +
-  theme(legend.position = "right", legend.title = element_blank(), 
-        legend.text = element_text(size =12))
-plot3 <- gheatmap(p3, df_PTs[, "divisions", drop = FALSE], 
-                  width= 0.1, color = F, colnames = F, 
-                  legend_title = F) + 
-  scale_fill_manual(breaks=listPTs, values = pal2)
+mltree$edge.length <- mltree$edge.length*29903
+
+###Time Tree
+ttree2 <- ttree
+ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
+#suppressWarnings({
+#  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
+#})
+#idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
+#anc <- levels(as.factor(metasub1$pango.group))[idx]
+timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", fieldnames)
+
+#diversity ML tree
+diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", fieldnames)
+
 ### omicron diversity tree
-MLtree_omi<-keep.tip(MLtree_sub1, all_omi)
-p4 <- ggtree(MLtree_omi) %<+% 
-  metasub_omi[ , c("fasta.header.name", "pango.group"), 
-               drop=FALSE] + 
-  geom_tippoint(color="black", size=1) +
-  geom_tippoint(aes(color = pango.group), size=1) + 
-  scale_color_manual(breaks=listpangogp, values = pal) +
-  #ggtitle("ML tree - Canada - subsample1, n = 8K")+
-  coord_cartesian(clip = 'off') + 
-  theme_tree2(plot.margin=margin(6, 40, 6, 6)) +
-  guides(color = guide_legend(override.aes = list(size = 4) ) ) +
-  theme(legend.position = "right", legend.title = element_blank(), 
-        legend.text = element_text(size =12))
-plot4 <- p4
-#plot4 <- gheatmap(p4, df_PTs[, "divisions", drop = FALSE], width= 0.1, color = F, colnames = F, legend_title = F) +
-#  scale_fill_manual(breaks=listPTs, values = pal2)
-# table(metasub1$pango.group)
+MLtree_omi<-keep.tip(mltree, metasub_omi$fasta.header.name)
+OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", fieldnames)
+
 ```
 
 
 ### Time Tree {.active}
-```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
-  plot1
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+  r2d3(data=timeTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="ttree-element")
 ```
 
 ### Diversity Tree
-```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
-  plot2
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=diversityTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="mltree-element")
 ```
 
 ### Omicron diversity tree
-```{r message=FALSE, echo = FALSE, fig.width=10, fig.height=25}
-  plot4
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=OmicrondiversityTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="omimltree-element")
 
 ```
 
@@ -951,6 +895,15 @@ The slope of root-to-tip plots over time provide an estimate of the substitution
 A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
 ```{r, dpi=300}
+
+get.tipnames <- function(tip.label) {
+sapply(tip.label, function(x) {
+  tokens <- strsplit(x, "_")[[1]]
+  ntok <- length(tokens)
+  paste(tokens[1:(ntok-2)], collapse='_')
+  })
+}
+
 source("scripts/fit-rtt.R")
 fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
 
@@ -1142,7 +1095,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 * Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
 
 
-
+variants
 # Acknowledgements and sources
 
 We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work.  Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
