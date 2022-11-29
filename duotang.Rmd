@@ -142,14 +142,25 @@ These analyses are subject to change given new data and updated lineage designat
 
 # this can be made more compact for faster loading
 meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
-
-meta$sample.collection.date <- as.Date(meta$sample.collection.date)
-meta$week <- cut(meta$sample.collection.date, 'week')
 meta$province <- meta$geo_loc_name..state.province.territory.
 
 #Select on ly the column we want to use later
-meta <- meta[,c("fasta.header.name","sample.collection.date","week",  "province", "rawlineage", "lineage")]
+columnlist=c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
+                      "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing","lineage", "rawlineage")
+meta <- meta[,columnlist]
 
+
+for(col in columnlist){
+  meta[col][meta[col]=="Undeclared"] <- "Unknown"
+  meta[col][meta[col]=="Not Provided"] <- "Unknown"
+  meta[col][meta[col]=="Restricted Access"] <- "Unknown"
+  meta[col][meta[col]=="Missing"] <- "Unknown"
+  meta[col][meta[col]=="Not Applicable"] <- "Unknown"
+}
+meta["purpose.of.sequencing"][meta["purpose.of.sequencing"]=="Sample has epidemiological link to Omicron Variant"] <- "Research"
+
+meta$sample.collection.date <- as.Date(meta$sample.collection.date)
+meta$week <- cut(meta$sample.collection.date, 'week')
 
 
 VOCVOI$pattern <- gsub("\\.","\\\\.",VOCVOI$pangodesignation)
@@ -191,6 +202,7 @@ for(row in 1:nrow(epidataCANall)) {
 }
 epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 
+
 ```
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
@@ -200,7 +212,7 @@ fullpangotree=makepangotree(unique(meta$rawlineage))
 latelineage_pangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-10-01") ]))
 
 
-reference <- list("BA.5.2.1")
+reference <- list("BA.5.2")
 
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
@@ -218,8 +230,6 @@ for( l in latelineage_pangotree){
 }
 allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
 
-test=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=getStrictoSubLineages("XBB*"), startpar=startpar2)
-print(test$fit$fit)
 
 ```
 
@@ -822,18 +832,7 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 
 ```{r message=FALSE}
 ### metadata and trees
-
 source("scripts/tree.r")
-
-meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
-meta$sample.collection.date <- as.Date(meta$sample.collection.date)
-meta$week <- cut(meta$sample.collection.date, 'week')
-meta$province <- meta$geo_loc_name..state.province.territory
-meta$pango.group <- 'other'
-variants <- sapply(VOCVOI$pattern, function(p) 
-  grepl(p, meta$rawlineage, perl=T))
-meta$pango.group[apply(variants, 1, sum)==1] <- VOCVOI$name[unlist(apply(variants, 1, which))]
-meta$pango.group <- as.factor(meta$pango.group)
 
 # load trees from files
 mltree <- read.tree("./data_needed/sample1.rtt.nwk")
