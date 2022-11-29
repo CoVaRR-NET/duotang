@@ -200,23 +200,17 @@ function updateTree(drawNodes = false) {
                       if (d.isTip) {
                           coords = d3.pointer(e);
                           let pos = d3.select(this).node().getBoundingClientRect();
-                          tooltip.html(
-                              "<p>" + 
-                              `<b>Province: </b>${d["province"]}<br/>` + 
-                              `<b>Sample date: </b>${d["sample.collection.date"]}<br/>` + 
-                              `<b>Host gender: </b>${d["host.gender"]}<br/>` + 
-                              `<b>Host age bin: </b>${d["host.age.bin"]}<br/>` + 
-                              `<b>Purpose of sampling: </b>${d["purpose.of.sampling"]}<br/>` + 
-                              `<b>Purpose of sequencing: </b>${d["purpose.of.sequencing"]}<br/>` + 
-                              `<b>Sample Source: </b>${d["sample.collected.by"]}<br/>` + 
-                              `<b>Lineage: </b>${d["lineage"]}<br/>` + 
-                              `<b>Pango Group: </b>${d["pango.group"]}<br/>` +             
-                              `<b>Sample Name: </b>${d["fasta.header.name"]}<br/>` +                                   
-                              "</p>" 
-                              ).style("visibility", "visible")
-                               .style("left", (coords[0] ) + "px")
-                               //.style("top", (coords[1] + yoffset - rdiv.scrollTop - 500) + "px");    
-                              //.style('left', `${pos['x']}px`)
+                          //populate the popout box text with ALL metadata columns
+                          var toolTipText = "<p>"  
+                          for(var i = 0; i < metadataFields.length; i++){
+                            cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
+                            cleanName = cleanName.split('.').join(' ');
+                            toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
+                          }
+                          toolTipText = toolTipText + "</p>";
+                          tooltip.html(toolTipText)
+                              .style("visibility", "visible")
+                              .style("left", (coords[0] ) + "px")
                               .style('top', `${(window.pageYOffset  + pos['y'] +15)}px`);
                       }
                   })
@@ -237,24 +231,18 @@ function updateTree(drawNodes = false) {
         if (d.isTip) {
             coords = d3.pointer(e);
             let pos = d3.select(this).node().getBoundingClientRect();
-            tooltip.html(
-                "<p>" + 
-                `<b>Province: </b>${d["province"]}<br/>` + 
-                `<b>Sample date: </b>${d["sample.collection.date"]}<br/>` + 
-                `<b>Host gender: </b>${d["host.gender"]}<br/>` + 
-                `<b>Host age bin: </b>${d["host.age.bin"]}<br/>` + 
-                `<b>Purpose of sampling: </b>${d["purpose.of.sampling"]}<br/>` + 
-                `<b>Purpose of sequencing: </b>${d["purpose.of.sequencing"]}<br/>` + 
-                `<b>Sample Source: </b>${d["sample.collected.by"]}<br/>` + 
-                `<b>Lineage: </b>${d["lineage"]}<br/>` + 
-                `<b>Pango Group: </b>${d["pango.group"]}<br/>` +        
-                `<b>Sample Name: </b>${d["fasta.header.name"]}<br/>` +                                                        
-                "</p>" 
-                ).style("visibility", "visible")
-                 .style("left", (coords[0] ) + "px")
-                 //.style("top", (coords[1] + yoffset - rdiv.scrollTop - 500) + "px");    
-                //.style('left', `${pos['x']}px`)
-                .style('top', `${(window.pageYOffset  + pos['y'] +15)}px`);
+            //populate the popout box text with ALL metadata columns
+            var toolTipText = "<p>"  
+            for(var i = 0; i < metadataFields.length; i++){
+              cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
+              cleanName = cleanName.split('.').join(' ');
+              toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
+            }
+            toolTipText = toolTipText + "</p>";
+            tooltip.html(toolTipText)
+              .style("visibility", "visible")
+              .style("left", (coords[0] ) + "px")
+              .style('top', `${(window.pageYOffset  + pos['y'] +15)}px`);
         }
     })
     .on("mouseout", function(e, d) {
