@@ -50,6 +50,9 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
     coord_flip()+ colScale+
     ggtitle("Recently designated lineages showing most growth")+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", reference, " with 95% CI bars"))+theme_bw()
     plot(p)
+    return()
   }
-  return(d)
+  else{
+    return(d)
+  }
 }

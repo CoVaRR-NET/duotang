@@ -195,14 +195,19 @@ epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
+fullpangotree=makepangotree(unique(meta$rawlineage))
+latelineage_pangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-10-01") ]))
+
+
 reference <- list("BA.5.2.1")
+
+#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
 startdate<-as.Date("2022-05-05")
-fullpangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-08-31") ]))
 
 allparams=list()
-for( l in fullpangotree){
-  lineagelist=getsublineagesfromnode(l)
+for( l in latelineage_pangotree){
+  lineagelist=getStrictoSubLineages(l)
   for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
     if(length(intersect(reference,lineagelist))==0){
       p=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
@@ -212,6 +217,8 @@ for( l in fullpangotree){
 }
 allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
 
+test=estimate.selection(region="Canada", startdate=startdate, reference=reference, mutants=getStrictoSubLineages("XBB*"), startpar=startpar2)
+print(test$fit$fit)
 
 ```
 
@@ -219,8 +226,26 @@ allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA
 
 ## Current Situation
 
-....
+BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest.
+**Variants of current interest**, due to their potential growth advantage, or mutations of potential functional significance (note: sublineages of many of these are also of interest). See also the evolving plot below of “Fastest growing lineages in Canada”:
 
+* BA.5.2.13
+* BA.5.2.24
+* BA.5.2.25
+* BE.1.2.1
+* BF.31.1
+* BF.7
+* BN.1
+* BQ.1
+* BQ.1.1
+* CA.1
+* CH.1.1
+* CK.2.1.1
+* CR.1
+* CZ.1 and other BQ.1.1 descendants
+* XBB
+* XBB.1
+* and other variants with immune evasion mutations (e.g: S:R346T), particularly those variants with sets of 7 or more of such mutations of interest.
 
 ## Omicron sublineages in Canada {.tabset} 
 
@@ -230,7 +255,7 @@ Here we take a closer look, sub-dividing the three major Omicron sub-lineages cu
 #### Sublineage BA.1
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/subtype_plotter.R")
-set=getsublineagesfromnode("BA.1*")
+set=getStrictoSubLineages("BA.1*")
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
@@ -241,18 +266,20 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.2
 #### Sublineage BA.2
 ```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.2*")
+set=getStrictoSubLineages("BA.2*")
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 ### BA.4
 #### Sublineage BA.4
 ```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.4*")
+set=getStrictoSubLineages("BA.4*")
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -260,9 +287,10 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5.1
 #### Sublineage BA.5.1
 ```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.5.1*")
+set=getStrictoSubLineages("BA.5.1*")
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -270,9 +298,10 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5.2
 #### Sublineage BA.5.2
 ```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.5.2*")
+set=getStrictoSubLineages("BA.5.2*")
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -280,10 +309,11 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### Other BA.5
 #### Sublineage BA.5 without BA.5.1 and BA.5.2
 ```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("BA.5*")
-set=set[!set %in% append(getsublineagesfromnode("BA.5.1*"),getsublineagesfromnode("BA.5.2*"))]
+set=getStrictoSubLineages("BA.5*")
+set=set[!set %in% append(getStrictoSubLineages("BA.5.1*"),getStrictoSubLineages("BA.5.2*"))]
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
@@ -291,8 +321,8 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### Recombinant and divergent lineages
 #### Recombinant and divergent lineages
 ```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getsublineagesfromnode("*")
-set=set[!set %in% c(getsublineagesfromnode("BA.1*"),getsublineagesfromnode("BA.2*"),getsublineagesfromnode("BA.4*"),getsublineagesfromnode("BA.5*"))]
+set=getAllStrictoLineages()
+set=set[!set %in% c(getStrictoSubLineages("BA.1*"),getStrictoSubLineages("BA.2*"),getStrictoSubLineages("BA.4*"),getStrictoSubLineages("BA.5*"))]
 rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200))
 rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200),scale=T)
 ```
@@ -329,7 +359,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))!="*"
   }else{FALSE}})]
   
-d = plot_growing_lineage(paramselected)
+plot_growing_lineage(paramselected)
 
 ```
 
@@ -356,7 +386,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))=="*"
   }else{FALSE}})]
   
-d = plot_growing_lineage(paramselected)
+plot_growing_lineage(paramselected)
 
   
 ```
@@ -409,9 +439,9 @@ startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
 
 
-sublineages_BA2 <- getsublineagesfromnode("BA.2*")
-sublineages_BA4 <- getsublineagesfromnode("BA.4*")
-sublineages_BA5 <- getsublineagesfromnode("BA.5*")
+sublineages_BA2 <- getStrictoSubLineages("BA.2*")
+sublineages_BA4 <- getStrictoSubLineages("BA.4*")
+sublineages_BA5 <- getStrictoSubLineages("BA.5*")
 #color for each lineage
 col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
 
@@ -543,18 +573,20 @@ print("Not enough data available")
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.2}
-
-plotsubvariant <- function(region,min,node){
-  gg=getsublineagesfromnode(node)
+source("scripts/scanlineages.R")
+plotsubvariant <- function(region,min,parentalnode){
+  #subnodes=getAllSubLineages(parentalnode,fullpangotree)
+  subnodes=getStrictoSubLineages(parentalnode)
   for(p in allparams) {
-    if(!any(is.na(p$fit))){
-      if(p$region==region && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
+    if(!any(is.na(p$fit)) && p$region==region ){
+      if((p$mut[[1]] %in% subnodes) && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
           printest(p$mut[[1]])
           plot.selection(plotparam=p)
       }
     }
   }
 }
+
 
 plotba2 <- function(region,min){
   plotsubvariant(region,min,"BA.2*")
@@ -743,6 +775,10 @@ plotba5("East provinces (NL+NS+NB)",20)
 
 ## Variants in Canada over time
 
+These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
+Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
+<!-- Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.   -->
+
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
 meta1 <- meta[as.Date(meta$week) > as.Date('2021-01-01'), ]
@@ -766,10 +802,6 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
      elementId="barplot-element")
 ```
 
-These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
-Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
-<!-- Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.   -->
-
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
 The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
@@ -780,23 +812,6 @@ There are two PANGO lineages that have a Canadian origin and that predominately 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
-
-**Variants of current interest**, due to their potential growth advantage, or mutations of potential functional significance (with sublineages of many of these also of interest, such as all BQ*). See also the plot below of "Recently designated lineages showing most growth":
-
-* BA.5.2.24
-* BA.5.2.25
-* BA.4.6
-* BE.1.2.1
-* BF.7
-* BQ.1
-* BQ.1.1
-* CA.1
-* CK.2.1.1
-* CZ.1 and other BQ.1.1 descendants
-* XBB
-* XBB.1
-* and other variants with immune evasion mutations (e.g: S:R346T), particularly those variants with sets of 7 or more of such mutations of interest.
-
 
 
 ## Canadian trees {.tabset}  
