@@ -36,13 +36,11 @@ cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1
           sed -i '1i alias\tlineage'  ${data_dir}/pango_designation_alias_key_viralai.tsv
           rm  ${data_dir}/alias_key.json
           (
-            python  $scripts_dir}/viralai_fetch_metadata.py --alias 
-${data_dir}/pango_designation_alias_key_viralai.tsv --csv ${data_dir}/virusseq.$datestamp.metadata.tsv && gzip ${data_dir}/virusseq.$datestamp.metadata.tsv
+            python  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key_viralai.tsv --csv ${data_dir}/virusseq.$datestamp.metadata.tsv && gzip ${data_dir}/virusseq.$datestamp.metadata.tsv
           )
           (
             mkdir -p  ${data_dir}/temp
-            python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq  
-${data_dir}/temp/fasta_drl.$datestamp.txt
+            python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
             dnastack files download -i  ${data_dir}/temp/fasta_drl.$datestamp.txt -o ${data_dir}/temp
             mv ${data_dir}/temp/*.fa ${data_dir}/virusseq.$datestamp.fasta && xz -T0 ${data_dir}/virusseq.$datestamp.fasta
             rm -r  ${data_dir}/temp
