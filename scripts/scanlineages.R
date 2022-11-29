@@ -1,4 +1,21 @@
 
+
+### Create a dataframe containing all translation from the actual data contained in 'meta'
+### Ordering is helping finding the nickname that make the final name as short as possible
+makepangolindico <- function(){
+  getdef <- function(x){
+    raw=x[1]
+    lin=x[2]
+    fullname=sapply(list(strsplit(raw, "\\.")[[1]][1:(length(strsplit(raw, "\\.")[[1]])-length(strsplit(lin, "\\.")[[1]])+1)]), paste, collapse = ".")
+    c(surname=strsplit(lin, "\\.")[[1]][1],fullname=fullname)
+  }
+  dico=as.data.frame(unique(t(sapply(as.data.frame(t(unique(meta[meta$rawlineage!=meta$lineage,c("rawlineage", "lineage")]))),getdef))))
+  dico=dico[order(sapply(dico$fullname,nchar),decreasing=TRUE),]
+  return(dico)
+}
+dico=makepangolindico()
+
+
 ###Construct the tree
 makepangotree <- function(rawlineagelist){
   fulltree=list()
@@ -31,41 +48,40 @@ makepangotree <- function(rawlineagelist){
   return(fulltree)
 }
 
-
-makepangolindico <- function(){
-  getdef <- function(x){
-    raw=x[1]
-    lin=x[2]
-    fullname=sapply(list(strsplit(raw, "\\.")[[1]][1:(length(strsplit(raw, "\\.")[[1]])-length(strsplit(lin, "\\.")[[1]])+1)]), paste, collapse = ".")
-    c(surname=strsplit(lin, "\\.")[[1]][1],fullname=fullname)
+rawtoreallineage <- function(lineage){
+  t=dico[sapply(dico$fullname,function(x){grepl(x,lineage)}),]
+  if(nrow(t)>0){
+    deduced=str_replace(lineage,t[1,"fullname"], t[1,"surname"])
+    observed=meta[meta$rawlineage==lineage,][1,]$lineage
+    if(! is.na(observed) && deduced!=observed){
+      return(observed)
+    }
+    return(deduced)
   }
-  dico=as.data.frame(unique(t(sapply(as.data.frame(t(unique(meta[meta$rawlineage!=meta$lineage,c("rawlineage", "lineage")]))),getdef))))
-  dico=dico[order(sapply(dico$fullname,nchar),decreasing=TRUE),]
-  return(dico)
+  return(lineage)
 }
 
-dico=makepangolindico()
 
-rawtoreallineage <- function(l){
-  t=dico[sapply(dico$fullname,function(x){grepl(x,l)}),]
-  if(nrow(t>0)){
-    l=str_replace(l,t[1,"fullname"], t[1,"surname"])
+realtorawlineage <- function(lineage){
+  #Since * could be directly add to the first part : eg BA*
+  if(substr(lineage, nchar(lineage), nchar(lineage))=="*"){
+    star="*"
+    lineage=substr(lineage, 1, nchar(lineage)-1)
+  }else{
+    star=""
   }
-  return(l)
-}
-
-realtorawlineage <- function(l){
-  firstpart=strsplit(l, "\\.")[[1]][1]
+  firstpart=strsplit(lineage, "\\.")[[1]][1]
   if(any(firstpart==dico$surname)){
-    l=sapply(list(c(dico$fullname[dico$surname==firstpart],strsplit(l, "\\.")[[1]][-1])), paste, collapse = ".")
+    lineage=sapply(list(c(dico$fullname[dico$surname==firstpart],strsplit(lineage, "\\.")[[1]][-1])), paste, collapse = ".")
   }
-  return(l)
+  return(paste(lineage,star,sep=""))
 }
 
+getAllStrictoLineages <- function(){
+  unique(meta$lineage)
+}
 
-
-
-getsublineagesfromnode <- function(x) {
+getStrictoSubLineages <- function(x) {
   if(substr(x, nchar(x), nchar(x))!="*"){
     return(list(rawtoreallineage(x)))
   }else{
@@ -79,4 +95,38 @@ getsublineagesfromnode <- function(x) {
     }
     return(l)
   }
+}
+
+
+getAllSubLineages <- function(x,tree) {
+  if(substr(x, nchar(x), nchar(x))!="*"){
+    return(list(rawtoreallineage(x)))
+  }else{
+    raw=realtorawlineage(x)
+    raw=substr(raw, 0, nchar(raw)-1) #remove star
+    togrep=paste(raw,"$|",raw,".",sep="")
+    togrep=gsub("\\.", "\\\\.",togrep)
+    l=tree[grepl(togrep,tree)]
+    l=lapply(l,rawtoreallineage)
+    if(length(l)>1){
+      l=append(rawtoreallineage(x),l)
+    }
+    return(l)
+  }
+}
+
+create.pango.group <-  function(VOCVOI) {
+  VOCVOI=VOCVOI[order(sapply(VOCVOI$pangodesignation,function(x){length(getStrictoSubLineages(x))}),decreasing=TRUE),]
+  col=rep("other",nrow(meta))
+  for(i in 1:nrow(VOCVOI)){
+    if(VOCVOI[i,"pangodesignation"]=="X*"){
+      lineagelist=unique(meta$lineage[grepl("^X",meta$lineage)])
+    }else{
+      lineagelist=getStrictoSubLineages(VOCVOI[i,"pangodesignation"])
+    }
+    for(l in lineagelist){
+      col[meta["lineage"]==l] <- VOCVOI[i,"name"]
+    }
+  }
+  return(col)
 }
