@@ -59,4 +59,4 @@ if __name__ == '__main__':
                                                             .map(alias_dic) + "." + df['rawlineage'].str.split(".",1).str[1]).fillna(df['rawlineage'])
 
     # Sort by sample_collection_date and write it to csv
-    df.to_csv(args.csv, encoding='utf-8', index=False, sep='\t')
+    df.to_csv(args.csv, encoding='utf-8', index=False, sep='\t', compressio='gzip')
