@@ -403,7 +403,6 @@ function populateMetadataOptions(field){
 //function for populating the checkboxes for colorgroups
 //`d` is the dropdown object passed in as "this" with the onchange() function.
 //`value` is the workaround for default color scheme on page load.
-var metadataOptions = []
 function displayOptions(d, value = ""){
   var target;
   if (value != "") { //default view on page load
@@ -417,7 +416,7 @@ function displayOptions(d, value = ""){
 	optionDiv.selectAll("*").remove()
 	colorByDiv.selectAll("label").remove()
 
-  	metadataOptions = populateMetadataOptions(target) //get all the unique values within a metadata column
+  	var metadataOptions = populateMetadataOptions(target) //get all the unique values within a metadata column
   	var selectAllBox = colorByDiv //insert a select all checkbox
   	          .append("label")
               .html(function(d) {

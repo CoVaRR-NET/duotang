@@ -3,7 +3,6 @@
 DrawTree <- function(tree, metadata, treeType, fieldnames = c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
                                                     "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing",
                                                     "lineage", "pango.group")){
-  printest("test1")
   suppressWarnings(tt.layout <- tree.layout(tree, type='r'))
   #assign default colour to init color variable in json
   
@@ -15,7 +14,6 @@ DrawTree <- function(tree, metadata, treeType, fieldnames = c("fasta.header.name
     temp[tt.layout$edges$isTip] <- as.character(metadata[[field]])
     tt.layout$edges[[field]] <- temp
   }
-  view(tt.layout$edges)
   
   # append vertical edges
   v.edges <- t(sapply(split(tt.layout$edges, tt.layout$edges$parent), function(e) {
@@ -24,9 +22,7 @@ DrawTree <- function(tree, metadata, treeType, fieldnames = c("fasta.header.name
       x0=x, x1=x, y0=min(e$y0), y1=max(e$y0),
       colour=e[1,]$colour)
   }))
-  view(v.edges)
   edges <- merge(tt.layout$edges, v.edges, all=TRUE)  # tips, internals
-  #view(max(edges$x1))
   jsonObj <- toJSON(list(nodes=tt.layout$nodes, edges=edges, treetype=treeType))
   
   return(jsonObj)
