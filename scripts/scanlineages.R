@@ -115,3 +115,18 @@ getAllSubLineages <- function(x,tree) {
   }
 }
 
+create.pango.group <-  function(VOCVOI) {
+  VOCVOI=VOCVOI[order(sapply(VOCVOI$pangodesignation,function(x){length(getStrictoSubLineages(x))}),decreasing=TRUE),]
+  col=rep("other",nrow(meta))
+  for(i in 1:nrow(VOCVOI)){
+    if(VOCVOI[i,"pangodesignation"]=="X*"){
+      lineagelist=unique(meta$lineage[grepl("^X",meta$lineage)])
+    }else{
+      lineagelist=getStrictoSubLineages(VOCVOI[i,"pangodesignation"])
+    }
+    for(l in lineagelist){
+      col[meta["lineage"]==l] <- VOCVOI[i,"name"]
+    }
+  }
+  return(col)
+}
