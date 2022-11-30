@@ -35,22 +35,6 @@ if __name__ == '__main__':
     query = """SELECT * FROM collections.virusseq.public_samples"""
     df = pd.DataFrame(data_connect_client.query(query))
 
-    if not df['gisaid_accession'].is_unique():
-        df.to_csv(args.csv.replace("metadata.tsv",
-                                   "gisaid_duplicates.tsv"),
-                  encoding='utf-8',
-                  index=False,
-                  sep='\t',
-                  columns=df['gisaid_accession'])
-
-    if not df['isolate'].is_unique():
-        df.to_csv(args.csv.replace("metadata.tsv",
-                                   "virusseq_duplicates.tsv"),
-                  encoding='utf-8',
-                  index=False,
-                  sep='\t',
-                  columns=df['isolate'])
-
     df['rawlineage'] = df['lineage']
     alias_df = pd.read_csv(args.alias, sep='\t', header=0)
     alias_dic = pd.Series(alias_df.lineage.values,
@@ -60,3 +44,16 @@ if __name__ == '__main__':
 
     # Sort by sample_collection_date and write it to csv
     df.to_csv(args.csv, encoding='utf-8', index=False, sep='\t', compressio='gzip')
+
+    if not df['gisaid_accession'].dropna().is_unique:
+        df[df['gisaid_accession'].duplicated(keep=False)].to_csv(
+            args.csv.replace("metadata.csv.gz",
+                             "gisaid_duplicate_ids.txt"),
+            encoding='utf-8', index=False, sep='\t',  columns=[
+                'gisaid_accession'])
+
+    if not df['isolate'].is_unique:
+        df[df['isolate'].duplicated(keep=False)].to_csv(
+            args.csv.replace("metadata.csv.gz", "duplicate_ids.txt"),
+            encoding='utf-8', index=False, sep='\t', columns=[
+                'isolate'])
