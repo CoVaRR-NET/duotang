@@ -35,12 +35,13 @@ if __name__ == '__main__':
     query = """SELECT * FROM collections.virusseq.public_samples"""
     df = pd.DataFrame(data_connect_client.query(query))
 
-    df['rawlineage'] = df['lineage']
+    df['raw_lineage'] = df['lineage']
     alias_df = pd.read_csv(args.alias, sep='\t', header=0)
     alias_dic = pd.Series(alias_df.lineage.values,
                           index=alias_df.alias).to_dict()
-    df['rawlineage']=(df['rawlineage'].str.extract(r"([A-Z]+)",expand=False)
-                                                            .map(alias_dic) + "." + df['rawlineage'].str.split(".",1).str[1]).fillna(df['rawlineage'])
+    df['raw_lineage']=(df['raw_lineage'].str.extract(r"([A-Z]+)",
+                                                    expand=False)
+                                                            .map(alias_dic) + "." + df['raw_lineage'].str.split(".",1).str[1]).fillna(df['raw_lineage'])
 
     # Sort by sample_collection_date and write it to csv
     df.to_csv(args.csv, encoding='utf-8', index=False, sep='\t',
