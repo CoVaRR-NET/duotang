@@ -5,7 +5,7 @@ tarcmd=$(case "$(uname -s)" in Darwin)  echo 'gtar';;  Linux) echo 'tar';; esac)
 datestamp=$(date --utc +%Y-%m-%dT%H_%M_%S)
 echo version will be stamped as : $datestamp
 
-data_dir=${PWD}/data_needed
+data_dir=${PWD}/${data_dir}
 scripts_dir=${PWD}/scripts
 
 #get the json containing aliases
@@ -55,15 +55,16 @@ cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1
           # scan tarball for filenames
           tar -ztf ${data_dir}/virusseq.$datestamp.tar.gz > ${data_dir}/.list_filenames$datestamp
           # stream metadata into gz-compressed file
-          $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat data_needed/.list_filenames$datestamp | grep tsv$) | gzip > ${data_dir}/virusseq.$datestamp.metadata.tsv.gz
+          $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat ${data_dir}/.list_filenames$datestamp | grep tsv$) | gzip > ${data_dir}/virusseq.$datestamp.metadata.tsv.gz
           # stream FASTA data into xz-compressed file
-          $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat data_needed/.list_filenames$datestamp | grep fasta$) | perl -p -e "s/\r//g" | xz -T0 > ${data_dir}/virusseq.$datestamp.fasta.xz
+          $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat ${data_dir}/.list_filenames$datestamp | grep fasta$) | perl -p -e "s/\r//g" | xz -T0 > ${data_dir}/virusseq.$datestamp.fasta.xz
           # delete tarball
           rm ${data_dir}/virusseq.$datestamp.tar.gz ${data_dir}/.list_filenames$datestamp
 
           dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.public_samples" --format csv > ${data_dir}/viralai.$datestamp.csv
-          ( cat ${data_dir}/pango_designation_alias_key.json;cat data_needed/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
+          ( cat ${data_dir}/pango_designation_alias_key.json;cat ${data_dir}/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
           tr ' ' ',' | sed 's/lineage,lineage/raw_lineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
+          python3 scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
         )
   fi
 
