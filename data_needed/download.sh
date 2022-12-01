@@ -22,7 +22,7 @@ cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1
       cat ${data_dir}/pango_designation_alias_key.json;
       zcat ${data_dir}/ncov-open.$datestamp.tsv.gz | tr ' ' '_' | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g'| sed 's/\t$/\tNA/g'
       ) |
-    awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"rawlineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
+    awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"raw_lineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
     tr ' ' '\t'  | gzip > ${data_dir}/ncov-open.$datestamp.withalias.tsv.gz
 )&
 
@@ -63,7 +63,7 @@ cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1
 
           dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.public_samples" --format csv > ${data_dir}/viralai.$datestamp.csv
           ( cat ${data_dir}/pango_designation_alias_key.json;cat data_needed/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
-          tr ' ' ',' | sed 's/lineage,lineage/rawlineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
+          tr ' ' ',' | sed 's/lineage,lineage/raw_lineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
         )
   fi
 

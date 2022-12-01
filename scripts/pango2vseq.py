@@ -34,7 +34,9 @@ for row in rows:
         row.update({'lineage': pangolin_alias.get(label, None)})
 
 fieldnames = list(rows[0].keys())
+fieldnames = [i.replace(' ','_').replace("(","").replace(")","").replace("/","_") for i in fieldnames]
+
 outfile = gzip.open(args.output, 'wt')
 writer = csv.DictWriter(outfile, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
 writer.writeheader()
-writer.writerows(rows)
+#writer.writerows(rows)
