@@ -133,7 +133,7 @@ These analyses are subject to change given new data and updated lineage designat
 #Download metadata from VirusSeq, put the date here:
 
 # this can be made more compact for faster loading
-meta <- read.csv(gzfile("../temp/duotang/data_needed/virusseq.metadata.csv.gz"),sep="\t")
+meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"),sep="\t")
 meta$province <- meta$geo_loc_name_state_province_territory
 
 #Select on ly the column we want to use later
