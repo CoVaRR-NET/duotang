@@ -9,7 +9,7 @@ makepangolindico <- function(){
     fullname=sapply(list(strsplit(raw, "\\.")[[1]][1:(length(strsplit(raw, "\\.")[[1]])-length(strsplit(lin, "\\.")[[1]])+1)]), paste, collapse = ".")
     c(surname=strsplit(lin, "\\.")[[1]][1],fullname=fullname)
   }
-  dico=as.data.frame(unique(t(sapply(as.data.frame(t(unique(meta[meta$rawlineage!=meta$lineage,c("rawlineage", "lineage")]))),getdef))))
+  dico=as.data.frame(unique(t(sapply(as.data.frame(t(unique(meta[meta$raw_lineage!=meta$lineage,c("raw_lineage", "lineage")]))),getdef))))
   dico=dico[order(sapply(dico$fullname,nchar),decreasing=TRUE),]
   return(dico)
 }
@@ -17,7 +17,7 @@ dico=makepangolindico()
 
 
 ###Construct the tree
-makepangotree <- function(rawlineagelist){
+makepangotree <- function(raw_lineagelist){
   fulltree=list()
   addelement <- function(e){
     toadd=list()
@@ -42,7 +42,7 @@ makepangotree <- function(rawlineagelist){
     }
     return(toadd)
   }
-  for(l in rawlineagelist){
+  for(l in raw_lineagelist){
     fulltree=append(fulltree,addelement(l))
   }
   return(fulltree)
@@ -52,7 +52,7 @@ rawtoreallineage <- function(lineage){
   t=dico[sapply(dico$fullname,function(x){grepl(x,lineage)}),]
   if(nrow(t)>0){
     deduced=str_replace(lineage,t[1,"fullname"], t[1,"surname"])
-    observed=meta[meta$rawlineage==lineage,][1,]$lineage
+    observed=meta[meta$raw_lineage==lineage,][1,]$lineage
     if(! is.na(observed) && deduced!=observed){
       return(observed)
     }
@@ -89,7 +89,7 @@ getStrictoSubLineages <- function(x) {
     raw=substr(raw, 0, nchar(raw)-1) #remove star
     togrep=paste(raw,"$|",raw,".",sep="")
     togrep=gsub("\\.", "\\\\.",togrep)
-    l=unique(meta$lineage[grepl(togrep,meta$rawlineage)])
+    l=unique(meta$lineage[grepl(togrep,meta$raw_lineage)])
     if(length(l)>1){
       l=append(rawtoreallineage(x),l)
     }

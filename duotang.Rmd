@@ -133,12 +133,12 @@ These analyses are subject to change given new data and updated lineage designat
 #Download metadata from VirusSeq, put the date here:
 
 # this can be made more compact for faster loading
-meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"))
-meta$province <- meta$geo_loc_name..state.province.territory.
+meta <- read.csv(gzfile("../temp/duotang/data_needed/virusseq.metadata.csv.gz"),sep="\t")
+meta$province <- meta$geo_loc_name_state_province_territory
 
 #Select on ly the column we want to use later
-columnlist=c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
-                      "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing","lineage", "rawlineage")
+columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin", "sample_collection_date", 
+                      "sample_collected_by", "purpose_of_sampling", "purpose_of_sequencing","lineage", "raw_lineage")
 meta <- meta[,columnlist]
 
 
@@ -148,12 +148,12 @@ for(col in columnlist){
   meta[col][meta[col]==unknowntag] <- "Unknown"
 }
 
-meta$sample.collection.date <- as.Date(meta$sample.collection.date)
-meta$week <- cut(meta$sample.collection.date, 'week')
+meta$sample_collection_date <- as.Date(meta$sample_collection_date)
+meta$week <- cut(meta$sample_collection_date, 'week')
 
 source("scripts/scanlineages.R")
-meta$pango.group <- create.pango.group(VOCVOI)
-meta$pango.group <- as.factor(meta$pango.group)
+meta$pango_group <- create.pango.group(VOCVOI)
+meta$pango_group <- as.factor(meta$pango_group)
 
 ## 2. LOAD epidemiological data (PHAC)
 
@@ -176,28 +176,26 @@ for(row in 1:nrow(epidataCANall)) {
 }
 epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
 
-
 ```
 
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
-fullpangotree=makepangotree(unique(meta$rawlineage))
-latelineage_pangotree=makepangotree(unique(meta$rawlineage[meta$sample.collection.date>as.Date("2022-10-14") ]))
-length(latelineage_pangotree)
+fullpangotree=makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree=makepangotree(unique(meta$raw_lineage[meta$sample_collection_date>as.Date("2022-10-14") ]))
 reference <- list("BA.5.2")
-
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date("2022-05-05")
+startdate<-as.Date(VirusSeq_release)-days(120)
 
 allparams=list()
 for( l in latelineage_pangotree){
   lineagelist=getStrictoSubLineages(l)
-  printest(lineagelist)
   for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
     if(length(intersect(reference,lineagelist))==0){
+      printest(region)
+      printest(l)
       p=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
       allparams=append(allparams,list(p))
     }
@@ -345,7 +343,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))!="*"
   }else{FALSE}})]
   
-plot_growing_lineage(paramselected)
+a=plot_growing_lineage(paramselected)
 
 ```
 
@@ -372,7 +370,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))=="*"
   }else{FALSE}})]
   
-plot_growing_lineage(paramselected)
+a=plot_growing_lineage(paramselected)
 
   
 ```
@@ -749,7 +747,7 @@ plotba5("Ontario",20)
 #### QC
 ##### Quebec (n>20)
 ```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Quebec",20)
+plotba5("Quebec",10)
 ```
 
 #### East
@@ -767,17 +765,18 @@ Because sampling and sequencing procedures vary by region and time, this does no
 
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
+
 meta1 <- meta[as.Date(meta$week) > as.Date('2021-01-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
 #meta1$pango.group <- meta1$jstrick 
 
 dat <- lapply(unique(meta1$province), function(x) {
   as.data.frame.matrix(table(meta1$week[meta1$province==x],
-                             meta1$pango.group[meta1$province==x]))
+                             meta1$pango_group[meta1$province==x]))
 })
 names(dat) <- unique(meta1$province)
 
-dat[['Canada']] <- as.data.frame.matrix(table(meta1$week, meta1$pango.group))
+dat[['Canada']] <- as.data.frame.matrix(table(meta1$week, meta1$pango_group))
 
 # pass colour legend to JavaScript layer
 dat[['legend']] <- as.list(VOCVOI$color)
@@ -786,7 +785,10 @@ dat[['legend']]$other <- 'grey'
 
 r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
      elementId="barplot-element")
+rm(dat)
+rm(meta1)
 ```
+
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
@@ -820,15 +822,15 @@ dateseq <- seq(ymd('2019-12-01'), ymd('2022-11-01'), by='3 month')
 mltree$tip.label <- reduce.tipnames(mltree$tip.label)
 ttree$tip.label <- reduce.tipnames(ttree$tip.label)
 
-fieldnames<- c("fasta.header.name", "province", "host.gender", "host.age.bin",
-               "sample.collected.by", "purpose.of.sampling",
-               "lineage", "pango.group","week")
+fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
+               "sample_collected_by", "purpose_of_sampling",
+               "lineage", "pango_group","week")
 
 # extract rows from metadata table that correspond to this tree
-metasub1 <- meta[meta$fasta.header.name %in% ttree$tip.label, fieldnames]
+metasub1 <- meta[meta$fasta_header_name %in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
-metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta.header.name), ]
-metasub_omi <- metasub1[grepl("Omicron",metasub1$pango.group ), ]
+metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
+metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
 
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
@@ -847,7 +849,7 @@ timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", fieldnames)
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", fieldnames)
 
 ### omicron diversity tree
-MLtree_omi<-keep.tip(mltree, metasub_omi$fasta.header.name)
+MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", fieldnames)
 
 ```

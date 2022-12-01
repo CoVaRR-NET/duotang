@@ -10,10 +10,10 @@ require(lubridate)
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
                              scaled=FALSE, col=NA, mindate=as.Date('2021-11-02')) {
 
-  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample.collection.date>mindate)
+  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate)
   #length(varmeta1$lineage)
   
-  varmeta1$pango.group <- varmeta1$lineage
+  varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
   if(nrow(lineagecount)>16)
@@ -21,30 +21,30 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     lineagecount=as_data_frame(lineagecount)
     rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-15) #filter(n<0.01*nrow(varmeta1))
     rarelineages_names=sapply(list(paste(rarelineages$lineage,"(",rarelineages$n,")",sep="")), paste, collapse = ", ")
-    varmeta1$pango.group<-replace(varmeta1$pango.group, varmeta1$pango.group  %in% rarelineages$lineage, "other lineages")
+    varmeta1$pango_group<-replace(varmeta1$pango_group, varmeta1$pango_group  %in% rarelineages$lineage, "other lineages")
   }
   else{rarelineages_names=""}
   
-  varmeta1$pango.group <- as.factor(varmeta1$pango.group)
+  varmeta1$pango_group <- as.factor(varmeta1$pango_group)
   
-  #print(varmeta1$sample.collection.date)
+  #print(varmeta1$sample_collection_date)
   
-  varmeta1$week <- cut(varmeta1$sample.collection.date, 'week')
+  varmeta1$week <- cut(varmeta1$sample_collection_date, 'week')
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
   varmeta1$week <- as.factor(as.character(varmeta1$week))
   
   if (is.na(col)) {
-    col <- rainbow(length(levels(varmeta1$pango.group)))  # default colour palette
+    col <- rainbow(length(levels(varmeta1$pango_group)))  # default colour palette
   }
   pal <- col
-  names(pal) <- levels(varmeta1$pango.group)
+  names(pal) <- levels(varmeta1$pango_group)
   pal["other lineages"] <- 'grey'  # named character vector
-  pal <- pal[match(levels(varmeta1$pango.group), names(pal))]
+  pal <- pal[match(levels(varmeta1$pango_group), names(pal))]
   if (region=='Canada') {
-    tab <- table(varmeta1$pango.group, varmeta1$week)  
+    tab <- table(varmeta1$pango_group, varmeta1$week)  
   } else {
     varmeta2 <- varmeta1[varmeta1$geo_loc_name..state.province.territory.==region, ]
-    tab <- table(varmeta2$pango.group, varmeta2$week)  
+    tab <- table(varmeta2$pango_group, varmeta2$week)  
   }
   
   if (scaled) {
@@ -53,7 +53,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     barplot(tab2, col=pal, 
             border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
             ylab="Sequenced cases per week (fraction)") -> mp
-    legend(x=max(mp)+1, y=1, legend=rev(levels(varmeta1$pango.group)), 
+    legend(x=max(mp)+1, y=1, legend=rev(levels(varmeta1$pango_group)), 
            bty='n', xpd=NA, cex=0.7, fill=rev(pal), 
            x.intersp=0.5, y.intersp=1, border=NA)
   } 
