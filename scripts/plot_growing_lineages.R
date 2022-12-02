@@ -34,7 +34,6 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
     couleur=rev(hcl.colors(length(levels(d$sequence_count)), "Red-Blue"))
     names(couleur)=levels(d$sequence_count)
     colScale=scale_colour_manual(name="sequence_count",values=couleur)
-    print(d$sel_coeff)
     d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
     p <- ggplot(d, aes(x=lineage, y=sel_coeff,colour=sequence_count))+
     geom_point(size=5)+

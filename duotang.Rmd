@@ -22,7 +22,7 @@ output:
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2022-11-28"
+VirusSeq_release="2022-12-01"
 
 pangoversion="4.1.3 (Viral AI)"
 
@@ -98,7 +98,7 @@ opts_knit$set(root.dir = getwd())
 
 ### Contributing authors:  
 
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro.
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Justin Jia, Zohaib Anwar and Erin Gill.
 Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Fiona Brinkman, Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, William Hsiao, and Erin Gill. 
 
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
@@ -115,8 +115,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 Only representations of aggregate data will be posted here.
 
 **Important caveats and disclaimers:**  
-These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing repositfa
-tories.
+These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
 Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
 For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
@@ -125,7 +124,7 @@ With the arrival of the Omicron wave, many jurisdictions across Canada reached t
 Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
-These analyses are subject to change given new data and updated lineage designations.
+These analyses are subject to frequent change given new data and updated lineage designations.
 
 ```{r load_data}
 
@@ -233,7 +232,7 @@ BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, w
 
 ## Omicron sublineages in Canada {.tabset} 
 
-Here we take a closer look, sub-dividing the three major Omicron sub-lineages currently circulating in Canada.
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
 
 ### BA.1
 #### Sublineage BA.1
@@ -488,13 +487,12 @@ local_maxdate=plot.selection.estimate(region="Alberta",
 #### Saskatchewan
 
 ```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-print("Not enough data available")
-#local_maxdate=plot.selection.estimate(region="Saskatchewan",
-#                                      startdate=startdate, startpar=startpar3,
-#                                      reference=c(sublineages_BA2),
-#                                      mutants=list(sublineages_BA4,sublineages_BA5),
-#                                      names=list("BA.4*","BA.5*"),
-#                                      maxdate=maxdate, col=col)
+local_maxdate=plot.selection.estimate(region="Saskatchewan",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
 ```
 
 
@@ -540,13 +538,13 @@ local_maxdate=plot.selection.estimate(region="Quebec",
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-print("Not enough data available")
-#local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
-#                                      startdate=startdate, startpar=startpar3,
-#                                      reference=c(sublineages_BA2),
-#                                      mutants=list(sublineages_BA4,sublineages_BA5),
-#                                      names=list("BA.4*","BA.5*"),
-#                                      maxdate=maxdate, col=col)
+#print("Not enough data available")
+local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
+                                      startdate=startdate, startpar=startpar3,
+                                      reference=c(sublineages_BA2),
+                                      mutants=list(sublineages_BA4,sublineages_BA5),
+                                      names=list("BA.4*","BA.5*"),
+                                      maxdate=maxdate, col=col)
 ```
 
 
