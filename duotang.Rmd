@@ -174,7 +174,7 @@ for(row in 1:nrow(epidataCANall)) {
   }
 }
 epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
-
+unique(meta$province)
 ```
 
 
@@ -766,7 +766,6 @@ Because sampling and sequencing procedures vary by region and time, this does no
 
 meta1 <- meta[as.Date(meta$week) > as.Date('2021-01-01'), ]
 meta1$week <- as.factor(as.character(meta1$week))
-#meta1$pango.group <- meta1$jstrick 
 
 dat <- lapply(unique(meta1$province), function(x) {
   as.data.frame.matrix(table(meta1$week[meta1$province==x],
@@ -825,7 +824,7 @@ fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "lineage", "pango_group","week")
 
 # extract rows from metadata table that correspond to this tree
-metasub1 <- meta[meta$fasta_header_name %in% ttree$tip.label, fieldnames]
+metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
 metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
