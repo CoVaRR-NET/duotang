@@ -23,7 +23,7 @@ alpha <- function(col, alpha) {
 .combine.lineages <- function(df) {
   df <- as.data.frame(
     unique(df %>% group_by(time) %>% transmute(
-      day=sample.collection.date, n=sum(n), time=time, lineage=lineage
+      day=sample_collection_date, n=sum(n), time=time, lineage=lineage
       )))
   df$lineage <- df$lineage[1]
   distinct(df)
@@ -47,15 +47,15 @@ alpha <- function(col, alpha) {
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
     province %in% prov,
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
-    ) %>% group_by(sample.collection.date) %>% dplyr::count(lineage)
+    !is.na(sample_collection_date),
+    sample_collection_date >= startdate
+    ) %>% group_by(sample_collection_date) %>% dplyr::count(lineage)
   
   # set final date
-  lastdate <- max(mydata$sample.collection.date)
+  lastdate <- max(mydata$sample_collection_date)
   
   # convert time to negative integers for fitting model (0 = last date)
-  mydata$time <- as.numeric(difftime(mydata$sample.collection.date, lastdate, 
+  mydata$time <- as.numeric(difftime(mydata$sample_collection_date, lastdate, 
                                      units='days'))
   
   # separate by reference and mutant lineage(s)

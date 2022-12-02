@@ -35,12 +35,12 @@ get.province.list <- function(region){
   mydata <- meta %>% filter(
     lineage %in% c(unlist(reference), unlist(mutants)), 
     province %in% get.province.list(region),
-    !is.na(sample.collection.date),
-    sample.collection.date >= startdate
+    !is.na(sample_collection_date),
+    sample_collection_date >= startdate
   )
   # separate by reference (n1) and mutant lineage(s) (n2)
   mydata$lineage = mydata$lineage %in% reference
-  mydata <- mydata %>% group_by(sample.collection.date) %>% dplyr::count(lineage, name = "n")
+  mydata <- mydata %>% group_by(sample_collection_date) %>% dplyr::count(lineage, name = "n")
   mydata$lineage <- lapply(mydata$lineage, function(isref) if(isref){"n1"}else{"n2"} )
   if(length(unique(mydata$lineage)) !=2 ){
     return(NA)
@@ -48,7 +48,7 @@ get.province.list <- function(region){
   
   
   widetable = pivot_wider(mydata, names_from = lineage, values_from = n, values_fill = 0 )
-  names(widetable)[names(widetable) == "sample.collection.date"] <- "date"
+  names(widetable)[names(widetable) == "sample_collection_date"] <- "date"
   
   
   alltime=seq.Date(as.Date(startdate), as.Date(max(widetable$date)), "days") 

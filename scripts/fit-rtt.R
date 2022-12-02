@@ -13,15 +13,15 @@ dlines <- function(x, y, col) {
 fit.rtt <- function(path, plot=FALSE) {
   rooted <- read.tree(path)
   rooted$tip.label <- get.tipnames(rooted$tip.label)
-  metadataRTT <- meta[meta$fasta.header.name %in% rooted$tip.label, ]
-  index1 <- match(rooted$tip.label, metadataRTT$fasta.header.name)
+  metadataRTT <- meta[meta$fasta_header_name %in% rooted$tip.label, ]
+  index1 <- match(rooted$tip.label, metadataRTT$fasta_header_name)
   if(sum(is.na(index1))!=0){
     print("some samples in the tree do not have sampling dates inthe metadatas")
     return()
   }
-  date <- metadataRTT$sample.collection.date[index1]
-  pg <- metadataRTT$pango.group[index1]
-  #print(metadataRTT[metadataRTT$pango.group=="other",]$lineage)
+  date <- metadataRTT$sample_collection_date[index1]
+  pg <- metadataRTT$pango_group[index1]
+  #print(metadataRTT[metadataRTT$pango_group=="other",]$lineage)
   date <- as.Date(date)
   # total branch length from root to each tip
   div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
