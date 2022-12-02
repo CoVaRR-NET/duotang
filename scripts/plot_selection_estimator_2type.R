@@ -18,17 +18,6 @@ alpha <- function(col, alpha) {
 }
 
 
-get.province.list <- function(region){
-  # handle special values for prov
-  if (region[1] == "East provinces (NL+NS+NB)") {
-    provlist <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
-  } else if (region[1] == "Canada") {
-    provlist <- unique(meta$province)
-  } else {
-    provlist <- region
-  }
-  return(provlist)
-}
 
 .make.estimator <- function(region, startdate, reference, mutants) {
   # filter metadata
