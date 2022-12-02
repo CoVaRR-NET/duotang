@@ -5,7 +5,7 @@ tarcmd=$(case "$(uname -s)" in Darwin)  echo 'gtar';;  Linux) echo 'tar';; esac)
 datestamp=$(date --utc +%Y-%m-%dT%H_%M_%S)
 echo version will be stamped as : $datestamp
 
-data_dir=${PWD}/${data_dir}
+data_dir=${PWD}/data_needed
 scripts_dir=${PWD}/scripts
 
 #get the json containing aliases
