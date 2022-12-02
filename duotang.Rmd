@@ -174,7 +174,6 @@ for(row in 1:nrow(epidataCANall)) {
   }
 }
 epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
-unique(meta$province)
 ```
 
 
@@ -182,7 +181,7 @@ unique(meta$province)
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
 fullpangotree=makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree=makepangotree(unique(meta$raw_lineage[meta$sample_collection_date>as.Date("2022-10-14") ]))
+latelineage_pangotree=makepangotree(unique(meta$raw_lineage[meta$sample_collection_date>as.Date("2022-11-14") ]))
 reference <- list("BA.5.2")
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
@@ -202,8 +201,9 @@ for( l in latelineage_pangotree){
 }
 allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
 
-
 ```
+
+
 
 # SARS-CoV-2 in Canada
 

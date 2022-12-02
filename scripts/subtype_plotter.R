@@ -8,18 +8,18 @@ require(lubridate)
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
-                             scaled=FALSE, col=NA, mindate=as.Date('2021-11-02')) {
+                             scaled=FALSE, col=NA, mindate=as.Date('2022-01-01')) {
 
-  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate)
-  #length(varmeta1$lineage)
+  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, province %in% get.province.list(region))
   
   varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
-  if(nrow(lineagecount)>16)
+  max=15
+  if(nrow(lineagecount)>max)
   { 
     lineagecount=as_data_frame(lineagecount)
-    rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-15) #filter(n<0.01*nrow(varmeta1))
+    rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-max) #filter(n<0.01*nrow(varmeta1))
     rarelineages_names=sapply(list(paste(rarelineages$lineage,"(",rarelineages$n,")",sep="")), paste, collapse = ", ")
     varmeta1$pango_group<-replace(varmeta1$pango_group, varmeta1$pango_group  %in% rarelineages$lineage, "other lineages")
   }
@@ -34,18 +34,14 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   varmeta1$week <- as.factor(as.character(varmeta1$week))
   
   if (is.na(col)) {
-    col <- rainbow(length(levels(varmeta1$pango_group)))  # default colour palette
+    set.seed(320)
+    col <- sample(rainbow(length(levels(varmeta1$pango_group))))  # default colour palette
   }
   pal <- col
   names(pal) <- levels(varmeta1$pango_group)
   pal["other lineages"] <- 'grey'  # named character vector
   pal <- pal[match(levels(varmeta1$pango_group), names(pal))]
-  if (region=='Canada') {
-    tab <- table(varmeta1$pango_group, varmeta1$week)  
-  } else {
-    varmeta2 <- varmeta1[varmeta1$geo_loc_name..state.province.territory.==region, ]
-    tab <- table(varmeta2$pango_group, varmeta2$week)  
-  }
+  tab <- table(varmeta1$pango_group, varmeta1$week)
   
   if (scaled) {
     par(mar=c(5,5,1,5))
