@@ -19,7 +19,7 @@ console.log(data)
 
 
 //set the default color scheme
-var defaultColorBy = "pango.group"
+var defaultColorBy = "pango_group"
 //sets the default colors. 
 var defaultColorList = ["#A6CEE3", "#1F78B4",  "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F","#B2DF8A", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928"];
 //sets scaling factors

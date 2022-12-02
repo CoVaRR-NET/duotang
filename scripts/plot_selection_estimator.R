@@ -33,7 +33,7 @@ alpha <- function(col, alpha) {
 .make.estimator <- function(region, startdate, reference, mutants) {
   # handle special values for prov
   if (region[1] == "East provinces (NL+NS+NB)") {
-    prov <- c("Nova_Scotia", "New_Brunswick", "Newfoundland and Labrador")
+    prov <- c("Nova Scotia", "New Brunswick", "Newfoundland and Labrador")
   } else if (region[1] == "Canada") {
     prov <- unique(meta$province)
   } else if (region[1] == "Canada (no AB)") {
