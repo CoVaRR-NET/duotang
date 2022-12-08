@@ -87,7 +87,7 @@ getAllStrictoLineages <- function(meta) {
 getStrictoSubLineages <- function(x, meta) {
   raw <- realtorawlineage(x)
   if (!endsWith(x, "*")) {
-    return(list(raw))
+    return(list(rawtoreallineage(raw)))
   }
   else {
     raw <- substr(raw, 0, nchar(raw)-1)  # remove star
