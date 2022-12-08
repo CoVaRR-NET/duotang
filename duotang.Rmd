@@ -268,7 +268,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.4
 #### Sublineage BA.4
 ```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.4*")
+set=getStrictoSubLineages("BA.4*",meta)
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
