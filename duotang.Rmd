@@ -195,7 +195,7 @@ startdate<-as.Date(VirusSeq_release)-days(120)
 
 allparams=list()
 for( l in latelineage_pangotree){
-  lineagelist=getStrictoSubLineages(l)
+  lineagelist=getStrictoSubLineages(l,meta)
   for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
     if(length(intersect(reference,lineagelist))==0){
       printest(region)
@@ -247,7 +247,7 @@ Here we take a look, sub-dividing the major sub-lineages currently circulating i
 #### Sublineage BA.1
 ```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/subtype_plotter.R")
-set=getStrictoSubLineages("BA.1*")
+set=getStrictoSubLineages("BA.1*",meta)
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
@@ -258,7 +258,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.2
 #### Sublineage BA.2
 ```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.2*")
+set=getStrictoSubLineages("BA.2*",meta)
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
@@ -279,7 +279,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5.1
 #### Sublineage BA.5.1
 ```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5.1*")
+set=getStrictoSubLineages("BA.5.1*",meta)
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
@@ -290,7 +290,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### BA.5.2
 #### Sublineage BA.5.2
 ```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5.2*")
+set=getStrictoSubLineages("BA.5.2*",meta)
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
@@ -301,8 +301,8 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ### Other BA.5
 #### Sublineage BA.5 without BA.5.1 and BA.5.2
 ```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5*")
-set=set[!set %in% append(getStrictoSubLineages("BA.5.1*"),getStrictoSubLineages("BA.5.2*"))]
+set=getStrictoSubLineages("BA.5*",meta)
+set=set[!set %in% append(getStrictoSubLineages("BA.5.1*",meta),getStrictoSubLineages("BA.5.2*",meta))]
 rarelineages_names=plot.subvariants(sublineage=set)
 rarelineages_names=plot.subvariants(sublineage=set,scale=T)
 printest(rarelineages_names)
@@ -314,7 +314,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 #### Recombinant and divergent lineages
 ```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 set=getAllStrictoLineages()
-set=set[!set %in% c(getStrictoSubLineages("BA.1*"),getStrictoSubLineages("BA.2*"),getStrictoSubLineages("BA.4*"),getStrictoSubLineages("BA.5*"))]
+set=set[!set %in% c(getStrictoSubLineages("BA.1*",meta),getStrictoSubLineages("BA.2*",meta),getStrictoSubLineages("BA.4*",meta),getStrictoSubLineages("BA.5*",meta))]
 rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200))
 rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date(VirusSeq_release)-days(200),scale=T)
 ```
@@ -431,9 +431,9 @@ startpar2 <- list(p=0.5, s=0.1)
 startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
 
 
-sublineages_BA2 <- getStrictoSubLineages("BA.2*")
-sublineages_BA4 <- getStrictoSubLineages("BA.4*")
-sublineages_BA5 <- getStrictoSubLineages("BA.5*")
+sublineages_BA2 <- getStrictoSubLineages("BA.2*",meta)
+sublineages_BA4 <- getStrictoSubLineages("BA.4*",meta)
+sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
 #color for each lineage
 col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
 
@@ -565,7 +565,7 @@ Here we show the trends of the various BA.2.* sublineages over time, relative to
 source("scripts/scanlineages.R")
 plotsubvariant <- function(region,min,parentalnode){
   #subnodes=getAllSubLineages(parentalnode,fullpangotree)
-  subnodes=getStrictoSubLineages(parentalnode)
+  subnodes=getStrictoSubLineages(parentalnode,meta)
   for(p in allparams) {
     if(!any(is.na(p$fit)) && p$region==region ){
       if((p$mut[[1]] %in% subnodes) && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
