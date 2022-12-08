@@ -144,10 +144,10 @@ create.pango.group <-  function(VOCVOI, meta) {
   lineage.groups <- lineage.groups[order(n.derived, decreasing=TRUE)]
   
   col <- rep("other", nrow(meta))  # prepare output vector
-  for (i in 1:length(lineage.list)) {
+  for (i in 1:length(lineage.groups)) {
     # this will overwrite PANGO groups with derived group labels
-    idx <- which(is.element(meta$lineage, lineage.list[[i]]))
-    col[idx] <- names(lineage.list)[i]
+    idx <- which(is.element(meta$lineage, lineage.groups[[i]]))
+    col[idx] <- names(lineage.groups)[i]
   }
 
   return(col)
