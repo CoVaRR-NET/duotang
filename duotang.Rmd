@@ -26,27 +26,29 @@ VirusSeq_release="2022-12-01"
 
 pangoversion="4.1.3 (Viral AI)"
 
-VOCVOI = data.frame(name=character(),pangodesignation=character(),color=character())
+VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
 
-VOCVOI=add.pango.group("Alpha","Q*",'#B29C71')
-VOCVOI=add.pango.group("Beta","B.1.351*",'#F08C3A')
-VOCVOI=add.pango.group("Gamma","B.1.1.28*",'#0000FF')
-VOCVOI=add.pango.group("Delta","AY*",'#A6CEE3')
-VOCVOI=add.pango.group("Lambda","B.1.1.1*",'#FFFF00')
+VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
+VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
+VOCVOI=add.pango.group("Gamma", "B.1.1.28*", '#0000FF')
+VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
+VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
 
-VOCVOI=add.pango.group("Omicron BA.1","BA.1*",'#8B0000')
-VOCVOI=add.pango.group("Omicron BA.2","BA.2*",'#FF0000')
-VOCVOI=add.pango.group("Omicron BA.4","BA.4*",'#BC544B')
-VOCVOI=add.pango.group("Omicron BA.5","BA.5*",'#CC66FF')
-VOCVOI=add.pango.group("Omicron BQ","BQ*",'#9CB329')
+VOCVOI=add.pango.group("Omicron BA.1", "BA.1*", '#8B0000')
+VOCVOI=add.pango.group("Omicron BA.2", "BA.2*", '#FF0000')
+VOCVOI=add.pango.group("Omicron BA.4", "BA.4*", '#BC544B')
+VOCVOI=add.pango.group("Omicron BA.5", "BA.5*", '#CC66FF')
+VOCVOI=add.pango.group("Omicron BQ", "BQ*", '#9CB329')
+VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
+#VOCVOI=add.pango.group("Omicron BF","BF*",'#9F2B11')
 
-VOCVOI=add.pango.group("A.23.1","A.23.1*",'#9AD378')
-VOCVOI=add.pango.group("B.1.438.1","B.1.438.1*",'#3EA534')
-VOCVOI=add.pango.group("Recombinants","X*",'black')
+VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
+VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
+VOCVOI=add.pango.group("Recombinants", "X*", 'black')
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
-pal["other"] <- 'grey'  # named character vector
+pal["other"] <- 'grey' # named character vector
 
 ```
 
@@ -132,26 +134,30 @@ These analyses are subject to frequent change given new data and updated lineage
 #Download metadata from VirusSeq, put the date here:
 
 # this can be made more compact for faster loading
-meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"),sep="\t")
+meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"), sep="\t")
 meta$province <- meta$geo_loc_name_state_province_territory
 
-#Select on ly the column we want to use later
-columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin", "sample_collection_date", 
-                      "sample_collected_by", "purpose_of_sampling", "purpose_of_sequencing","lineage", "raw_lineage")
-meta <- meta[,columnlist]
+# Select only the column we want to use later
+columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin",
+             "sample_collection_date", "sample_collected_by", 
+             "purpose_of_sampling", "purpose_of_sequencing","lineage", 
+             "raw_lineage")
+meta <- meta[ , columnlist]
 
 
-### metadata cleaning
-for(col in columnlist){
-  for(unknowntag in c("Undeclared","Not Provided","Restricted Access","Missing","Not Applicable"))
-  meta[col][meta[col]==unknowntag] <- "Unknown"
-}
+### metadata cleaning 
+unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
+                 "Not Applicable")
+meta <- as.data.frame(apply(meta, 2, function(x) {
+  x[is.element(x, unknown.str)] <- "Unknown"
+  x
+}))
 
 meta$sample_collection_date <- as.Date(meta$sample_collection_date)
 meta$week <- cut(meta$sample_collection_date, 'week')
 
 source("scripts/scanlineages.R")
-meta$pango_group <- create.pango.group(VOCVOI)
+meta$pango_group <- create.pango.group(VOCVOI, meta)
 meta$pango_group <- as.factor(meta$pango_group)
 
 ## 2. LOAD epidemiological data (PHAC)
@@ -209,9 +215,11 @@ allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA
 
 ## Current Situation
 
-BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest.
-**Variants of current interest**, due to their potential growth advantage, or mutations of potential functional significance (note: sublineages of many of these are also of interest). See also the evolving plot below of “Fastest growing lineages in Canada”:
 
+BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest. BA.2.75, which previously was more associated with the eastern hemisphere of the globe, is starting to increase more notably in some regions in the western hemisphere, including some regions of Canada.
+**Variants of current interest**,, due to their potential growth advantage, or mutations of potential functional significance (note: sublineages of many of these are also of interest). See also the evolving plot below of “Fastest growing lineages in Canada”:
+
+* BA.2.75
 * BA.5.2.13
 * BA.5.2.24
 * BA.5.2.25
@@ -221,6 +229,7 @@ BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, w
 * BN.1
 * BQ.1
 * BQ.1.1
+* BW.1
 * CA.1
 * CH.1.1
 * CK.2.1.1
@@ -453,8 +462,6 @@ maxdate=plot.selection.estimate(region="Canada (no AB)",
                                       mutants=list(sublineages_BA4,sublineages_BA5),
                                       names=list("BA.4*","BA.5*"),
                                       maxdate=NA, col=col)
-  #plot.selection.estimate(region="Canada (no AB)", startdate=startdate, startpar=startpar2,
-#                         reference=c(name1, name2), mutants=list(name3), col=col)
 ```
 
 ### BC
@@ -1087,7 +1094,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 variants
 # Acknowledgements and sources
 
-We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work.  Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
+We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
 
 We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the VirusSeq database, on which this research is based.
 
@@ -1096,7 +1103,7 @@ We wish to acknowledge the following organisations/laboratories for contributing
 
 * Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
 
-* Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)  
+* Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)
 
 
 
