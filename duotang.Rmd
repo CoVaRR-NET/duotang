@@ -22,7 +22,7 @@ output:
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2022-12-01"
+VirusSeq_release="2022-12-08"
 
 pangoversion="4.1.3 (Viral AI)"
 
