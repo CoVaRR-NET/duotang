@@ -147,7 +147,7 @@ def load_metadata(path):
     """
     handle = gzip.open(path, 'rt')
     metadata = {}
-    rows = csv.DictReader(handle)
+    rows = csv.DictReader(handle, delimiter='\t', quoting=csv.QUOTE_NONE)
     
     for count, row in enumerate(rows):
         lineage = row["lineage"]
@@ -156,7 +156,7 @@ def load_metadata(path):
 
         # parse collection date
         try:
-            dt = datetime.strptime(row["sample collection date"], "%Y-%m-%d")
+            dt = datetime.strptime(row["sample_collection_date"], "%Y-%m-%d")
         except ValueError:
             # skip records with incomplete collection dates
             continue
@@ -167,7 +167,7 @@ def load_metadata(path):
         if yearweek not in metadata[lineage]:
             metadata[lineage].update({yearweek: []})
         metadata[lineage][yearweek].append(
-            tuple([row["fasta header name"], row["sample collection date"]])
+            tuple([row["fasta_header_name"], row["sample_collection_date"]])
         )
 
     return metadata
