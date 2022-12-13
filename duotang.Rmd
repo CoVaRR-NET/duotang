@@ -23,6 +23,7 @@ output:
 source("scripts/utils.R")
 #Date of the VirusSeq release
 VirusSeq_release="2022-12-08"
+Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.1.3 (Viral AI)"
 
@@ -255,15 +256,27 @@ printest(rarelineages_names)
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 
-### BA.2
+### early BA.2
 #### Sublineage BA.2
-```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+```{r subtype plotter BA.2 early, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 set=getStrictoSubLineages("BA.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"))
+rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"),scale=T)
 printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### late BA.2
+#### Sublineage BA.2
+```{r subtype plotter BA.2 late, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getStrictoSubLineages("BA.2*",meta)
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"))
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"),scale=T)
+printest(rarelineages_names)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
 
 ### BA.4
 #### Sublineage BA.4
@@ -427,22 +440,36 @@ SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day ov
 Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
 
 ```{r setting function for selection estimator}
-startpar2 <- list(p=0.5, s=0.1)
-startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
+startpar3 <- list(p=c(0.8, 0.1), s=c(0.1, 0.1))
 
-
-sublineages_BA2 <- getStrictoSubLineages("BA.2*",meta)
-sublineages_BA4 <- getStrictoSubLineages("BA.4*",meta)
+setAll=getAllStrictoLineages(meta)
 sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
+sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
+
+setAll=setAll[!setAll %in% sublineages_BA5]
+sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
+
 #color for each lineage
-col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
+col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
+
+source("scripts/plot_selection_estimator.R")
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-as.Date("2022-05-01") #Using a later date with less sampling noise
-source("scripts/plot_selection_estimator.R")
+startdate<-as.Date(VirusSeq_release)-days(75) #Using a later date with less sampling noise
+
+sub.plot.selection.estimate <- function(region,maxdate=NA){
+  maxdate=plot.selection.estimate(region=region,
+                                        startdate=startdate, startpar=startpar3,
+                                        reference=c(setAll),
+                                        mutants=list(sublineages_BA5,sublineages_BQ),
+                                        names=list("BA.5*","BQ*","the rest"),
+                                        maxdate=maxdate, col=col)
+  return(maxdate)
+}
+
 
 
 #####################################################
@@ -456,37 +483,24 @@ source("scripts/plot_selection_estimator.R")
 
 ```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
 source("scripts/plot_selection_estimator.R")
-maxdate=plot.selection.estimate(region="Canada (no AB)",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=NA, col=col)
+maxdate=sub.plot.selection.estimate(region="Canada")
+
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="British Columbia",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
 ```
 
 ### AL
 #### Alberta
 
 ```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="Alberta",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
 ```
 
 
@@ -494,12 +508,8 @@ local_maxdate=plot.selection.estimate(region="Alberta",
 #### Saskatchewan
 
 ```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-local_maxdate=plot.selection.estimate(region="Saskatchewan",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
 ```
 
 
@@ -508,23 +518,15 @@ local_maxdate=plot.selection.estimate(region="Saskatchewan",
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 print("Not enough data available")
-#plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar2,
-#                        reference=c(sublineages_BA2),
-#                        mutants=list(sublineages_BA4,sublineages_BA5),
-#                        names=list("BA.4*","BA.5*"), maxdate=maxdate, col=col)
+#local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
 ```
 
 ### ON
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="Ontario",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
 
 ```
 
@@ -533,25 +535,15 @@ local_maxdate=plot.selection.estimate(region="Ontario",
 #### Quebec
 
 ```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="Quebec",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
 ```
 
 ### East
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
 ```
 
 
@@ -771,7 +763,7 @@ Because sampling and sequencing procedures vary by region and time, this does no
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
 
-meta1 <- meta[as.Date(meta$week) > as.Date('2021-01-01'), ]
+meta1 <- meta[as.Date(meta$week) > Variants_Canada_over_time_Start_Date, ]
 meta1$week <- as.factor(as.character(meta1$week))
 
 dat <- lapply(unique(meta1$province), function(x) {
