@@ -15,6 +15,48 @@ output:
 ---
 
 
+
+```{r setup, include=FALSE, warning=FALSE}
+############################
+#### LIBRARIES LOADING #####
+############################
+
+#coding and data
+#library(tidyverse) # wrangling and everything really
+library(tidyr)
+library(knitr) # Needed to set root directory
+
+library(lubridate)  # dates are awful
+
+library(parallel)
+
+#plotting and tables
+library(ggplot2)  # Work-horse plotting package
+#library(ggtree) #All things phylogenetic visualization
+#library(DT) # showing a interactive table
+
+#colors
+#library(RColorBrewer)
+#library(colorspace)
+#library(viridis)
+
+#library(MASS)
+
+# used for passing data to JavaScript D3 framework
+library(ggfree)
+library(r2d3)
+library(jsonlite)
+
+#Those libraries are required by the plot_selection_estimator scripts
+#library(bbmle)
+#library(HelpersMG)
+
+theme_set(theme_classic())
+
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = getwd())
+```
+
 ```{r variables, include=FALSE, warning=FALSE}
 ############################
 ##### GLOBAL VARIABLES #####
@@ -54,50 +96,6 @@ pal["other"] <- 'grey' # named character vector
 ```
 
 
-```{r setup, include=FALSE, warning=FALSE}
-############################
-#### LIBRARIES LOADING #####
-############################
-
-#coding and data
-library(tidyverse) # wrangling and everything really
-library(knitr) # Needed to set root directory
-
-library(lubridate) # dates are special
-
-#phylo-specific
-library(treeio)  # https://bioconductor.org/packages/release/bioc/html/treeio.html
-library(phylotools)
-library(tidytree)
-library(phytools)
-
-
-#plotting and tables
-library(ggplot2) # Work-horse plotting package
-library(ggtree) #All things phylogenetic visualization
-library(DT) # showing a interactive table
-
-#colors
-library(RColorBrewer)
-library(colorspace)
-library(viridis)
-
-library(MASS)
-
-# used for passing data to JavaScript D3 framework
-library(ggfree)
-library(r2d3)
-library(jsonlite)
-
-#Those libraries are required by the plot_selection_estimator scripts
-library(bbmle)
-library(HelpersMG)
-
-theme_set(theme_classic())
-
-# You would need to change this folder to be wherever you wanted the html file to be written.
-opts_knit$set(root.dir = getwd())
-```
 
 ### Contributing authors:  
 
@@ -170,43 +168,71 @@ epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
-epidataCANall$previousvalue=0
+epidataCANall$previousvalue <- 0
 #small loop to get the numtoday column from previous versions of this file from the cumulative cases
 for(row in 1:nrow(epidataCANall)) {
-  p=epidataCANall[row, "prname"]
-  subdf=epidataCANall[which( (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) ),]
-  if(nrow(subdf)!=0){
-    nextrow=which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
-    epidataCANall[nextrow,"previousvalue"]=epidataCANall[row, "totalcases"]
+  p <- epidataCANall[row, "prname"]
+  subdf <- epidataCANall[which( 
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+    ), ]
+  if(nrow(subdf) != 0) {
+    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
   }
 }
-epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
+epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 ```
 
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
-fullpangotree=makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree=makepangotree(unique(meta$raw_lineage[meta$sample_collection_date>as.Date("2022-10-14") ]))
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > as.Date("2022-10-14") ]))
 reference <- list("BA.5.2")
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date(VirusSeq_release)-days(120)
+startdate <- as.Date(VirusSeq_release) - days(120)
 
-allparams=list()
-for( l in latelineage_pangotree){
-  lineagelist=getStrictoSubLineages(l,meta)
-  for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
-    if(length(intersect(reference,lineagelist))==0){
-      printest(region)
-      printest(l)
-      p=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
-      allparams=append(allparams,list(p))
+all.regions <- c("East provinces (NL+NS+NB)", "Alberta", "Manitoba", #"Manitoba", 
+                 "Saskatchawan", "Quebec", "Ontario", "Canada")
+
+#t0 <- Sys.time()
+allparams <- mclapply(latelineage_pangotree, function(l) {
+  lineagelist <- getStrictoSubLineages(l, meta)
+  #for( region in rev(all.regions)){
+  lapply(rev(all.regions), function(region) {
+    if(length(intersect(reference,lineagelist))==0) {
+      #printest(region)
+      #printest(l)
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+      #allparams <- append(allparams, list(p))
+    } else {
+      NA
     }
-  }
-}
-allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
+  })
+}, mc.cores=8)
+allparams <- do.call(c, allparams)  # same structure as below
+#print(Sys.time() - t0)
+
+#t0 <- Sys.time()
+#allparams <- list()
+#for( l in latelineage_pangotree ) {
+#  lineagelist <- getStrictoSubLineages(l,meta)
+#  for( region in rev(all.regions)){
+#    if(length(intersect(reference,lineagelist))==0){
+#      #printest(region)
+#      #printest(l)
+#      p <- estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+#      allparams <- append(allparams, list(p))
+#    }
+#  }
+#}
+#print(Sys.time() - t0)
+
+allparams <- allparams[order(sapply(allparams, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
 
 ```
 

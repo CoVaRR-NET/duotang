@@ -49,11 +49,13 @@ makepangotree <- function(raw_lineagelist){
 }
 
 
-rawtoreallineage <- function(lineage){
-  t=dico[sapply(dico$fullname,function(x){grepl(x,lineage)}),]
-  if(nrow(t)>0){
-    deduced=str_replace(lineage,t[1,"fullname"], t[1,"surname"])
-    observed=meta[meta$raw_lineage==lineage,][1,]$lineage
+rawtoreallineage <- function(lineage) {
+  # FIXME: dico should be passed as an argument, not an implicit global var
+  sub.dico <- dico[sapply(dico$fullname, function(x) { grepl(x, lineage) } ), ]
+  if (nrow(sub.dico)>0) {
+    #deduced <- str_replace(lineage,t[1,"fullname"], t[1,"surname"])
+    deduced <- gsub(sub.dico$fullname[1], sub.dico$surname[1], lineage)
+    observed <- meta[meta$raw_lineage==lineage, ][1, ]$lineage
     if(! is.na(observed) && deduced!=observed){
       return(observed)
     }
