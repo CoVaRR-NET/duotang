@@ -17,45 +17,21 @@ output:
 
 
 ```{r setup, include=FALSE, warning=FALSE}
-############################
-#### LIBRARIES LOADING #####
-############################
-
-#coding and data
-#library(tidyverse) # wrangling and everything really
 library(tidyr)
 library(knitr) # Needed to set root directory
-
 library(lubridate)  # dates are awful
-
-library(parallel)
-
-#plotting and tables
+library(parallel)  # speed up selection plotting (#133)
 library(ggplot2)  # Work-horse plotting package
-#library(ggtree) #All things phylogenetic visualization
-#library(DT) # showing a interactive table
-
-#colors
-#library(RColorBrewer)
-#library(colorspace)
-#library(viridis)
-
-#library(MASS)
-
-# used for passing data to JavaScript D3 framework
-library(ggfree)
-library(r2d3)
+library(ggfree) 
+library(r2d3)  # used for passing data to JavaScript D3 framework
 library(jsonlite)
-
-#Those libraries are required by the plot_selection_estimator scripts
-#library(bbmle)
-#library(HelpersMG)
 
 theme_set(theme_classic())
 
 # You would need to change this folder to be wherever you wanted the html file to be written.
 opts_knit$set(root.dir = getwd())
 ```
+
 
 ```{r variables, include=FALSE, warning=FALSE}
 ############################
@@ -71,6 +47,7 @@ pangoversion="4.1.3 (Viral AI)"
 
 VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
 
+# FIXME: this should be stored as an external CSV file
 VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
 VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
 VOCVOI=add.pango.group("Gamma", "B.1.1.28*", '#0000FF')
@@ -202,7 +179,7 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
   lineagelist <- getStrictoSubLineages(l, meta)
   #for( region in rev(all.regions)){
   lapply(rev(all.regions), function(region) {
-    if(length(intersect(reference,lineagelist))==0) {
+    if(length(intersect(reference, lineagelist)) == 0) {
       #printest(region)
       #printest(l)
       estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
@@ -213,6 +190,7 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
   })
 }, mc.cores=8)
 allparams <- do.call(c, allparams)  # same structure as below
+allparams <- allparams[!is.na(allparams)]
 #print(Sys.time() - t0)
 
 #t0 <- Sys.time()
