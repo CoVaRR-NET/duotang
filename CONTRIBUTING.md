@@ -12,23 +12,19 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 
 ## Dependencies
 * [Python 3.9+](https://www.python.org/downloads/)
-  * [BioPython](https://biopython.org/)
-  * [dnastack](https://docs.viral.ai/analysis/)
+   * [BioPython](https://biopython.org/)
+   * [dnastack](https://docs.viral.ai/analysis/)
 * [R 4.0.2+](https://cran.r-project.org/)
-  * [ape](https://cran.r-project.org/web/packages/ape/index.html)
-  
-  * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
-  * [lubridate](https://cran.r-project.org/web/packages/lubridate/index.html)
-  * [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html)
-  
-  * [r2d3](https://cran.r-project.org/web/packages/r2d3/index.html)
-  * [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
-  * [ggfree](https://github.com/ArtPoon/ggfree) (note this is the only package not available on CRAN - installation instructions are provided in its README document)
-  
-  * [bbmle](https://cran.r-project.org/web/packages/bbmle/index.html)
-  * [HelpersMG](https://cran.r-project.org/web/packages/HelpersMG/index.html)
-  * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
-  
+   * [ape](https://cran.r-project.org/web/packages/ape/index.html)
+   * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
+   * [lubridate](https://cran.r-project.org/web/packages/lubridate/index.html)
+   * [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html)
+   * [r2d3](https://cran.r-project.org/web/packages/r2d3/index.html)
+   * [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
+   * [ggfree](https://github.com/ArtPoon/ggfree) (note this is the only package not available on CRAN - installation instructions are provided in its README document)
+   * [bbmle](https://cran.r-project.org/web/packages/bbmle/index.html)
+   * [HelpersMG](https://cran.r-project.org/web/packages/HelpersMG/index.html)
+   * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
