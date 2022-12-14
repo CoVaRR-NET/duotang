@@ -301,8 +301,12 @@ var coloredGroups = {}
 //`chkbox` is the HTML checkbox object passed in as "this" from the onchange() function.
 function changeSingleOptionColor(chkbox){
   const target = chkbox.control.id.split("_");
-  var colorBy = target[0];
-  var idToColor = target[1];
+  console.log(target)
+  var idToColor = target.pop();
+  var colorBy = target.join("_");
+  console.log(idToColor)
+  console.log(colorBy)
+
   var n = 0 //counter for number of edges with color X
   if (chkbox.children[0].checked == true){ //set a color because box checked
     //if more than 12 colors, just give up being qualitative and use a random color
@@ -456,7 +460,7 @@ for(var i = 0; i < data.edges.length; i++){
     }
   }
 }
-var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta.header.name"] //list of keys that are not metadata
+var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
 //remove the non-metadata keys.
 metadataFields = metadataFields.filter( function( el ) {
   return !fieldsToRemove.includes( el );
