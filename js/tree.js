@@ -175,7 +175,6 @@ var xmax = d3.max(data.edges, e => e.x1),
     ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
     yoffset = absolutePosition(svg.node());
   
-  console.log(xmax)
 /* #endregion */
 //function called when the div needs to be re-rendered due to an update
 //`drawNodes` is a flag for drawing circles at the tip of the branches. Defaults to false.
@@ -301,12 +300,9 @@ var coloredGroups = {}
 //`chkbox` is the HTML checkbox object passed in as "this" from the onchange() function.
 function changeSingleOptionColor(chkbox){
   const target = chkbox.control.id.split("_");
-  console.log(target)
   var idToColor = target.pop();
   var colorBy = target.join("_");
-  console.log(idToColor)
-  console.log(colorBy)
-
+  
   var n = 0 //counter for number of edges with color X
   if (chkbox.children[0].checked == true){ //set a color because box checked
     //if more than 12 colors, just give up being qualitative and use a random color
