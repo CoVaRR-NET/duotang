@@ -355,7 +355,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))!="*"
   }else{FALSE}})]
   
-a=plot_growing_lineage(paramselected[1:25])
+a=plot_growing_lineage(paramselected[1:min(25,length(paramselected))])
 
 ```
 
@@ -382,7 +382,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))=="*"
   }else{FALSE}})]
   
-a=plot_growing_lineage(paramselected[1:min(24,len(paramselected))])
+a=plot_growing_lineage(paramselected[1:min(25,length(paramselected))])
 
   
 ```
