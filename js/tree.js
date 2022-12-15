@@ -15,13 +15,17 @@
  *  `height` and `width` is the div height and width. Automatically passed in with the r2d3() function in R
  */
 console = d3.window(div.node()).console;
-console.log(data)
+//console.log(data)
 
 
 //set the default color scheme
 var defaultColorBy = "pango_group"
 //sets the default colors. 
 var defaultColorList = ["#A6CEE3", "#1F78B4",  "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F","#B2DF8A", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928"];
+var presetColorsForDuotangConsistency = {"Other":"#777777"}
+for(var i = 0; i < data.VOCVOI.length; i++){
+  presetColorsForDuotangConsistency[data.VOCVOI[i].name] = data.VOCVOI[i].color.replace("black", "#000000")
+} 
 //sets scaling factors
 var scalingFactors = {
   "timetree": 1,
@@ -311,7 +315,15 @@ function changeSingleOptionColor(chkbox){
       colours.push( "#" + randomColor);
     }
     //color the edges
-    colourToUse = colours.shift()
+    if (colorBy == "pango_group"){
+      if (idToColor in presetColorsForDuotangConsistency){
+        colourToUse = presetColorsForDuotangConsistency[idToColor];
+      }else{
+        colourToUse = presetColorsForDuotangConsistency["Other"];
+      }
+    } else{
+      colourToUse = colours.shift();
+    }
     tipOnlyEdgesIndexList.forEach(function(i){
       if (data.edges[i][colorBy] == idToColor){
         data.edges[i].colour = colourToUse;
@@ -363,7 +375,15 @@ function changeAllOptionColor(d, colorBy, noCheckBoxControl = false){
               var randomColor = Math.floor(Math.random()*16777215).toString(16);
               colours.push( "#" + randomColor);
             }
-            colourToUse = colours.shift();
+            if (colorBy == "pango_group"){
+              if (data.edges[i][colorBy] in presetColorsForDuotangConsistency){
+                colourToUse = presetColorsForDuotangConsistency[data.edges[i][colorBy]];
+              }else{
+                colourToUse = presetColorsForDuotangConsistency["Other"];
+              }
+            } else{
+              colourToUse = colours.shift();
+            }            
             data.edges[i].colour = colourToUse;
             coloredGroups[data.edges[i][colorBy]] = [colourToUse, 1]
           }else{

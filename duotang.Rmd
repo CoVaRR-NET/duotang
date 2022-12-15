@@ -69,7 +69,6 @@ VOCVOI=add.pango.group("Recombinants", "X*", 'black')
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey' # named character vector
-
 ```
 
 
@@ -832,14 +831,14 @@ ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", fieldnames)
+timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", VOCVOI, fieldnames)
 
 #diversity ML tree
-diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", fieldnames)
+diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", VOCVOI, fieldnames)
 
 ### omicron diversity tree
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", fieldnames)
+OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", VOCVOI, fieldnames)
 
 ```
 
