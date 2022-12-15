@@ -64,7 +64,7 @@ VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
 
 VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
 VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
-VOCVOI=add.pango.group("Recombinants", "X*", 'black')
+VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
@@ -207,7 +207,8 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 ## Current Situation
 
 
-BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest. BA.2.75, which previously was more associated with the eastern hemisphere of the globe, is starting to increase more notably in some regions in the western hemisphere, including some regions of Canada.
+BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest. BA.2.75 and XBB variants, which were previously more associated with the eastern hemisphere of the globe, are starting to increase more notably in some regions in the western hemisphere, including some regions of Canada.
+
 **Variants of current interest**,, due to their potential growth advantage, or mutations of potential functional significance (note: sublineages of many of these are also of interest). See also the evolving plot below of “Fastest growing lineages in Canada”:
 
 * BA.2.75
@@ -826,20 +827,29 @@ mltree$edge.length <- mltree$edge.length*29903
 ###Time Tree
 ttree2 <- ttree
 ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
+
+
+
+hab=unique(meta$host_age_bin)
+hab=hab[order(hab)]
+presetColors=data.frame(name=c("Other",VOCVOI$name,hab), color=c("#777777",VOCVOI$color,rev(hcl.colors(length(hab)-1, "Red-Blue")),"#777777"))
+presetColors
+
 #suppressWarnings({
 #  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", VOCVOI, fieldnames)
+timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", presetColors, fieldnames)
 
 #diversity ML tree
-diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", VOCVOI, fieldnames)
+diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
 
 ### omicron diversity tree
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", VOCVOI, fieldnames)
 
+
+OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
 ```
 
 

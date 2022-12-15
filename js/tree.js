@@ -22,9 +22,9 @@ console = d3.window(div.node()).console;
 var defaultColorBy = "pango_group"
 //sets the default colors. 
 var defaultColorList = ["#A6CEE3", "#1F78B4",  "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F","#B2DF8A", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928"];
-var presetColorsForDuotangConsistency = {"Other":"#777777"}
+var presetColors = {}
 for(var i = 0; i < data.VOCVOI.length; i++){
-  presetColorsForDuotangConsistency[data.VOCVOI[i].name] = data.VOCVOI[i].color.replace("black", "#000000")
+  presetColors[data.VOCVOI[i].name] = data.VOCVOI[i].color
 } 
 //sets scaling factors
 var scalingFactors = {
@@ -315,13 +315,9 @@ function changeSingleOptionColor(chkbox){
       colours.push( "#" + randomColor);
     }
     //color the edges
-    if (colorBy == "pango_group"){
-      if (idToColor in presetColorsForDuotangConsistency){
-        colourToUse = presetColorsForDuotangConsistency[idToColor];
-      }else{
-        colourToUse = presetColorsForDuotangConsistency["Other"];
-      }
-    } else{
+    if (idToColor in presetColors){
+      colourToUse = presetColors[idToColor];
+    }else{
       colourToUse = colours.shift();
     }
     tipOnlyEdgesIndexList.forEach(function(i){
@@ -375,12 +371,8 @@ function changeAllOptionColor(d, colorBy, noCheckBoxControl = false){
               var randomColor = Math.floor(Math.random()*16777215).toString(16);
               colours.push( "#" + randomColor);
             }
-            if (colorBy == "pango_group"){
-              if (data.edges[i][colorBy] in presetColorsForDuotangConsistency){
-                colourToUse = presetColorsForDuotangConsistency[data.edges[i][colorBy]];
-              }else{
-                colourToUse = presetColorsForDuotangConsistency["Other"];
-              }
+            if (data.edges[i][colorBy] in presetColors){
+                colourToUse = presetColors[data.edges[i][colorBy]];
             } else{
               colourToUse = colours.shift();
             }            
