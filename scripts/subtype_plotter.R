@@ -8,9 +8,13 @@ require(lubridate)
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
-                             scaled=FALSE, col=NA, mindate=as.Date('2022-01-01')) {
-
-  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, province %in% get.province.list(region))
+                             scaled=FALSE, col=NA, mindate=as.Date('2021-11-01'), maxdate=NA) {
+  if(is.na(maxdate)){
+    varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, province %in% get.province.list(region))
+  }
+  else{
+    varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, sample_collection_date<=maxdate, province %in% get.province.list(region))
+  }
   
   varmeta1$pango_group <- varmeta1$lineage
   

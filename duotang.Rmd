@@ -15,6 +15,24 @@ output:
 ---
 
 
+
+```{r setup, include=FALSE, warning=FALSE}
+library(tidyr)
+library(knitr) # Needed to set root directory
+library(lubridate)  # dates are awful
+library(parallel)  # speed up selection plotting (#133)
+library(ggplot2)  # Work-horse plotting package
+library(ggfree) 
+library(r2d3)  # used for passing data to JavaScript D3 framework
+library(jsonlite)
+
+theme_set(theme_classic())
+
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = getwd())
+```
+
+
 ```{r variables, include=FALSE, warning=FALSE}
 ############################
 ##### GLOBAL VARIABLES #####
@@ -23,14 +41,16 @@ output:
 source("scripts/utils.R")
 #Date of the VirusSeq release
 VirusSeq_release="2022-12-08"
+Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.1.3 (Viral AI)"
 
 VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
 
+# FIXME: this should be stored as an external CSV file
 VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
 VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
-VOCVOI=add.pango.group("Gamma", "B.1.1.28*", '#0000FF')
+VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
 VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
 VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
 
@@ -44,59 +64,14 @@ VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
 
 VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
 VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
-VOCVOI=add.pango.group("Recombinants", "X*", 'black')
+VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey' # named character vector
-
 ```
 
 
-```{r setup, include=FALSE, warning=FALSE}
-############################
-#### LIBRARIES LOADING #####
-############################
-
-#coding and data
-library(tidyverse) # wrangling and everything really
-library(knitr) # Needed to set root directory
-
-library(lubridate) # dates are special
-
-#phylo-specific
-library(treeio)  # https://bioconductor.org/packages/release/bioc/html/treeio.html
-library(phylotools)
-library(tidytree)
-library(phytools)
-
-
-#plotting and tables
-library(ggplot2) # Work-horse plotting package
-library(ggtree) #All things phylogenetic visualization
-library(DT) # showing a interactive table
-
-#colors
-library(RColorBrewer)
-library(colorspace)
-library(viridis)
-
-library(MASS)
-
-# used for passing data to JavaScript D3 framework
-library(ggfree)
-library(r2d3)
-library(jsonlite)
-
-#Those libraries are required by the plot_selection_estimator scripts
-library(bbmle)
-library(HelpersMG)
-
-theme_set(theme_classic())
-
-# You would need to change this folder to be wherever you wanted the html file to be written.
-opts_knit$set(root.dir = getwd())
-```
 
 ### Contributing authors:  
 
@@ -159,7 +134,7 @@ meta$week <- cut(meta$sample_collection_date, 'week')
 source("scripts/scanlineages.R")
 meta$pango_group <- create.pango.group(VOCVOI, meta)
 meta$pango_group <- as.factor(meta$pango_group)
-
+meta[meta == ""] <- "Unknown"
 ## 2. LOAD epidemiological data (PHAC)
 
 
@@ -169,44 +144,60 @@ epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
-epidataCANall$previousvalue=0
+epidataCANall$previousvalue <- 0
 #small loop to get the numtoday column from previous versions of this file from the cumulative cases
 for(row in 1:nrow(epidataCANall)) {
-  p=epidataCANall[row, "prname"]
-  subdf=epidataCANall[which( (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) ),]
-  if(nrow(subdf)!=0){
-    nextrow=which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
-    epidataCANall[nextrow,"previousvalue"]=epidataCANall[row, "totalcases"]
+  p <- epidataCANall[row, "prname"]
+  subdf <- epidataCANall[which( 
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+    ), ]
+  if(nrow(subdf) != 0) {
+    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
   }
 }
-epidataCANall$numtoday=epidataCANall$totalcases-epidataCANall$previousvalue
+
+epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 ```
 
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
-fullpangotree=makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree=makepangotree(unique(meta$raw_lineage[meta$sample_collection_date>as.Date("2022-10-14") ]))
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > as.Date("2022-10-14") ]))
 reference <- list("BA.5.2")
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
-startdate<-as.Date(VirusSeq_release)-days(120)
 
-allparams=list()
-for( l in latelineage_pangotree){
-  lineagelist=getStrictoSubLineages(l,meta)
-  for( region in rev(c("East provinces (NL+NS+NB)","Alberta","Manitoba","Manitoba","Saskatchawan","Quebec","Ontario", "Canada"))){
-    if(length(intersect(reference,lineagelist))==0){
-      printest(region)
-      printest(l)
-      p=estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
-      allparams=append(allparams,list(p))
+#startdate <- as.Date(VirusSeq_release) - days(120)
+startdate <- max(meta$sample_collection_date) - days(120)
+
+all.regions <- c("East provinces (NL+NS+NB)", "Alberta", "Manitoba", #"Manitoba", 
+                 "Saskatchawan", "Quebec", "Ontario", "Canada")
+
+#t0 <- Sys.time()
+allparams <- mclapply(latelineage_pangotree, function(l) {
+  lineagelist <- getStrictoSubLineages(l, meta)
+  #for( region in rev(all.regions)){
+  lapply(rev(all.regions), function(region) {
+    if(length(intersect(reference, lineagelist)) == 0) {
+      #printest(region)
+      #printest(l)
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+      #allparams <- append(allparams, list(p))
+    } else {
+      NA
     }
-  }
-}
-allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA}else{(p$fit)$fit[["s1"]]}}), decreasing = TRUE)]
+  })
+}, mc.cores=8)
+allparams <- do.call(c, allparams)  # same structure as below
+allparams <- allparams[!is.na(allparams)]
+#print(Sys.time() - t0)
 
+allparams <- allparams[order(sapply(allparams, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
 ```
 
 
@@ -216,7 +207,8 @@ allparams=allparams[order(sapply(allparams, function(p){if(any(is.na(p$fit))){NA
 ## Current Situation
 
 
-BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest. BA.2.75, which previously was more associated with the eastern hemisphere of the globe, is starting to increase more notably in some regions in the western hemisphere, including some regions of Canada.
+BQ.1, BQ.1.1 and associated sublineages continue to show the strongest growth, with other newer sublineages as noted below also of potential interest. BA.2.75 and XBB variants, which were previously more associated with the eastern hemisphere of the globe, are starting to increase more notably in some regions in the western hemisphere, including some regions of Canada.
+
 **Variants of current interest**,, due to their potential growth advantage, or mutations of potential functional significance (note: sublineages of many of these are also of interest). See also the evolving plot below of “Fastest growing lineages in Canada”:
 
 * BA.2.75
@@ -255,15 +247,27 @@ printest(rarelineages_names)
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 
-### BA.2
+### early BA.2
 #### Sublineage BA.2
-```{r subtype plotter BA.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+```{r subtype plotter BA.2 early, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 set=getStrictoSubLineages("BA.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
+rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"))
+rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"),scale=T)
 printest(rarelineages_names)
 ```
 The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
+
+### late BA.2
+#### Sublineage BA.2
+```{r subtype plotter BA.2 late, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+set=getStrictoSubLineages("BA.2*",meta)
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"))
+rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"),scale=T)
+printest(rarelineages_names)
+```
+The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
+
 
 ### BA.4
 #### Sublineage BA.4
@@ -351,7 +355,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))!="*"
   }else{FALSE}})]
   
-a=plot_growing_lineage(paramselected)
+a=plot_growing_lineage(paramselected[1:25])
 
 ```
 
@@ -378,7 +382,7 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   substr(x, nchar(x), nchar(x))=="*"
   }else{FALSE}})]
   
-a=plot_growing_lineage(paramselected)
+a=plot_growing_lineage(paramselected[1:min(24,len(paramselected))])
 
   
 ```
@@ -414,35 +418,48 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 
 ## Selection on Omicron {.tabset}  
 
-Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
-Here we examine the major sublineages of Omicron currently in Canada and their relative rate of spread. 
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major variants circulating are Omicron sublineages BA.2 (including BG), BA.4, and BA.5 (including BE and BF). BA.4 and BA.5 are spreading in Canada, as illustrated below. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.4 or BA.5)/freq(BA.2)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
+Currently, the major group of Omicron lineages rising in frequency are the BQ.* group, which descend from BA.5\*.  We first show this growth of BQ.\* and other BA.5* (here excluding BQ.\*), relative to the remaining strains, which consist predominantly of BA.2* and BA.4\*. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BQ.\* or BA.5\*)/freq(other)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
-For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
-SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
-<!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
+For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+
+Caveat:  These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
 
 **Caveat:**
 Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
 
 ```{r setting function for selection estimator}
-startpar2 <- list(p=0.5, s=0.1)
-startpar3 <- list(p=c(0.4, 0.1), s=c(0.05, 0.1))
+startpar3 <- list(p=c(0.8, 0.1), s=c(0.1, 0.1))
 
-
-sublineages_BA2 <- getStrictoSubLineages("BA.2*",meta)
-sublineages_BA4 <- getStrictoSubLineages("BA.4*",meta)
+setAll=getAllStrictoLineages(meta)
 sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
+sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
+
+setAll=setAll[!setAll %in% sublineages_BA5]
+sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
+
 #color for each lineage
-col <- c(pal["Omicron BA.4"], pal["Omicron BA.5"])
+col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
+
+source("scripts/plot_selection_estimator.R")
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-as.Date("2022-05-01") #Using a later date with less sampling noise
-source("scripts/plot_selection_estimator.R")
+startdate<-as.Date(VirusSeq_release)-days(75) #Using a later date with less sampling noise
+
+sub.plot.selection.estimate <- function(region,maxdate=NA){
+  maxdate=plot.selection.estimate(region=region,
+                                        startdate=startdate, startpar=startpar3,
+                                        reference=c(setAll),
+                                        mutants=list(sublineages_BA5,sublineages_BQ),
+                                        names=list("BA.5*","BQ*","the rest"),
+                                        maxdate=maxdate, col=col)
+  return(maxdate)
+}
+
 
 
 #####################################################
@@ -456,37 +473,24 @@ source("scripts/plot_selection_estimator.R")
 
 ```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
 source("scripts/plot_selection_estimator.R")
-maxdate=plot.selection.estimate(region="Canada (no AB)",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=NA, col=col)
+maxdate=sub.plot.selection.estimate(region="Canada")
+
 ```
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="British Columbia",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
 ```
 
 ### AL
 #### Alberta
 
 ```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="Alberta",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
 ```
 
 
@@ -494,12 +498,8 @@ local_maxdate=plot.selection.estimate(region="Alberta",
 #### Saskatchewan
 
 ```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-local_maxdate=plot.selection.estimate(region="Saskatchewan",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
 ```
 
 
@@ -508,23 +508,15 @@ local_maxdate=plot.selection.estimate(region="Saskatchewan",
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 print("Not enough data available")
-#plot.selection.estimate(region="Manitoba", startdate=startdate, startpar=startpar2,
-#                        reference=c(sublineages_BA2),
-#                        mutants=list(sublineages_BA4,sublineages_BA5),
-#                        names=list("BA.4*","BA.5*"), maxdate=maxdate, col=col)
+#local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
 ```
 
 ### ON
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-#print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="Ontario",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
 
 ```
 
@@ -533,12 +525,7 @@ local_maxdate=plot.selection.estimate(region="Ontario",
 #### Quebec
 
 ```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=plot.selection.estimate(region="Quebec",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
 ```
 
 ### East
@@ -546,12 +533,7 @@ local_maxdate=plot.selection.estimate(region="Quebec",
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
 #print("Not enough data available")
-local_maxdate=plot.selection.estimate(region="East provinces (NL+NS+NB)",
-                                      startdate=startdate, startpar=startpar3,
-                                      reference=c(sublineages_BA2),
-                                      mutants=list(sublineages_BA4,sublineages_BA5),
-                                      names=list("BA.4*","BA.5*"),
-                                      maxdate=maxdate, col=col)
+local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
 ```
 
 
@@ -566,13 +548,17 @@ source("scripts/scanlineages.R")
 plotsubvariant <- function(region,min,parentalnode){
   #subnodes=getAllSubLineages(parentalnode,fullpangotree)
   subnodes=getStrictoSubLineages(parentalnode,meta)
+  nplot=0
   for(p in allparams) {
     if(!any(is.na(p$fit)) && p$region==region ){
       if((p$mut[[1]] %in% subnodes) && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
-          printest(p$mut[[1]])
           plot.selection(plotparam=p)
+          nplot=nplot+1
       }
     }
+  }
+  if(nplot==0){
+    print("Not enough data available")
   }
 }
 
@@ -771,7 +757,7 @@ Because sampling and sequencing procedures vary by region and time, this does no
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
 
-meta1 <- meta[as.Date(meta$week) > as.Date('2021-01-01'), ]
+meta1 <- meta[as.Date(meta$week) > Variants_Canada_over_time_Start_Date, ]
 meta1$week <- as.factor(as.character(meta1$week))
 
 dat <- lapply(unique(meta1$province), function(x) {
@@ -835,27 +821,34 @@ metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
 metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
-
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
 
 ###Time Tree
 ttree2 <- ttree
 ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
+
+
+
+hab=unique(meta$host_age_bin)
+hab=hab[order(hab)]
+presetColors=data.frame(name=c("other",VOCVOI$name,hab), color=c("#777777",VOCVOI$color,rev(hcl.colors(length(hab)-1, "Red-Blue")),"#777777"))
+
 #suppressWarnings({
 #  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", fieldnames)
+timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", presetColors, fieldnames)
 
 #diversity ML tree
-diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", fieldnames)
+diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
 
 ### omicron diversity tree
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", fieldnames)
 
+
+OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
 ```
 
 

@@ -15,13 +15,17 @@
  *  `height` and `width` is the div height and width. Automatically passed in with the r2d3() function in R
  */
 console = d3.window(div.node()).console;
-console.log(data)
+//console.log(data)
 
 
 //set the default color scheme
 var defaultColorBy = "pango_group"
 //sets the default colors. 
 var defaultColorList = ["#A6CEE3", "#1F78B4",  "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F","#B2DF8A", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928"];
+var presetColors = {}
+for(var i = 0; i < data.VOCVOI.length; i++){
+  presetColors[data.VOCVOI[i].name] = data.VOCVOI[i].color
+} 
 //sets scaling factors
 var scalingFactors = {
   "timetree": 1,
@@ -175,7 +179,6 @@ var xmax = d3.max(data.edges, e => e.x1),
     ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
     yoffset = absolutePosition(svg.node());
   
-  console.log(xmax)
 /* #endregion */
 //function called when the div needs to be re-rendered due to an update
 //`drawNodes` is a flag for drawing circles at the tip of the branches. Defaults to false.
@@ -202,11 +205,11 @@ function updateTree(drawNodes = false) {
                           let pos = d3.select(this).node().getBoundingClientRect();
                           //populate the popout box text with ALL metadata columns
                           var toolTipText = "<p>"  
-                          for(var i = 0; i < metadataFields.length; i++){
-                            cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
-                            cleanName = cleanName.split('.').join(' ');
-                            toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
-                          }
+							for(var i = 0; i < metadataFields.length; i++){
+							  cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
+							  cleanName = cleanName.split('_').join(' ');
+							  toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
+							}
                           toolTipText = toolTipText + "</p>";
                           tooltip.html(toolTipText)
                               .style("visibility", "visible")
@@ -235,7 +238,7 @@ function updateTree(drawNodes = false) {
             var toolTipText = "<p>"  
             for(var i = 0; i < metadataFields.length; i++){
               cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
-              cleanName = cleanName.split('.').join(' ');
+              cleanName = cleanName.split('_').join(' ');
               toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
             }
             toolTipText = toolTipText + "</p>";
@@ -301,8 +304,9 @@ var coloredGroups = {}
 //`chkbox` is the HTML checkbox object passed in as "this" from the onchange() function.
 function changeSingleOptionColor(chkbox){
   const target = chkbox.control.id.split("_");
-  var colorBy = target[0];
-  var idToColor = target[1];
+  var idToColor = target.pop();
+  var colorBy = target.join("_");
+  
   var n = 0 //counter for number of edges with color X
   if (chkbox.children[0].checked == true){ //set a color because box checked
     //if more than 12 colors, just give up being qualitative and use a random color
@@ -311,7 +315,11 @@ function changeSingleOptionColor(chkbox){
       colours.push( "#" + randomColor);
     }
     //color the edges
-    colourToUse = colours.shift()
+    if (idToColor in presetColors){
+      colourToUse = presetColors[idToColor];
+    }else{
+      colourToUse = colours.shift();
+    }
     tipOnlyEdgesIndexList.forEach(function(i){
       if (data.edges[i][colorBy] == idToColor){
         data.edges[i].colour = colourToUse;
@@ -363,7 +371,11 @@ function changeAllOptionColor(d, colorBy, noCheckBoxControl = false){
               var randomColor = Math.floor(Math.random()*16777215).toString(16);
               colours.push( "#" + randomColor);
             }
-            colourToUse = colours.shift();
+            if (data.edges[i][colorBy] in presetColors){
+                colourToUse = presetColors[data.edges[i][colorBy]];
+            } else{
+              colourToUse = colours.shift();
+            }            
             data.edges[i].colour = colourToUse;
             coloredGroups[data.edges[i][colorBy]] = [colourToUse, 1]
           }else{
@@ -456,7 +468,7 @@ for(var i = 0; i < data.edges.length; i++){
     }
   }
 }
-var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta.header.name"] //list of keys that are not metadata
+var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
 //remove the non-metadata keys.
 metadataFields = metadataFields.filter( function( el ) {
   return !fieldsToRemove.includes( el );

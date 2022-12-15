@@ -301,7 +301,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
     text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
   }  
-  str4=sprintf("Relative to %s*","BA.2")
+  str4=sprintf("Relative to %s*",names[[3]])
   text(x=toplot$date[1], y=0.81,str4, col="black", pos=4, cex = 1)
   
   

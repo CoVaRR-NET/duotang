@@ -250,7 +250,7 @@ if __name__ == "__main__":
                              "per week per province, before cutoff date")
     parser.add_argument("--year", type=int, default=2022,
                         help="int, year number for cutoff date")
-    parser.add_argument("--epiweek", type=int, default=15,
+    parser.add_argument("--epiweek", type=int, default=31,
                         help="int, week number for cutoff date")
 
     args = parser.parse_args()
