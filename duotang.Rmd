@@ -50,7 +50,7 @@ VOCVOI = data.frame(name=character(), pangodesignation=character(), color=charac
 # FIXME: this should be stored as an external CSV file
 VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
 VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
-VOCVOI=add.pango.group("Gamma", "B.1.1.28*", '#0000FF')
+VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
 VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
 VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
 
@@ -418,14 +418,13 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 
 ## Selection on Omicron {.tabset}  
 
-Of particular interest when there are newly arriving or emerging lineages is whether they have a selective advantage (and by how much), relative to the lineages already circulating within a population.
-Here we examine the major sublineages of Omicron currently in Canada and their relative rate of spread. 
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major variants circulating are Omicron sublineages BA.2 (including BG), BA.4, and BA.5 (including BE and BF). BA.4 and BA.5 are spreading in Canada, as illustrated below. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BA.4 or BA.5)/freq(BA.2)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods). 
+Currently, the major group of Omicron lineages rising in frequency are the BQ.* group, which descend from BA.5\*.  We first show this growth of BQ.\* and other BA.5* (here excluding BQ.\*), relative to the remaining strains, which consist predominantly of BA.2* and BA.4\*. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BQ.\* or BA.5\*)/freq(other)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
-For comparison, Alpha had a selective advantage of 6%-11% per day over preexisting
-SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
-<!-- SUGGESTION: Figure out why BA.2 gets named BA.2.3 in some provinces (first date of lineage - sort by names?). -->
+For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+
+Caveat:  These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
 
 **Caveat:**
 Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
@@ -533,8 +532,8 @@ local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
+#print("Not enough data available")
+local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
 ```
 
 
@@ -549,13 +548,18 @@ source("scripts/scanlineages.R")
 plotsubvariant <- function(region,min,parentalnode){
   #subnodes=getAllSubLineages(parentalnode,fullpangotree)
   subnodes=getStrictoSubLineages(parentalnode,meta)
+  nplot=0
   for(p in allparams) {
     if(!any(is.na(p$fit)) && p$region==region ){
       if((p$mut[[1]] %in% subnodes) && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
           printest(p$mut[[1]])
           plot.selection(plotparam=p)
+          nplot=nplot+1
       }
     }
+  }
+  if(nplot==0){
+    print("Not enough data available")
   }
 }
 
