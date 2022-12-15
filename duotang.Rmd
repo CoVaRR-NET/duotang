@@ -832,8 +832,7 @@ ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
-presetColors=data.frame(name=c("Other",VOCVOI$name,hab), color=c("#777777",VOCVOI$color,rev(hcl.colors(length(hab)-1, "Red-Blue")),"#777777"))
-presetColors
+presetColors=data.frame(name=c("other",VOCVOI$name,hab), color=c("#777777",VOCVOI$color,rev(hcl.colors(length(hab)-1, "Red-Blue")),"#777777"))
 
 #suppressWarnings({
 #  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
