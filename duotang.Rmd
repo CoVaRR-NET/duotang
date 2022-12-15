@@ -342,7 +342,7 @@ Background shading illustrates sub-variants that we need to keep an eye on in bl
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
 
-```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=12}
+```{r overview of the selection estimator plot stricto, fig.retina = 2, warning=FALSE, fig.height=7}
 
 source("scripts/plot_growing_lineages.R")
 #paramselected=allparamstricto[sapply(allparamstricto,function(x){x$region=="Canada" & (x$fit)$fit[["s1"]]>0 & sum(x$toplot$n2)>10})]
