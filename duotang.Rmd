@@ -552,7 +552,6 @@ plotsubvariant <- function(region,min,parentalnode){
   for(p in allparams) {
     if(!any(is.na(p$fit)) && p$region==region ){
       if((p$mut[[1]] %in% subnodes) && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
-          printest(p$mut[[1]])
           plot.selection(plotparam=p)
           nplot=nplot+1
       }
