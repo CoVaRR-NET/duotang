@@ -87,7 +87,10 @@ alpha <- function(col, alpha) {
     ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0)
   })
   
-  refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
+  #refdate <- which.max(smooth.spline(v[!is.na(v)])$y)
+  refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
+  #refdate <- which.max(smooth.spline(v[!is.na(v)],w=toplot$n1,nknots=10)$y)
+  
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
   timeend <- -(timestart+refdate)
   timestart <- -refdate
@@ -102,7 +105,6 @@ alpha <- function(col, alpha) {
   dateseq <- seq.Date(as.Date(startdate), as.Date(lastdate), "days")
   dateconverter <- data.frame(time=toplot$time, date=as.Date(dateseq))
   toplot$date <- dateconverter$date
-  
   list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot)
 }
 
@@ -236,8 +238,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
-  
-  #if (!is.na(fit$sample)) {  
+  if (any(!is.na(fit$sample))) {  
     # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
       row <- as.numeric(x)
@@ -251,7 +252,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
     } 
     lo95 <- qcurve(0.025)
     hi95 <- qcurve(0.975)  
-  #}
+  }
   
   par(mar=c(5,5,1,1))
   if(is.na(maxdate)){
@@ -273,7 +274,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
     lines(toplot$date, scurves[,3])
   }
   
-  #if (!is.na(fit$sample)) {
+  if (any(!is.na(fit$sample))) {  
     # display confidence intervals
     polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
             col=alpha(col[1], 0.5))
@@ -281,7 +282,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
       polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
               col=alpha(col[2], 0.5))
     }
-  #}
+  }
   
   # report parameter estimates on plot
   if(is.na(names[[1]])){name=est$mutdata[[1]]$lineage[1]}
