@@ -40,7 +40,7 @@ opts_knit$set(root.dir = getwd())
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2022-12-15"
+VirusSeq_release="2022-12-19"
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.1.3 (Viral AI)"
@@ -733,7 +733,7 @@ plotba5("Ontario",20)
 #### QC
 ##### Quebec (n>20)
 ```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Quebec",10)
+plotba5("Quebec",20)
 ```
 
 #### East
