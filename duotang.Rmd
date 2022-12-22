@@ -40,7 +40,7 @@ opts_knit$set(root.dir = getwd())
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2022-12-08"
+VirusSeq_release="2022-12-19"
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.1.3 (Viral AI)"
@@ -130,6 +130,7 @@ meta <- as.data.frame(apply(meta, 2, function(x) {
 
 meta$sample_collection_date <- as.Date(meta$sample_collection_date)
 meta$week <- cut(meta$sample_collection_date, 'week')
+meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
 
 source("scripts/scanlineages.R")
 meta$pango_group <- create.pango.group(VOCVOI, meta)
@@ -424,12 +425,14 @@ Currently, the major group of Omicron lineages rising in frequency are the BQ.* 
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
-Caveat:  These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
-
 **Caveat:**
-Separate analyses are provided for those provinces with at least 20 BA.2 sequences in the database. These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada.
+These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
+
+
 
 ```{r setting function for selection estimator}
+source("scripts/plot_selection_estimator.R")
+
 startpar3 <- list(p=c(0.8, 0.1), s=c(0.1, 0.1))
 
 setAll=getAllStrictoLineages(meta)
@@ -442,13 +445,11 @@ sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
 #color for each lineage
 col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
 
-source("scripts/plot_selection_estimator.R")
-
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-as.Date(VirusSeq_release)-days(75) #Using a later date with less sampling noise
+startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
 
 sub.plot.selection.estimate <- function(region,maxdate=NA){
   maxdate=plot.selection.estimate(region=region,
@@ -459,8 +460,6 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
                                         maxdate=maxdate, col=col)
   return(maxdate)
 }
-
-
 
 #####################################################
 # tabs for displaying in notebook
@@ -489,8 +488,7 @@ print("Not enough data available")
 #### Alberta
 
 ```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
+local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
 ```
 
 
@@ -498,8 +496,7 @@ print("Not enough data available")
 #### Saskatchewan
 
 ```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
+local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
 ```
 
 
@@ -515,8 +512,7 @@ print("Not enough data available")
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
+local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
 
 ```
 
@@ -532,7 +528,6 @@ local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-#print("Not enough data available")
 local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
 ```
 
@@ -546,12 +541,10 @@ Here we show the trends of the various BA.2.* sublineages over time, relative to
 ```{r general settings for selection estimator BA.2}
 source("scripts/scanlineages.R")
 plotsubvariant <- function(region,min,parentalnode){
-  #subnodes=getAllSubLineages(parentalnode,fullpangotree)
-  subnodes=getStrictoSubLineages(parentalnode,meta)
   nplot=0
   for(p in allparams) {
-    if(!any(is.na(p$fit)) && p$region==region ){
-      if((p$mut[[1]] %in% subnodes) && (p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
+    if(!any(is.na(p$fit)) && p$region==region && isSubLineage(parentalnode,p$mut[[1]])){
+      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
           plot.selection(plotparam=p)
           nplot=nplot+1
       }
@@ -738,7 +731,7 @@ plotba5("Ontario",20)
 #### QC
 ##### Quebec (n>20)
 ```{r function and selection estimator BA.5 QC, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-plotba5("Quebec",10)
+plotba5("Quebec",20)
 ```
 
 #### East
@@ -804,8 +797,8 @@ source("scripts/tree.r")
 # load trees from files
 mltree <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree <- read.tree("./data_needed/sample1.timetree.nwk")
-stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-11-01'), by='3 month')
+#stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
 # tips are labeled with [fasta name]_[lineage]_[coldate]
 # extracting just the first part makes it easier to link to metadata
@@ -814,7 +807,7 @@ ttree$tip.label <- reduce.tipnames(ttree$tip.label)
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","week")
+               "lineage", "pango_group","month","week")
 
 # extract rows from metadata table that correspond to this tree
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
@@ -828,11 +821,23 @@ mltree$edge.length <- mltree$edge.length*29903
 ttree2 <- ttree
 ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
 
-
-
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
-presetColors=data.frame(name=c("other",VOCVOI$name,hab), color=c("#777777",VOCVOI$color,rev(hcl.colors(length(hab)-1, "Red-Blue")),"#777777"))
+months=unique(meta$month)
+months=as.character(months[order(months)])
+weeks=unique(meta$week)
+weeks=as.character(weeks[order(weeks)])
+presetColors=data.frame(name=c("other",
+                               VOCVOI$name,
+                               hab,
+                               months,
+                               weeks), 
+                        color=c("#777777",
+                                VOCVOI$color,
+                                rev(hcl.colors(length(hab)-1, "Berlin")),"#777777",
+                                hcl.colors(length(months), "Berlin"),
+                                hcl.colors(length(weeks), "Berlin")
+                                ))
 
 #suppressWarnings({
 #  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
@@ -847,8 +852,8 @@ diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, field
 ### omicron diversity tree
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 
-
 OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
+
 ```
 
 
@@ -1084,7 +1089,6 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 * Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
 
 
-variants
 # Acknowledgements and sources
 
 We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).

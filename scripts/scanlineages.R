@@ -122,6 +122,16 @@ getAllSubLineages <- function(x, tree) {
   }
 }
 
+isSubLineage <- function(parent,child){
+  raw_parent=realtorawlineage(parent)
+  raw_child=realtorawlineage(child)
+  if (endsWith(parent, "*")) {
+    raw_parent=realtorawlineage(substr(parent, 1, nchar(parent)-1))
+  }
+  np=nchar(raw_parent)
+  nextchar=substr(raw_child, np+1, np+1)
+  return(substr(raw_child, 1, np)==raw_parent && nextchar %in% c(".","*",""))
+}
 
 #' create.pango.group
 #' 
