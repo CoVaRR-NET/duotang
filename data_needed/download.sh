@@ -34,6 +34,7 @@ cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1
           echo "Data source is ViralAi"
           cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print $1,$2}' |  tr ' ' \\t  >  ${data_dir}/pango_designation_alias_key_viralai.tsv
           sed -i '1i alias\tlineage'  ${data_dir}/pango_designation_alias_key_viralai.tsv
+	  cat ${data_dir}/pango_designation_alias_key_viralai.tsv ${data_dir}/alias_key.json | awk 'NF==2 && substr($1,1,1)!="\""{dico[$1]=$2}NF==2 && substr($1,1,2)=="\"X"{split(substr($2,1,length($2)-1),t,",");for(i in t){split(t[i],tt,"\"");e=split(tt[2],ttt,".");res=ttt[1];if(res in dico){res=dico[res]};for (j=2; j<=e;j++){res=res"."ttt[j]};t[i]=res}alias=substr($1,2,length($1)-3);printf alias" ";for(i in t){printf "%s ",t[i]}print " "}' | awk '{r=$2;for(i=3;i<=NF;i++){l=split(r,t1,".");split($i,t2,".");r=t1[1];k=2;while(t1[k]==t2[k]){r=r"."t1[k];k++}}r=r"."$1;print $1,r}' > ${data_dir}/pango_designation_alias_key_Xrecomb_viralai.tsv
           rm  ${data_dir}/alias_key.json
           (
             python  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key_viralai.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
