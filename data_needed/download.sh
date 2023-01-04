@@ -42,7 +42,7 @@ cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1
             mkdir -p  ${data_dir}/temp
             python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
             dnastack files download -i  ${data_dir}/temp/fasta_drl.$datestamp.txt -o ${data_dir}/temp
-            mv ${data_dir}/temp/*.fa ${data_dir}/virusseq.$datestamp.fasta && xz -T0 ${data_dir}/virusseq.$datestamp.fasta
+            mv ${data_dir}/temp/*.xz ${data_dir}/virusseq.$datestamp.fasta.xz
             rm -r  ${data_dir}/temp
           )
 
