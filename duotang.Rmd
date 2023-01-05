@@ -806,6 +806,7 @@ metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
+mltree <- ladderize(mltree, FALSE)
 
 ###Time Tree
 ttree2 <- ttree
