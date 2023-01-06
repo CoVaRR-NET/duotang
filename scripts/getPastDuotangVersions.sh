@@ -29,7 +29,7 @@ sed -i '/data_needed/d' commitHistory2.txt
 mkdir -p archive
 echo "Here we store old versions of the duotang notebook:" > archive/readme.md
 #recreate the duotang.html file from each commit and save it
-for i in `cat commitHistory2.txt`; do
+for i in `cat commitHistory2.txt | sed '1!G;h;$!d'`; do
 	echo $i;
 	name=`echo $i | cut -d',' -f3`
 	commit=`echo $i | cut -d',' -f1`
