@@ -155,8 +155,6 @@ create.pango.group <-  function(VOCVOI, meta) {
   # smaller group  
   n.derived <- sapply(lineage.groups, length)
   lineage.groups <- lineage.groups[order(n.derived, decreasing=TRUE)]
-  print(names(lineage.groups))
-  print(n.derived)
   col <- rep("other", nrow(meta))  # prepare output vector
   for (i in 1:length(lineage.groups)) {
     # this will overwrite PANGO groups with derived group labels
