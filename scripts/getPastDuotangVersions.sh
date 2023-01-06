@@ -18,7 +18,7 @@ else
 fi
 
 #pull all commits with changes to duotang.html
-git log --pretty=%as.%H --follow --name-only -- duotang.html > commitHistory.txt
+git log --pretty=%ad,%H --date=short --follow --name-only -- duotang.html | tr ':' '_'> commitHistory.txt
 #remove empty lines
 sed -i '/^$/d' commitHistory.txt
 #joins every 2 lines together
@@ -31,9 +31,9 @@ echo "Here we store old versions of the duotang notebook:" > archive/readme.md
 #recreate the duotang.html file from each commit and save it
 for i in `cat commitHistory2.txt`; do
 	echo $i;
-	name=`echo $i | cut -d',' -f2`
+	name=`echo $i | cut -d',' -f3`
 	commit=`echo $i | cut -d',' -f1`
-	id=`echo $commit | cut -d'.' -f2`
+	id=`echo $i | cut -d',' -f2`
 	date=`echo $commit | cut -d'.' -f1`
 	git show $id:$name > archive/$commit.html
 	if [ -s archive/$commit.html ]; then
