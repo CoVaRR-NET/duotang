@@ -31,7 +31,7 @@ if __name__ == '__main__':
     data_connect_client = client.get_data_connect_client(
         collection_name)
 
-    query = """SELECT * FROM collections.virusseq.public_samples"""
+    query = """SELECT * FROM collections.virusseq.samples"""
     df = pd.DataFrame(data_connect_client.query(query))
     alias_df = pd.read_csv(args.alias, sep='\t', header=0)
     alias_dic = pd.Series(alias_df.lineage.values,
