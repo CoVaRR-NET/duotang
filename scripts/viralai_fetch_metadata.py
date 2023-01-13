@@ -21,7 +21,6 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-
     # Create the client
     api_url = 'https://viral.ai/api/'
     client = CollectionServiceClient.make(ServiceEndpoint(
@@ -32,16 +31,18 @@ if __name__ == '__main__':
     data_connect_client = client.get_data_connect_client(
         collection_name)
 
-    query = """SELECT * FROM collections.virusseq.public_samples"""
+    query = """SELECT * FROM collections.virusseq.samples"""
     df = pd.DataFrame(data_connect_client.query(query))
-
-    df['raw_lineage'] = df['lineage']
     alias_df = pd.read_csv(args.alias, sep='\t', header=0)
     alias_dic = pd.Series(alias_df.lineage.values,
                           index=alias_df.alias).to_dict()
-    df['raw_lineage']=(df['raw_lineage'].str.extract(r"([A-Z]+)",
-                                                    expand=False)
-                                                            .map(alias_dic) + "." + df['raw_lineage'].str.split(".",1).str[1]).fillna(df['raw_lineage'])
+    def addalias(line):
+        temp=line['lineage'].split(".",1)
+        if temp[0] in alias_dic:
+            temp[0]=alias_dic[temp[0]]
+        return(".".join(temp))
+    
+    df['raw_lineage']=df.apply(addalias, axis=1)
 
     # Sort by sample_collection_date and write it to csv
     df.to_csv(args.csv, encoding='utf-8', index=False, sep='\t',

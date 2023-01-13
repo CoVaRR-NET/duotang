@@ -291,7 +291,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
                   format(round(fit$fit[["s1"]],3), nsmall=3), 
                   format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
                   format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
-  text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
+  text(x=toplot$date[1], y=0.59, str2, col=col[1], pos=4, cex = 1)
   
   if (length(mutants) > 1) {
     if(is.na(names[[1]])){name=est$mutdata[[2]]$lineage[1]}
@@ -300,10 +300,10 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
                     format(round(fit$fit[["s2"]], 3), nsmall=3), 
                     format(round(fit$confint["s2", "2.5 %"], 3), nsmall=3),
                     format(round(fit$confint["s2", "97.5 %"], 3), nsmall=3))    
-    text(x=toplot$date[1], y=0.88, str3, col=col[2], pos=4, cex = 1)
+    text(x=toplot$date[1], y=0.52, str3, col=col[2], pos=4, cex = 1)
   }  
   str4=sprintf("Relative to %s*",names[[3]])
-  text(x=toplot$date[1], y=0.81,str4, col="black", pos=4, cex = 1)
+  text(x=toplot$date[1], y=0.45,str4, col="black", pos=4, cex = 1)
   
   
   # second plot - logit transform
@@ -326,6 +326,8 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
     lines(toplot$date, scurves[,3] / scurves[,1])
     text(x=toplot$date[1], y=200, str3, col=col[2], pos=4, cex=1)
   }
+  str4=sprintf("Relative to %s*",names[[3]])
+  text(x=toplot$date[1], y=90,str4, col="black", pos=4, cex = 1)
   return(max(toplot$date))
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
