@@ -43,7 +43,7 @@ source("scripts/utils.R")
 VirusSeq_release="2023-01-12"
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
-pangoversion="4.1.3 (Viral AI)"
+pangoversion="4.2 (Viral AI)"
 
 VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
 
@@ -256,7 +256,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 
 
 ### late BA.2
-#### Sublineage BA.2 after 20220 August 1st
+#### Sublineage BA.2 after 2020 August 1st
 ```{r subtype plotter BA.2 late, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
 set=getStrictoSubLineages("BA.2*",meta)
 rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"))
@@ -342,7 +342,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ## Fastest growing lineages in Canada {.tabset}
 
 
-Here we show the selection estimates and their 95% confidence intervals for pangolin lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
 
 
@@ -561,7 +561,10 @@ source("scripts/scanlineages.R")
 plotsubvariant <- function(region,min,parentalnode){
   nplot=0
   for(p in allparams) {
-    if(!any(is.na(p$fit)) && p$region==region && isSubLineage(parentalnode,p$mut[[1]])){
+    if(!any(is.na(p$fit)) && 
+       p$region==region && 
+       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
+       isSubLineage(parentalnode,p$mut[[1]])){
       if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
           plot.selection(plotparam=p)
           nplot=nplot+1
@@ -590,7 +593,7 @@ plotothers <- function(region,min){
   for(p in allparams) {
     if(!any(is.na(p$fit)) && 
        p$region==region && 
-       !isSubLineage("BA.5*",p$mut[[1]]) && 
+       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
        !isSubLineage("BA.2*",p$mut[[1]])){
       if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
           plot.selection(plotparam=p)
@@ -663,7 +666,7 @@ apply(all.regions,1,function(reg){
 
 ## Variants in Canada over time
 
-These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to PANGO lineage/variant designation (Pango version `r pangoversion`), up to `r epidate`.
+These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to Pango lineage designation (Pango version `r pangoversion`), up to `r epidate`.
 Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
 <!-- Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.   -->
 
@@ -698,7 +701,7 @@ By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequence
 The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
 See below for jurisdictional differences of these plots.   
 
-There are two PANGO lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
+There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - a USA lineage that spread well in Canada  
@@ -881,7 +884,7 @@ Studies on mutational correlations to superspreading events, vaccination status,
 # Methodology {.tabset} 
 
 Genome data and metadata are sourced from the [Canadian VirusSeq Data Portal](https://virusseq-dataportal.ca/).
-Pangolin lineage assignments are generated using the [pangoLEARN](https://github.com/cov-lineages/pangoLEARN) algorithm.
+Pango lineage assignments are generated using the [pangoLEARN](https://github.com/cov-lineages/pangoLEARN) algorithm.
 Source code for generating this RMarkdown notebook can be found in [https://github.com/CoVaRR-NET/duotang].
 
 ## Trees
@@ -1004,7 +1007,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 * Nybbler tool for subsampling SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
 * Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
 * IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
-* cov-lineages (summaries of PANGO lineages) [https://cov-lineages.org/lineage_list.html]
+* cov-lineages (summaries of Pango lineages) [https://cov-lineages.org/lineage_list.html]
 * CoVizu (analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time) [https://github.com/PoonLab/covizu/]
 * COVID-MVP (mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health, CIDGOH) [https://covidmvp.cidgoh.ca/]
 * Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
