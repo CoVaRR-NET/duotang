@@ -207,24 +207,30 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
-***[Note: Variant proportions may change notably in upcoming updates, due to the recent holiday season impacting data collection.]***
+***[Note: Variant proportions may change notably in upcoming updates, due to the recent holiday season impacting data collection. Note also some recent updates to the analyses, including now the ability to view variants showing most growth by province.]***
 
-BQ.1, BQ.1.1 and some associated BQ variants are dominant at this time in Canada. Other variants, including XBB.1.5, are showing notable growth internationally, and have been more recently detected in Canada, with low numbers to date. XBB.1.5 has the spike mutation S:F486P, which is of note as it potentially increases immune evasion while also improving binding with the human ACE2 receptor. S:F486P is a “two-step mutation”, requiring two changes from the Wuhan ancestor to transition from the amino acid phenylalanine (F) to proline (P) and is now observed in XBB.1.5 plus some BA.2/BA.2.75-based variants and other unrelated BA.5-based variants. Some intermediate variants with a serine (S) have also recently been observed, including in Canada, that may lead to more variants with S:F486P.  Variants not yet classified and/or not yet in Canada that are associated with significant new outbreaks in other countries are also being monitored, including by mutation-based analysis.
+BQ.1, BQ.1.1 and some associated BQ variants are still dominant at this time in Canada, with some sublineages such as BQ.1.1.10 showing notable growth in some provinces (that have most recent data). XBB.1.5, of note due to its mutations and growth internationally, has been recently detected in more provinces Canada, with evidence of growth in some provinces. Other recombinant variants are also showing growth in parts of Canada, including XBM (first detected in Canada and the US), and XBF. Note that XBF, some other recombinants (like XBL, which is a recombinant of a recombinant), and some BN.1-type variants, are also noted for having high immune evasion and improved ability to bind to the human ACE2 receptor - at a level similar to XBB.1.5. Note also that differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important.
+Mutational analysis shows continued steady growth in prevalence of S:R346T (associated with immune evasion) and more recently S:F486P (associated with immune evasion and improved binding to the human ACE2 receptor). Some “intermediate” variants, such as those with a serine (S) at position S:486, have also recently been observed in Canada (such as the newly designated XBM).
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (See also the evolving plot below of “Fastest growing lineages in Canada”):
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (See also the evolving plots below of “Fastest growing lineages in Canada”):
 
-* BA.2 and BA.2.75 new subvariants not yet further classified
-* BA.5.2 new subvariants not yet further classified
-* BE.1.1 and other BA.5-type variants with S:F486P
-* BF.7 new subvariants not yet further classified
-* BQ.1, BQ.1.1, BQ.1.3 and many associated descendants
-* BW.1, BW.1.1 (descendants of BA.5.6)
-* CH.1.1 (descendant of BM which is BA.2.75.3)
-* CK.1, CK.2.1.1 (descendants of BA.5.2)
-* XAY.2 (has Delta's S:L452R mutation plus the S:486P mutation)
-* XBB newer variants, including XBB.1, XBB.1.5
-and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
-
+ * BA.2 and BA.2.75 new subvariants
+ * BA.5.2 new subvariants not yet further classified
+ * BE.1.1 and other BA.5-type variants with S:F486P
+ * BF.7 new subvariants not yet further classified
+ * BN.1\* subvariants due to high predicted immune evasion
+ * BQ.1, BQ.1.1, BQ.1.1.10, BQ.1.3 and many associated descendants
+ * BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
+ * CH.1.1 (descendant of BM which is BA.2.75.3)
+ * CK.1, CK.2.1.1 (descendants of BA.5.2)
+ * DS.1 (highest predicted immune evasion)
+ * XAY.2 (BA.2/Delta recominant with Delta’s S:L452R mutation plus the S:F486P mutation)
+ * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada)
+ * XBB.1, XBB.1.5, XBB.1.9.1, XBB.6.1 and subvariants with S:F486P
+ * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5)
+ * XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
+ * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant)
+ * ...and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
 
 ## Omicron sublineages in Canada {.tabset} 
 
@@ -342,7 +348,7 @@ The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
 ## Fastest growing lineages in Canada {.tabset}
 
 
-Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto. Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto (i.e., sequences designated as `r reference[[1]]` and not its descendants, like `r reference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
 
 
