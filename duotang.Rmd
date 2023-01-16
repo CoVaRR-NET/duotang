@@ -174,7 +174,7 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(1) ]))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(60) ]))
 reference <- getStrictoSubLineages("BQ.1",meta)
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
@@ -238,30 +238,32 @@ Here we take a look, sub-dividing the major sub-lineages currently circulating i
 
 
 
-```{r, results='asis', figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis',}
 
 source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
                                       "BA.4*","BA.5.1*","BA.5.2*",
                                       "BQ*","BA.5*","B*"),
                                tabname=c("BA.1","early BA.2","late BA.2",
-                                      "BA.4","BA.5.1","BA.5.2",
-                                      "BQ","Other BA.5","Divergent lineages"),
+                                         "BA.4","BA.5.1","BA.5.2",
+                                         "BQ","Other BA.5","Divergent lineages"),
                                mindate=c("","","2022-08-01",
-                                      "","","",
-                                      "","","2022-03-01"),
+                                         "","","",
+                                         "","","2022-03-01"),
                                maxdate=c("2022-06-01","2022-08-01","",
-                                      "","","",
-                                      "","",""),
+                                         "","","",
+                                         "","",""),
                                exclude_previously_plotted=c(FALSE,FALSE,FALSE,
-                                      FALSE,FALSE,FALSE,
-                                      FALSE,TRUE,TRUE)
-                    )
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,TRUE,TRUE))
 
+
+
+    
 plotted=c()
 tmp=apply(sublineagestoplot,1,function(sub){
-  cat("####", sub[["tabname"]], "\n")
-  cat("#####",sub[["tabname"]],"sublineages")
+  cat("###", sub[["tabname"]], "\n")
+  cat("####", sub[["tabname"]],"sublineages")
   mindate=NA
   maxdate=NA
   if(sub[["mindate"]]!=""){
@@ -285,6 +287,8 @@ tmp=apply(sublineagestoplot,1,function(sub){
   }
   cat("\n\n")})
 
+
+
 ```
 
 
@@ -302,6 +306,7 @@ Background shading illustrates sub-variants that we need to keep an eye on in bl
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
 ```{r, results='asis', fig.retina = 2, warning=FALSE, fig.height=7}
+
 source("scripts/plot_growing_lineages.R")
 selectparam <- function(p,reg){
   if(!any(is.na(p$fit))){
@@ -452,8 +457,7 @@ maxdate=sub.plot.selection.estimate(region="Canada")
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
+local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
 ```
 
 ### AL
@@ -476,8 +480,7 @@ local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
 #### Manitoba
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
+local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
 ```
 
 ### ON
