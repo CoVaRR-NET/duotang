@@ -64,7 +64,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     
     # match case counts to variant freq data and rescale as 2nd axis
     idx <- match(floor_date(epi$date, "weeks", week_start=1),
-                 seq(min(as.Date(colnames(tab))), max(as.Date(colnames(tab))), "weeks"))
+                 floor_date(as.Date(levels(varmeta1$week)), "weeks", week_start=1))
     y <- cases.wk[!is.na(idx)]
     lab.y <- pretty(y)  # for drawing axis
     max.count <- max(apply(tab, 2, sum))
