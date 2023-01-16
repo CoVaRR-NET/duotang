@@ -174,7 +174,7 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(60) ]))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(1) ]))
 reference <- getStrictoSubLineages("BQ.1",meta)
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
@@ -236,113 +236,56 @@ Mutational analysis shows continued steady growth in prevalence of S:R346T (asso
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
 
-### BA.1
-#### Sublineage BA.1 until 2022 June 1st
-```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+
+
+```{r, results='asis', figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+
 source("scripts/subtype_plotter.R")
-set=getStrictoSubLineages("BA.1*",meta)
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-06-01"))
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-06-01"),scale=T)
-plotted=set
-printest(rarelineages_names)
+sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
+                                      "BA.4*","BA.5.1*","BA.5.2*",
+                                      "BQ*","BA.5*","B*"),
+                               tabname=c("BA.1","early BA.2","late BA.2",
+                                      "BA.4","BA.5.1","BA.5.2",
+                                      "BQ","Other BA.5","Divergent lineages"),
+                               mindate=c("","","2022-08-01",
+                                      "","","",
+                                      "","","2022-03-01"),
+                               maxdate=c("2022-06-01","2022-08-01","",
+                                      "","","",
+                                      "","",""),
+                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,
+                                      FALSE,FALSE,FALSE,
+                                      FALSE,TRUE,TRUE)
+                    )
+
+plotted=c()
+tmp=apply(sublineagestoplot,1,function(sub){
+  cat("####", sub[["tabname"]], "\n")
+  cat("#####",sub[["tabname"]],"sublineages")
+  mindate=NA
+  maxdate=NA
+  if(sub[["mindate"]]!=""){
+    cat(" from",sub[["mindate"]])
+    mindate=as.Date(sub[["mindate"]])
+  }
+  if(sub[["maxdate"]]!=""){
+    cat(" until",sub[["maxdate"]])
+    maxdate=as.Date(sub[["maxdate"]])
+  }
+  cat("\n\n")
+  set=getStrictoSubLineages(sub[["name"]],meta)
+  if(sub[["exclude_previously_plotted"]]){
+    set=set[!set %in% plotted]
+  }
+  rarelineages_names=plot.subvariants(sublineage=set,mindate=mindate,maxdate=maxdate)
+  rarelineages_names=plot.subvariants(sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
+  plotted <<- unique(c(plotted,set))
+  if(rarelineages_names!=""){
+    cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
+  }
+  cat("\n\n")})
+
 ```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### early BA.2
-#### Sublineage BA.2 until 2022 August 1st
-```{r subtype plotter BA.2 early, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"))
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"),scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### late BA.2
-#### Sublineage BA.2 after 2020 August 1st
-```{r subtype plotter BA.2 late, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"))
-rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"),scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.4
-#### Sublineage BA.4
-```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.4*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.5.1
-#### Sublineage BA.5.1
-```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5.1*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.5.2
-#### Sublineage BA.5.2
-```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-### BQ
-#### Sublineage BQ
-```{r subtype plotter BQ, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BQ*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-### Other BA.5
-#### Sublineage BA.5 without BA.5.1\*, BA.5.2\*, and BQ\*
-```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5*",meta)
-set=set[!set %in% plotted]
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### Divergent lineages
-#### Divergent lineages
-```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-
-set=getAllStrictoLineages(meta)
-set=set[!set %in% plotted]
-rarelineages_names=plot.subvariants(sublineage=set,mindate=max(meta$sample_collection_date)-days(100))
-rarelineages_names=plot.subvariants(sublineage=set,mindate=max(meta$sample_collection_date)-days(100),scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
 
 
 ## Fastest growing lineages in Canada {.tabset}
@@ -370,7 +313,7 @@ selectparam <- function(p,reg){
   }else{FALSE}
   }
 
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   cat("##### Plot single lineages in",reg[["name"]],"\n","\n")
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
@@ -407,7 +350,7 @@ selectparam <- function(p,reg){
   }else{FALSE}
   }
 
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   cat("##### Plot monophyletic groups of lineages in",reg[["name"]],"\n","\n")
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
@@ -624,7 +567,7 @@ Here we show the trends of the various BA.2.* sublineages over time, relative to
 
 
 ```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
@@ -643,7 +586,7 @@ Here we show the trends of the various BA.5# sublineages over time, relative to 
 
 
 ```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
@@ -660,7 +603,7 @@ Here we show the trends of the various other sublineages over time, relative to 
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
