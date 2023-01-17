@@ -70,9 +70,9 @@ all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
                                 "Quebec", "Nova Scotia", "New Brunswick",
                                 "Newfoundland and Labrador"),
-                         shortname=c("Canada","BC", "AL",
-                                     "SA", "MA", "ON", 
-                                     "QC", "NS", "NB","NFL"))
+                         shortname=c("Canada","BC", "AB",
+                                     "SK", "MA", "ON", 
+                                     "QC", "NS", "NB","NL"))
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
@@ -130,7 +130,7 @@ meta <- meta[ , columnlist]
 
 ### metadata cleaning 
 unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
-                 "Not Applicable","","NA")
+                 "Not Applicable","","NA","unknow")
 meta <- as.data.frame(apply(meta, 2, function(x) {
   x[is.element(x, unknown.str)] <- "Unknown"
   x
@@ -460,7 +460,7 @@ maxdate=sub.plot.selection.estimate(region="Canada")
 local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
 ```
 
-### AL
+### AB
 #### Alberta
 
 ```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
@@ -503,7 +503,7 @@ local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
+local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB+PE)",maxdate=maxdate)
 ```
 
 
