@@ -69,8 +69,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     lab.y <- pretty(y)  # for drawing axis
     max.count <- max(apply(tab, 2, sum))
     y2 <- (y-min(y)) / (max(y)-min(y)) * max.count  # scale to variant counts
-    at.y <- lab.y / (max(y)-min(y)) * max.count
-    
+    at.y <- (lab.y-min(lab.y)) / (max(y)-min(y)) * max.count
     barplot(tab, col=pal, 
             border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
             ylab="Sequenced cases per week") -> mp
