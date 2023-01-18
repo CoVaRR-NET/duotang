@@ -66,6 +66,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     idx <- match(floor_date(epi$date, "weeks", week_start=1),
                  floor_date(as.Date(levels(varmeta1$week)), "weeks", week_start=1))
     y <- cases.wk[!is.na(idx)]
+    y[is.na(y)] <- 0 #sometimes there is no data for a given week 
     lab.y <- pretty(y)  # for drawing axis
     max.count <- max(apply(tab, 2, sum))
     y2 <- (y-min(y)) / (max(y)-min(y)) * max.count  # scale to variant counts
