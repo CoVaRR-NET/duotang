@@ -1,0 +1,238 @@
+
+---
+title: |
+  ![Duotang_GISAID](../img/CoVaRR-Net_Logo-600.png){width=1lm}
+subtitle: "Duotang - GISAID "
+author: "DO NOT MAKE THIS PAGE PUBLIC"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_document:
+    keep_md: true
+    code_folding: hide
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+
+
+```{r setup, include=FALSE, warning=FALSE}
+library(tidyr)
+library(knitr) # Needed to set root directory
+library(lubridate)  # dates are awful
+library(parallel)  # speed up selection plotting (#133)
+library(ggplot2)  # Work-horse plotting package
+library(ggfree) 
+library(r2d3)  # used for passing data to JavaScript D3 framework
+library(jsonlite)
+
+theme_set(theme_classic())
+
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = getwd())
+```
+
+
+```{r variables, include=FALSE, warning=FALSE}
+############################
+##### GLOBAL VARIABLES #####
+############################
+
+source("../scripts/utils.R")
+#Date of the VirusSeq release
+Variants_Canada_over_time_Start_Date=as.Date('2021-06-01')
+
+pangoversion="4.2 (Viral AI)"
+
+VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
+
+# FIXME: this should be stored as an external CSV file
+VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
+VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
+VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
+VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
+VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
+
+VOCVOI=add.pango.group("Omicron BA.1", "BA.1*", '#8B0000')
+VOCVOI=add.pango.group("Omicron BA.2", "BA.2*", '#FF0000')
+VOCVOI=add.pango.group("Omicron BA.4", "BA.4*", '#BC544B')
+VOCVOI=add.pango.group("Omicron BA.5", "BA.5*", '#CC66FF')
+VOCVOI=add.pango.group("Omicron BQ", "BQ*", '#9CB329')
+VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
+#VOCVOI=add.pango.group("Omicron BF","BF*",'#9F2B11')
+
+VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
+VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
+VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
+
+all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
+                                "Saskatchawan", "Manitoba", "Ontario", 
+                                "Quebec", "Nova Scotia", "New Brunswick",
+                                "Newfoundland and Labrador","Prince Edward Island"),
+                         shortname=c("Canada","BC", "AB",
+                                     "SK", "MA", "ON", 
+                                     "QC", "NS", "NB",
+                                     "NL","PE"))
+
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+pal["other"] <- 'grey' # named character vector
+```
+
+
+
+```{r load_data}
+
+## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
+#Download metadata from VirusSeq, put the date here:
+
+# this can be made more compact for faster loading
+meta <- read.csv(gzfile("metadatagisaid.tsv.gz"), sep="\t")
+meta$province <- meta$geo_loc_name_state_province_territory
+
+# Select only the column we want to use later
+columnlist=c("fasta_header_name", "province", "sample_collection_date",
+             "lineage", "raw_lineage")
+meta <- meta[ , columnlist]
+
+
+### metadata cleaning 
+unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
+                 "Not Applicable","","NA","unknown")
+meta <- as.data.frame(apply(meta, 2, function(x) {
+  x[is.element(x, unknown.str)] <- "Unknown"
+  x
+}))
+
+meta$sample_collection_date <- as.Date(meta$sample_collection_date)
+meta$week <- cut(meta$sample_collection_date, 'week')
+meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
+
+source("../scripts/scanlineages.R")
+meta$pango_group <- create.pango.group(VOCVOI, meta)
+meta$pango_group <- as.factor(meta$pango_group)
+
+
+metaV <- read.csv(gzfile("../data_needed/virusseq.metadata.csv.gz"), sep="\t")
+metaV$province <- metaV$geo_loc_name_state_province_territory
+metaV <- metaV[ , columnlist]
+metaV <- as.data.frame(apply(metaV, 2, function(x) {x[is.element(x, unknown.str)] <- "Unknown";return(x)}))
+metaV$sample_collection_date <- as.Date(metaV$sample_collection_date)
+metaV$week <- cut(metaV$sample_collection_date, 'week')
+metaV$month <- gsub("-..$","",as.character(cut(metaV$sample_collection_date, 'month')))
+metaV$pango_group <- create.pango.group(VOCVOI, metaV)
+metaV$pango_group <- as.factor(metaV$pango_group)
+## 2. LOAD epidemiological data (PHAC)
+
+
+## 2. LOAD epidemiological data (PHAC)
+
+#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
+epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
+epidataCANall$date <- as.Date(epidataCANall$date)
+epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
+epidate <- tail(epidataCANall,1)$date #download date
+
+epidataCANall$previousvalue <- 0
+#small loop to get the numtoday column from previous versions of this file from the cumulative cases
+for(row in 1:nrow(epidataCANall)) {
+  p <- epidataCANall[row, "prname"]
+  subdf <- epidataCANall[which( 
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+    ), ]
+  if(nrow(subdf) != 0) {
+    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
+  }
+}
+epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
+
+  
+```
+
+
+```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+source("../scripts/plot_selection_estimator_2type.R")
+source("../scripts/scanlineages.R")
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(0) ]))
+reference <- getStrictoSubLineages("BQ.1",meta)
+
+startdate <- max(meta$sample_collection_date) - days(120)
+
+```
+# SARS-CoV-2 in Canada
+
+## Omicron sublineages in Canada {.tabset} 
+
+
+```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis', error=TRUE}
+
+source("subtype_plotter2.R")
+
+sublineagestoplot = data.frame(name=c("B.1.1.7*","B.1.1.28.1*","AY*","B*",
+                                      "BA.1*","BA.2*","BA.2*",
+                                      "BA.4*","BA.5.1*","BA.5.2*",
+                                      "BQ*","BA.5*","B*"),
+                               tabname=c("Alpha","Gamma","Delta","2020",
+                                         "BA.1","BA.2(early)","BA.2(late)",
+                                         "BA.4","BA.5.1","BA.5.2",
+                                         "BQ","BA.5(rest)","Rest"),
+                               mindate=c("","","2021-03-01","2020-02-01",
+                                         "","","2022-08-01",
+                                         "","","",
+                                         "","","2022-03-01"),
+                               maxdate=c("","","2022-01-01","2021-06-01",
+                                         "2022-06-01","2022-08-01","",
+                                         "","","",
+                                         "","",""),
+                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,TRUE,
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,TRUE,TRUE))
+
+tmp=apply(all.regions,1,function(reg){
+  cat("###", reg[["shortname"]], "\n")
+  cat("#### in",reg[["name"]],"{.tabset} \n\n")
+  plotted=c()
+  tmp=apply(sublineagestoplot,1,function(sub){
+    cat("#####", sub[["tabname"]], "\n")
+    cat("######", sub[["tabname"]],"sublineages in",reg[["name"]])
+    mindate=NA
+    maxdate=as.Date("2023-01-03")
+    if(sub[["mindate"]]!=""){
+      cat(" from",sub[["mindate"]])
+      mindate=as.Date(sub[["mindate"]])
+    }
+    if(sub[["maxdate"]]!=""){
+      cat(" until",sub[["maxdate"]])
+      maxdate=as.Date(sub[["maxdate"]])
+    }
+    cat(" \n\n")
+    set=getStrictoSubLineages(sub[["name"]],meta)
+    if(sub[["exclude_previously_plotted"]]){
+      set=set[!set %in% plotted]
+    }
+    plotted_set=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate)
+    plotted_set=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
+    #if(rarelineages_names!=""){
+    #  cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
+    #}
+    plotted <<- unique(c(plotted,plotted_set))
+    cat("\n\n")
+  })
+cat("\n\n")})
+    
+```
+
+
+# Session info {.tabset}
+The version numbers of all packages in the current environment as well as information about the R install is reported below. 
+
+## Hide
+
+## Show
+
+```{r session_info}
+sessionInfo()
+```
