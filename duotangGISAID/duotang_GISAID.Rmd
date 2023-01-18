@@ -1,9 +1,9 @@
 
 ---
 title: |
-  ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
-subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
-author: "Pillar 6"
+  ![Duotang_GISAID](../img/CoVaRR-Net_Logo-600.png){width=1lm}
+subtitle: "Duotang - GISAID "
+author: "DO NOT MAKE THIS PAGE PUBLIC"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
@@ -157,7 +157,7 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 source("../scripts/plot_selection_estimator_2type.R")
 source("../scripts/scanlineages.R")
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(1) ]))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(0) ]))
 reference <- getStrictoSubLineages("BQ.1",meta)
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
@@ -182,71 +182,6 @@ allparams <- allparams[!is.na(allparams)]
 allparams <- allparams[order(sapply(allparams, function(p) { 
   ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
   }), decreasing = TRUE)]
-```
-
-
-
-# SARS-CoV-2 in Canada
-
-## Omicron sublineages in Canada {.tabset} 
-
-
-```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis',}
-
-source("../scripts/subtype_plotter2.R")
-#min(meta$sample_collection_date[meta$lineage %in% getStrictoSubLineages("BA.5")])
-#min(metaV$sample_collection_date[metaV$lineage %in% getStrictoSubLineages("BA.5")])
-
-sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
-                                      "BA.4*","BA.5.1*","BA.5.2*",
-                                      "BQ*","BA.5*","B*"),
-                               tabname=c("BA.1","early BA.2","late BA.2",
-                                         "BA.4","BA.5.1","BA.5.2",
-                                         "BQ","Other BA.5","Divergent lineages"),
-                               mindate=c("","","2022-08-01",
-                                         "","","",
-                                         "","","2022-03-01"),
-                               maxdate=c("2022-06-01","2022-08-01","",
-                                         "","","",
-                                         "","",""),
-                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,
-                                                            FALSE,FALSE,FALSE,
-                                                            FALSE,TRUE,TRUE))
-
-
-    
-plotted=c()
-tmp=apply(sublineagestoplot,1,function(sub){
-  cat("###", sub[["tabname"]], "\n")
-  cat("####", sub[["tabname"]],"sublineages")
-  mindate=NA
-  maxdate=as.Date("2023-01-03")
-  if(sub[["mindate"]]!=""){
-    cat(" from",sub[["mindate"]])
-    mindate=as.Date(sub[["mindate"]])
-  }
-  if(sub[["maxdate"]]!=""){
-    cat(" until",sub[["maxdate"]])
-    maxdate=as.Date(sub[["maxdate"]])
-  }
-  cat(" {.tabset} \n\n")
-  set=getStrictoSubLineages(sub[["name"]],meta)
-  if(sub[["exclude_previously_plotted"]]){
-    set=set[!set %in% plotted]
-  }
-  
-  tmp=apply(all.regions[c(1:3,5:11),],1,function(reg){
-    cat("#####", reg[["shortname"]], "\n")
-    cat("######", sub[["tabname"]],"sublineages in",reg[["name"]],"\n","\n")
-    rarelineages_names=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate)
-    rarelineages_names=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
-    if(rarelineages_names!=""){
-      cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
-    }
-    cat("\n\n")
-  })
-  plotted <<- unique(c(plotted,set))
-  cat("\n\n")})
 ```
 
 
@@ -284,7 +219,7 @@ tmp=apply(all.regions,1,function(reg){
   if(n!=0){
     a=plot_growing_lineage(paramselected[1:n])
   }else{
-    cat("![<img height=\"100\"/>](img/NotEnoughData.jpg)")
+    cat("![<img height=\"100\"/>](../img/NotEnoughData.jpg)")
   }
   cat("\n\n")})
 
@@ -321,7 +256,7 @@ tmp=apply(all.regions,1,function(reg){
   if(n!=0){
     a=plot_growing_lineage(paramselected[1:n])
   }else{
-    cat("![](img/NotEnoughData.jpg)")
+    cat("![](../img/NotEnoughData.jpg)")
   }
   cat("\n\n")})
 
@@ -342,16 +277,6 @@ DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE))
 
 
 ## Selection on Omicron {.tabset}  
-
-Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
-
-Currently, the major group of Omicron lineages rising in frequency are the BQ.* group, which descend from BA.5\*.  We first show this growth of BQ.\* and other BA.5* (here excluding BQ.\*), relative to the remaining strains, which consist predominantly of BA.2* and BA.4\*. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BQ.\* or BA.5\*)/freq(other)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
-
-For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
-
-**Caveat:**
-These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
-
 
 
 ```{r setting function for selection estimator}
@@ -446,11 +371,32 @@ local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
 local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
 ```
 
-### East
-#### East provinces
+### NB
+#### New Brunswick
 
-```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB+PE)",maxdate=maxdate)
+```{r selection estimator New Brunswick, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="New Brunswick",maxdate=maxdate)
+```
+
+### NS
+#### Nova Scotia
+
+```{r selection estimator Nova Scotia, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="Nova Scotia",maxdate=maxdate)
+```
+
+### PE
+#### Prince Edward Island
+
+```{r selection estimator Prince Edward Island, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region=" Prince Edward Island)",maxdate=maxdate)
+```
+
+### NL
+#### Newfoundland and Labrador
+
+```{r selection estimator Newfoundland and Labrador, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="Newfoundland and Labrador",maxdate=maxdate)
 ```
 
 
@@ -563,11 +509,7 @@ tmp=apply(all.regions,1,function(reg){
   
 ```
 
-## Variants in Canada over time
-
-These plots show the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to Pango lineage designation (Pango version `r pangoversion`), up to `r epidate`.
-Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
-<!-- Case counts over time (rolling 7 day average) are added in as a grey curve for comparison, given that sequencing coverage varies over time.   -->
+## Variants in Canada over time 
 
 ```{r example_summaries, out.height="580px"}
 # focus on emergence of VoCs in Canada
@@ -593,39 +535,6 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
 rm(dat)
 rm(meta1)
 ```
-
-
-From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
-By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
-The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
-See below for jurisdictional differences of these plots.   
-
-There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
-
-* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
-* B.1.2 - a USA lineage that spread well in Canada  
-* B.1.160 - an European lineages that spread well in Canada  
-
-
-# Future development
-
-We are in the process of adding or would like to develop code for some of the following analyses:   
-
-* dN/dS (by variant and by gene/domains)  
-* Tajima's D over time  
-* clustering analyses
-* genomically inferred epidemiological parameters: R0, serial interval, etc.
-
-With anonymized data on vaccination status, severity/outcome, reason for sequencing (*e.g.*, outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving.
-Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
-
-
-# Methodology {.tabset} 
-
-Genome data and metadata are sourced from the [Canadian VirusSeq Data Portal](https://virusseq-dataportal.ca/).
-Pango lineage assignments are generated using the [pangoLEARN](https://github.com/cov-lineages/pangoLEARN) algorithm.
-Source code for generating this RMarkdown notebook can be found in [https://github.com/CoVaRR-NET/duotang].
-
 
 # Session info {.tabset}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 

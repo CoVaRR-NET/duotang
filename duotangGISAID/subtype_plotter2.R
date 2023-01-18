@@ -7,8 +7,8 @@ require(lubridate)
 #' @param sublineage:  char, vector of lineage names for subsetting
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
-plot.subvariants <- function(region='Canada', sublineage=c(name1), 
-                             scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
+plot.subvariants <- function(region='Canada', sublineage, 
+                             scaled=FALSE, mindate=NA, maxdate=NA) {
   if(is.na(maxdate)){
     maxdate=max(metaV$sample_collection_date)
   }
@@ -36,20 +36,17 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   
   varmetaV1$pango_group <- as.factor(varmetaV1$pango_group)
   
-  if (is.na(col)) {
-    set.seed(320) #setted for 15 colors were close shades are not contiguous
-    col <- sample(rainbow(length(levels(varmetaV1$pango_group))))  # default colour palette
-  }
-  
   if(nrow(lineagecountV)<5){
     varmeta1$pango_group <- factor(varmeta1$pango_group)
-    pal <- col
+    set.seed(320)
+    pal <- sample(rainbow(length(levels(varmeta1$pango_group))))
     names(pal) <- levels(varmeta1$pango_group)
     pal["other lineages"] <- 'grey'  # named character vector
     pal <- pal[match(levels(varmeta1$pango_group), names(pal))]
   }else{
     varmeta1$pango_group <- factor(varmeta1$pango_group, levels=levels(varmetaV1$pango_group))
-    pal <- col
+    set.seed(320)
+    pal <- sample(rainbow(length(levels(varmetaV1$pango_group))))
     names(pal) <- levels(varmetaV1$pango_group)
     pal["other lineages"] <- 'grey'  # named character vector
     pal <- pal[match(levels(varmetaV1$pango_group), names(pal))]
@@ -65,7 +62,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
         tab2 <- apply(tabV, 2, function(x) x/sum(x))
         barplot(tab2, col=pal, 
                 border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-                ylab="Sequenced cases per week (fraction)") -> mp
+                ylab="Sequenced cases per week (fraction)",main = "VirusSeq") -> mp
         legend(x=max(mp)+1, y=1, legend=rev(levels(varmetaV1$pango_group)), 
                bty='n', xpd=NA, cex=0.7, fill=rev(pal), 
                x.intersp=0.5, y.intersp=1, border=NA)
@@ -78,15 +75,16 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
       idx <- match(floor_date(epi$date, "weeks", week_start=1),
                    floor_date(as.Date(levels(varmetaV1$week)), "weeks", week_start=1))
       y <- cases.wk[!is.na(idx)]
+      y[is.na(y)] <- 0
       lab.y <- pretty(y)  # for drawing axis
       max.count <- max(apply(tabV, 2, sum))
       y2 <- (y-min(y)) / (max(y)-min(y)) * max.count  # scale to variant counts
       at.y <- (lab.y-min(lab.y)) / (max(y)-min(y)) * max.count
       barplot(tabV, col=pal, 
               border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-              ylab="Sequenced cases per week") -> mp
+              ylab="Sequenced cases per week",main = "VirusSeq") -> mp
       lines(mp, y2, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
-      axis(side=4, at=at.y, labels=format(lab.y, scientific=F), hadj=0,
+      axis(side=4, at=at.y, labels=format(lab.y, format = 'd'), hadj=0,
            las=1, cex.axis=0.7, col='grey50', col.ticks='grey50',
            col.axis='grey50')
     }}
@@ -98,7 +96,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
       tab2 <- apply(tab, 2, function(x) x/sum(x))
       barplot(tab2, col=pal, 
               border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-              ylab="Sequenced cases per week (fraction)") -> mp
+              ylab="Sequenced cases per week (fraction)",main = "GISAID") -> mp
       legend(x=max(mp)+1, y=1, legend=rev(levels(varmeta1$pango_group)), 
              bty='n', xpd=NA, cex=0.7, fill=rev(pal), 
              x.intersp=0.5, y.intersp=1, border=NA)
@@ -111,19 +109,20 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
       idx <- match(floor_date(epi$date, "weeks", week_start=1),
                    floor_date(as.Date(levels(varmeta1$week)), "weeks", week_start=1))
       y <- cases.wk[!is.na(idx)]
+      y[is.na(y)] <- 0
       lab.y <- pretty(y)  # for drawing axis
       max.count <- max(apply(tab, 2, sum))
       y2 <- (y-min(y)) / (max(y)-min(y)) * max.count  # scale to variant counts
       at.y <- (lab.y-min(lab.y)) / (max(y)-min(y)) * max.count
       barplot(tab, col=pal, 
               border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-              ylab="Sequenced cases per week") -> mp
+              ylab="Sequenced cases per week",main = "GISAID") -> mp
       lines(mp, y2, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
-      axis(side=4, at=at.y, labels=format(lab.y, scientific=F), hadj=0,
+      axis(side=4, at=at.y, labels=format(lab.y, format = 'd'), hadj=0,
            las=1, cex.axis=0.7, col='grey50', col.ticks='grey50',
            col.axis='grey50')
   }}
-  return(rarelineages_names)
+  return(unique(varmetaV1$lineage))
 }
 
 
