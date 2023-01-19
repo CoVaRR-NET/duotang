@@ -173,23 +173,23 @@ source("subtype_plotter2.R")
 sublineagestoplot = data.frame(name=c("B.1.1.7*","B.1.1.28.1*","AY*","B*",
                                       "BA.1*","BA.2*","BA.2*",
                                       "BA.4*","BA.5.1*","BA.5.2*",
-                                      "BQ*","BA.5*","B*"),
+                                      "BQ*","BA.5*","B*","B*"),
                                tabname=c("Alpha","Gamma","Delta","2020",
                                          "BA.1","BA.2(early)","BA.2(late)",
                                          "BA.4","BA.5.1","BA.5.2",
-                                         "BQ","BA.5(rest)","Rest"),
+                                         "BQ","BA.5(rest)","Rest","recent"),
                                mindate=c("","","2021-03-01","2020-02-01",
                                          "","","2022-08-01",
                                          "","","",
-                                         "","","2022-03-01"),
+                                         "","","2022-03-01","2022-11-01"),
                                maxdate=c("","","2022-01-01","2021-06-01",
                                          "2022-06-01","2022-08-01","",
                                          "","","",
-                                         "","",""),
+                                         "","","",""),
                                exclude_previously_plotted=c(FALSE,FALSE,FALSE,TRUE,
                                                             FALSE,FALSE,FALSE,
                                                             FALSE,FALSE,FALSE,
-                                                            FALSE,TRUE,TRUE))
+                                                            FALSE,TRUE,TRUE,FALSE))
 
 tmp=apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
