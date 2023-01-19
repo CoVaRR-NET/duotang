@@ -496,33 +496,6 @@ tmp=apply(all.regions,1,function(reg){
   
 ```
 
-## Variants in Canada over time 
-
-```{r example_summaries, out.height="580px"}
-# focus on emergence of VoCs in Canada
-
-meta1 <- meta[as.Date(meta$week) > Variants_Canada_over_time_Start_Date, ]
-meta1$week <- as.factor(as.character(meta1$week))
-
-dat <- lapply(unique(meta1$province), function(x) {
-  as.data.frame.matrix(table(meta1$week[meta1$province==x],
-                             meta1$pango_group[meta1$province==x]))
-})
-names(dat) <- unique(meta1$province)
-
-dat[['Canada']] <- as.data.frame.matrix(table(meta1$week, meta1$pango_group))
-
-# pass colour legend to JavaScript layer
-dat[['legend']] <- as.list(VOCVOI$color)
-names(dat[['legend']]) <- VOCVOI$name
-dat[['legend']]$other <- 'grey'
-
-r2d3(data=toJSON(dat), script="../js/barplot.js", container="div",
-     elementId="barplot-element")
-rm(dat)
-rm(meta1)
-```
-
 # Session info {.tabset}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
 
