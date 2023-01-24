@@ -39,8 +39,6 @@ opts_knit$set(root.dir = getwd())
 ############################
 
 source("../scripts/utils.R")
-#Date of the VirusSeq release
-Variants_Canada_over_time_Start_Date=as.Date('2021-06-01')
 
 pangoversion="4.2 (Viral AI)"
 
@@ -397,7 +395,7 @@ plotsubvariant <- function(region,min,parentalnode){
        p$region==region && 
        substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
        isSubLineage(parentalnode,p$mut[[1]])){
-      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
+      if((p$fit)$fit[["s1"]]>0.07 && sum(p$toplot$n2)>min){
           plot.selection(plotparam=p)
           nplot=nplot+1
       }
@@ -471,7 +469,7 @@ Here we show the trends of the various BA.5# sublineages over time, relative to 
 ```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
-  n_min=20
+  n_min=10
   if(reg[["name"]]=="Canada"){n_min=50}
   cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
   plotba5(reg[["name"]],n_min)

@@ -191,7 +191,9 @@ sublineagestoplot = data.frame(name=c("B.1.1.7*","B.1.1.28.1*","AY*","B*",
                                                             FALSE,FALSE,FALSE,
                                                             FALSE,TRUE,TRUE,FALSE))
 
-tmp=apply(all.regions,1,function(reg){
+#sublineagestoplot = data.frame(name=c("B*"),tabname=c("recent"),mindate=c("2022-12-12"),maxdate=c(""),exclude_previously_plotted=c(FALSE))
+
+tmp=apply(all.regions[1,],1,function(reg){
   cat("###", reg[["shortname"]], "\n")
   cat("#### in",reg[["name"]],"{.tabset} \n\n")
   plotted=c()
