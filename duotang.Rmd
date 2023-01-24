@@ -930,7 +930,7 @@ We used a Python wrapper of [minimap2](https://github.com/lh3/minimap2) (version
 A maximum likelihood (ML) tree was reconstructed from each alignment using the COVID-19 release of [IQ-TREE](http://www.iqtree.org/) (version 2.2.0).
 Outliers were identified in by root-to-tip regression using the R package [ape](https://cran.r-project.org/web/packages/ape/) and removed from the dataset.
 [TreeTime](https://github.com/neherlab/treetime) was used to reconstruct a time-scaled tree under a strict molecular clock model.
-The resulting trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+The resulting trees were converted into interactive plots with [ggfree](https://github.com/ArtPoon/ggfree) and [r2d3](https://rstudio.github.io/r2d3/).
 
 ## Mutational composition
 ### Mutation composition graph
