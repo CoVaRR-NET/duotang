@@ -15,7 +15,8 @@ pangolin_raw = {}
 rows = csv.DictReader(open(args.lineages))
 for row in rows:
     pangolin_alias.update({row['isolate']: row['lineage']})
-    pangolin_raw.update({row['isolate']: row['rawlineage']})
+    pangolin_raw.update({row['isolate']: row['raw_lineage']})
+    #print(row)
 
 # handle gzip file if indicated by filename extension
 if args.metadata.endswith('.gz'):
@@ -30,7 +31,7 @@ for row in rows:
     if lineage is None:
         print(f"ERROR: Failed to retrieve Pangolin output for {label}")
     else:
-        row.update({'rawlineage': lineage})
+        row.update({'raw_lineage': lineage})
         row.update({'lineage': pangolin_alias.get(label, None)})
 
 fieldnames = list(rows[0].keys())

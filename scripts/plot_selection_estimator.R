@@ -120,7 +120,6 @@ alpha <- function(col, alpha) {
   p.vecs / apply(p.vecs, 1, sum)  # normalize to probabilities
 }
 
-
 #' log-likelihood for multinomial distribution
 #' This assumes that repeated observations over time are independent
 #' outcomes determined only by the probabilities of every type.
@@ -219,12 +218,15 @@ alpha <- function(col, alpha) {
 #' @param col:  char, vector of colour specification strings
 #' @param method:  char, pass to optim()
 #' @example 
-#' region <- "Canada (no AB)"
-#' startdate <- as.Date("2021-12-15")
-#' reference <- c("BA.1")  # or c("BA.1", "BA.1.1")
-#' mutants <- list("BA.1.1", "BA.2")
-#' mutant_names <- list("BA.1.1", "BA.2")
-#' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
+ #region <- "Canada"
+ #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+ #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
+ #mutants <- list(sublineages_BA5,sublineages_BQ)
+ #names <- list("BA.5*","BQ*","the rest")
+ #startpar <- startpar3
+ #method='BFGS'
+ #maxdate=NA
+ #col=c('red', 'blue')
 plot.selection.estimate <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
   est <- .make.estimator(region, startdate, reference, mutants)
@@ -237,7 +239,8 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   nvar <- length(fit$fit)/2
   
   # generate sigmoidal (S-shaped) curves of selection
-  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
+  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=c(toplot$time))#, seq(38,99)))
+  scurves.extended<- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=c(toplot$time, seq(max(toplot$time)+1,(max(toplot$time)+100))))#, ))
   if (any(!is.na(fit$sample))) {  
     # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
@@ -328,7 +331,7 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   }
   str4=sprintf("Relative to %s*",names[[3]])
   text(x=toplot$date[1], y=90,str4, col="black", pos=4, cex = 1)
-  return(max(toplot$date))
+  return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col))
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 

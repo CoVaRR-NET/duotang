@@ -252,6 +252,8 @@ if __name__ == "__main__":
                         help="int, year number for cutoff date")
     parser.add_argument("--epiweek", type=int, default=31,
                         help="int, week number for cutoff date")
+    parser.add_argument("--nosample", action=argparse.BooleanOptionalAction,
+                        help="bool, whether or not sampling should be performed")
 
     args = parser.parse_args()
     if args.seed:
@@ -265,10 +267,16 @@ if __name__ == "__main__":
 
     progress("loading metadata")
     metadata = load_metadata(args.metadata)
-
+    with gzip.open (args.metadata, 'rt', encoding='utf-8') as fh:
+        numline = len(fh.readlines()) -1
     progress("sampling records")
-    sample = sampling(metadata, before=args.before, after=args.after, 
+    if (args.nosample == True and numline < 10000):
+        sample = sampling(metadata, before=numline, after=numline, 
                       cutoff=(args.year, args.epiweek))
+    else:    
+        sample = sampling(metadata, before=args.before, after=args.after, 
+                      cutoff=(args.year, args.epiweek))
+
 
     progress(f"aligning {len(sample)} samples")
     aligner = align(args.infile, refpath=args.reffile, sample=sample, limit=args.limit)

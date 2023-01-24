@@ -25,6 +25,8 @@ library(ggplot2)  # Work-horse plotting package
 library(ggfree) 
 library(r2d3)  # used for passing data to JavaScript D3 framework
 library(jsonlite)
+library(tidyverse)
+library(reshape2) #used to plot case count selection plots
 
 theme_set(theme_classic())
 
@@ -40,7 +42,7 @@ opts_knit$set(root.dir = getwd())
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2023-01-12"
+VirusSeq_release="2023-01-17"
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
@@ -449,22 +451,29 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
 
 ```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
 source("scripts/plot_selection_estimator.R")
-maxdate=sub.plot.selection.estimate(region="Canada")
-
+selectionEstimateFits <- list()
+obj = sub.plot.selection.estimate(region="Canada")
+maxdate=obj$date
+selectionEstimateFits[["Canada"]] <- obj$fit
 ```
+
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
+
+print("Not enough data available")
+#local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
+#selectionEstFit_BC <- (sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate))$fit
+
 ```
 
 ### AB
 #### Alberta
 
-```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
+```{r selection estimator AB, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+selectionEstimateFits[["AB"]] <- (sub.plot.selection.estimate(region="Alberta",maxdate=maxdate))
 ```
 
 
@@ -472,7 +481,7 @@ local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
 #### Saskatchewan
 
 ```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
+selectionEstimateFits[["SK"]] <- (sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate))
 ```
 
 
@@ -487,7 +496,7 @@ local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
+selectionEstimateFits[["ON"]] <- (sub.plot.selection.estimate(region="Ontario",maxdate=maxdate))
 
 ```
 
@@ -496,17 +505,80 @@ local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
 #### Quebec
 
 ```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
+selectionEstimateFits[["QC"]] <- (sub.plot.selection.estimate(region="Quebec",maxdate=maxdate))
 ```
 
 ### East
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB+PE)",maxdate=maxdate)
+selectionEstimateFits[["East"]] <- (sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate))
 ```
 
+## {.unlisted .unnumbered}
 
+### Case count selection {.tabset}
+
+```{r case count selection estimator setup}
+source("scripts/plot_case_count_selection_estimator.R")
+caseData <- parseCaseData(maxdate)
+plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
+  #caseCountData <- caseData$AB
+  #selectionEstimateObject<- selectionEstFit_AB
+  #filename="test"
+  #caseFit <- (getCaseCountSmoothFit(caseCountData, 5))$y
+  caseFit <- CubicSplSmooth(caseCountData)
+
+  selectionFit <- selectionEstimateObject$fit
+  selectionScurves <- selectionEstimateObject$scurves
+  selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
+  selectionNames <- selectionEstimateObject$names
+  selectionColors <- selectionEstimateObject$color
+  caseSelectionLines <- list()
+  
+  #build to total case line.
+  caseSelectionLines[[1]] <- list("line"=(data.frame(caseCountData$Reported_Date, caseFit)), "names" = "CaseCount", "color"="limegreen")
+
+  #build line for each variant
+  for (i in seq(from=2, to=ncol(selectionScurves))){
+      x = caseCountData$Reported_Date
+      actual = caseFit[1:length(selectionScurves[,i])] * selectionScurves[,i]
+      proj = caseFit[(length(selectionScurves[,i])+1):length(caseFit)] * selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseFit)]
+      y = c(actual, proj)
+      #type <- c(c(rep("actual",length(selectionScurves[,i]))), c(rep("projection", length(caseFit) - length(selectionScurves[,i]))))
+      line <- data.frame(x,y)
+      caseSelectionLines[[i]] <- list("line"=line, "names" = selectionNames[[i-1]], "color"=selectionColors[i-1])
+  }
+  
+  #build the line for  "the rest"
+  x <- caseCountData$Reported_Date
+  actual = caseFit[1:length(selectionScurves[,1])] * selectionScurves[,1]
+  proj = caseFit[(length(selectionScurves[,i])+1):length(caseFit)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseFit)]
+  y = c(actual, proj)
+  line <- data.frame(x,y)
+  caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
+
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),numActualDatapoints=nrow(selectionScurves),filename=filename)
+}
+```
+
+Some description text here...
+
+```{r, warning=FALSE, message=FALSE, fig.height=3, fig.width=5, warning=FALSE, out.width="100%", results='asis'}
+dataAvailable.regions <- all.regions %>% filter(shortname %in% c("AB", "ON", "QC"))
+apply(dataAvailable.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
+  p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])
+  print(p)
+  cat("\n\n")})
+  
+```
+## {.unlisted .unnumbered}
+
+### BA.2 sublineages selection {.tabset}
 
 ```{r general settings for selection estimator BA.2}
 source("scripts/scanlineages.R")
@@ -562,10 +634,6 @@ plotothers <- function(region,min){
 ```
 
 
-## {.unlisted .unnumbered}
-
-### BA.2 sublineages selection {.tabset}
-
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 
@@ -574,7 +642,7 @@ tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
+  cat("#####",reg[["name"]],"\n","\n")
   plotba2(reg[["name"]],n_min)
   cat("\n\n")})
   
@@ -672,6 +740,7 @@ source("scripts/tree.r")
 # load trees from files
 mltree <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree <- read.tree("./data_needed/sample1.timetree.nwk")
+recombTTree <- read.tree("./data_needed/sample4.timetree.nwk")
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
@@ -679,23 +748,32 @@ dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 # extracting just the first part makes it easier to link to metadata
 mltree$tip.label <- reduce.tipnames(mltree$tip.label)
 ttree$tip.label <- reduce.tipnames(ttree$tip.label)
+recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
+
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
                "lineage", "pango_group","month","week")
 
-# extract rows from metadata table that correspond to this tree
+# extract rows from metadata table that correspond to ttree 
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
 metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
+
+#omi tree metadata
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
+
+#recomb tree metadata
+mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
+mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$fasta_header_name), ]
+
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
 mltree <- ladderize(mltree, FALSE)
 
 ###Time Tree
-ttree2 <- ttree
-ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
+ttree$edge.length[ttree$edge.length == 0] <- 1e-4
+recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
@@ -720,8 +798,8 @@ presetColors=data.frame(name=c("other",
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", presetColors, fieldnames)
-
+timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames)
+recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "timetree", presetColors, fieldnames)
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
 
@@ -729,7 +807,6 @@ diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, field
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 
 OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
-
 ```
 
 
@@ -748,6 +825,13 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
 ### Omicron diversity tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
     r2d3(data=OmicrondiversityTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="omimltree-element")
+
+```
+
+### Recombinant time tree
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=recombTimeTreeJsonObj, 
      script="js/tree.js", container="div", elementId="omimltree-element")
 
 ```
