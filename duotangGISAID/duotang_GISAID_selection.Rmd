@@ -292,7 +292,7 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
                                         mutants=list(sublineages_BA5,sublineages_BQ),
                                         names=list("BA.5*","BQ*","the rest"),
                                         maxdate=maxdate, col=col)
-  return(maxdate)
+  return(maxdate$date)
 }
 
 #####################################################
