@@ -33,10 +33,9 @@ if __name__ == "__main__":
     parser.add_argument("--extractbyid", action=argparse.BooleanOptionalAction,
                         help="bool, specifies that the regex should be applied to ID rather than lineage")
     args = parser.parse_args()
-
+    print("regex is: " + args.regex)
     idToExtract = []
-    header = "isolate	lineage	organism	study_id	gene_name	host_gender	body_product	host_age_bin	host_disease	last_updated	scorpio_call	host_age_unit	scorpio_notes	anatomical_part	scorpio_support	scorpio_version	submission_date	dehosting_method	gisaid_accession	pangolin_version	scorpio_conflict	collection_device	collection_method	fasta_header_name	environmental_site	anatomical_material	purpose_of_sampling	sample_collected_by	sequencing_protocol	geo_loc_name_country	host_age_null_reason	host_scientific_name	pangolin_data_version	purpose_of_sequencing	sequence_submitted_by	sequencing_instrument	environmental_material	sample_collection_date	bioinformatics_protocol	depth_of_coverage_value	diagnostic_pcr_ct_value	breadth_of_coverage_value	reference_genome_accession	purpose_of_sampling_details	specimen_collector_sample_id	purpose_of_sequencing_details	consensus_sequence_software_name	sample_collection_date_null_reason	consensus_sequence_software_version	diagnostic_pcr_ct_value_null_reason	raw_sequence_data_processing_method	geo_loc_name_state_province_territory	raw_lineage\n"
-    metadataMatched = [header]
+    metadataMatched = []
     metadataRemainder = []
     #read in the metadata file
     with gzip.open(args.metadata, 'rt', encoding='utf-8') as fh:
@@ -52,7 +51,8 @@ if __name__ == "__main__":
                 metadataMatched.append(line)
             else:
                 metadataRemainder.append(line)
-
+    metadataMatched.insert(0, metadataRemainder[0])
+    
     print("outputting metadata...")
     with gzip.open(args.outfile + "/SequenceMetadata_matched.tsv.gz", 'wt') as fh:
         for line in metadataMatched:

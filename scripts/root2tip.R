@@ -18,10 +18,6 @@ if (length(args) > 4) pos <- as.integer(args[5])
 format <- '%Y-%m-%d'
 if (length(args) > 5) format <- args[6]
 
-args <- c()
-args[1] <- "./data_needed/sample4.fasta.treefile"
-args[2] <- "data_needed/sample4.rtt.nwk"
-args[3] <- "data_needed/sample4.dates.tsv"
 require(ape)
 phy <- read.tree(args[1])
 

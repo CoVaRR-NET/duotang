@@ -12,9 +12,10 @@ output:
     theme: cerulean
     toc: true
     toc_float: true
+params:
+ date:
+  value: "2023-01-17"
 ---
-
-
 
 ```{r setup, include=FALSE, warning=FALSE}
 library(tidyr)
@@ -42,7 +43,7 @@ opts_knit$set(root.dir = getwd())
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2023-01-17"
+VirusSeq_release=params$date
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
@@ -209,30 +210,29 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
-***[Note: Variant proportions may change notably in upcoming updates, due to the recent holiday season impacting data collection. Note also some recent updates to the analyses, including now the ability to view variants showing most growth by province.]***
+***[Note some recent updates to the analyses, including the ability to view variants showing most growth by province.]***
 
-BQ.1, BQ.1.1 and some associated BQ variants are still dominant at this time in Canada, with some sublineages such as BQ.1.1.10 showing notable growth in some provinces (that have most recent data). XBB.1.5, of note due to its mutations and growth internationally, has been recently detected in more provinces Canada, with evidence of growth in some provinces. Other recombinant variants are also showing growth in parts of Canada, including XBM (first detected in Canada and the US), and XBF. Note that XBF, some other recombinants (like XBL, which is a recombinant of a recombinant), and some BN.1-type variants, are also noted for having high immune evasion and improved ability to bind to the human ACE2 receptor - at a level similar to XBB.1.5. Note also that differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important.
-Mutational analysis shows continued steady growth in prevalence of S:R346T (associated with immune evasion) and more recently S:F486P (associated with immune evasion and improved binding to the human ACE2 receptor). Some “intermediate” variants, such as those with a serine (S) at position S:486, have also recently been observed in Canada (such as the newly designated XBM).
+BQ.1.1 is peaking at this time in Canada, with XBB.1.5 still the primary variant of interest due to its mutations, plus growth significantly in multiple provinces with the most recent data. Some other BQ.1*, BF.7, CH.1.1, and select recombinants are growing, but not as significantly as XBB.1.5 right now. Differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important. For example, New Brunswick has more of a “soup” of different variants, with Quebec having more notable XBB.1.5 plus a “soup” of other variants, while Ontario has also significant XBB.1.5 but in addition it has some other select lineages showing more prevalence, in addition to their “soup” of other variants. Mutational analysis shows continued steady growth in prevalence of the S:F486P mutation of note (associated with immune evasion and improved binding to the human ACE2 receptor). Cases with this mutation are now almost exclusively XBB.1.5.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (See also the evolving plots below of “Fastest growing lineages in Canada”):
-
- * BA.2 and BA.2.75 new subvariants
- * BA.5.2 new subvariants not yet further classified
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. Note that XBB.1.5 is still of primary note and some of these have only been observed internationally. See also the evolving plots below of “Fastest growing lineages in Canada”:
+ 
+ * BA.2 and BA.2.75 new subvariants, including possible misclassifications of XBB.1.5 as BA.2.10.1.
  * BE.1.1 and other BA.5-type variants with S:F486P
  * BF.7 new subvariants not yet further classified
- * BN.1\* subvariants due to high predicted immune evasion
- * BQ.1, BQ.1.1, BQ.1.1.10, BQ.1.3 and many associated descendants
+ * BM.1.1.1
+ * BN.1* subvariants due to high predicted immune evasion
+ * BQ.1* new descendants
  * BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
- * CH.1.1 (descendant of BM which is BA.2.75.3)
- * CK.1, CK.2.1.1 (descendants of BA.5.2)
+ * CH.1.1 (descendant of BM which is BA.2.75.3) and some sublineages recently detected in Canada such as CH.1.1.3
+ * CJ.1 with S:F486P (but not showing growth in Canada)
  * DS.1 (highest predicted immune evasion)
- * XAY.2 (BA.2/Delta recominant with Delta’s S:L452R mutation plus the S:F486P mutation)
- * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada)
+ * XAY.2 (BA.2/Delta recombinant with Delta’s S:L452R mutation plus the S:F486P mutation)
+ * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada but not now showing growth)
  * XBB.1, XBB.1.5, XBB.1.9.1, XBB.6.1 and subvariants with S:F486P
- * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5)
+ * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5) - but growth not notable
  * XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
- * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant)
- * ...and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
+ * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant, but growth not notable)
+ * …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
 
 ## Omicron sublineages in Canada {.tabset} 
 
@@ -465,7 +465,7 @@ selectionEstimateFits[["Canada"]] <- obj$fit
 
 print("Not enough data available")
 #local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
-#selectionEstFit_BC <- (sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate))$fit
+#selectionEstimateFits[["BC"]]  <- (sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate))
 
 ```
 
@@ -489,7 +489,7 @@ selectionEstimateFits[["SK"]] <- (sub.plot.selection.estimate(region="Saskatchew
 #### Manitoba
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
+selectionEstimateFits[["MB"]] =sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
 ```
 
 ### ON
@@ -515,67 +515,6 @@ selectionEstimateFits[["QC"]] <- (sub.plot.selection.estimate(region="Quebec",ma
 selectionEstimateFits[["East"]] <- (sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate))
 ```
 
-## {.unlisted .unnumbered}
-
-### Case count selection {.tabset}
-
-```{r case count selection estimator setup}
-source("scripts/plot_case_count_selection_estimator.R")
-caseData <- parseCaseData(maxdate)
-plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
-  #caseCountData <- caseData$AB
-  #selectionEstimateObject<- selectionEstFit_AB
-  #filename="test"
-  #caseFit <- (getCaseCountSmoothFit(caseCountData, 5))$y
-  caseFit <- CubicSplSmooth(caseCountData)
-
-  selectionFit <- selectionEstimateObject$fit
-  selectionScurves <- selectionEstimateObject$scurves
-  selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
-  selectionNames <- selectionEstimateObject$names
-  selectionColors <- selectionEstimateObject$color
-  caseSelectionLines <- list()
-  
-  #build to total case line.
-  caseSelectionLines[[1]] <- list("line"=(data.frame(caseCountData$Reported_Date, caseFit)), "names" = "CaseCount", "color"="limegreen")
-
-  #build line for each variant
-  for (i in seq(from=2, to=ncol(selectionScurves))){
-      x = caseCountData$Reported_Date
-      actual = caseFit[1:length(selectionScurves[,i])] * selectionScurves[,i]
-      proj = caseFit[(length(selectionScurves[,i])+1):length(caseFit)] * selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseFit)]
-      y = c(actual, proj)
-      #type <- c(c(rep("actual",length(selectionScurves[,i]))), c(rep("projection", length(caseFit) - length(selectionScurves[,i]))))
-      line <- data.frame(x,y)
-      caseSelectionLines[[i]] <- list("line"=line, "names" = selectionNames[[i-1]], "color"=selectionColors[i-1])
-  }
-  
-  #build the line for  "the rest"
-  x <- caseCountData$Reported_Date
-  actual = caseFit[1:length(selectionScurves[,1])] * selectionScurves[,1]
-  proj = caseFit[(length(selectionScurves[,i])+1):length(caseFit)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseFit)]
-  y = c(actual, proj)
-  line <- data.frame(x,y)
-  caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
-
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),numActualDatapoints=nrow(selectionScurves),filename=filename)
-}
-```
-
-Some description text here...
-
-```{r, warning=FALSE, message=FALSE, fig.height=3, fig.width=5, warning=FALSE, out.width="100%", results='asis'}
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("AB", "ON", "QC"))
-apply(dataAvailable.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
-  p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])
-  print(p)
-  cat("\n\n")})
-  
-```
 ## {.unlisted .unnumbered}
 
 ### BA.2 sublineages selection {.tabset}
@@ -740,7 +679,6 @@ source("scripts/tree.r")
 # load trees from files
 mltree <- read.tree("./data_needed/sample1.rtt.nwk")
 ttree <- read.tree("./data_needed/sample1.timetree.nwk")
-recombTTree <- read.tree("./data_needed/sample4.timetree.nwk")
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
@@ -748,7 +686,6 @@ dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 # extracting just the first part makes it easier to link to metadata
 mltree$tip.label <- reduce.tipnames(mltree$tip.label)
 ttree$tip.label <- reduce.tipnames(ttree$tip.label)
-recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
 
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
@@ -763,17 +700,12 @@ metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 #omi tree metadata
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
 
-#recomb tree metadata
-mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
-mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$fasta_header_name), ]
-
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
 mltree <- ladderize(mltree, FALSE)
 
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
-recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
@@ -799,7 +731,7 @@ presetColors=data.frame(name=c("other",
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
 timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames)
-recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "timetree", presetColors, fieldnames)
+
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
 
@@ -828,14 +760,6 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
      script="js/tree.js", container="div", elementId="omimltree-element")
 
 ```
-
-### Recombinant time tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=recombTimeTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="omimltree-element")
-
-```
-
 
 <!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
 
@@ -901,8 +825,6 @@ ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) +
 }
 
 ```
-
-
 
 # Future development
 
@@ -1062,8 +984,6 @@ We wish to acknowledge the following organisations/laboratories for contributing
 
 * Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)
 
-
-
 # Session info {.tabset}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
 
@@ -1074,3 +994,9 @@ The version numbers of all packages in the current environment as well as inform
 ```{r session_info}
 sessionInfo()
 ```
+
+
+# [Previous Versions](https://covarr-net.github.io/duotang/archive/)
+
+# [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html)
+

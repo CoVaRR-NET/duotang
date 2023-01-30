@@ -4,7 +4,7 @@ parseCaseData<- function(maxDate = NA){
   if (is.na(maxDate)){
     stop("Expected a max cutoff date, got None")
   }
-
+  #maxDate = maxdate
   BC<-read.csv("data_needed/AgeCaseCountBC.csv", header=T)%>% 
     filter(Age_Group %in% c("90+", "80-89","70-79")) %>% #keep only the 70+ case counts
     group_by(Reported_Date) %>% #group data by reported date
@@ -27,14 +27,14 @@ parseCaseData<- function(maxDate = NA){
     filter(Nom %in% c("70-79 ans","80-89 ans","90 ans et plus")) %>% #keep only the 70+ case counts
     group_by(Date) %>%#group data by reported date
     summarize(n = sum(as.numeric(psi_quo_pos_n)))%>% #get total count of num cases per day
-    filter(Date > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
+    filter(as.Date(Date) > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
     mutate (Date = as.Date(Date)) %>% #format the column as dates
     rename(Reported_Date = Date) %>% #relabel date column.
     drop_na() #drop row if any col is NA
-  
-  #Case_Reported_Date, Age_Group
+
+    #Case_Reported_Date, Age_Group
   ON <-read.csv("data_needed/AgeCaseCountON.csv", header=T)%>% 
-    filter(Age_Group%in% c("70s","80s","90+")) %>% #keep only the 70+ case counts
+   filter(Age_Group%in% c("70s","80s","90+")) %>% #keep only the 70+ case counts
     group_by(Case_Reported_Date) %>%#group data by reported date
     summarize(n = n())%>% #get total count of num cases per day
     filter(Case_Reported_Date > (as.Date(maxDate)-days(120))) %>%##keep everything within the last 120 days from latest virrusseq colleection date. 
@@ -42,7 +42,18 @@ parseCaseData<- function(maxDate = NA){
     rename(Reported_Date = Case_Reported_Date) %>% #relabel date column.
     drop_na() #drop row if any col is NA
   
-  #SK <- read.csv("data_needed/AgeCaseCountSK.csv", header=T) %>%
+  Canada <- read.csv("data_needed/AgeCaseCountCAN.csv", header=T)%>% 
+    filter(status == "cases") %>%
+    filter(gender == "all") %>%
+    filter(age_group %in% c("70 to 79","80+")) %>% #keep only the 70+ case counts
+    group_by(date) %>%#group data by reported date
+    summarize(n = sum(as.numeric(count)))%>% #get total count of num cases per day
+    filter(date > (as.Date(maxDate)-days(120))) %>%##keep everything within the last 120 days from latest virrusseq colleection date. 
+    mutate (date = as.Date(date)) %>% #format the column as dates
+    rename(Reported_Date = date) %>% #relabel date column.
+    drop_na() #drop row if any col is NA
+  
+   #SK <- read.csv("data_needed/AgeCaseCountSK.csv", header=T) %>%
   #  filter(Region == "Total") %>% select (Date, Age.60.to.79, Age.80.) %>% #take the rows and columns we need
   #  mutate(Age60.79 =  Age.60.to.79 - lag( Age.60.to.79, default = 0)) %>% #get the diff to previos cell for age 60-79, this is the new per day
   #  mutate(Age80 =  Age.80. - lag( Age.80., default = 0)) %>%  # #get the diff to previos cell for age 80+, this is the new per day
@@ -51,7 +62,7 @@ parseCaseData<- function(maxDate = NA){
   #  mutate (Reported_Date = as.Date(Reported_Date)) %>% #format the column as dates
   #  filter(Reported_Date > (as.Date(maxDate)-days(120))) #keep everything within the last 120 days from latest virrusseq colleection date. 
     
-  return (list("BC" = BC, "ON" = ON, "QC"=QC, "AB"=AB))#, "SK"=SK))
+  return (list("BC" = BC, "ON" = ON, "QC"=QC, "AB"=AB, "Canada"=Canada))#, "SK"=SK))
 }
 
 #get smooth fit of casecounts
@@ -62,11 +73,41 @@ getCaseCountSmoothFit <- function(countData, knots=5){
   return (smooth.spline(countData$Reported_Date, countData$n,nknots=knots))
 }
 
-CubicSplSmooth <- function(countData, lambda=10^3) {
+CubicSplSmooth <- function(countData, df=7) {
   if (!c("Reported_Date", "n") %in% colnames(countData)){
     stop("Possible corrupted countData. Expected column: Reported_Date and n.")
   }
-  return(lm(n ~ bs(Reported_Date,knots = c(rep(1,3),seq(1,length(countData)),rep(length(countData),2))),data = countData )$fit)
+  #if (is.na(df)){df = ceiling(length(countData$n) / 20)}
+  bs <- (lm(n ~ bs(Reported_Date, df = df), data = countData )$fit)
+  return(bs)
+}
+
+CubicSplSmooth2 <- function(data, lambda=10^3) {
+  data <- caseData$QC
+  #data is a datafrome of 2 columns (date,n)
+  M <- nrow(data)
+  data$n <- log(data$n)
+  Knots <- c(1, 1,seq(1,M),M,M,M)
+  X <- bs(data$n, degree =3, knots = Knots)
+  Dsq <- diff(X, differences = 2)
+  a <- t(X) %*% X + lambda * t(Dsq) %*% Dsq
+  b <- t(X) %*% data$n
+  s <- solve(a,b)
+  r <- X %*% s
+  return(r)
+}
+
+CubicSplSmooth3 <- function(data, lambda=10^3) {
+  Knots <- c(rep(1, 3), seq(M), rep(M, 3))
+  X <- matrix(NA, M, M+2)
+  for (t in 1:M) {
+    for (n in 0:(M+1)) {
+      X[t, n+1] <- BSplineBasis(3, Knots, n, t)
+    }
+  }
+  Dsq <- diff(X, 2)
+  a <- lm.fit(X, data[,2], lambda*t(Dsq) %*% Dsq)
+  return(X %*% a$coefficients)
 }
 
 
@@ -119,7 +160,8 @@ plotCaseCountByDate2 <- function(countData, lineFits, numActualDatapoints, filen
     ylim(0, max(countData$n)) + 
     xlab("Sample collection date") +
     ylab("Age 70+ case count") +
-    labs(caption = paste0("Last day of genomic data (Darker colors) is ", max((d %>% filter(type=="actual"))$Reported_Date))) +
+    labs(caption = paste0("Last day of genomic data (Darker colors) is ", max((d %>% filter(type=="actual"))$Reported_Date),
+                          "\n Last day of cases count data is ", max((d %>% filter(type=="projection"))$Reported_Date))) +
     theme_bw() 
   
   

@@ -5,7 +5,6 @@ suppressMessages({
   require(bbmle, quietly=T)
   require(HelpersMG, quietly=T)
   require(dplyr, quietly=T)
-  #require(scales, quietly=T)
 })
 
 
@@ -218,17 +217,18 @@ alpha <- function(col, alpha) {
 #' @param col:  char, vector of colour specification strings
 #' @param method:  char, pass to optim()
 #' @example 
- #region <- "Canada"
- #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
- #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
- #mutants <- list(sublineages_BA5,sublineages_BQ)
- #names <- list("BA.5*","BQ*","the rest")
- #startpar <- startpar3
- #method='BFGS'
- #maxdate=NA
- #col=c('red', 'blue')
+# region <- "Canada"
+# startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+# reference <- c(setAll)  # or c("BA.1", "BA.1.1")
+# mutants <- list(sublineages_BA5,sublineages_BQ)
+# names <- list("BA.5*","BQ*","the rest")
+# startpar <- startpar3
+# method='BFGS'
+# maxdate=NA
+# col=c('red', 'blue')
 plot.selection.estimate <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
+
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
@@ -261,7 +261,8 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   if(is.na(maxdate)){
     maxdate=max(toplot$date)
   }
-  # display counts
+
+  #diplay counts
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), maxdate), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/10, 
        xlab="Sample collection date", 
@@ -331,11 +332,134 @@ plot.selection.estimate <- function(region, startdate, reference, mutants, names
   }
   str4=sprintf("Relative to %s*",names[[3]])
   text(x=toplot$date[1], y=90,str4, col="black", pos=4, cex = 1)
-  return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col))
+
+  return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col, "region"=region, "plot"=p))
   # Bends suggest a changing selection over time (e.g., due to the impact of 
   # vaccinations differentially impacting the variants). Sharper turns are more 
   # often due to NPI measures. 
 }
 
+plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
+                                    startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
+  #region <- "Quebec"
+  #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+  #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
+  #mutants <- list(sublineages_BA5,sublineages_BQ)
+  #names <- list("BA.5*","BQ*","the rest")
+  #startpar <- startpar3
+  #method='BFGS'
+  #maxdate=NA
+  #col=c('red', 'blue')
+  
+  
+  est <- .make.estimator(region, startdate, reference, mutants)
+  toplot <- est$toplot
+  toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+  fit <- .fit.model(est, startpar, method=method)
+  
+  # Once we get the set of {p,s} values, we can run them through the s-shaped 
+  # curve of selection
+  nvar <- length(fit$fit)/2
+  
+  # generate sigmoidal (S-shaped) curves of selection
+  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=c(toplot$time))#, seq(38,99)))
+  scurves.extended<- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=c(toplot$time, seq(max(toplot$time)+1,(max(toplot$time)+100))))#, ))
+  if (any(!is.na(fit$sample))) {  
+    # calculate 95% confidence intervals from sampled parameters
+    s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
+      row <- as.numeric(x)
+      s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
+    })
+    qcurve <- function(q) {
+      sapply(1:ncol(scurves), function(i) {
+        apply(sapply(s95, function(x) x[,i]), 1, 
+              function(y) quantile(y, q)) 
+      })
+    } 
+    lo95 <- qcurve(0.025)
+    hi95 <- qcurve(0.975)  
+  }
+  
+  par(mar=c(5,5,1,1))
+  if(is.na(maxdate)){
+    maxdate=max(toplot$date)
+  }
+  # display counts
+  plotData <- toplot %>% melt(id = c("date", "time", "tot")) %>% dplyr::select(date, variable, value, tot) %>% 
+    filter(variable != "n1") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
+    mutate(variable2=names[as.numeric(variable)-1]) %>% mutate (p = value/tot) %>% dplyr::select(-tot) %>%
+    mutate(variable3=paste0("s", (as.numeric(variable)-1))) #%>% 
+    mutate (variable4 = coalesce(unlist(fit$fit)[variable3], variable3)) #paste0(variable2, ": ", round(fit$fit[[variable3]], 3))) #, " {", round(fit$confint[paste0("s", as.numeric(variable1)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable1)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
+  plotData$test <- fit$fit[[plotData$variable3]]
+  plotData$p[is.nan(plotData$p)]<-0
+  plotData$variable =  as.factor(plotData$variable)
+  view(plotData)
+  p<- ggplot() +
+    geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
+    scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
+    xlab("Sample collection date") +
+    ylab(paste0("Proportion in ", est$region)) + 
+    ylim(0,1) +
+    xlim(min(plotData$date), maxdate)
+  variable3="s2"
+  fit$fit[[variable3]]
+  
+  p <- p + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,2]))
+  
+  if (ncol(scurves) > 2) {
+    for (i in seq(3,ncol(scurves))){
+      p <- p + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,i]))
+    }
+  }
+  
+  if (any(!is.na(fit$sample))) {  
+    p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[1], alpha=0.5)
+    if(ncol(lo95) > 2) {
+      for (i in seq(3,ncol(lo95))){
+        p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,i], ymax=hi95[,i]), color = "black", fill=col[i-1], alpha=0.5)
+      }
+    }
+  }
+  
+  p<-p + theme_bw() +     
+    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
+    theme(legend.position="bottom", legend.title=element_blank(), legend.text=element_text(size=12), text = element_text(size = 20)) 
+  
+  # second plot - logit transform
+  options(scipen=1000000)
+  
+  plotData <- toplot %>% melt(id = c("date", "time", "n1")) %>% dplyr::select(date, variable, value, n1) %>% 
+    filter(variable != "tot") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
+    mutate(variable=names[as.numeric(variable)-1]) %>% mutate (p = value/n1) %>% dplyr::select(-n1) %>% filter(p != Inf) %>%
+    mutate(variable=paste0(variable, ": ", round(fit$fit[["s2"]], 3), " {", round(fit$confint["s2", "2.5 %"], 3), ", ", round(fit$confint["s2", "97.5 %"], 3), "}"))
+  #plotData$p[is.nan(plotData$p)]<-0
+  plotData$variable =  as.factor(plotData$variable)
+  
+  p2<- ggplot() +
+    geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
+    scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
+    xlab("Sample collection date") +
+    ylab(paste0("Proportion in ", est$region)) + 
+    scale_y_log10(limits=c(0.001,1000), breaks = c(0.001, 0.01, 0.1, 1, 10, 100, 1000), labels = c(0.001, 0.01, 0.1, 1, 10, 100, 1000)) +
+    xlim(min(plotData$date), maxdate)
+  
+  
+  p2 <- p2 + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,2]/scurves[,1]))
+  
+  if (ncol(scurves) > 2) {
+    for (i in seq(3,ncol(scurves))){
+      p2 <- p2 + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,i]/scurves[,1]))
+    }
+  }
+  p2<-p2 + theme_bw() + 
+    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
+    theme(legend.position="bottom", legend.title=element_blank(), legend.text=element_text(size=12), text = element_text(size = 20)) 
+  
+
+  return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col, "region"=region, "plot1"=p, "plot2"=p2))
+  # Bends suggest a changing selection over time (e.g., due to the impact of 
+  # vaccinations differentially impacting the variants). Sharper turns are more 
+  # often due to NPI measures. 
+}
 
 
