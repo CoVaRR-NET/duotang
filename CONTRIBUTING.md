@@ -29,6 +29,8 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
 
+# THIS GUIDE IS NOW SIGNIFICANTLY OUT DATE AND SHOULD NOT BE USED TO BUILD DUOTANG. NEW DOCUMENTATION COMING SOON.
+
 ## To obtain required data
 
 Note `<datetime>` is a placeholder for the date and time associated with downloading VirusSeq data, *e.g.*, `2022-03-16T15:17:45`.
