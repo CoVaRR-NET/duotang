@@ -12,9 +12,10 @@ output:
     theme: cerulean
     toc: true
     toc_float: true
+params:
+ date:
+  value: "2023-01-17"
 ---
-
-
 
 ```{r setup, include=FALSE, warning=FALSE}
 library(tidyr)
@@ -25,6 +26,8 @@ library(ggplot2)  # Work-horse plotting package
 library(ggfree) 
 library(r2d3)  # used for passing data to JavaScript D3 framework
 library(jsonlite)
+library(tidyverse)
+library(reshape2) #used to plot case count selection plots
 
 theme_set(theme_classic())
 
@@ -40,7 +43,7 @@ opts_knit$set(root.dir = getwd())
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release="2023-01-12"
+VirusSeq_release=params$date
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
@@ -70,9 +73,9 @@ all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
                                 "Quebec", "Nova Scotia", "New Brunswick",
                                 "Newfoundland and Labrador"),
-                         shortname=c("Canada","BC", "AL",
-                                     "SA", "MA", "ON", 
-                                     "QC", "NS", "NB","NFL"))
+                         shortname=c("Canada","BC", "AB",
+                                     "SK", "MA", "ON", 
+                                     "QC", "NS", "NB","NL"))
 
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
@@ -130,7 +133,7 @@ meta <- meta[ , columnlist]
 
 ### metadata cleaning 
 unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
-                 "Not Applicable","","NA")
+                 "Not Applicable","","NA","unknow")
 meta <- as.data.frame(apply(meta, 2, function(x) {
   x[is.element(x, unknown.str)] <- "Unknown"
   x
@@ -207,142 +210,88 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
-***[Note: Variant proportions may change notably in upcoming updates, due to the recent holiday season impacting data collection. Note also some recent updates to the analyses, including now the ability to view variants showing most growth by province.]***
+***[Note some recent updates to the analyses, including the ability to view variants showing most growth by province.]***
 
-BQ.1, BQ.1.1 and some associated BQ variants are still dominant at this time in Canada, with some sublineages such as BQ.1.1.10 showing notable growth in some provinces (that have most recent data). XBB.1.5, of note due to its mutations and growth internationally, has been recently detected in more provinces Canada, with evidence of growth in some provinces. Other recombinant variants are also showing growth in parts of Canada, including XBM (first detected in Canada and the US), and XBF. Note that XBF, some other recombinants (like XBL, which is a recombinant of a recombinant), and some BN.1-type variants, are also noted for having high immune evasion and improved ability to bind to the human ACE2 receptor - at a level similar to XBB.1.5. Note also that differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important.
-Mutational analysis shows continued steady growth in prevalence of S:R346T (associated with immune evasion) and more recently S:F486P (associated with immune evasion and improved binding to the human ACE2 receptor). Some “intermediate” variants, such as those with a serine (S) at position S:486, have also recently been observed in Canada (such as the newly designated XBM).
+BQ.1.1 is peaking at this time in Canada, with XBB.1.5 still the primary variant of interest due to its mutations, plus growth significantly in multiple provinces with the most recent data. Some other BQ.1*, BF.7, CH.1.1, and select recombinants are growing, but not as significantly as XBB.1.5 right now. Differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important. For example, New Brunswick has more of a “soup” of different variants, with Quebec having more notable XBB.1.5 plus a “soup” of other variants, while Ontario has also significant XBB.1.5 but in addition it has some other select lineages showing more prevalence, in addition to their “soup” of other variants. Mutational analysis shows continued steady growth in prevalence of the S:F486P mutation of note (associated with immune evasion and improved binding to the human ACE2 receptor). Cases with this mutation are now almost exclusively XBB.1.5.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (See also the evolving plots below of “Fastest growing lineages in Canada”):
-
- * BA.2 and BA.2.75 new subvariants
- * BA.5.2 new subvariants not yet further classified
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. Note that XBB.1.5 is still of primary note and some of these have only been observed internationally. See also the evolving plots below of “Fastest growing lineages in Canada”:
+ 
+ * BA.2 and BA.2.75 new subvariants, including possible misclassifications of XBB.1.5 as BA.2.10.1.
  * BE.1.1 and other BA.5-type variants with S:F486P
  * BF.7 new subvariants not yet further classified
- * BN.1\* subvariants due to high predicted immune evasion
- * BQ.1, BQ.1.1, BQ.1.1.10, BQ.1.3 and many associated descendants
+ * BM.1.1.1
+ * BN.1* subvariants due to high predicted immune evasion
+ * BQ.1* new descendants
  * BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
- * CH.1.1 (descendant of BM which is BA.2.75.3)
- * CK.1, CK.2.1.1 (descendants of BA.5.2)
+ * CH.1.1 (descendant of BM which is BA.2.75.3) and some sublineages recently detected in Canada such as CH.1.1.3
+ * CJ.1 with S:F486P (but not showing growth in Canada)
  * DS.1 (highest predicted immune evasion)
- * XAY.2 (BA.2/Delta recominant with Delta’s S:L452R mutation plus the S:F486P mutation)
- * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada)
+ * XAY.2 (BA.2/Delta recombinant with Delta’s S:L452R mutation plus the S:F486P mutation)
+ * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada but not now showing growth)
  * XBB.1, XBB.1.5, XBB.1.9.1, XBB.6.1 and subvariants with S:F486P
- * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5)
+ * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5) - but growth not notable
  * XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
- * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant)
- * ...and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
+ * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant, but growth not notable)
+ * …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
 
 ## Omicron sublineages in Canada {.tabset} 
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
 
-### BA.1
-#### Sublineage BA.1 until 2022 June 1st
-```{r subtype plotter BA.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
+
+
+```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis',}
+
 source("scripts/subtype_plotter.R")
-set=getStrictoSubLineages("BA.1*",meta)
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-06-01"))
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-06-01"),scale=T)
-plotted=set
-printest(rarelineages_names)
+sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
+                                      "BA.4*","BA.5.1*","BA.5.2*",
+                                      "BQ*","BA.5*","B*"),
+                               tabname=c("BA.1","early BA.2","late BA.2",
+                                         "BA.4","BA.5.1","BA.5.2",
+                                         "BQ","Other BA.5","Divergent lineages"),
+                               mindate=c("","","2022-08-01",
+                                         "","","",
+                                         "","","2022-03-01"),
+                               maxdate=c("2022-06-01","2022-08-01","",
+                                         "","","",
+                                         "","",""),
+                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,TRUE,TRUE))
+
+
+
+    
+plotted=c()
+tmp=apply(sublineagestoplot,1,function(sub){
+  cat("###", sub[["tabname"]], "\n")
+  cat("####", sub[["tabname"]],"sublineages")
+  mindate=NA
+  maxdate=NA
+  if(sub[["mindate"]]!=""){
+    cat(" from",sub[["mindate"]])
+    mindate=as.Date(sub[["mindate"]])
+  }
+  if(sub[["maxdate"]]!=""){
+    cat(" until",sub[["maxdate"]])
+    maxdate=as.Date(sub[["maxdate"]])
+  }
+  cat("\n\n")
+  set=getStrictoSubLineages(sub[["name"]],meta)
+  if(sub[["exclude_previously_plotted"]]){
+    set=set[!set %in% plotted]
+  }
+  rarelineages_names=plot.subvariants(sublineage=set,mindate=mindate,maxdate=maxdate)
+  rarelineages_names=plot.subvariants(sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
+  plotted <<- unique(c(plotted,set))
+  if(rarelineages_names!=""){
+    cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
+  }
+  cat("\n\n")})
+
+
+
 ```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### early BA.2
-#### Sublineage BA.2 until 2022 August 1st
-```{r subtype plotter BA.2 early, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"))
-rarelineages_names=plot.subvariants(sublineage=set,maxdate=as.Date("2022-08-01"),scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### late BA.2
-#### Sublineage BA.2 after 2020 August 1st
-```{r subtype plotter BA.2 late, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"))
-rarelineages_names=plot.subvariants(sublineage=set,mindate=as.Date("2022-08-01"),scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.4
-#### Sublineage BA.4
-```{r subtype plotter BA.4, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.4*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.5.1
-#### Sublineage BA.5.1
-```{r subtype plotter BA.5.1, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5.1*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### BA.5.2
-#### Sublineage BA.5.2
-```{r subtype plotter BA.5.2, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5.2*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-### BQ
-#### Sublineage BQ
-```{r subtype plotter BQ, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BQ*",meta)
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-### Other BA.5
-#### Sublineage BA.5 without BA.5.1\*, BA.5.2\*, and BQ\*
-```{r subtype plotter BA.5.3, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-set=getStrictoSubLineages("BA.5*",meta)
-set=set[!set %in% plotted]
-rarelineages_names=plot.subvariants(sublineage=set)
-rarelineages_names=plot.subvariants(sublineage=set,scale=T)
-plotted=c(plotted,set)
-printest(rarelineages_names)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
-
-### Divergent lineages
-#### Divergent lineages
-```{r subtype plotter rest, figures-side, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5, fig.height=5, fig.show="hold", out.width="50%"}
-
-set=getAllStrictoLineages(meta)
-set=set[!set %in% plotted]
-rarelineages_names=plot.subvariants(sublineage=set,mindate=max(meta$sample_collection_date)-days(100))
-rarelineages_names=plot.subvariants(sublineage=set,mindate=max(meta$sample_collection_date)-days(100),scale=T)
-```
-The grey zone represent rare lineages (not in top 15) : `r rarelineages_names`
-
 
 
 ## Fastest growing lineages in Canada {.tabset}
@@ -359,6 +308,7 @@ Background shading illustrates sub-variants that we need to keep an eye on in bl
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
 ```{r, results='asis', fig.retina = 2, warning=FALSE, fig.height=7}
+
 source("scripts/plot_growing_lineages.R")
 selectparam <- function(p,reg){
   if(!any(is.na(p$fit))){
@@ -370,7 +320,7 @@ selectparam <- function(p,reg){
   }else{FALSE}
   }
 
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   cat("##### Plot single lineages in",reg[["name"]],"\n","\n")
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
@@ -407,7 +357,7 @@ selectparam <- function(p,reg){
   }else{FALSE}
   }
 
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   cat("##### Plot monophyletic groups of lineages in",reg[["name"]],"\n","\n")
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
@@ -501,23 +451,29 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
 
 ```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
 source("scripts/plot_selection_estimator.R")
-maxdate=sub.plot.selection.estimate(region="Canada")
-
+selectionEstimateFits <- list()
+obj = sub.plot.selection.estimate(region="Canada")
+maxdate=obj$date
+selectionEstimateFits[["Canada"]] <- obj$fit
 ```
+
 
 ### BC
 #### British Columbia
 
 ```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+
 print("Not enough data available")
 #local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
+#selectionEstimateFits[["BC"]]  <- (sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate))
+
 ```
 
-### AL
+### AB
 #### Alberta
 
-```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
+```{r selection estimator AB, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+selectionEstimateFits[["AB"]] <- (sub.plot.selection.estimate(region="Alberta",maxdate=maxdate))
 ```
 
 
@@ -525,7 +481,7 @@ local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
 #### Saskatchewan
 
 ```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
+selectionEstimateFits[["SK"]] <- (sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate))
 ```
 
 
@@ -533,15 +489,14 @@ local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
 #### Manitoba
 
 ```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
+selectionEstimateFits[["MB"]] =sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
 ```
 
 ### ON
 #### Ontario
 
 ```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
+selectionEstimateFits[["ON"]] <- (sub.plot.selection.estimate(region="Ontario",maxdate=maxdate))
 
 ```
 
@@ -550,17 +505,19 @@ local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
 #### Quebec
 
 ```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
+selectionEstimateFits[["QC"]] <- (sub.plot.selection.estimate(region="Quebec",maxdate=maxdate))
 ```
 
 ### East
 #### East provinces
 
 ```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-local_maxdate=sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
+selectionEstimateFits[["East"]] <- (sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate))
 ```
 
+## {.unlisted .unnumbered}
 
+### BA.2 sublineages selection {.tabset}
 
 ```{r general settings for selection estimator BA.2}
 source("scripts/scanlineages.R")
@@ -616,19 +573,15 @@ plotothers <- function(region,min){
 ```
 
 
-## {.unlisted .unnumbered}
-
-### BA.2 sublineages selection {.tabset}
-
 Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
 
 
 ```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
+  cat("#####",reg[["name"]],"\n","\n")
   plotba2(reg[["name"]],n_min)
   cat("\n\n")})
   
@@ -643,7 +596,7 @@ Here we show the trends of the various BA.5# sublineages over time, relative to 
 
 
 ```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
@@ -660,7 +613,7 @@ Here we show the trends of the various other sublineages over time, relative to 
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-apply(all.regions,1,function(reg){
+tmp=apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
@@ -734,22 +687,25 @@ dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 mltree$tip.label <- reduce.tipnames(mltree$tip.label)
 ttree$tip.label <- reduce.tipnames(ttree$tip.label)
 
+
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
                "lineage", "pango_group","month","week")
 
-# extract rows from metadata table that correspond to this tree
+# extract rows from metadata table that correspond to ttree 
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
 metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
+
+#omi tree metadata
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
+
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
 mltree <- ladderize(mltree, FALSE)
 
 ###Time Tree
-ttree2 <- ttree
-ttree2$edge.length[ttree2$edge.length == 0] <- 1e-4
+ttree$edge.length[ttree$edge.length == 0] <- 1e-4
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
@@ -774,7 +730,7 @@ presetColors=data.frame(name=c("other",
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree2, metasub1, "timetree", presetColors, fieldnames)
+timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames)
 
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
@@ -783,7 +739,6 @@ diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, field
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 
 OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
-
 ```
 
 
@@ -805,7 +760,6 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
      script="js/tree.js", container="div", elementId="omimltree-element")
 
 ```
-
 
 <!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
 
@@ -872,8 +826,6 @@ ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) +
 
 ```
 
-
-
 # Future development
 
 We are in the process of adding or would like to develop code for some of the following analyses:   
@@ -900,7 +852,7 @@ We used a Python wrapper of [minimap2](https://github.com/lh3/minimap2) (version
 A maximum likelihood (ML) tree was reconstructed from each alignment using the COVID-19 release of [IQ-TREE](http://www.iqtree.org/) (version 2.2.0).
 Outliers were identified in by root-to-tip regression using the R package [ape](https://cran.r-project.org/web/packages/ape/) and removed from the dataset.
 [TreeTime](https://github.com/neherlab/treetime) was used to reconstruct a time-scaled tree under a strict molecular clock model.
-The resulting trees were plotted with [ggtree](https://github.com/YuLab-SMU/ggtree).
+The resulting trees were converted into interactive plots with [ggfree](https://github.com/ArtPoon/ggfree) and [r2d3](https://rstudio.github.io/r2d3/).
 
 ## Mutational composition
 ### Mutation composition graph
@@ -1032,8 +984,6 @@ We wish to acknowledge the following organisations/laboratories for contributing
 
 * Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)
 
-
-
 # Session info {.tabset}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
 
@@ -1044,3 +994,9 @@ The version numbers of all packages in the current environment as well as inform
 ```{r session_info}
 sessionInfo()
 ```
+
+
+# [Previous Versions](https://covarr-net.github.io/duotang/archive/)
+
+# [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html)
+

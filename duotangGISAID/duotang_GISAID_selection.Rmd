@@ -1,0 +1,506 @@
+
+---
+title: |
+  ![Duotang_GISAID](../img/CoVaRR-Net_Logo-600.png){width=1lm}
+subtitle: "Duotang - GISAID "
+author: "DO NOT MAKE THIS PAGE PUBLIC"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_document:
+    keep_md: true
+    code_folding: hide
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+
+
+```{r setup, include=FALSE, warning=FALSE}
+library(tidyr)
+library(knitr) # Needed to set root directory
+library(lubridate)  # dates are awful
+library(parallel)  # speed up selection plotting (#133)
+library(ggplot2)  # Work-horse plotting package
+library(ggfree) 
+library(r2d3)  # used for passing data to JavaScript D3 framework
+library(jsonlite)
+
+theme_set(theme_classic())
+
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = getwd())
+```
+
+
+```{r variables, include=FALSE, warning=FALSE}
+############################
+##### GLOBAL VARIABLES #####
+############################
+
+source("../scripts/utils.R")
+
+pangoversion="4.2 (Viral AI)"
+
+VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
+
+# FIXME: this should be stored as an external CSV file
+VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
+VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
+VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
+VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
+VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
+
+VOCVOI=add.pango.group("Omicron BA.1", "BA.1*", '#8B0000')
+VOCVOI=add.pango.group("Omicron BA.2", "BA.2*", '#FF0000')
+VOCVOI=add.pango.group("Omicron BA.4", "BA.4*", '#BC544B')
+VOCVOI=add.pango.group("Omicron BA.5", "BA.5*", '#CC66FF')
+VOCVOI=add.pango.group("Omicron BQ", "BQ*", '#9CB329')
+VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
+#VOCVOI=add.pango.group("Omicron BF","BF*",'#9F2B11')
+
+VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
+VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
+VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
+
+all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
+                                "Saskatchawan", "Manitoba", "Ontario", 
+                                "Quebec", "Nova Scotia", "New Brunswick",
+                                "Newfoundland and Labrador","Prince Edward Island"),
+                         shortname=c("Canada","BC", "AB",
+                                     "SK", "MA", "ON", 
+                                     "QC", "NS", "NB",
+                                     "NL","PE"))
+
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+pal["other"] <- 'grey' # named character vector
+```
+
+
+
+```{r load_data}
+
+## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
+#Download metadata from VirusSeq, put the date here:
+
+# this can be made more compact for faster loading
+meta <- read.csv(gzfile("metadatagisaid.tsv.gz"), sep="\t")
+meta$province <- meta$geo_loc_name_state_province_territory
+
+# Select only the column we want to use later
+columnlist=c("fasta_header_name", "province", "sample_collection_date",
+             "lineage", "raw_lineage")
+meta <- meta[ , columnlist]
+
+
+### metadata cleaning 
+unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
+                 "Not Applicable","","NA","unknown")
+meta <- as.data.frame(apply(meta, 2, function(x) {
+  x[is.element(x, unknown.str)] <- "Unknown"
+  x
+}))
+
+meta$sample_collection_date <- as.Date(meta$sample_collection_date)
+meta$week <- cut(meta$sample_collection_date, 'week')
+meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
+
+source("../scripts/scanlineages.R")
+meta$pango_group <- create.pango.group(VOCVOI, meta)
+meta$pango_group <- as.factor(meta$pango_group)
+
+
+## 2. LOAD epidemiological data (PHAC)
+
+#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
+epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
+epidataCANall$date <- as.Date(epidataCANall$date)
+epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
+epidate <- tail(epidataCANall,1)$date #download date
+
+epidataCANall$previousvalue <- 0
+#small loop to get the numtoday column from previous versions of this file from the cumulative cases
+for(row in 1:nrow(epidataCANall)) {
+  p <- epidataCANall[row, "prname"]
+  subdf <- epidataCANall[which( 
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+    ), ]
+  if(nrow(subdf) != 0) {
+    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
+  }
+}
+epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
+
+
+
+  
+```
+
+
+```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+source("../scripts/plot_selection_estimator_2type.R")
+source("../scripts/scanlineages.R")
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(30) ]))
+reference <- getStrictoSubLineages("BQ.1",meta)
+#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
+startpar2 <- list(p=0.5, s=0.05)
+
+startdate <- max(meta$sample_collection_date) - days(120)
+
+#t0 <- Sys.time()
+allparams <- mclapply(latelineage_pangotree, function(l) {
+  lineagelist <- getStrictoSubLineages(l, meta)
+  lapply(rev(all.regions$name), function(region) {
+    if(length(intersect(reference, lineagelist)) == 0) {
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    } else {
+      NA
+    }
+  })
+}, mc.cores=8)
+allparams <- do.call(c, allparams)  # same structure as below
+allparams <- allparams[!is.na(allparams)]
+
+allparams <- allparams[order(sapply(allparams, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
+```
+
+
+## Fastest growing lineages in Canada {.tabset}
+
+
+Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto (i.e., sequences designated as `r reference[[1]]` and not its descendants, like `r reference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+
+
+
+### Plot (stricto) {.tabset}
+
+Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+```{r, results='asis', fig.retina = 2, warning=FALSE, fig.height=7}
+
+source("../scripts/plot_growing_lineages.R")
+selectparam <- function(p,reg){
+  if(!any(is.na(p$fit))){
+    x=p$mut[[1]];
+    p$region==reg&
+    (p$fit)$fit[["s1"]]>0 & 
+    sum(p$toplot$n2)>10&
+    substr(x, nchar(x), nchar(x))!="*"
+  }else{FALSE}
+  }
+
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  cat("##### Plot single lineages in",reg[["name"]],"\n","\n")
+  paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
+  n=min(25,length(paramselected))
+  if(n!=0){
+    a=plot_growing_lineage(paramselected[1:n])
+  }else{
+    cat("![<img height=\"100\"/>](../img/NotEnoughData.jpg)")
+  }
+  cat("\n\n")})
+
+```
+
+
+
+### Plot (non stricto)  {.tabset}
+      
+This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
+
+Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+
+```{r tabs, results='asis', warning=FALSE, fig.height=7}
+source("../scripts/plot_growing_lineages.R")
+selectparam <- function(p,reg){
+  if(!any(is.na(p$fit))){
+    x=p$mut[[1]];
+    p$region==reg&
+    (p$fit)$fit[["s1"]]>0 & 
+    sum(p$toplot$n2)>10&
+    substr(x, nchar(x), nchar(x))=="*"
+  }else{FALSE}
+  }
+
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  cat("##### Plot monophyletic groups of lineages in",reg[["name"]],"\n","\n")
+  paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
+  n=min(25,length(paramselected))
+  if(n!=0){
+    a=plot_growing_lineage(paramselected[1:n])
+  }else{
+    cat("![](../img/NotEnoughData.jpg)")
+  }
+  cat("\n\n")})
+
+```
+
+### Table of all the selection estimates 
+
+```{r overview of the selection estimator table}
+
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10
+  }else{FALSE}})]
+DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE))
+
+```
+
+
+## Selection on Omicron {.tabset}  
+
+
+```{r setting function for selection estimator}
+source("../scripts/plot_selection_estimator.R")
+
+startpar3 <- list(p=c(0.8, 0.1), s=c(0.1, 0.1))
+
+setAll=getAllStrictoLineages(meta)
+sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
+sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
+
+setAll=setAll[!setAll %in% sublineages_BA5]
+sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
+
+#color for each lineage
+col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
+
+#Set a starting date
+#Note that the startdate shouldn't be too much before both alleles become common
+#or rare migration events that die off could throw off the estimation procedure 
+#(so that the parameter estimates account for the presence of those alleles long in the past).
+startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
+
+sub.plot.selection.estimate <- function(region,maxdate=NA){
+  maxdate=plot.selection.estimate(region=region,
+                                        startdate=startdate, startpar=startpar3,
+                                        reference=c(setAll),
+                                        mutants=list(sublineages_BA5,sublineages_BQ),
+                                        names=list("BA.5*","BQ*","the rest"),
+                                        maxdate=maxdate, col=col)
+  return(maxdate$date)
+}
+
+#####################################################
+# tabs for displaying in notebook
+#each PT tab should have curve plot and breakpoint plot side by side
+```
+
+
+### Canada
+#### Canada
+
+```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+source("../scripts/plot_selection_estimator.R")
+maxdate=sub.plot.selection.estimate(region="Canada")
+
+```
+
+### BC
+#### British Columbia
+
+```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
+```
+
+### AB
+#### Alberta
+
+```{r selection estimator AL, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+local_maxdate=sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
+```
+
+
+### SK
+#### Saskatchewan
+
+```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
+local_maxdate=sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
+```
+
+
+### MB
+#### Manitoba
+
+```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
+```
+
+### ON
+#### Ontario
+
+```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+local_maxdate=sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
+
+```
+
+
+### QC
+#### Quebec
+
+```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+local_maxdate=sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
+```
+
+### NB
+#### New Brunswick
+
+```{r selection estimator New Brunswick, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="New Brunswick",maxdate=maxdate)
+```
+
+### NS
+#### Nova Scotia
+
+```{r selection estimator Nova Scotia, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="Nova Scotia",maxdate=maxdate)
+```
+
+### PE
+#### Prince Edward Island
+
+```{r selection estimator Prince Edward Island, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region=" Prince Edward Island)",maxdate=maxdate)
+```
+
+### NL
+#### Newfoundland and Labrador
+
+```{r selection estimator Newfoundland and Labrador, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
+local_maxdate=sub.plot.selection.estimate(region="Newfoundland and Labrador",maxdate=maxdate)
+```
+
+
+
+```{r general settings for selection estimator BA.2}
+source("../scripts/scanlineages.R")
+plotsubvariant <- function(region,min,parentalnode){
+  nplot=0
+  for(p in allparams) {
+    if(!any(is.na(p$fit)) && 
+       p$region==region && 
+       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
+       isSubLineage(parentalnode,p$mut[[1]])){
+      if((p$fit)$fit[["s1"]]>0.07 && sum(p$toplot$n2)>min){
+          plot.selection(plotparam=p)
+          nplot=nplot+1
+      }
+    }
+  }
+  if(nplot==0){
+    print("Not enough data available")
+  }
+}
+
+
+plotba2 <- function(region,min){
+  plotsubvariant(region,min,"BA.2*")
+}
+
+
+
+plotba5 <- function(region,min){
+  plotsubvariant(region,min,"BA.5*")
+}
+
+
+plotothers <- function(region,min){
+  nplot=0
+  for(p in allparams) {
+    if(!any(is.na(p$fit)) && 
+       p$region==region && 
+       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
+       !isSubLineage("BA.2*",p$mut[[1]])){
+      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
+          plot.selection(plotparam=p)
+          nplot=nplot+1
+      }
+    }
+  }
+  if(nplot==0){
+    print("Not enough data available")
+  }
+}
+
+
+```
+
+
+## {.unlisted .unnumbered}
+
+### BA.2 sublineages selection {.tabset}
+
+Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+
+```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
+  plotba2(reg[["name"]],n_min)
+  cat("\n\n")})
+  
+```
+
+
+
+### BA.5 sublineages selection {.tabset}
+
+Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+
+
+```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  n_min=10
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
+  plotba5(reg[["name"]],n_min)
+  cat("\n\n")})
+  
+```
+
+### Other sublineages selection {.tabset}
+
+Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
+  plotothers(reg[["name"]],n_min)
+  cat("\n\n")})
+  
+```
+
+# Session info {.tabset}
+The version numbers of all packages in the current environment as well as information about the R install is reported below. 
+
+## Hide
+
+## Show
+
+```{r session_info}
+sessionInfo()
+```

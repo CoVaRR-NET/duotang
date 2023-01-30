@@ -8,14 +8,15 @@ require(lubridate)
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants <- function(region='Canada', sublineage=c(name1), 
-                             scaled=FALSE, col=NA, mindate=as.Date('2021-11-01'), maxdate=NA) {
+                             scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
   if(is.na(maxdate)){
-    varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, province %in% get.province.list(region))
+    maxdate=max(meta$sample_collection_date)
   }
-  else{
-    varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, sample_collection_date<=maxdate, province %in% get.province.list(region))
+  if(is.na(mindate)){
+    mindate=as.Date("2021-01-01")
+    
   }
-  
+  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, sample_collection_date<=maxdate, province %in% get.province.list(region))
   varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
@@ -31,14 +32,11 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   
   varmeta1$pango_group <- as.factor(varmeta1$pango_group)
   
-  #print(varmeta1$sample_collection_date)
-  
   varmeta1$week <- cut(varmeta1$sample_collection_date, 'week')
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
-  varmeta1$week <- as.factor(as.character(varmeta1$week))
   
   if (is.na(col)) {
-    set.seed(320)
+    set.seed(320) #setted for 15 colors were close shades are not contiguous
     col <- sample(rainbow(length(levels(varmeta1$pango_group))))  # default colour palette
   }
   pal <- col
@@ -46,7 +44,7 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
   pal["other lineages"] <- 'grey'  # named character vector
   pal <- pal[match(levels(varmeta1$pango_group), names(pal))]
   tab <- table(varmeta1$pango_group, varmeta1$week)
-  
+
   if (scaled) {
     par(mar=c(5,5,1,5))
     tab2 <- apply(tab, 2, function(x) x/sum(x))
@@ -65,14 +63,14 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     cases.wk <- epi$numtotal_last7
     
     # match case counts to variant freq data and rescale as 2nd axis
-    idx <- match(floor_date(epi$date, "weeks", week_start=1), 
+    idx <- match(floor_date(epi$date, "weeks", week_start=1),
                  floor_date(as.Date(levels(varmeta1$week)), "weeks", week_start=1))
     y <- cases.wk[!is.na(idx)]
+    y[is.na(y)] <- 0 #sometimes there is no data for a given week 
     lab.y <- pretty(y)  # for drawing axis
     max.count <- max(apply(tab, 2, sum))
-    y2 <- y / (max(y)-min(y)) * max.count  # scale to variant counts
-    at.y <- lab.y / (max(y)-min(y)) * max.count
-    
+    y2 <- (y-min(y)) / (max(y)-min(y)) * max.count  # scale to variant counts
+    at.y <- (lab.y-min(lab.y)) / (max(y)-min(y)) * max.count
     barplot(tab, col=pal, 
             border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
             ylab="Sequenced cases per week") -> mp

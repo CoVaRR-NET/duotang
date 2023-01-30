@@ -18,7 +18,6 @@ if (length(args) > 4) pos <- as.integer(args[5])
 format <- '%Y-%m-%d'
 if (length(args) > 5) format <- args[6]
 
-
 require(ape)
 phy <- read.tree(args[1])
 
@@ -69,5 +68,10 @@ outliers <- which(abs(residuals(fit)) > 4*stderr)
 # export files for TreeTime
 pruned <- drop.tip(rooted, tip=rooted$tip.label[outliers])
 write.tree(pruned, file=args[2])
-dates <- data.frame(name=pruned$tip.label, date=tip.dates[-outliers])
+
+if (length(outliers) == 0){
+  dates <- data.frame(name=pruned$tip.label, date=tip.dates)
+} else{
+  dates <- data.frame(name=pruned$tip.label, date=tip.dates[-outliers])
+}
 write.table(dates, sep='\t', file=args[3], row.names=F, quote=F)
