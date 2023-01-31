@@ -4,7 +4,7 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
+date: '`r format(params$date, "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true

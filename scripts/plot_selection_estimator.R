@@ -146,6 +146,12 @@ alpha <- function(col, alpha) {
 
 # I had to write these wrapper functions because mle2 doesn't like vector 
 # parameters >:(
+.ll.quadnom <- function(p1, p2, p3, s1, s2, s3, refdata, mutdata) {
+  suppressWarnings(
+    .llfunc(p=c(p1, p2, p3), s=c(s1, s2, s3), refdata=refdata, mutdata=mutdata)
+  )
+}
+
 .ll.trinom <- function(p1, p2, s1, s2, refdata, mutdata) {
   suppressWarnings(
     .llfunc(p=c(p1, p2), s=c(s1, s2), refdata=refdata, mutdata=mutdata)
@@ -178,8 +184,12 @@ alpha <- function(col, alpha) {
                  start=list(p1=startpar$p[1], p2=startpar$p[2], 
                             s1=startpar$s[1], s2=startpar$s[2]), 
                  data=list(refdata=refdata, mutdata=mutdata), method=method)
-  }
-  else {
+  }  else if (length(startpar$s) == 3) {
+    bbml <- mle2(.ll.quadnom, 
+                 start=list(p1=startpar$p[1], p2=startpar$p[2], p3=startpar$p[3], 
+                            s1=startpar$s[1], s2=startpar$s[2], s3=startpar$s[3]), 
+                 data=list(refdata=refdata, mutdata=mutdata), method=method)
+  } else {
     stop("ERROR: function does not currently support more than three types!")
   }
   
@@ -344,19 +354,18 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   #region <- "Quebec"
   #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
   #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
-  #mutants <- list(sublineages_BA5,sublineages_BQ)
-  #names <- list("BA.5*","BQ*","the rest")
-  #startpar <- startpar3
+  #mutants <- mutants
+  #names <- mutantNames
+  #startpar <- startpar
   #method='BFGS'
   #maxdate=NA
-  #col=c('red', 'blue')
+  #col=col
   
   
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   fit <- .fit.model(est, startpar, method=method)
-  
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -387,13 +396,12 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   # display counts
   plotData <- toplot %>% melt(id = c("date", "time", "tot")) %>% dplyr::select(date, variable, value, tot) %>% 
     filter(variable != "n1") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
-    mutate(variable2=names[as.numeric(variable)-1]) %>% mutate (p = value/tot) %>% dplyr::select(-tot) %>%
-    mutate(variable3=paste0("s", (as.numeric(variable)-1))) #%>% 
-    mutate (variable4 = coalesce(unlist(fit$fit)[variable3], variable3)) #paste0(variable2, ": ", round(fit$fit[[variable3]], 3))) #, " {", round(fit$confint[paste0("s", as.numeric(variable1)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable1)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
-  plotData$test <- fit$fit[[plotData$variable3]]
-  plotData$p[is.nan(plotData$p)]<-0
+    mutate (p = value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot) %>%
+    rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]])) %>%
+    mutate(variable = paste0(names[as.numeric(variable)-1], ":", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
+    
   plotData$variable =  as.factor(plotData$variable)
-  view(plotData)
+
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
     scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
@@ -401,17 +409,13 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     ylab(paste0("Proportion in ", est$region)) + 
     ylim(0,1) +
     xlim(min(plotData$date), maxdate)
-  variable3="s2"
-  fit$fit[[variable3]]
   
-  p <- p + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,2]))
-  
-  if (ncol(scurves) > 2) {
-    for (i in seq(3,ncol(scurves))){
-      p <- p + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,i]))
-    }
-  }
-  
+  scurvesPlotData <- cbind(toplot[,"date", drop=F], scurves[,2:ncol(scurves)])
+  colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
+  scurvesPlotData=scurvesPlotData %>% melt(id="date")
+  p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
+    scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
+    
   if (any(!is.na(fit$sample))) {  
     p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[1], alpha=0.5)
     if(ncol(lo95) > 2) {
@@ -430,9 +434,9 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   
   plotData <- toplot %>% melt(id = c("date", "time", "n1")) %>% dplyr::select(date, variable, value, n1) %>% 
     filter(variable != "tot") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
-    mutate(variable=names[as.numeric(variable)-1]) %>% mutate (p = value/n1) %>% dplyr::select(-n1) %>% filter(p != Inf) %>%
-    mutate(variable=paste0(variable, ": ", round(fit$fit[["s2"]], 3), " {", round(fit$confint["s2", "2.5 %"], 3), ", ", round(fit$confint["s2", "97.5 %"], 3), "}"))
-  #plotData$p[is.nan(plotData$p)]<-0
+    mutate (p = value/n1) %>% filter(p != Inf) %>% dplyr::select(-n1) %>%
+    rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]])) %>%
+    mutate(variable = paste0(names[as.numeric(variable)-1], ":",round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
   plotData$variable =  as.factor(plotData$variable)
   
   p2<- ggplot() +
@@ -443,8 +447,13 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     scale_y_log10(limits=c(0.001,1000), breaks = c(0.001, 0.01, 0.1, 1, 10, 100, 1000), labels = c(0.001, 0.01, 0.1, 1, 10, 100, 1000)) +
     xlim(min(plotData$date), maxdate)
   
+  scurvesPlotData <- cbind(toplot[,"date", drop=F], (scurves[,2:ncol(scurves)]/scurves[,1]))
+  colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
+  scurvesPlotData=scurvesPlotData %>% melt(id=c("date"))
   
-  p2 <- p2 + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,2]/scurves[,1]))
+  p2 <- p2 + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
+    scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
+  
   
   if (ncol(scurves) > 2) {
     for (i in seq(3,ncol(scurves))){

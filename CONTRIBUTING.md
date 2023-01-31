@@ -29,7 +29,26 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
 
-# THIS GUIDE IS NOW SIGNIFICANTLY OUT DATE AND SHOULD NOT BE USED TO BUILD DUOTANG. NEW DOCUMENTATION COMING SOON.
+## Conda Environment
+
+These dependencies can also be installed from the environment.yaml using `conda env create -f conda-env.yaml`
+
+# Automated update
+
+The update script `update.sh` is available at the root of this repo. This script attempts to automate the data download, data processing, and knitting process of building CoVaRR-Net Duotang.
+
+Provided that a duotang conda environment is available, run the following command at the root directory:
+`update.sh`
+
+Arguments can also be provided for custom build functions:
+ * `-o|--date` String in format "YYYY-MM-DD", this will be the datestamped used throughout the build process (default: $CurrentUTCDate)
+ * `-s|--source` The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
+ * `-o|--outdir` The output directory of all but the HTML files (default: data_needed). 
+ * `-f|--scriptdir` The ABSOLUTE path to the scripts directory (default: scripts).
+ * `--overwrite` Flag for discarding current checkpoints and restart update from beginning"
+ * `--buildmain` Flag used to knit the RMD and push the changes to the main branch. Should only be used when dev is ready to be published"
+
+# Step by step instruction to obtain data, and to generate phylogenies
 
 ## To obtain required data
 

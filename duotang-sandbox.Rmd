@@ -18,6 +18,11 @@ params:
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
+
+#list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse",  )
+#new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+#if(length(new.packages)) install.packages(new.packages)
+
 library(tidyr)
 library(knitr) # Needed to set root directory
 library(lubridate)  # dates are awful
@@ -185,17 +190,22 @@ These selection analyses must be interpreted with caution due to the potential f
 ```{r setting function for selection estimator, warning=FALSE, message=FALSE, }
 source("scripts/plot_selection_estimator.R")
 
-startpar3 <- list(p=c(0.8, 0.1), s=c(0.1, 0.1))
+startpar <- list(p=c(0.8, 0.05, 0.01), s=c(0.1, 0.1, 0.1))
 
 setAll=getAllStrictoLineages(meta)
 sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
 sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
+sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
 
 setAll=setAll[!setAll %in% sublineages_BA5]
+setAll=setAll[!setAll %in% sublineages_BQ]
+setAll=setAll[!setAll %in% sublineages_XBB]
 sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
 
+mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
+mutantNames = list("BA.5*","BQ*","XBB*", "the rest")
 #color for each lineage
-col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
+col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
@@ -205,10 +215,10 @@ startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with l
 
 sub.plot.selection.estimate <- function(region,maxdate=NA){
   obj=plot.selection.estimate.ggplot(region=region,
-                                        startdate=startdate, startpar=startpar3,
+                                        startdate=startdate, startpar=startpar,
                                         reference=c(setAll),
-                                        mutants=list(sublineages_BA5,sublineages_BQ),
-                                        names=list("BA.5*","BQ*","the rest"),
+                                        mutants=mutants,
+                                        names=mutantNames,
                                         maxdate=maxdate, col=col)
   return(obj)
 }
@@ -257,11 +267,12 @@ apply(dataAvailable.regions,1,function(reg){
 source("scripts/plot_case_count_selection_estimator.R")
 caseData <- parseCaseData(maxdate)
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
-  #acseCountData <- caseData$BC
-  #selectionEstimateObject<- selectionEstimateFits$BC
+  #caseCountData <- caseData$ON
+  #selectionEstimateObject<- selectionEstimateFits$ON
   #filename=NA
   #caseFit <- (getCaseCountSmoothFit(caseCountData, 5))$y
-  caseFit <- CubicSplSmooth(caseCountData)
+  #caseFit <- CubicSplSmooth(caseCountData, 5)$fit
+  caseFit <- 10^(getCaseCountSmoothFitWithLambda(caseCountData)$y)
   selectionFit <- selectionEstimateObject$fit
   selectionScurves <- selectionEstimateObject$scurves
   selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
@@ -303,14 +314,19 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filen
 Some description text here...
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis'}
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("AB", "ON", "QC", "Canada"))
+dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
 apply(dataAvailable.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
   cat("#####",reg[["name"]],"\n","\n")
-  p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
-  print(p)
+  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1)){
+    cat("Not enough genomic data available.")
+  } else if (reg[["shortname"]] %in% names(caseData)){
+      p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
+      print(p)
+  } else {
+    cat("No case count data available.")
+  }
+
   cat("\n\n")})
   
 ```
