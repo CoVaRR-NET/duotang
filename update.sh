@@ -244,11 +244,11 @@ echo "nex2nwk" > $checkPointFile
 #nex2nwk:
 date
 echo "knitting the Rmd..."
-Rscript -e "rmarkdown::render('duotang.Rmd',params=list(date = $datestamp))"Rscript -e "rmarkdown::render('duotang.Rmd',params=list(date = $datestamp))"
+Rscript -e "rmarkdown::render('duotang.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "duotangbuilt" > $checkPointFile
 
 #duotangbuilt:
-Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(date = $datestamp))"
+Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "duotangsandboxbuilt" > $checkPointFile
 
 #duotangsandboxbuilt:

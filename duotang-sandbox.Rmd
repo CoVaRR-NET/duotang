@@ -4,7 +4,6 @@ title: |
   ![Duotang - Sandbox](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang - Sandbox, a playground for genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -13,8 +12,11 @@ output:
     toc: true
     toc_float: true
 params:
- date:
-  value: "2023-01-27"
+ datestamp:
+  label: "Datestamp"
+  input: date
+  format: yyyy-mm-dd
+  value: "2023-01-30"
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
@@ -86,6 +88,8 @@ pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey' # named character vector
 ```
+
+##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
 
 ### Contributing authors:  
 
@@ -190,7 +194,9 @@ These selection analyses must be interpreted with caution due to the potential f
 ```{r setting function for selection estimator, warning=FALSE, message=FALSE, }
 source("scripts/plot_selection_estimator.R")
 
-startpar <- list(p=c(0.8, 0.05, 0.01), s=c(0.1, 0.1, 0.1))
+#startpar <- list(p=c(0.5, 0.1), s=c(0.1, 0.1))
+
+startpar <- list(p=c(0.5, 0.2, 0.05), s=c(0.0, 0.0, 0.1))
 
 setAll=getAllStrictoLineages(meta)
 sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
@@ -203,7 +209,7 @@ setAll=setAll[!setAll %in% sublineages_XBB]
 sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
 
 mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
-mutantNames = list("BA.5*","BQ*","XBB*", "the rest")
+mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
 #color for each lineage
 col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
 

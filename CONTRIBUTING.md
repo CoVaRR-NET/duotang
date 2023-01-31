@@ -41,12 +41,12 @@ Provided that a duotang conda environment is available, run the following comman
 `update.sh`
 
 Arguments can also be provided for custom build functions:
- * `-o|--date` String in format "YYYY-MM-DD", this will be the datestamped used throughout the build process (default: $CurrentUTCDate)
+ * `-d|--date` String in format "YYYY-MM-DD", this will be the datestamped used throughout the build process (default: $CurrentUTCDate)
  * `-s|--source` The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
- * `-o|--outdir` The output directory of all but the HTML files (default: data_needed). 
- * `-f|--scriptdir` The ABSOLUTE path to the scripts directory (default: scripts).
+ * `-o|--outdir` The output directory of all but the HTML files (default: ./data_needed). 
+ * `-f|--scriptdir` The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
  * `--overwrite` Flag for discarding current checkpoints and restart update from beginning"
- * `--buildmain` Flag used to knit the RMD and push the changes to the main branch. Should only be used when dev is ready to be published"
+ * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing."
 
 # Step by step instruction to obtain data, and to generate phylogenies
 
