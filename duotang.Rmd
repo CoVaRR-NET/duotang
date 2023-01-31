@@ -4,7 +4,6 @@ title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
 author: "Pillar 6"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     keep_md: true
@@ -13,8 +12,11 @@ output:
     toc: true
     toc_float: true
 params:
- date:
-  value: "2023-01-17"
+ datestamp:
+  label: "Datestamp"
+  input: date
+  format: yyyy-mm-dd
+  value: "2023-01-30"
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
@@ -43,7 +45,7 @@ opts_knit$set(root.dir = getwd())
 
 source("scripts/utils.R")
 #Date of the VirusSeq release
-VirusSeq_release=params$date
+VirusSeq_release=format(as.Date(params$datestamp),"%B %d, %Y")
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
@@ -81,8 +83,7 @@ pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey' # named character vector
 ```
-
-
+##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
 
 ### Contributing authors:  
 
@@ -212,7 +213,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ***[Note some recent updates to the analyses, including the ability to view variants showing most growth by province.]***
 
-BQ.1.1 is peaking at this time in Canada, with XBB.1.5 still the primary variant of interest due to its mutations, plus growth significantly in multiple provinces with the most recent data. Some other BQ.1*, BF.7, CH.1.1, and select recombinants are growing, but not as significantly as XBB.1.5 right now. Differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important. For example, New Brunswick has more of a “soup” of different variants, with Quebec having more notable XBB.1.5 plus a “soup” of other variants, while Ontario has also significant XBB.1.5 but in addition it has some other select lineages showing more prevalence, in addition to their “soup” of other variants. Mutational analysis shows continued steady growth in prevalence of the S:F486P mutation of note (associated with immune evasion and improved binding to the human ACE2 receptor). Cases with this mutation are now almost exclusively XBB.1.5.
+BQ.1.1 is peaking at this time in Canada, with XBB.1.5 still the primary variant of interest due to its mutations, plus growth significantly in multiple provinces with the most recent data. Some other BQ.1*, BF.7, CH.1.1, and select recombinants are growing, but not as significantly as XBB.1.5 right now. Differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important. Mutational analysis shows continued steady growth in prevalence of the S:F486P mutation of note (associated with immune evasion and improved binding to the human ACE2 receptor). Cases with this mutation are now almost exclusively XBB.1.5.
 
 **Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. Note that XBB.1.5 is still of primary note and some of these have only been observed internationally. See also the evolving plots below of “Fastest growing lineages in Canada”:
  
@@ -606,22 +607,22 @@ tmp=apply(all.regions,1,function(reg){
   
 ```
 
-### Other sublineages selection {.tabset}
+<!-- ### Other sublineages selection {.tabset} -->
 
-Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+<!-- Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection. -->
 
 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-tmp=apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
-  plotothers(reg[["name"]],n_min)
-  cat("\n\n")})
-  
-```
+<!-- ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'} -->
+<!-- tmp=apply(all.regions,1,function(reg){ -->
+<!--   cat("####", reg[["shortname"]], "\n") -->
+<!--   n_min=20 -->
+<!--   if(reg[["name"]]=="Canada"){n_min=50} -->
+<!--   cat("#####",reg[["name"]],"(n>",n_min,")\n","\n") -->
+<!--   plotothers(reg[["name"]],n_min) -->
+<!--   cat("\n\n")}) -->
+
+<!-- ``` -->
 
 ## Variants in Canada over time
 

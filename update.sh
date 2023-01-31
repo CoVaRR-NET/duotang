@@ -36,6 +36,10 @@ while [[ $# -gt 0 ]]; do
       OVERWRITE="YES"
       shift # past argument
       ;;
+	--buildmain)
+      BUILDMAIN="YES"
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -56,12 +60,14 @@ if [ -z "$SOURCE" ]; then SOURCE="viralai"; fi
 if [ -z "$data_dir" ]; then data_dir="data_needed"; fi
 if [ -z "$scripts_dir" ]; then scripts_dir="scripts"; fi
 if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
+if [ "$BUILDMAIN" = "YES" ]; then $BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 
 echo "Datestamp used: ${DATE}"
 echo "Date source: ${SOURCE}"
 echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
+echo "Main branch build mode: ${BUILDMAIN}"
 
 datestamp=$DATE
 
@@ -76,8 +82,13 @@ function jumpTo ()
     exit
 }
 
-#checkpoint logics
+if [ "$BUILDMAIN" = "YES" ]; then 
+	eval "$(conda shell.bash hook)"
+	conda activate duotang
+	jumpTo nex2nwk 
+fi
 
+#checkpoint logics
 if [ -f $checkPointFile ]; then
 
 	eval "$(conda shell.bash hook)"
@@ -99,6 +110,7 @@ else
 	conda activate duotang
     jumpTo begin
 fi
+
 
 #begin:
 echo "begin" > $checkPointFile
@@ -232,11 +244,11 @@ echo "nex2nwk" > $checkPointFile
 #nex2nwk:
 date
 echo "knitting the Rmd..."
-Rscript -e "rmarkdown::render('duotang.Rmd',params=list(date = $datestamp))"
+Rscript -e "rmarkdown::render('duotang.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "duotangbuilt" > $checkPointFile
 
 #duotangbuilt:
-Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(date = $datestamp))"
+Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "duotangsandboxbuilt" > $checkPointFile
 
 #duotangsandboxbuilt:
@@ -251,8 +263,19 @@ fi
 echo "htmlencrypted" > $checkPointFile
 
 #htmlencrypted:
+if [ "$BUILDMAIN" = "YES" ]; then 
+	scripts/getPastDuotangVersions.sh
+fi
+echo "archive" > $checkPointFile
+
+#archive
+if [ "$BUILDMAIN" = "YES" ]; then 
+	git add *.html
+	git commit -m "update: $datestamp"
+	git push origin main
+fi
+
 echo "Update completed successfully"
 echo "finish" > $checkPointFile
 
 conda deactivate
-

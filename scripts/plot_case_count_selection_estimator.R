@@ -73,6 +73,20 @@ getCaseCountSmoothFit <- function(countData, knots=5){
   return (smooth.spline(countData$Reported_Date, countData$n,nknots=knots))
 }
 
+getCaseCountSmoothFitWithLambda<-function(countData, lambda=0.001){
+  if (!c("Reported_Date", "n") %in% colnames(countData)){
+    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
+  }
+  return(smooth.spline(log10(countData$n),lambda=lambda))
+}
+
+getCaseCountSmoothFitWithSpar<-function(countData, spar=0.8){
+  if (!c("Reported_Date", "n") %in% colnames(countData)){
+    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
+  }
+  return(smooth.spline(log10(countData$n),spar=0.8))
+}
+
 CubicSplSmooth <- function(countData, df=7) {
   if (!c("Reported_Date", "n") %in% colnames(countData)){
     stop("Possible corrupted countData. Expected column: Reported_Date and n.")
