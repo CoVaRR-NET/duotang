@@ -231,10 +231,10 @@ if __name__ == "__main__":
                         help="input, xz-compressed FASTA file from virusseq.py")
     parser.add_argument("metadata", type=str,
                         help="input, gz-compressed metadata file from pango2seq.py")
-    parser.add_argument("outfile", type=argparse.FileType('w'),
-                        help="output, path to write FASTA file of aligned sample")
+    parser.add_argument("outfile", type=str,
+                        help="output, prefix to write FASTA file of aligned sample")
 
-    parser.add_argument("--reffile", type=str, default="data_needed/NC_045512.fa",
+    parser.add_argument("--reffile", type=str, default="resources/NC_045512.fa",
                         help="optional, path to reference genome FASTA")
     parser.add_argument("--limit", type=int, default=5000,
                         help="optional, maximum tolerance for gaps due to misalignment "
@@ -254,34 +254,47 @@ if __name__ == "__main__":
                         help="int, week number for cutoff date")
     parser.add_argument("--nosample", action=argparse.BooleanOptionalAction,
                         help="bool, whether or not sampling should be performed")
+    parser.add_argument("--samplenum", type=int, default=3,
+                        help="int, how many subsamples should be produced.")
 
     args = parser.parse_args()
-    if args.seed:
-        random.seed(args.seed)
+    if (args.nosample == True):
+        args.samplenum=1
+    
+    print("Subsampling {} times.".format(args.samplenum))
+    for i in range(args.samplenum):
+        outpath =  str(args.outfile) + "_sample" + str(i+1) + ".fasta"
+        print("outputting to: " + outpath)
+        if args.seed:
+            random.seed(args.seed)
+        
+        with open(outpath, "w") as fh:
+            with open(args.reffile) as handle:
+                header, seq = next(iter_fasta(handle))
+                reflen = len(seq)
+            # write reference genome to file for outgroup rooting later
+                fh.write(f">reference\n{seq}\n")
 
-    with open(args.reffile) as handle:
-        header, seq = next(iter_fasta(handle))
-        reflen = len(seq)
-        # write reference genome to file for outgroup rooting later
-        args.outfile.write(f">reference\n{seq}\n")
-
-    progress("loading metadata")
-    metadata = load_metadata(args.metadata)
-    with gzip.open (args.metadata, 'rt', encoding='utf-8') as fh:
-        numline = len(fh.readlines()) -1
-    progress("sampling records")
-    if (args.nosample == True and numline < 10000):
-        sample = sampling(metadata, before=numline, after=numline, 
-                      cutoff=(args.year, args.epiweek))
-    else:    
-        sample = sampling(metadata, before=args.before, after=args.after, 
-                      cutoff=(args.year, args.epiweek))
+        progress("loading metadata")
+        metadata = load_metadata(args.metadata)
+        with gzip.open (args.metadata, 'rt', encoding='utf-8') as fh:
+            numline = len(fh.readlines()) -1
+        progress("sampling records")
+        if (args.nosample == True and numline < 10000):
+            sample = sampling(metadata, before=numline, after=numline, 
+                          cutoff=(args.year, args.epiweek))
+        else:    
+            sample = sampling(metadata, before=args.before, after=args.after, 
+                          cutoff=(args.year, args.epiweek))
 
 
-    progress(f"aligning {len(sample)} samples")
-    aligner = align(args.infile, refpath=args.reffile, sample=sample, limit=args.limit)
-    #aligner = align(args.infile, refpath=args.reffile, sample=None, limit=args.limit)
-    for header, seq in aligner:
-        args.outfile.write(f">{header}\n{seq}\n")
+        progress(f"aligning {len(sample)} samples")
+        aligner = align(args.infile, refpath=args.reffile, sample=sample, limit=args.limit)
+        #aligner = align(args.infile, refpath=args.reffile, sample=None, limit=args.limit)
+        with open (outpath, "a") as fh:
+            for header, seq in aligner:
+                fh.write(f">{header}\n{seq}\n")
+        
+        progress(f"finished sampling number {i+1}.")
 
     progress("finished!")

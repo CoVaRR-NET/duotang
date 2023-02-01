@@ -678,8 +678,8 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 source("scripts/tree.r")
 
 # load trees from files
-mltree <- read.tree("./data_needed/sample1.rtt.nwk")
-ttree <- read.tree("./data_needed/sample1.timetree.nwk")
+mltree <- read.tree("./data_needed/aligned_allSeqs_sample1.rtt.nwk")
+ttree <- read.tree("./data_needed/aligned_allSeqs_sample1.timetree.nwk")
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
@@ -707,6 +707,7 @@ mltree <- ladderize(mltree, FALSE)
 
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
+#ttree <- ladderize(ttree, FALSE)
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
@@ -784,14 +785,14 @@ sapply(tip.label, function(x) {
 }
 
 source("scripts/fit-rtt.R")
-fit1 <- fit.rtt("./data_needed/sample1.rtt.nwk", plot=TRUE)
+fit1 <- fit.rtt("./data_needed/aligned_allSeqs_sample1.rtt.nwk", plot=TRUE)
 
 ```
 
 
 ```{r}
-fit2 <- fit.rtt("data_needed/sample2.rtt.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/sample3.rtt.nwk", plot=FALSE)
+fit2 <- fit.rtt("data_needed/aligned_allSeqs_sample2.rtt.nwk", plot=FALSE)
+fit3 <- fit.rtt("data_needed/aligned_allSeqs_sample3.rtt.nwk", plot=FALSE)
 ```
 
 

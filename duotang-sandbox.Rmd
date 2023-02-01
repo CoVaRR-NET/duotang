@@ -196,7 +196,7 @@ source("scripts/plot_selection_estimator.R")
 
 #startpar <- list(p=c(0.5, 0.1), s=c(0.1, 0.1))
 
-startpar <- list(p=c(0.5, 0.2, 0.05), s=c(0.0, 0.0, 0.1))
+startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
 
 setAll=getAllStrictoLineages(meta)
 sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
@@ -345,9 +345,9 @@ Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Ca
 source("scripts/tree.r")
 
 # load trees from files
-mltree <- read.tree("./data_needed/sample5.rtt.nwk")
-ttree <- read.tree("./data_needed/sample5.timetree.nwk")
-recombTTree <- read.tree("./data_needed/sample4.timetree.nwk")
+mltree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk")
+ttree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.timetree.nwk")
+recombTTree <- read.tree("./data_needed/aligned_recombinant_XBBS_sample1.timetree.nwk")
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
@@ -380,7 +380,9 @@ mltree <- ladderize(mltree, FALSE)
 
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
+#ttree <- ladderize(ttree, FALSE)
 recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
+#recombTTree <- ladderize(recombTTree, FALSE)
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
@@ -406,7 +408,7 @@ presetColors=data.frame(name=c("other",
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
 timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames)
-recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "timetree", presetColors, fieldnames)
+recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, fieldnames)
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
 
@@ -466,14 +468,14 @@ sapply(tip.label, function(x) {
 }
 
 source("scripts/fit-rtt.R")
-fit1 <- fit.rtt("./data_needed/sample5.rtt.nwk", plot=TRUE)
+fit1 <- fit.rtt("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk", plot=TRUE)
 
 ```
 
 
 ```{r}
-fit2 <- fit.rtt("data_needed/sample6.rtt.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/sample7.rtt.nwk", plot=FALSE)
+fit2 <- fit.rtt("data_needed/aligned_nonrecombinant_sample2.rtt.nwk", plot=FALSE)
+fit3 <- fit.rtt("data_needed/aligned_nonrecombinant_sample3.rtt.nwk", plot=FALSE)
 ```
 
 

@@ -450,16 +450,11 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   scurvesPlotData <- cbind(toplot[,"date", drop=F], (scurves[,2:ncol(scurves)]/scurves[,1]))
   colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
   scurvesPlotData=scurvesPlotData %>% melt(id=c("date"))
-  
+  #(scurvesPlotData)
   p2 <- p2 + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
   
-  
-  if (ncol(scurves) > 2) {
-    for (i in seq(3,ncol(scurves))){
-      p2 <- p2 + geom_line(data=toplot, mapping = aes(x=date, y=scurves[,i]/scurves[,1]))
-    }
-  }
+
   p2<-p2 + theme_bw() + 
     labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
     theme(legend.position="bottom", legend.title=element_blank(), legend.text=element_text(size=12), text = element_text(size = 20)) 

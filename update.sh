@@ -8,7 +8,6 @@
 ####################################################################
 
 # None of the arguments are required, defaults are set for all of them if they are not provided.
-
 POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -60,7 +59,7 @@ if [ -z "$SOURCE" ]; then SOURCE="viralai"; fi
 if [ -z "$data_dir" ]; then data_dir="data_needed"; fi
 if [ -z "$scripts_dir" ]; then scripts_dir="scripts"; fi
 if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
-if [ "$BUILDMAIN" = "YES" ]; then $BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
+if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 
 echo "Datestamp used: ${DATE}"
 echo "Date source: ${SOURCE}"
@@ -189,7 +188,9 @@ wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/fil
 wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/cases/4565.csv
 wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv
 wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv
-#wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
+wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
+gzip -f ${data_dir}/AgeCaseCount*
+
 echo "casecount" > $checkPointFile
 #casecount:
 
@@ -200,7 +201,7 @@ echo "dataloaded" > $checkPointFile
 #removes the recombinants
 date
 echo "separating out the recombinants from the data..."
-python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/
+python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
 
 echo "removerecomb" > $checkPointFile
 
@@ -208,40 +209,46 @@ echo "removerecomb" > $checkPointFile
 #removerecomb:
 date
 echo "aligning sequences..."
-for i in 1 2 3; do 
-	python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/sample$i.fasta; 
+
+#All Sequences
+python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
+
+#selected recombinants
+for variant in `ls $data_dir/*regex*.fasta.xz`; do
+	name=${variant##*/}; 
+	name=${name%.*};
+	name=${name%.*};
+	name=`echo $name|cut -d '_' -f3-`;
+	echo $variant
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
 done
 
-#recombinants only alignment, probably dont need to sample it.
-python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_matched.fasta.xz ${data_dir}/SequenceMetadata_matched.tsv.gz ${data_dir}/sample4.fasta --nosample; 
-
-for i in 5 6 7; do python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/sample$i.fasta; done
+#non-recombinants
+python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
 
 echo "aligned" > $checkPointFile
 
 #aligned:
-for i in 1 2 3 4 5 6 7; do 
+for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
+	echo $alignedFasta
 	date
-	echo "building tree # $i..."
-	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s ${data_dir}/sample$i.fasta -m GTR -ninit 10 -n 4 --redo; 
+	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 4 --redo; 
 done
 echo "treebuilt" > $checkPointFile
 
 #treebuilt:
-date
 echo "cleaning trees..."
-for i in 1 2 3 4 5 6 7; do Rscript ${scripts_dir}/root2tip.R ${data_dir}/sample$i.fasta.treefile ${data_dir}/sample$i.rtt.nwk ${data_dir}/sample$i.dates.tsv; done
-echo "root2tip" > $checkPointFile
+for treefile in `ls $data_dir/aligned_*.treefile`; do
+	name=${treefile%.*};
+	name=${name%.*};
+	echo $name
+	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
+	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root --outdir ${name}.treetime_dir;
+	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
+done
+echo "treecleaned" > $checkPointFile
 
-#root2tip:
-for i in 1 2 3 4 5 6 7; do treetime --tree ${data_dir}/sample$i.rtt.nwk --dates ${data_dir}/sample$i.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root --outdir ${data_dir}/sample$i.treetime_dir ;done
-echo "treetime" > $checkPointFile
-
-#treetime:
-for i in 1 2 3 4 5 6 7; do python3 ${scripts_dir}/nex2nwk.py ${data_dir}/sample$i.treetime_dir/timetree.nexus ${data_dir}/sample$i.timetree.nwk; done
-echo "nex2nwk" > $checkPointFile
-
-#nex2nwk:
+#treecleaned:
 date
 echo "knitting the Rmd..."
 Rscript -e "rmarkdown::render('duotang.Rmd',params=list(datestamp="\"$datestamp\""))"
