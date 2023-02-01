@@ -30,7 +30,8 @@ for(var i = 0; i < data.VOCVOI.length; i++){
 var scalingFactors = {
   "timetree": 1,
   "mltree": 0.8,
-  "omimltree": 0.13,
+  "omimltree": 0.95,
+  "recombtimetree": 0.95,
 };
 var scalingFactor = scalingFactors[data.treetype]
 

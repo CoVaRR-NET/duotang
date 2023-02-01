@@ -5,7 +5,7 @@ parseCaseData<- function(maxDate = NA){
     stop("Expected a max cutoff date, got None")
   }
   #maxDate = maxdate
-  BC<-read.csv("data_needed/AgeCaseCountBC.csv", header=T)%>% 
+  BC<-read.csv(gzfile("data_needed/AgeCaseCountBC.csv.gz"), header=T)%>% 
     filter(Age_Group %in% c("90+", "80-89","70-79")) %>% #keep only the 70+ case counts
     group_by(Reported_Date) %>% #group data by reported date
     summarize(n=n()) %>% #get total count of num cases per day
@@ -13,7 +13,7 @@ parseCaseData<- function(maxDate = NA){
     mutate (Reported_Date = as.Date(Reported_Date)) %>% #format the column as dates
     drop_na() #drop row if any col is NA
   
-  AB <- read.csv("data_needed/AgeCaseCountAB.csv", header=T)%>% 
+  AB <- read.csv(gzfile("data_needed/AgeCaseCountAB.csv.gz"), header=T)%>% 
     filter(`Age.group` %in% c("80+ years","70-79 years")) %>% #keep only the 70+ case counts
     group_by(`Date.reported`) %>% #group data by reported date
     summarize(n=n()) %>% #get total count of num cases per day
@@ -22,7 +22,7 @@ parseCaseData<- function(maxDate = NA){
     rename(Reported_Date = `Date.reported`) %>% #relabel date column.
     drop_na() #drop row if any col is NA
   
-  QC <- read.csv("data_needed/AgeCaseCountQC.csv", header=T)%>% 
+  QC <- read.csv(gzfile("data_needed/AgeCaseCountQC.csv.gz"), header=T)%>% 
     filter(Date != "Date inconnue") %>%
     filter(Nom %in% c("70-79 ans","80-89 ans","90 ans et plus")) %>% #keep only the 70+ case counts
     group_by(Date) %>%#group data by reported date
@@ -33,7 +33,7 @@ parseCaseData<- function(maxDate = NA){
     drop_na() #drop row if any col is NA
 
     #Case_Reported_Date, Age_Group
-  ON <-read.csv("data_needed/AgeCaseCountON.csv", header=T)%>% 
+  ON <-read.csv(gzfile("data_needed/AgeCaseCountON.csv.gz"), header=T)%>% 
    filter(Age_Group%in% c("70s","80s","90+")) %>% #keep only the 70+ case counts
     group_by(Case_Reported_Date) %>%#group data by reported date
     summarize(n = n())%>% #get total count of num cases per day
@@ -42,7 +42,7 @@ parseCaseData<- function(maxDate = NA){
     rename(Reported_Date = Case_Reported_Date) %>% #relabel date column.
     drop_na() #drop row if any col is NA
   
-  Canada <- read.csv("data_needed/AgeCaseCountCAN.csv", header=T)%>% 
+  Canada <- read.csv(gzfile("data_needed/AgeCaseCountCAN.csv.gz"), header=T)%>% 
     filter(status == "cases") %>%
     filter(gender == "all") %>%
     filter(age_group %in% c("70 to 79","80+")) %>% #keep only the 70+ case counts

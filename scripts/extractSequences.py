@@ -28,16 +28,28 @@ if __name__ == "__main__":
                         help="input, gz-compressed metadata file from pango2seq.py")
     parser.add_argument("--outfile", type=str, 
                         help="output, path to write FASTA.XZ and metadata files")
-    parser.add_argument("--regex", type=str, default="^X\S*$",
-                        help="regex used to extract lineages")
+    parser.add_argument("--extractregex", type=str, default="^X\S*$",
+                        help="regex used to extract lineages from all data. i.e. blacklist")
+    parser.add_argument("--keepregex",action='extend', nargs="+",  default=[],
+                        help="regex used to keep lineages from extracted data. i.e. whitelist")
     parser.add_argument("--extractbyid", action=argparse.BooleanOptionalAction,
                         help="bool, specifies that the regex should be applied to ID rather than lineage")
     args = parser.parse_args()
-    print("regex is: " + args.regex)
-    idToExtract = []
-    metadataMatched = []
+    if (len(args.keepregex) == 0):
+        args.keepregex = [args.extractregex]
+    print("extractregex is: " + args.extractregex)
+    print("keepregex is: " + ",".join(args.keepregex))
+
+    idToKeep = []
+    idToRemove = []
+    idToWhitelist = {}
+
+    metadataBlacklist = []
+    metadataWhitelist = {}
     metadataRemainder = []
-    #read in the metadata file
+    
+    print("outputting metadata...")
+    #first we use the extractregex variable to remove sequences (blacklist)
     with gzip.open(args.metadata, 'rt', encoding='utf-8') as fh:
         for line in fh:
             #if metadata belongs to the regex being searched
@@ -46,35 +58,66 @@ if __name__ == "__main__":
             else:
                 strToMatch = line.split('\t')[1]
 
-            if (re.search(args.regex, strToMatch)):
-                idToExtract.append(line.split('\t')[23])
-                metadataMatched.append(line)
+            if (re.search(args.extractregex, strToMatch)):
+                idToRemove.append(line.split('\t')[23])
+                metadataBlacklist.append(line)
             else:
+                idToKeep.append(line.split('\t')[23])
                 metadataRemainder.append(line)
-    metadataMatched.insert(0, metadataRemainder[0])
+    metadataBlacklist.insert(0, metadataRemainder[0])
     
-    print("outputting metadata...")
+    #now we use keepregex to keep sequences from the removed pile
+    for regex in args.keepregex:
+        ids = []
+        md = []
+        for line in metadataBlacklist:
+            #if metadata belongs to the regex being searched
+            if (args.extractbyid == True):
+                strToMatch = line.split('\t')[0]
+            else:
+                strToMatch = line.split('\t')[1]
+
+            if (re.search(regex, strToMatch)):
+                ids.append(line.split('\t')[23])
+                md.append(line)
+        idToWhitelist[''.join([i for i in regex if i.isalpha()])] = ids
+        md.insert(0, metadataRemainder[0])
+        metadataWhitelist[''.join([i for i in regex if i.isalpha()])]= md
+    
+    for key in idToWhitelist.keys():
+        with gzip.open(args.outfile + "/SequenceMetadata_regex_" + key + ".tsv.gz", 'wt') as fh:
+            for line in metadataWhitelist[key]:
+                fh.write(line)
+
     with gzip.open(args.outfile + "/SequenceMetadata_matched.tsv.gz", 'wt') as fh:
-        for line in metadataMatched:
+        for line in metadataBlacklist:
             fh.write(line)
+    
     with gzip.open(args.outfile + "/SequenceMetadata_remainder.tsv.gz", 'wt') as fh:
         for line in metadataRemainder:
             fh.write(line)
 
     print("parsing through sequences...")
-    recordsMatched = []
+    recordsMatched = {}
     recordsRemainder = []
     with lzma.open(args.infile, "rt", encoding='utf-8') as rfh:
         for record in SeqIO.parse(rfh, "fasta"):
-            if (any(record.id in id for id in idToExtract)):
-                recordsMatched.append(record)
+            if (any(record.id in id for id in idToRemove)):
+                for key in idToWhitelist:
+                    if (any(record.id in id for id in idToWhitelist[key])):
+                        if (key not in recordsMatched):
+                            recordsMatched[key] = [record]
+                        else:
+                            recordsMatched[key].append(record)
             else:
                 recordsRemainder.append(record)
 
+
     print("outputting matched sequences...")
-    with lzma.open(args.outfile + "/Sequences_matched.fasta.xz", 'wt', encoding='utf-8') as wfh:
-        for record in recordsMatched:
-            wfh.write(">" + record.id + "\n" + str(record.seq) + "\n")
+    for key in recordsMatched:
+        with lzma.open(args.outfile + "/Sequences_regex_" + key + ".fasta.xz", 'wt', encoding='utf-8') as wfh:
+            for record in recordsMatched[key]:
+                wfh.write(">" + record.id + "\n" + str(record.seq) + "\n")
     
     print("outputting remainder sequences, this step takes a while... go for a break :)")
     with lzma.open(args.outfile + "/Sequences_remainder.fasta.xz", 'wt', encoding='utf-8') as wfh:
