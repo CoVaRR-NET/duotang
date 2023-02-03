@@ -193,10 +193,8 @@ These selection analyses must be interpreted with caution due to the potential f
 
 ```{r setting function for selection estimator, warning=FALSE, message=FALSE, }
 source("scripts/plot_selection_estimator.R")
-
-#startpar <- list(p=c(0.5, 0.1), s=c(0.1, 0.1))
-
-startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
+#startpar <- list(p=c(0.1, 0.01), s=c(0.05, 0.05))
+startpar <- list(p=c(0.5, 0.1, 0.05), s=c(0, 0, 0.05))
 
 setAll=getAllStrictoLineages(meta)
 sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
@@ -210,9 +208,11 @@ sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
 
 mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
 mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
-#color for each lineage
 col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
 
+#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
+#mutantNames = list("BQ*", "XBB*", "the rest") #"
+#col <- c(pal["Omicron BQ"], "XBB"="lightblue")
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
@@ -246,7 +246,7 @@ selectionEstimateFits[["East"]] <- sub.plot.selection.estimate(region="East prov
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
 ```
-
+selection plot display
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis'}
 dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
 apply(dataAvailable.regions,1,function(reg){
@@ -261,7 +261,7 @@ apply(dataAvailable.regions,1,function(reg){
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
   }
   cat("\n\n")})
-  
+
 ```
 
 
@@ -273,12 +273,19 @@ apply(dataAvailable.regions,1,function(reg){
 source("scripts/plot_case_count_selection_estimator.R")
 caseData <- parseCaseData(maxdate)
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
-  #caseCountData <- caseData$ON
-  #selectionEstimateObject<- selectionEstimateFits$ON
-  #filename=NA
-  #caseFit <- (getCaseCountSmoothFit(caseCountData, 5))$y
-  #caseFit <- CubicSplSmooth(caseCountData, 5)$fit
-  caseFit <- 10^(getCaseCountSmoothFitWithLambda(caseCountData)$y)
+  #caseCountData <- caseData$Canada
+  #selectionEstimateObject<- selectionEstimateFits$Canada
+  #filename="test"
+  if (selectionEstimateObject$region == "Canada"){dayToCut = 2} else { dayToCut = 5 }
+  caseCountData$report_type <- "Accurate"
+  caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
+  caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))
+  caseFitLinePredictedValues <- c((10^(predict(caseFitModel, data.frame(x=(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)))[[2]]))$x)
+  caseFitLineValues <- 10^(caseFitModel$y)
+  caseCountFitLine<-data.frame(caseCountData$Reported_Date, c(caseFitLineValues, c(caseFitLinePredictedValues)), caseCountData$report_type)
+  colnames(caseCountFitLine) <- c("Reported_Date", "n", "type")
+  caseCountFitLine <- caseCountFitLine %>% mutate(type = ifelse(type=="UnderReported", "Projected", "Actual"))
+  
   selectionFit <- selectionEstimateObject$fit
   selectionScurves <- selectionEstimateObject$scurves
   selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
@@ -289,30 +296,42 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filen
   selectionNames <- selectionEstimateObject$names
   selectionColors <- selectionEstimateObject$color
   caseSelectionLines <- list()
-  
   #build to total case line.
-  caseSelectionLines[[1]] <- list("line"=(data.frame(caseCountData$Reported_Date, (caseFit))), "names" = "CaseCount", "color"="limegreen")
+  caseSelectionLines[[1]] <- list("line"=caseCountFitLine, "names" = "CaseCount", "color"="limegreen")
 
   #build line for each variant
   for (i in seq(from=2, to=ncol(selectionScurves))){
       x = caseCountData$Reported_Date
-      actual = caseFit[1:length(selectionScurves[,i])] * selectionScurves[,i]
-      proj = caseFit[(length(selectionScurves[,i])+1):length(caseFit)] * selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseFit)]
+      actual = caseCountFitLine$n[1:length(selectionScurves[,i])] * selectionScurves[,i]
+      actual <- actual[!is.na(actual)]
+      if (length(actual) == length(caseCountData$Reported_Date)){
+        proj = NULL
+      } else{
+        proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] *   selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseCountFitLine$n)]
+        proj <- proj[!is.na(proj)]
+      }
       y = c(actual, proj)
       #type <- c(c(rep("actual",length(selectionScurves[,i]))), c(rep("projection", length(caseFit) - length(selectionScurves[,i]))))
-      line <- data.frame(x,y)
+      line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
+      colnames(line) <- c("Reported_Date", "n", "type")
       caseSelectionLines[[i]] <- list("line"=line, "names" = selectionNames[[i-1]], "color"=selectionColors[i-1])
   }
-  
+
   #build the line for  "the rest"
   x <- caseCountData$Reported_Date
-  actual = caseFit[1:length(selectionScurves[,1])] * selectionScurves[,1]
-  proj = caseFit[(length(selectionScurves[,i])+1):length(caseFit)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseFit)]
-  y = c(actual, proj)
-  line <- data.frame(x,y)
+  actual = caseCountFitLine$n[1:length(selectionScurves[,1])] * selectionScurves[,1]
+  actual <- actual[!is.na(actual)]
+  if (length(actual) == length(caseCountData$Reported_Date)){
+    proj = NULL
+  } else{
+    proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseCountFitLine$n)]
+    proj <- proj[!is.na(proj)]
+  }
+  y = unique(c(actual, proj))
+  line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
+  colnames(line) <- c("Reported_Date", "n", "type")
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
-
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),numActualDatapoints=nrow(selectionScurves),filename=filename)
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),filename=filename)
 }
 
 ```
@@ -335,114 +354,6 @@ apply(dataAvailable.regions,1,function(reg){
 
   cat("\n\n")})
   
-```
-
-## Canadian trees {.tabset}  
-Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
-
-```{r message=FALSE}
-### metadata and trees
-source("scripts/tree.r")
-
-# load trees from files
-mltree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk")
-ttree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.timetree.nwk")
-recombTTree <- read.tree("./data_needed/aligned_recombinant_XBBS_sample1.timetree.nwk")
-#stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
-
-# tips are labeled with [fasta name]_[lineage]_[coldate]
-# extracting just the first part makes it easier to link to metadata
-mltree$tip.label <- reduce.tipnames(mltree$tip.label)
-ttree$tip.label <- reduce.tipnames(ttree$tip.label)
-recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
-
-
-fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
-               "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","month","week")
-
-# extract rows from metadata table that correspond to ttree 
-metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
-# sort rows to match tip labels in tree
-metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
-
-#omi tree metadata
-metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
-
-#recomb tree metadata
-mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
-mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$fasta_header_name), ]
-
-#scale to number of mutations
-mltree$edge.length <- mltree$edge.length*29903
-mltree <- ladderize(mltree, FALSE)
-
-###Time Tree
-ttree$edge.length[ttree$edge.length == 0] <- 1e-4
-#ttree <- ladderize(ttree, FALSE)
-recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
-#recombTTree <- ladderize(recombTTree, FALSE)
-
-hab=unique(meta$host_age_bin)
-hab=hab[order(hab)]
-months=unique(meta$month)
-months=as.character(months[order(months)])
-weeks=unique(meta$week)
-weeks=as.character(weeks[order(weeks)])
-presetColors=data.frame(name=c("other",
-                               VOCVOI$name,
-                               hab,
-                               months,
-                               weeks), 
-                        color=c("#777777",
-                                VOCVOI$color,
-                                rev(hcl.colors(length(hab)-1, "Berlin")),"#777777",
-                                hcl.colors(length(months), "Berlin"),
-                                hcl.colors(length(weeks), "Berlin")
-                                ))
-
-#suppressWarnings({
-#  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
-#})
-#idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
-#anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames)
-recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, fieldnames)
-#diversity ML tree
-diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
-
-### omicron diversity tree
-MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
-
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
-```
-
-
-### Time Tree {.active}
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-  r2d3(data=timeTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="ttree-element")
-```
-
-### Diversity Tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=diversityTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="mltree-element")
-```
-
-### Omicron diversity tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=OmicrondiversityTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="omimltree-element")
-
-```
-
-### Recombinant time tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=recombTimeTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="recombttree-element")
-
 ```
 
 
@@ -468,14 +379,14 @@ sapply(tip.label, function(x) {
 }
 
 source("scripts/fit-rtt.R")
-fit1 <- fit.rtt("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk", plot=TRUE)
+fit1 <- fit.rtt("./data_needed/aligned_allSeqs_sample1.rtt.nwk", plot=TRUE)
 
 ```
 
 
 ```{r}
-fit2 <- fit.rtt("data_needed/aligned_nonrecombinant_sample2.rtt.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/aligned_nonrecombinant_sample3.rtt.nwk", plot=FALSE)
+fit2 <- fit.rtt("data_needed/aligned_allSeqs_sample2.rtt.nwk", plot=FALSE)
+fit3 <- fit.rtt("data_needed/aligned_allSeqs_sample3.rtt.nwk", plot=FALSE)
 ```
 
 

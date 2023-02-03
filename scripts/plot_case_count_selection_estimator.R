@@ -126,11 +126,10 @@ CubicSplSmooth3 <- function(data, lambda=10^3) {
 
 
 #plot the casecount by selection estimate. 
-plotCaseCountByDate2 <- function(countData, lineFits, numActualDatapoints, filename=NA){
+plotCaseCountByDate2 <- function(countData, lineFits, filename=NA){
   #countData <- caseCountData
   #lineFits <-rev(caseSelectionLines)
-  #numActualDatapoints <- 121
-  #filename = "ON"
+  #filename = "test"
   if (!c("Reported_Date", "n") %in% colnames(countData)){
     stop("Possible corrupted countData. Expected column: Reported_Date and n.")
   }
@@ -142,93 +141,53 @@ plotCaseCountByDate2 <- function(countData, lineFits, numActualDatapoints, filen
       stop("Possible corrupted lineFits Expected key: line, color, name")
     }
     fitData <- lineFits[[i]]$line
-    colnames(fitData) <- c("Reported_Date", lineFits[[i]]$names)
-    countData<- merge(countData, fitData, by = "Reported_Date", all = T)
+    colnames(fitData) <- c("Reported_Date", lineFits[[i]]$names, "type")
+    countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T)
     colors[lineFits[[i]]$names] = lineFits[[i]]$color
     rValues[lineFits[[i]]$names] = round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2)
   }
-  countData$type <- c(rep("actual", numActualDatapoints), rep("projection", nrow(countData) - numActualDatapoints))
-  #view(countData)
-  d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "type")) 
+  
+  countData$type <- lineFits[[2]]$line$type
+  
+  d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) 
   d$variable <- factor(d$variable , levels=levels(fct_relevel(sort(levels(d$variable)), "The Rest", after=0)))
   legendValues <- d %>% dplyr::select(variable) %>% mutate(variable = as.character(variable)) %>% unique() %>% 
     mutate(colorToUse = colors[variable]) %>% mutate(nameWithR = paste0(variable, "\n(r = ", rValues[variable], "%)")) %>%
     arrange(factor(variable, levels = levels(d$variable)))
   legendColors <- legendValues$colorToUse
   legendLabels <- legendValues$nameWithR
-  #duplicate the last row of the actual data so projections are show continiously.
-  lastDayActual <- d %>% filter(type == "actual") %>% filter(Reported_Date == max(Reported_Date)) %>% mutate(type="projection")
-  #firstDayProjectiond <- d %>% filter(type == "projection") %>% filter(Reported_Date == min(Reported_Date)) %>% mutate(type="actual")
-  d <- rbind(d, lastDayActual) #%>% rbind(firstDayProjectiond)
-  #view(d %>% filter(type=="actual"))
+  #duplicate the last row of the actual/accurate data so projections are show continiously.
+  lastDayActual <- d %>% filter(type == "Actual") %>% filter(Reported_Date == max(Reported_Date)) %>% mutate(type="Projected")
+  lastDayAccurate <- d %>% filter(report_type == "Accurate") %>% filter(Reported_Date == max(Reported_Date)) %>% mutate(report_type="UnderReported")
+  lastDayAccurate$value=NA
+  d <- rbind(d, lastDayActual) %>% rbind(lastDayAccurate)
+  #view(d)
+  caseCountLabel <- paste0("Case Count\n(r = ", rValues["CaseCount"], "%)")
   p<- ggplot() +
-    geom_area(data = d[d$type=="actual",], mapping = aes(x=Reported_Date, y=value, fill=variable),size = 0.5, alpha = 0.6, color="white", linetype="solid")+
-    geom_area(data = d[d$type=="projection",], mapping = aes(x=Reported_Date, y=value, fill=variable), size = 0.5, alpha = 0.3,color="white",  linetype="dotted")+
+    geom_area(data = d[d$type=="Actual" & d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=value, fill=variable),size = 0.5, alpha = 0.6, color="white", linetype="solid")+
+    geom_area(data = d[d$type=="Projected" & d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=value, fill=variable), size = 0.5, alpha = 0.3,color="white",  linetype="dotted")+
     #geom_area(data = d, mapping = aes(x=Reported_Date, y=value, fill=variable, alpha=type))+
     scale_fill_manual(name = "Variants", labels = legendLabels, values = legendColors) +
-    #scale_alpha_manual(name = NULL, labels = c("Actual", "Projected"), values = c(0.6, 0.4)) +
-    geom_line(data = d, mapping = aes(x=Reported_Date, y=CaseCount, linetype = "Total Cases"), color = 'darkgreen', size = 1) +
-    scale_linetype_manual(name = NULL, labels = c(paste0("Total \n(r = ", rValues["CaseCount"], "%)")), values = c("solid"))+
-    geom_point(data = d, mapping = aes(x = Reported_Date, y=n, shape="Cases per day"), size=2, color = "limegreen") +
-    scale_shape_manual(name = NULL, labels = c("Cases per day"), values=c(19)) +
+    #scale_alpha_manual(name = NULL, labels = c("Actual", "Projected"), values = c(0.6, 0.4)) +    
+    geom_point(data = d, mapping = aes(x = Reported_Date, y=n, shape=report_type), size=2, color = "limegreen") +
+    #scale_shape_manual(name = NULL, values=c(19)) +
+    scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
+    geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
+
     ylim(0, max(countData$n)) + 
     xlab("Sample collection date") +
     ylab("Age 70+ case count") +
-    labs(caption = paste0("Last day of genomic data (Darker colors) is ", max((d %>% filter(type=="actual"))$Reported_Date),
-                          "\n Last day of cases count data is ", max((d %>% filter(type=="projection"))$Reported_Date))) +
-    theme_bw() 
-  
-  
+
+    theme_bw() +
+    guides(`Case Count` = guide_legend(order = 0),
+           Variants = guide_legend(order =2)) +
+    labs(caption = paste0("Last day of genomic data (Darker colors) is ", max((d %>% filter(type=="Actual"))$Reported_Date),
+                          "\n Last day of accurate cases count data is ", max((d %>% filter(report_type=="Accurate"))$Reported_Date))) +
+    theme(legend.text=element_text(size=12), text = element_text(size = 20)) 
   
     if (!is.na(filename)){
       p <- p + ggtitle(paste0("Dataset: ", filename))
       ggsave(paste0("casecount_",filename, ".png"), plot = p, width = 11, height = 8)
     }
   return (p)
-}
-
-
-plotCaseCountByDate <- function(countData, lineFits, filename=NA ){
-  countData <- caseCountData
-  lineFits <-rev(caseSelectionLines)
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
-  plot(countData$Reported_Date, as.numeric(countData$n), 
-       xaxt="n", xlab="Sample collection date",
-       ylim=c(0,max(countData$n)+20), ylab="Age 60+ Case Counts",  
-       pch = 20, col = "limegreen")
-  axis(side = 1, at = pretty(countData$Reported_Date), label = format(pretty(countData$Reported_Date),"%b"))
-  for (i in seq(1:length(lineFits))){
-    if (!c("line", "color", "names") %in% names(lineFits[[i]])){
-      stop("Possible corrupted lineFits Expected key: line, color, name")
-    }
-    X <- countData$Reported_Date[0:length(lineFits[[i]]$line)]
-    Y <- lineFits[[i]]$line
-    color <-lineFits[[i]]$color
-    print(i)
-    
-    if (i != length(lineFits)){
-      for (j in seq(1:i)){
-        if (j == i){
-          Y <- Y
-        } else{
-          Y <- Y + lineFits[[j]]$line
-        }
-      }
-    }
-
-    lines(X, Y, col=color, lwd=2)
-    r = log(rev(Y)[1]/rev(Y)[2]) * 100
-    text(x=X[1]-5, y=(max(countData$n) + 20 - ((max(countData$n)/20)*(i-1))), paste0 (lineFits[[i]]$names, " (r = ", round(r, 2),"%)"), col=color, pos=4, cex = 0.85)
-    
-    if (lineFits[[i]]$names != "CaseCount"){
-      polygon(c(min(X),X, max(X)),c(min(Y),Y, max(Y)), col = alpha(color, 0.4))
-    }
-  }
-  if (!is.na(filename)){
-    title(main=paste0("Dataset: ", filename))
-    dev.copy(png,paste0("casecount_",filename, ".png"))
-    dev.off()
-  }
 }

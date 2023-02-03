@@ -17,9 +17,9 @@
 console = d3.window(div.node()).console;
 //console.log(data)
 
-
 //set the default color scheme
-var defaultColorBy = "pango_group"
+if (data.defaultColorBy == null){var defaultColorBy = "pango_group"}
+else{defaultColorBy = data.defaultColorBy[0]}
 //sets the default colors. 
 var defaultColorList = ["#A6CEE3", "#1F78B4",  "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F","#B2DF8A", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928"];
 var presetColors = {}
@@ -29,11 +29,18 @@ for(var i = 0; i < data.VOCVOI.length; i++){
 //sets scaling factors
 var scalingFactors = {
   "timetree": 1,
-  "mltree": 0.8,
-  "omimltree": 0.95,
-  "recombtimetree": 0.95,
+  "mltree": 0.7,
+  "omimltree": 0.11,
+  "recombtimetree": 1,
 };
+var axisOrientations ={
+  "timetree": 1,
+  "mltree": 0,
+  "omimltree": 0,
+  "recombtimetree": 1,
+}
 var scalingFactor = scalingFactors[data.treetype]
+var axisOrientation = axisOrientations[data.treetype]
 
 function absolutePosition(el) {
   // https://stackoverflow.com/questions/25630035/javascript-getboundingclientrect-changes-while-scrolling
@@ -254,7 +261,12 @@ function updateTree(drawNodes = false) {
     })
   }
   // draw x-axis labels
-  var xAxisScale = d3.scaleLinear().domain([xmax, 0]).range([0, gwidth-100])
+  if (axisOrientation == 1){
+      var xAxisScale = d3.scaleLinear().domain([xmax, 0]).range([0, gwidth-100])
+  }else{
+      var xAxisScale = d3.scaleLinear().domain([0, xmax]).range([0, gwidth-100])
+  }
+  
   var xAxis = d3.axisBottom(xAxisScale)
                   .scale(xAxisScale);
   tg.attr("class", "x axis")

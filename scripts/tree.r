@@ -1,6 +1,6 @@
 #code used to draw interactive phylogenetic trees by Justin Jia https://github.com/bfjia
 
-DrawTree <- function(tree, metadata, treeType, VOCVOI, fieldnames = c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
+DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pango_group", fieldnames = c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
                                                     "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing",
                                                     "lineage", "pango.group")){
   suppressWarnings(tt.layout <- tree.layout(tree, type='r'))
@@ -23,7 +23,7 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, fieldnames = c("fasta.hea
       colour=e[1,]$colour)
   }))
   edges <- merge(tt.layout$edges, v.edges, all=TRUE)  # tips, internals
-  jsonObj <- toJSON(list(nodes=tt.layout$nodes, edges=edges, treetype=treeType, VOCVOI=VOCVOI))
+  jsonObj <- toJSON(list(nodes=tt.layout$nodes, edges=edges, treetype=treeType, defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
   
   return(jsonObj)
 }

@@ -35,6 +35,10 @@ while [[ $# -gt 0 ]]; do
       OVERWRITE="YES"
       shift # past argument
       ;;
+	--clean)
+      CLEAN="YES"
+      shift # past argument
+      ;;
 	--buildmain)
       BUILDMAIN="YES"
       shift # past argument
@@ -60,6 +64,7 @@ if [ -z "$data_dir" ]; then data_dir="data_needed"; fi
 if [ -z "$scripts_dir" ]; then scripts_dir="scripts"; fi
 if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
+if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 
 echo "Datestamp used: ${DATE}"
 echo "Date source: ${SOURCE}"
@@ -67,6 +72,7 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Main branch build mode: ${BUILDMAIN}"
+echo "clean up mode: ${BUILDMAIN}"
 
 datestamp=$DATE
 
@@ -84,7 +90,12 @@ function jumpTo ()
 if [ "$BUILDMAIN" = "YES" ]; then 
 	eval "$(conda shell.bash hook)"
 	conda activate duotang
-	jumpTo nex2nwk 
+	jumpTo treecleaned 
+fi
+if [ "$CLEAN" = "YES" ]; then 
+	eval "$(conda shell.bash hook)"
+	conda activate duotang
+	jumpTo cleanup
 fi
 
 #checkpoint logics
@@ -189,7 +200,7 @@ wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/
 wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv
 wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv
 wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
-gzip -f ${data_dir}/AgeCaseCount*
+gzip -f ${data_dir}/AgeCaseCount*.csv
 
 echo "casecount" > $checkPointFile
 #casecount:
@@ -277,12 +288,21 @@ echo "archive" > $checkPointFile
 
 #archive
 if [ "$BUILDMAIN" = "YES" ]; then 
+	git status
 	git add *.html
-	git commit -m "update: $datestamp"
+	git add archive/*.html
+	git commit -m "Update: $datestamp"
 	git push origin main
 fi
 
 echo "Update completed successfully"
 echo "finish" > $checkPointFile
+
+
+#cleanup:
+if [ "$CLEAN" = "YES" ]; then 
+	echo "Removing temporary files..."
+	mkdir -p ${data_dir}/$datestamp
+fi
 
 conda deactivate

@@ -37,8 +37,7 @@ theme_set(theme_classic())
 opts_knit$set(root.dir = getwd())
 ```
 
-
-```{r variables, include=FALSE, warning=FALSE}
+```{r load_data}
 ############################
 ##### GLOBAL VARIABLES #####
 ############################
@@ -82,40 +81,6 @@ all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey' # named character vector
-```
-##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
-
-### Contributing authors:  
-
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Justin Jia, Zohaib Anwar and Erin Gill.
-Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and William Hsiao. 
-
-Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
-A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
-
-
-# Introduction  
-
-This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
-It is for discussion with pillar 6's team and for sharing with collaborators, e.g. public health labs.
-These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
-
-Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
-Only representations of aggregate data will be posted here.
-
-**Important caveats and disclaimers:**  
-These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
-Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
-
-For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
-When possible, these differences in sampling strategies are mentioned but they are not always known.
-With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
-Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
-
-Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
-These analyses are subject to frequent change given new data and updated lineage designations.
-
-```{r load_data}
 
 ## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
 #Download metadata from VirusSeq, put the date here:
@@ -174,6 +139,40 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 ```
 
 
+##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
+
+### Contributing authors:  
+
+Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Justin Jia, Zohaib Anwar and Erin Gill.
+Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and William Hsiao. 
+
+Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
+A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
+
+
+# Introduction  
+
+This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
+It is for discussion with pillar 6's team and for sharing with collaborators, e.g. public health labs.
+These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
+
+Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
+Only representations of aggregate data will be posted here.
+
+**Important caveats and disclaimers:**  
+These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
+Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
+
+For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
+When possible, these differences in sampling strategies are mentioned but they are not always known.
+With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
+Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
+
+Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
+These analyses are subject to frequent change given new data and updated lineage designations.
+
+The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
+
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 source("scripts/scanlineages.R")
@@ -224,7 +223,7 @@ BQ.1.1 is peaking at this time in Canada, with XBB.1.5 still the primary variant
  * BN.1* subvariants due to high predicted immune evasion
  * BQ.1* new descendants
  * BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
- * CH.1.1 (descendant of BM which is BA.2.75.3) and some sublineages recently detected in Canada such as CH.1.1.3
+ * CH.1.1 (descendant of BM which is BA.2.75.3) and some sublineages recently detected in Canada such as CH.1.1.2
  * CJ.1 with S:F486P (but not showing growth in Canada)
  * DS.1 (highest predicted immune evasion)
  * XAY.2 (BA.2/Delta recombinant with Delta’s S:L452R mutation plus the S:F486P mutation)
@@ -401,29 +400,38 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages rising in frequency are the BQ.* group, which descend from BA.5\*.  We first show this growth of BQ.\* and other BA.5* (here excluding BQ.\*), relative to the remaining strains, which consist predominantly of BA.2* and BA.4\*. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BQ.\* or BA.5\*)/freq(other)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BW\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
 **Caveat:**
-These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
+These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
 
 
 
-```{r setting function for selection estimator}
+```{r, warning=FALSE, message=FALSE}
 source("scripts/plot_selection_estimator.R")
 
-startpar3 <- list(p=c(0.8, 0.1), s=c(0.1, 0.1))
+startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
+#startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
 
 setAll=getAllStrictoLineages(meta)
-sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
+#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
 sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
+sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
 
-setAll=setAll[!setAll %in% sublineages_BA5]
-sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
+#setAll=setAll[!setAll %in% sublineages_BA5]
+setAll=setAll[!setAll %in% sublineages_BQ]
+setAll=setAll[!setAll %in% sublineages_XBB]
 
+mutants = list(sublineages_BQ, sublineages_XBB)
+mutantNames = list("BQ*", "XBB*", "the rest") #"
+col <- c(pal["Omicron BQ"], "XBB"="lightblue")
+
+#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
+#mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
 #color for each lineage
-col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
+#col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
@@ -432,88 +440,49 @@ col <- c(pal["Omicron BA.5"], pal["Omicron BQ"])
 startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
 
 sub.plot.selection.estimate <- function(region,maxdate=NA){
-  maxdate=plot.selection.estimate(region=region,
-                                        startdate=startdate, startpar=startpar3,
+  obj=plot.selection.estimate.ggplot(region=region,
+                                        startdate=startdate, startpar=startpar,
                                         reference=c(setAll),
-                                        mutants=list(sublineages_BA5,sublineages_BQ),
-                                        names=list("BA.5*","BQ*","the rest"),
+                                        mutants=mutants,
+                                        names=mutantNames,
                                         maxdate=maxdate, col=col)
-  return(maxdate)
+  return(obj)
 }
 
+selectionEstimateFits <- list()
+selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
+maxdate=selectionEstimateFits[["Canada"]]$date
+selectionEstimateFits[["BC"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
+selectionEstimateFits[["BC"]]$plot1 <- NULL
+#sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
+selectionEstimateFits[["AB"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
+selectionEstimateFits[["SK"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
+selectionEstimateFits[["SK"]]$plot1 <- NULL
+
+selectionEstimateFits[["MB"]] <- sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
+selectionEstimateFits[["ON"]] <- sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
+selectionEstimateFits[["QC"]] <- sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
+selectionEstimateFits[["East"]] <- sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
 #####################################################
 # tabs for displaying in notebook
 #each PT tab should have curve plot and breakpoint plot side by side
 ```
 
-
-### Canada
-#### Canada
-
-```{r selection estimator Canada, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-source("scripts/plot_selection_estimator.R")
-selectionEstimateFits <- list()
-obj = sub.plot.selection.estimate(region="Canada")
-maxdate=obj$date
-selectionEstimateFits[["Canada"]] <- obj$fit
-```
-
-
-### BC
-#### British Columbia
-
-```{r selection estimator BC, message=FALSE, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-
-print("Not enough data available")
-#local_maxdate=sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
-#selectionEstimateFits[["BC"]]  <- (sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate))
-
-```
-
-### AB
-#### Alberta
-
-```{r selection estimator AB, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-selectionEstimateFits[["AB"]] <- (sub.plot.selection.estimate(region="Alberta",maxdate=maxdate))
-```
-
-
-### SK
-#### Saskatchewan
-
-```{r selection estimator SK, echo=FALSE, fig.height=5, fig.show="hold", fig.width=5, message=FALSE, warning=FALSE, out.width="50%"}
-selectionEstimateFits[["SK"]] <- (sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate))
-```
-
-
-### MB
-#### Manitoba
-
-```{r selection estimator MB, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-selectionEstimateFits[["MB"]] =sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
-```
-
-### ON
-#### Ontario
-
-```{r selection estimator ON, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-selectionEstimateFits[["ON"]] <- (sub.plot.selection.estimate(region="Ontario",maxdate=maxdate))
-
-```
-
-
-### QC
-#### Quebec
-
-```{r selection estimator QC, message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-selectionEstimateFits[["QC"]] <- (sub.plot.selection.estimate(region="Quebec",maxdate=maxdate))
-```
-
-### East
-#### East provinces
-
-```{r selection estimator East prov., message=FALSE , warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%", eval=FALSE}
-selectionEstimateFits[["East"]] <- (sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate))
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis'}
+dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
+apply(dataAvailable.regions,1,function(reg){
+  cat("###", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("####",reg[["name"]],"\n","\n")
+  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
+  {cat("Not enough data available")}
+  else {
+    print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
+    print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
+  }
+  cat("\n\n")})
+  
 ```
 
 ## {.unlisted .unnumbered}
@@ -667,19 +636,18 @@ There are two Pango lineages that have a Canadian origin and that predominately 
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
 
-
 ## Canadian trees {.tabset}  
-
 Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
-<!-- SUGGESTION: it might be nice to colour the Omicron tree by Pango sublineage names (e.g., BA.2.12.1) -->
+The x-axis of the time trees represent the number of years from today for which SARS-CoV-2 first emerged. The x-axis of the diversity trees shows the number of mutations from the reference Wuhan-1 sequence for diversity trees. 
 
 ```{r message=FALSE}
 ### metadata and trees
 source("scripts/tree.r")
 
 # load trees from files
-mltree <- read.tree("./data_needed/aligned_allSeqs_sample1.rtt.nwk")
-ttree <- read.tree("./data_needed/aligned_allSeqs_sample1.timetree.nwk")
+mltree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk")
+ttree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.timetree.nwk")
+recombTTree <- read.tree("./data_needed/aligned_recombinant_XBBS_sample1.timetree.nwk")
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
@@ -687,6 +655,7 @@ dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 # extracting just the first part makes it easier to link to metadata
 mltree$tip.label <- reduce.tipnames(mltree$tip.label)
 ttree$tip.label <- reduce.tipnames(ttree$tip.label)
+recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
 
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
@@ -701,6 +670,10 @@ metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 #omi tree metadata
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
 
+#recomb tree metadata
+mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
+mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$fasta_header_name), ]
+
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
 mltree <- ladderize(mltree, FALSE)
@@ -708,6 +681,8 @@ mltree <- ladderize(mltree, FALSE)
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
 #ttree <- ladderize(ttree, FALSE)
+recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
+#recombTTree <- ladderize(recombTTree, FALSE)
 
 hab=unique(meta$host_age_bin)
 hab=hab[order(hab)]
@@ -732,15 +707,15 @@ presetColors=data.frame(name=c("other",
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames)
-
+timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames=fieldnames)
+recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, "lineage", fieldnames= fieldnames)
 #diversity ML tree
-diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames)
+diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
 
 ### omicron diversity tree
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames)
+OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
 ```
 
 
@@ -748,6 +723,13 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
   r2d3(data=timeTreeJsonObj, 
      script="js/tree.js", container="div", elementId="ttree-element")
+```
+
+### XBB* time tree
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=recombTimeTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="recombttree-element")
+
 ```
 
 ### Diversity Tree
@@ -762,6 +744,7 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
      script="js/tree.js", container="div", elementId="omimltree-element")
 
 ```
+
 
 <!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
 
