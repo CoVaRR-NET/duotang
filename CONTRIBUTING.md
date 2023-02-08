@@ -25,6 +25,10 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
    * [bbmle](https://cran.r-project.org/web/packages/bbmle/index.html)
    * [HelpersMG](https://cran.r-project.org/web/packages/HelpersMG/index.html)
    * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
+   * [DT](https://cran.r-project.org/web/packages/DT/index.html)
+   * [shiny](https://cran.r-project.org/web/packages/shiny/index.html)
+   * [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
+   * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
