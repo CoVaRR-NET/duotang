@@ -19,6 +19,7 @@ params:
   value: "2023-01-30"
 ---
 
+
 ```{r setup, include=FALSE, warning=FALSE}
 library(tidyr)
 library(knitr) # Needed to set root directory
@@ -115,9 +116,6 @@ for(row in 1:nrow(epidataCANall)) {
   }
 }
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
-
-
-  
 ```
 
 
@@ -241,9 +239,6 @@ sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
                                                             FALSE,FALSE,FALSE,
                                                             FALSE,TRUE,TRUE))
 
-
-
-    
 plotted=c()
 tmp=apply(sublineagestoplot,1,function(sub){
   cat("###", sub[["tabname"]], "\n")
@@ -389,191 +384,8 @@ For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preex
 **Caveat:**
 These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
 
-
-
-```{r, warning=FALSE, message=FALSE}
-source("scripts/plot_selection_estimator.R")
-
-startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-#startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
-
-setAll=getAllStrictoLineages(meta)
-#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
-sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
-sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
-
-#setAll=setAll[!setAll %in% sublineages_BA5]
-setAll=setAll[!setAll %in% sublineages_BQ]
-setAll=setAll[!setAll %in% sublineages_XBB]
-
-mutants = list(sublineages_BQ, sublineages_XBB)
-mutantNames = list("BQ*", "XBB*", "the rest") #"
-col <- c(pal["Omicron BQ"], "XBB"="lightblue")
-
-#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
-#mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
-#color for each lineage
-#col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
-
-#Set a starting date
-#Note that the startdate shouldn't be too much before both alleles become common
-#or rare migration events that die off could throw off the estimation procedure 
-#(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
-
-sub.plot.selection.estimate <- function(region,maxdate=NA){
-  obj=plot.selection.estimate.ggplot(region=region,
-                                        startdate=startdate, startpar=startpar,
-                                        reference=c(setAll),
-                                        mutants=mutants,
-                                        names=mutantNames,
-                                        maxdate=maxdate, col=col)
-  return(obj)
-}
-
-selectionEstimateFits <- list()
-selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
-maxdate=selectionEstimateFits[["Canada"]]$date
-selectionEstimateFits[["BC"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
-selectionEstimateFits[["BC"]]$plot1 <- NULL
-#sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
-selectionEstimateFits[["AB"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
-selectionEstimateFits[["SK"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
-selectionEstimateFits[["SK"]]$plot1 <- NULL
-
-selectionEstimateFits[["MB"]] <- sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
-selectionEstimateFits[["ON"]] <- sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
-selectionEstimateFits[["QC"]] <- sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
-selectionEstimateFits[["East"]] <- sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
-#####################################################
-# tabs for displaying in notebook
-#each PT tab should have curve plot and breakpoint plot side by side
+```{r selection, child="selection.Rmd"}
 ```
-
-```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis'}
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
-apply(dataAvailable.regions,1,function(reg){
-  cat("###", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("####",reg[["name"]],"\n","\n")
-  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
-  {cat("Not enough data available")}
-  else {
-    print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
-    print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
-  }
-  cat("\n\n")})
-  
-```
-
-## {.unlisted .unnumbered}
-
-### BA.2 sublineages selection {.tabset}
-
-```{r general settings for selection estimator BA.2}
-source("scripts/scanlineages.R")
-plotsubvariant <- function(region,min,parentalnode){
-  nplot=0
-  for(p in allparams) {
-    if(!any(is.na(p$fit)) && 
-       p$region==region && 
-       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
-       isSubLineage(parentalnode,p$mut[[1]])){
-      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
-          plot.selection(plotparam=p)
-          nplot=nplot+1
-      }
-    }
-  }
-  if(nplot==0){
-    print("Not enough data available")
-  }
-}
-
-
-plotba2 <- function(region,min){
-  plotsubvariant(region,min,"BA.2*")
-}
-
-
-
-plotba5 <- function(region,min){
-  plotsubvariant(region,min,"BA.5*")
-}
-
-
-plotothers <- function(region,min){
-  nplot=0
-  for(p in allparams) {
-    if(!any(is.na(p$fit)) && 
-       p$region==region && 
-       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
-       !isSubLineage("BA.2*",p$mut[[1]])){
-      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
-          plot.selection(plotparam=p)
-          nplot=nplot+1
-      }
-    }
-  }
-  if(nplot==0){
-    print("Not enough data available")
-  }
-}
-
-
-```
-
-
-Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-
-```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-tmp=apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"\n","\n")
-  plotba2(reg[["name"]],n_min)
-  cat("\n\n")})
-  
-```
-
-
-
-### BA.5 sublineages selection {.tabset}
-
-Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-
-
-```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-tmp=apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
-  plotba5(reg[["name"]],n_min)
-  cat("\n\n")})
-  
-```
-
-<!-- ### Other sublineages selection {.tabset} -->
-
-<!-- Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection. -->
-
-
-
-<!-- ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'} -->
-<!-- tmp=apply(all.regions,1,function(reg){ -->
-<!--   cat("####", reg[["shortname"]], "\n") -->
-<!--   n_min=20 -->
-<!--   if(reg[["name"]]=="Canada"){n_min=50} -->
-<!--   cat("#####",reg[["name"]],"(n>",n_min,")\n","\n") -->
-<!--   plotothers(reg[["name"]],n_min) -->
-<!--   cat("\n\n")}) -->
-
-<!-- ``` -->
 
 ## Variants in Canada over time
 
@@ -618,179 +430,15 @@ There are two Pango lineages that have a Canadian origin and that predominately 
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
 
+
 ## Canadian trees {.tabset}  
-Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
-The x-axis of the time trees represent the number of years from today for which SARS-CoV-2 first emerged. The x-axis of the diversity trees shows the number of mutations from the reference Wuhan-1 sequence for diversity trees. 
 
-```{r message=FALSE}
-### metadata and trees
-source("scripts/tree.r")
-
-# load trees from files
-mltree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk")
-ttree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.timetree.nwk")
-recombTTree <- read.tree("./data_needed/aligned_recombinant_XBBS_sample1.timetree.nwk")
-#stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
-
-# tips are labeled with [fasta name]_[lineage]_[coldate]
-# extracting just the first part makes it easier to link to metadata
-mltree$tip.label <- reduce.tipnames(mltree$tip.label)
-ttree$tip.label <- reduce.tipnames(ttree$tip.label)
-recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
-
-
-fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
-               "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","month","week")
-
-# extract rows from metadata table that correspond to ttree 
-metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
-# sort rows to match tip labels in tree
-metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
-
-#omi tree metadata
-metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
-
-#recomb tree metadata
-mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
-mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$fasta_header_name), ]
-
-#scale to number of mutations
-mltree$edge.length <- mltree$edge.length*29903
-mltree <- ladderize(mltree, FALSE)
-
-###Time Tree
-ttree$edge.length[ttree$edge.length == 0] <- 1e-4
-#ttree <- ladderize(ttree, FALSE)
-recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
-#recombTTree <- ladderize(recombTTree, FALSE)
-
-hab=unique(meta$host_age_bin)
-hab=hab[order(hab)]
-months=unique(meta$month)
-months=as.character(months[order(months)])
-weeks=unique(meta$week)
-weeks=as.character(weeks[order(weeks)])
-presetColors=data.frame(name=c("other",
-                               VOCVOI$name,
-                               hab,
-                               months,
-                               weeks), 
-                        color=c("#777777",
-                                VOCVOI$color,
-                                rev(hcl.colors(length(hab)-1, "Berlin")),"#777777",
-                                hcl.colors(length(months), "Berlin"),
-                                hcl.colors(length(weeks), "Berlin")
-                                ))
-
-#suppressWarnings({
-#  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
-#})
-#idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
-#anc <- levels(as.factor(metasub1$pango.group))[idx]
-timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames=fieldnames)
-recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, "lineage", fieldnames= fieldnames)
-#diversity ML tree
-diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
-
-### omicron diversity tree
-MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
-
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
+```{r trees, child="trees.Rmd"}
 ```
-
-
-### Time Tree {.active}
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-  r2d3(data=timeTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="ttree-element")
-```
-
-### XBB* time tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=recombTimeTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="recombttree-element")
-
-```
-
-### Diversity Tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=diversityTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="mltree-element")
-```
-
-### Omicron diversity tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=OmicrondiversityTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="omimltree-element")
-
-```
-
-
-<!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
-
-<!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
-
-
 
 ## Root-to-tip analyses  
 
-The slope of root-to-tip plots over time provide an estimate of the substitution rate.
-A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
-
-```{r, dpi=300}
-
-get.tipnames <- function(tip.label) {
-sapply(tip.label, function(x) {
-  tokens <- strsplit(x, "_")[[1]]
-  ntok <- length(tokens)
-  paste(tokens[1:(ntok-2)], collapse='_')
-  })
-}
-
-source("scripts/fit-rtt.R")
-fit1 <- fit.rtt("./data_needed/aligned_allSeqs_sample1.rtt.nwk", plot=TRUE)
-
-```
-
-
-```{r}
-fit2 <- fit.rtt("data_needed/aligned_allSeqs_sample2.rtt.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/aligned_allSeqs_sample3.rtt.nwk", plot=FALSE)
-```
-
-
-### Molecular clock estimates (based on three independent subsamples)
-
-Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest, with their 95% confidence interval.
-
-```{r}
-
-if(!is.null(fit1)){
-est1 <- get.ci(fit1); est1$rep <- 'Rep1'
-est2 <- get.ci(fit2); est2$rep <- 'Rep2'
-est3 <- get.ci(fit3); est3$rep <- 'Rep3'
-sec.frame <- rbind(est1, est2, est3)
-sec.frame$est[sec.frame$est < 0] <- 0
-sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
-sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
-
-pal <- VOCVOI$color
-names(pal) <- VOCVOI$name
-pal["other"] <- "white"
-
-ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
-  geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
-  scale_fill_manual(values=pal) + 
-  theme(axis.text.x = element_text(size=9, angle=45, hjust=1, vjust=0.95),
-        legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
-  geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.7,
-                position=position_dodge(1)) +
-  labs(y="Substitutions / Genome / Day",
-       x="Lineage", fill="Subsample")
-}
-
+```{r rtt, child="rtt.Rmd"}
 ```
 
 # Future development
