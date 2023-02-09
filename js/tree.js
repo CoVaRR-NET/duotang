@@ -29,8 +29,8 @@ for(var i = 0; i < data.VOCVOI.length; i++){
 //sets scaling factors
 var scalingFactors = {
   "timetree": 1,
-  "mltree": 0.7,
-  "omimltree": 0.11,
+  "mltree": 1,
+  "omimltree": 1,
   "recombtimetree": 1,
 };
 var axisOrientations ={
@@ -39,8 +39,8 @@ var axisOrientations ={
   "omimltree": 0,
   "recombtimetree": 1,
 }
-var scalingFactor = scalingFactors[data.treetype]
-var axisOrientation = axisOrientations[data.treetype]
+var scalingFactor = scalingFactors[data.treetype] || 1
+var axisOrientation = axisOrientations[data.treetype] || 0
 
 function absolutePosition(el) {
   // https://stackoverflow.com/questions/25630035/javascript-getboundingclientrect-changes-while-scrolling
@@ -179,14 +179,14 @@ var tooltip = div.append("div")
     .style("pointer-events", "none");
 
 // set up plotting scales
-var xmax = d3.max(data.edges, e => e.x1),
+var xmax = d3.max(data.edges, e => +e.x1),
     ntips = data.nodes.filter(x => x['n.tips'] == 0).length,
-    xScale = d3.scaleLinear().domain([0, xmax]).range([0, (gwidth-100) * scalingFactor]),
+    xScale = d3.scaleLinear().domain([0, xmax]).range([0, (gwidth-100) ]),
     yScale = d3.scaleLinear().domain([0, ntips]).range([gheight, 40]),
-    xlScale = d3.scaleLinear().domain([0, xmax]).range([0, 100 * scalingFactor]),
+    xlScale = d3.scaleLinear().domain([0, xmax]).range([0, 100 ]),
     ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
     yoffset = absolutePosition(svg.node());
-  
+
 /* #endregion */
 //function called when the div needs to be re-rendered due to an update
 //`drawNodes` is a flag for drawing circles at the tip of the branches. Defaults to false.

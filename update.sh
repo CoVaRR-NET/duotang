@@ -72,7 +72,7 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Main branch build mode: ${BUILDMAIN}"
-echo "clean up mode: ${BUILDMAIN}"
+echo "Clean up mode: ${BUILDMAIN}"
 
 datestamp=$DATE
 
@@ -107,7 +107,7 @@ if [ -f $checkPointFile ]; then
     step=`cat $checkPointFile`;
     #echo $step
     if [ $step = "finish" ]; then
-        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data. exiting"
+        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data, or use the --overwrite flag. exiting"
         exit 0
     else
         echo "attempting to restart workflow from $step"
@@ -252,9 +252,15 @@ echo "cleaning trees..."
 for treefile in `ls $data_dir/aligned_*.treefile`; do
 	name=${treefile%.*};
 	name=${name%.*};
+	recombString="recombinant"
+	keeproot="--keep-root"
+	echo $keeproot
+	if [[ "$name" == *"$recombString"* ]];then
+		keeproot=""
+	fi
 	echo $name
 	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
-	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root --outdir ${name}.treetime_dir;
+	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
 	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
 echo "treecleaned" > $checkPointFile

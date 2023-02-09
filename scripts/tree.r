@@ -14,7 +14,6 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pang
     temp[tt.layout$edges$isTip] <- as.character(metadata[[field]])
     tt.layout$edges[[field]] <- temp
   }
-  
   # append vertical edges
   v.edges <- t(sapply(split(tt.layout$edges, tt.layout$edges$parent), function(e) {
     x <- e[1,]$x0
@@ -22,7 +21,9 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pang
       x0=x, x1=x, y0=min(e$y0), y1=max(e$y0),
       colour=e[1,]$colour)
   }))
+  
   edges <- merge(tt.layout$edges, v.edges, all=TRUE)  # tips, internals
+  
   jsonObj <- toJSON(list(nodes=tt.layout$nodes, edges=edges, treetype=treeType, defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
   
   return(jsonObj)

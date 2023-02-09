@@ -51,7 +51,7 @@ Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 pangoversion="4.2 (Viral AI)"
 
 # load variant designations and colour palette from file
-VOCVOI <- read.csv("vocvoi.csv")
+VOCVOI <- read.csv("resources/vocvoi.csv")
 
 all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
@@ -71,14 +71,12 @@ pal["other"] <- 'grey' # named character vector
 # this can be made more compact for faster loading
 meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"), sep="\t")
 meta$province <- meta$geo_loc_name_state_province_territory
-
 # Select only the column we want to use later
 columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin",
              "sample_collection_date", "sample_collected_by", 
              "purpose_of_sampling", "purpose_of_sequencing","lineage", 
-             "raw_lineage")
+             "raw_lineage", "gisaid_accession", "isolate")
 meta <- meta[ , columnlist]
-
 
 ### metadata cleaning 
 unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
@@ -95,6 +93,8 @@ meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'mont
 source("scripts/scanlineages.R")
 meta$pango_group <- create.pango.group(VOCVOI, meta)
 meta$pango_group <- as.factor(meta$pango_group)
+
+meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 ## 2. LOAD epidemiological data (PHAC)
 
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
@@ -116,6 +116,7 @@ for(row in 1:nrow(epidataCANall)) {
   }
 }
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
+
 ```
 
 
@@ -190,29 +191,30 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
-***[Note some recent updates to the analyses, including the ability to view variants showing most growth by province.]***
+***[Note a new analysis is now available below of a time tree limited to XBB and its descendents]***
 
-BQ.1.1 is peaking at this time in Canada, with XBB.1.5 still the primary variant of interest due to its mutations, plus growth significantly in multiple provinces with the most recent data. Some other BQ.1*, BF.7, CH.1.1, and select recombinants are growing, but not as significantly as XBB.1.5 right now. Differences between some provinces have become more significant, so province-specific analysis is becoming increasingly important. Mutational analysis shows continued steady growth in prevalence of the S:F486P mutation of note (associated with immune evasion and improved binding to the human ACE2 receptor). Cases with this mutation are now almost exclusively XBB.1.5.
+XBB.1.5 continues to grow steadily and significantly. Some other select variants with the S:F486P mutation are also showing growth in some regions such as CJ.1 and XBF. BQ.1.1 is increasing again in some regions of Canada along with some other select BQ.1 subvariants, BW.1.1, and CH.1.1. Differences between some provinces continue - see also the evolving plots below of “Fastest growing lineages in Canada”, per province.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. Note that XBB.1.5 is still of primary note and some of these have only been observed internationally. See also the evolving plots below of “Fastest growing lineages in Canada”:
- 
- * BA.2 and BA.2.75 new subvariants, including possible misclassifications of XBB.1.5 as BA.2.10.1.
- * BE.1.1 and other BA.5-type variants with S:F486P
- * BF.7 new subvariants not yet further classified
- * BM.1.1.1
- * BN.1* subvariants due to high predicted immune evasion
- * BQ.1* new descendants
- * BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
- * CH.1.1 (descendant of BM which is BA.2.75.3) and some sublineages recently detected in Canada such as CH.1.1.2
- * CJ.1 with S:F486P (but not showing growth in Canada)
- * DS.1 (highest predicted immune evasion)
- * XAY.2 (BA.2/Delta recombinant with Delta’s S:L452R mutation plus the S:F486P mutation)
- * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada but not now showing growth)
- * XBB.1, XBB.1.5, XBB.1.9.1, XBB.6.1 and subvariants with S:F486P
- * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5) - but growth not notable
- * XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
- * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant, but growth not notable)
- * …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of mutations of interest.
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada):
+* BA.2 and BA.2.75 new subvariants, including possible misclassifications of XBB.1.5 as BA.2.10.1.
+* BE.1.1 and other BA.5-type variants with S:F486P
+* BM.1.1.1
+* BM.2 (high predicted affinity for the human ACE2 receptor)
+* BN.1* subvariants due to high predicted immune evasion
+* BQ.1.8 with S:F486P
+* BQ.1* select new descendants
+* BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
+* CH.1.1 (descendant of BM which is BA.2.75.3 with S:L452R) and sublineages
+* CJ.1 with S:F486P
+* DN.1.1.1 (highest predicted affinity for the human ACE2 receptor) )
+* DS.1 (highest predicted immune evasion)
+* XAY.2 (BA.2/Delta recombinant with Delta’s S:L452R mutation plus the S:F486P mutation)
+* XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada but not now showing growth)
+* XBB.1, XBB.1.5, XBB.1.9.1, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
+* XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5)
+* XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
+* XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant, but growth not notable)
+* …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T and S:F486P), particularly those variants with sets of immune evasive mutations of interest.
 
 ## Omicron sublineages in Canada {.tabset} 
 
@@ -375,15 +377,6 @@ Mutational profile of Omicron and its sublineages in Canada and globally for the
 
 ## Selection on Omicron {.tabset}  
 
-Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
-
-Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BW\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
-
-For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
-
-**Caveat:**
-These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
-
 ```{r selection, child="selection.Rmd"}
 ```
 
@@ -429,7 +422,6 @@ There are two Pango lineages that have a Canadian origin and that predominately 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
-
 
 ## Canadian trees {.tabset}  
 

@@ -194,20 +194,37 @@ These selection analyses must be interpreted with caution due to the potential f
 ```{r setting function for selection estimator, warning=FALSE, message=FALSE, }
 source("scripts/plot_selection_estimator.R")
 #startpar <- list(p=c(0.1, 0.01), s=c(0.05, 0.05))
-startpar <- list(p=c(0.5, 0.1, 0.05), s=c(0, 0, 0.05))
+
+startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
+#startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
 
 setAll=getAllStrictoLineages(meta)
-sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
+#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
 sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
 
-setAll=setAll[!setAll %in% sublineages_BA5]
+#setAll=setAll[!setAll %in% sublineages_BA5]
 setAll=setAll[!setAll %in% sublineages_BQ]
 setAll=setAll[!setAll %in% sublineages_XBB]
-sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
 
-mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
-mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
+mutants = list(sublineages_BQ, sublineages_XBB)
+mutantNames = list("BQ*", "XBB*", "the rest") #"
+col <- c(pal["Omicron BQ"], "XBB"="lightblue")
+
+#startpar <- list(p=c(0.5, 0.1, 0.05), s=c(0, 0, 0.05))
+
+#setAll=getAllStrictoLineages(meta)
+#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
+#sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
+#sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
+
+#setAll=setAll[!setAll %in% sublineages_BA5]
+#setAll=setAll[!setAll %in% sublineages_BQ]
+#setAll=setAll[!setAll %in% sublineages_XBB]
+#sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
+
+#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
+#mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
 col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
 
 #mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
@@ -232,15 +249,17 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
 selectionEstimateFits <- list()
 selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
 maxdate=selectionEstimateFits[["Canada"]]$date
-selectionEstimateFits[["BC"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
-selectionEstimateFits[["BC"]]$plot1 <- NULL
-#sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
-selectionEstimateFits[["AB"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
-selectionEstimateFits[["SK"]] <- sub.plot.selection.estimate(region="Saskatchewan",maxdate=maxdate)
-selectionEstimateFits[["MB"]] <- sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
-selectionEstimateFits[["ON"]] <- sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
-selectionEstimateFits[["QC"]] <- sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
-selectionEstimateFits[["East"]] <- sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
+dataAvailable.regions <- all.regions %>% filter(shortname %in% c("BC", "AB", "SK", "MA", "ON", "QC", "East"))
+for (i in seq(1:nrow(dataAvailable.regions))){
+  tryCatch(
+    expr = {
+      selectionEstimateFits[[dataAvailable.regions[i,2]]] = sub.plot.selection.estimate(region=dataAvailable.regions[i,1],maxdate=maxdate)
+    },
+    error = function(e){
+      selectionEstimateFits[[dataAvailable.regions[i,2]]]$plot1 <- NULL
+    }
+  )  
+}
 
 #####################################################
 # tabs for displaying in notebook
