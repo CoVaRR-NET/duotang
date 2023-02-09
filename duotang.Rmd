@@ -49,26 +49,8 @@ Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
 
-VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
-
-# FIXME: this should be stored as an external CSV file
-VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
-VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
-VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
-VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
-VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
-
-VOCVOI=add.pango.group("Omicron BA.1", "BA.1*", '#8B0000')
-VOCVOI=add.pango.group("Omicron BA.2", "BA.2*", '#FF0000')
-VOCVOI=add.pango.group("Omicron BA.4", "BA.4*", '#BC544B')
-VOCVOI=add.pango.group("Omicron BA.5", "BA.5*", '#CC66FF')
-VOCVOI=add.pango.group("Omicron BQ", "BQ*", '#9CB329')
-VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
-#VOCVOI=add.pango.group("Omicron BF","BF*",'#9F2B11')
-
-VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
-VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
-VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
+# load variant designations and colour palette from file
+VOCVOI <- read.csv("vocvoi.csv")
 
 all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
