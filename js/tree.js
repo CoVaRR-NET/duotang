@@ -482,6 +482,7 @@ for(var i = 0; i < data.edges.length; i++){
   }
 }
 var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
+var fieldsToNotIncludeInDropdown = ["GID", "isolate"]
 //remove the non-metadata keys.
 metadataFields = metadataFields.filter( function( el ) {
   return !fieldsToRemove.includes( el );
@@ -491,13 +492,15 @@ data.tips = tipOnlyEdgesIndexList.map(i => data.edges[i])//defines new tip only 
 //move the default color scheme to the beginning of the dropdown menu.
 metadataFields = metadataFields.filter(item => item != defaultColorBy);
 metadataFields.unshift(defaultColorBy);
-
+sortMetadataFields = metadataFields.filter( function( el ) {
+  return !fieldsToNotIncludeInDropdown.includes( el );
+} ); 
 //draws the dropdown menu.
 var colorByDivData = colorByDiv
               .append("select")
                 .on("change", function() { displayOptions(this);})
               .selectAll("option")
-                .data(metadataFields)
+                .data(sortMetadataFields)
                 .enter()
                 .append("option")
                   .attr('class','selection')

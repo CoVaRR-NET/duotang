@@ -47,6 +47,10 @@ while [[ $# -gt 0 ]]; do
       NOCONDA="YES"
       shift # past argument
       ;;
+	--downloadonly)
+      DOWNLOADONLY="YES"
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -69,7 +73,7 @@ if [ -z "$scripts_dir" ]; then scripts_dir="scripts"; fi
 if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
-
+if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 else 
@@ -86,6 +90,7 @@ echo "Date source: ${SOURCE}"
 echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
+echo "Download data only?: ${DOWNLOADONLY}"
 echo "Main branch build mode: ${BUILDMAIN}"
 echo "Clean up mode: ${BUILDMAIN}"
 echo "Not using Conda?: ${NOCONDA}"
@@ -223,6 +228,10 @@ gzip -f ${data_dir}/AgeCaseCount*.csv
 
 echo "casecount" > $checkPointFile
 #casecount:
+if [ "$DOWNLOADONLY" = "YES" ]; then
+	echo "Data download complete, exiting..."
+	exit 0
+fi
 
 echo "dataloaded" > $checkPointFile
 
@@ -328,6 +337,10 @@ echo "finish" > $checkPointFile
 if [ "$CLEAN" = "YES" ]; then 
 	echo "Removing temporary files..."
 	mkdir -p ${data_dir}/$datestamp
+	cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
+	cp ${data_dir}/*.nwk ${data_dir}/$datestamp
+	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
+	cp ${data_dir}/virusseq.metadata.fasta.xz ${data_dir}/$datestamp
 fi
 
 if [ "$NOCONDA" = "NO" ]; then 
