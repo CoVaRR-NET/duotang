@@ -76,6 +76,18 @@ if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
+	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
+	if [[ -n $(which python) ]]; then 
+		echo "Using python at $(which python)"
+	else
+		if [[ -n $(which python3) ]]; then 
+			echo "Using python at $(which python3)"
+			alias python="python3"
+		else
+			echo "Python not found, please check your dependencies"
+			exit 1
+		fi
+	fi
 else 
 	if [[ -n $(which conda) ]]; then 
 		NOCONDA="NO"; 
@@ -85,8 +97,10 @@ else
 	fi
 fi
 
+echo -e "\n\nHere are the config being used: \n"
+
 echo "Datestamp used: ${DATE}"
-echo "Date source: ${SOURCE}"
+echo "Data source: ${SOURCE}"
 echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
@@ -94,8 +108,11 @@ echo "Download data only?: ${DOWNLOADONLY}"
 echo "Main branch build mode: ${BUILDMAIN}"
 echo "Clean up mode: ${BUILDMAIN}"
 echo "Not using Conda?: ${NOCONDA}"
-
+echo ""
+echo ""
 datestamp=$DATE
+
+read -p "Press any key to start the update, or ctrl+C to adjust config"
 
 #function as a hack for labels and goto statements.
 #labels start with '#' and end with ':' to avoid syntax errors. e.g. "#LabelName:"
@@ -153,6 +170,7 @@ echo "begin" > $checkPointFile
 echo version will be stamped as : $datestamp
 
 #get the json containing aliases
+wget -O ${data_dir}/lineageNotes.tsv https://raw.githubusercontent.com/cov-lineages/pango-designation/master/lineage_notes.txt
 wget -O ${data_dir}/alias_key.json https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  #> /dev/null 2>&1
 cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print "alias",$1,$2}' >  ${data_dir}/pango_designation_alias_key.json
 echo "alias" > $checkPointFile
@@ -309,7 +327,12 @@ if [ -f ".secret" ]; then
 	python3 scripts/encrypt.py duotang-sandbox.html $secret
 	mv duotang-sandbox-protected.html duotang-sandbox.html
 else
-	echo ".secret file not found, unable to encrypt"
+	echo ".secret file not found, unable to encrypt."
+	echo "Make a .secret text file at root directory, put a password in it. "
+	echo "For example e.g. echo 'Hunter2' > .secret"
+	echo "DO NOT ADD THIS FILE TO GIT."
+	rm -f duotang-sandbox.html
+	echo "duotangbuilt" > $checkPointFile
 	exit 1
 fi
 echo "htmlencrypted" > $checkPointFile

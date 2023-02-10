@@ -181,16 +181,6 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 
 ## Selection on Omicron {.tabset}  
 
-Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
-
-Currently, the major group of Omicron lineages rising in frequency are the BQ.* group, which descend from BA.5\*.  We first show this growth of BQ.\* and other BA.5* (here excluding BQ.\*), relative to the remaining strains, which consist predominantly of BA.2* and BA.4\*. Left plot: y-axis is the proportion of sub-lineages BA.4 and BA.5 among Omicron; right plot: y-axis describes the logit function, log(freq(BQ.\* or BA.5\*)/freq(other)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
-
-For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
-
-**Caveat:**
-These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of BQ.\*, BA.5\*, and other lineages during this time frame are not displayed.
-
-
 ```{r setting function for selection estimator, warning=FALSE, message=FALSE, }
 source("scripts/plot_selection_estimator.R")
 #startpar <- list(p=c(0.1, 0.01), s=c(0.05, 0.05))
@@ -291,10 +281,11 @@ apply(dataAvailable.regions,1,function(reg){
 ```{r case count selection estimator setup}
 source("scripts/plot_case_count_selection_estimator.R")
 caseData <- parseCaseData(maxdate)
+populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
   #caseCountData <- caseData$Canada
   #selectionEstimateObject<- selectionEstimateFits$Canada
-  #filename="test"
+  #filename=NA
   if (selectionEstimateObject$region == "Canada"){dayToCut = 2} else { dayToCut = 5 }
   caseCountData$report_type <- "Accurate"
   caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
@@ -350,12 +341,14 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filen
   line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
   colnames(line) <- c("Reported_Date", "n", "type")
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),filename=filename)
+  
+  population <- as.numeric(populationData[2,selectionEstimateObject$region])
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,filename=filename )
 }
 
 ```
 
-Some description text here...
+These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts.  The fit from the “Selection on Omicron” section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001.
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis'}
 dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
