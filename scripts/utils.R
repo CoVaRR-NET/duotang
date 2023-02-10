@@ -20,6 +20,7 @@ printest <-function(x){
 }
 
 
+# FIXME: this is deprecated now that VOCVOI is loaded from CSV file
 add.pango.group <-  function(n,p,c) {
   return(rbind(VOCVOI,data.frame(name=n,pangodesignation=p,color=c)))
 }

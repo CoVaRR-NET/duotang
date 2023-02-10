@@ -90,16 +90,32 @@ meta$sample_collection_date <- as.Date(meta$sample_collection_date)
 meta$week <- cut(meta$sample_collection_date, 'week')
 meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
 
+startdate <- max(meta$sample_collection_date) - days(120)
+
+
+## parse PANGO lineages
 source("scripts/scanlineages.R")
 meta$pango_group <- create.pango.group(VOCVOI, meta)
 meta$pango_group <- as.factor(meta$pango_group)
 
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
+
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+
+latelineage_pangotree <- makepangotree(unique(
+  meta$raw_lineage[
+    meta$sample_collection_date > max(meta$sample_collection_date) - days(60) 
+    ]
+  ))
+
+reference <- getStrictoSubLineages("BQ.1", meta)
+
+
 ## 2. LOAD epidemiological data (PHAC)
 
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
-epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
+epidataCANall <- read.csv("data_needed/CanadianEpiData.csv")
 epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
@@ -117,7 +133,6 @@ for(row in 1:nrow(epidataCANall)) {
   }
 }
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
-
 ```
 
 
@@ -141,7 +156,7 @@ These analyses can spur further research within or across pillars, be used for r
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
 
-**Important caveats and disclaimers:**  
+**Important caveats and disclaimers:**  x
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
 Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
@@ -155,16 +170,11 @@ These analyses are subject to frequent change given new data and updated lineage
 
 The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
 
+
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
-source("scripts/scanlineages.R")
-fullpangotree <- makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(60) ]))
-reference <- getStrictoSubLineages("BQ.1",meta)
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
 startpar2 <- list(p=0.5, s=0.05)
-
-startdate <- max(meta$sample_collection_date) - days(120)
 
 #t0 <- Sys.time()
 allparams <- mclapply(latelineage_pangotree, function(l) {
@@ -177,6 +187,7 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
     }
   })
 }, mc.cores=8)
+
 allparams <- do.call(c, allparams)  # same structure as below
 allparams <- allparams[!is.na(allparams)]
 #print(Sys.time() - t0)
@@ -184,9 +195,8 @@ allparams <- allparams[!is.na(allparams)]
 allparams <- allparams[order(sapply(allparams, function(p) { 
   ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
   }), decreasing = TRUE)]
+
 ```
-
-
 
 # SARS-CoV-2 in Canada
 
@@ -225,7 +235,7 @@ Here we take a look, sub-dividing the major sub-lineages currently circulating i
 
 
 
-```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis',}
+```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
 source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
@@ -366,7 +376,7 @@ DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE))
 
 ```
 
-
+ 
 
 ## Mutational composition of Omicron
 
