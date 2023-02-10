@@ -156,7 +156,7 @@ These analyses can spur further research within or across pillars, be used for r
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
 
-**Important caveats and disclaimers:**  x
+**Important caveats and disclaimers:**  
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
 Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
