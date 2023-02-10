@@ -43,6 +43,10 @@ while [[ $# -gt 0 ]]; do
       BUILDMAIN="YES"
       shift # past argument
       ;;
+	--noconda)
+      NOCONDA="YES"
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -66,6 +70,17 @@ if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 
+if [ "$NOCONDA" = "YES" ]; then 
+	NOCONDA="YES"; 
+else 
+	if [[ -n $(which conda) ]]; then 
+		NOCONDA="NO"; 
+	else 
+		echo "Conda not found, make sure conda is in $PATH or use the --noconda flag"
+		exit 1
+	fi
+fi
+
 echo "Datestamp used: ${DATE}"
 echo "Date source: ${SOURCE}"
 echo "Data will be written to: ${data_dir}"
@@ -73,6 +88,7 @@ echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Main branch build mode: ${BUILDMAIN}"
 echo "Clean up mode: ${BUILDMAIN}"
+echo "Not using Conda?: ${NOCONDA}"
 
 datestamp=$DATE
 
@@ -100,9 +116,10 @@ fi
 
 #checkpoint logics
 if [ -f $checkPointFile ]; then
-
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
     echo "checkpoint file found..."
     step=`cat $checkPointFile`;
     #echo $step
@@ -116,8 +133,10 @@ if [ -f $checkPointFile ]; then
     fi
 else
     #no checkpoint, start fresh
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
     jumpTo begin
 fi
 
@@ -311,4 +330,6 @@ if [ "$CLEAN" = "YES" ]; then
 	mkdir -p ${data_dir}/$datestamp
 fi
 
-conda deactivate
+if [ "$NOCONDA" = "NO" ]; then 
+	conda deactivate
+fi
