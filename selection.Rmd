@@ -1,4 +1,13 @@
-```{r, warning=FALSE}
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
+
+Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BW\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+
+For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+
+**Caveat:**
+These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
+
+```{r, warning=FALSE, message=FALSE}
 source("scripts/plot_selection_estimator.R")
 
 startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))

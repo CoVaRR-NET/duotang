@@ -43,6 +43,10 @@ while [[ $# -gt 0 ]]; do
       BUILDMAIN="YES"
       shift # past argument
       ;;
+	--noconda)
+      NOCONDA="YES"
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -66,13 +70,25 @@ if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 
+if [ "$NOCONDA" = "YES" ]; then 
+	NOCONDA="YES"; 
+else 
+	if [[ -n $(which conda) ]]; then 
+		NOCONDA="NO"; 
+	else 
+		echo "Conda not found, make sure conda is in $PATH or use the --noconda flag"
+		exit 1
+	fi
+fi
+
 echo "Datestamp used: ${DATE}"
 echo "Date source: ${SOURCE}"
 echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Main branch build mode: ${BUILDMAIN}"
-echo "clean up mode: ${BUILDMAIN}"
+echo "Clean up mode: ${BUILDMAIN}"
+echo "Not using Conda?: ${NOCONDA}"
 
 datestamp=$DATE
 
@@ -100,14 +116,15 @@ fi
 
 #checkpoint logics
 if [ -f $checkPointFile ]; then
-
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
     echo "checkpoint file found..."
     step=`cat $checkPointFile`;
     #echo $step
     if [ $step = "finish" ]; then
-        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data. exiting"
+        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data, or use the --overwrite flag. exiting"
         exit 0
     else
         echo "attempting to restart workflow from $step"
@@ -116,8 +133,10 @@ if [ -f $checkPointFile ]; then
     fi
 else
     #no checkpoint, start fresh
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
     jumpTo begin
 fi
 
@@ -252,9 +271,15 @@ echo "cleaning trees..."
 for treefile in `ls $data_dir/aligned_*.treefile`; do
 	name=${treefile%.*};
 	name=${name%.*};
+	recombString="recombinant"
+	keeproot="--keep-root"
+	echo $keeproot
+	if [[ "$name" == *"$recombString"* ]];then
+		keeproot=""
+	fi
 	echo $name
 	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
-	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root --outdir ${name}.treetime_dir;
+	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
 	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
 echo "treecleaned" > $checkPointFile
@@ -305,4 +330,6 @@ if [ "$CLEAN" = "YES" ]; then
 	mkdir -p ${data_dir}/$datestamp
 fi
 
-conda deactivate
+if [ "$NOCONDA" = "NO" ]; then 
+	conda deactivate
+fi

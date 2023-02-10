@@ -1,5 +1,5 @@
 Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
-The x-axis of the time trees represent the number of years from today for which SARS-CoV-2 first emerged. The x-axis of the diversity trees shows the number of mutations from the reference Wuhan-1 sequence for diversity trees. 
+The x-axis of the time tree represents the estimated number of years from today for which the root emerged. Due to the low number of XBB sequences, this estimate may not be accurate. The x-axis of the diversity trees shows the number of mutations from the outgroup. 
 
 ```{r message=FALSE}
 ### metadata and trees
@@ -21,7 +21,7 @@ recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","month","week")
+               "lineage", "pango_group","month","week", "GID", "isolate")
 
 # extract rows from metadata table that correspond to ttree 
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
@@ -57,11 +57,11 @@ presetColors=data.frame(name=c("other",
                                months,
                                weeks), 
                         color=c("#777777",
-                                         VOCVOI$color,
-                                         rev(hcl.colors(length(hab)-1, "Berlin")),"#777777",
-                                         hcl.colors(length(months), "Berlin"),
-                                         hcl.colors(length(weeks), "Berlin")
-                        ))
+                                VOCVOI$color,
+                                rev(hcl.colors(length(hab)-1, "Berlin")),"#777777",
+                                hcl.colors(length(months), "Berlin"),
+                                hcl.colors(length(weeks), "Berlin")
+                                ))
 
 #suppressWarnings({
 #  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
@@ -70,6 +70,7 @@ presetColors=data.frame(name=c("other",
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
 timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames=fieldnames)
 recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, "lineage", fieldnames= fieldnames)
+
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
 
@@ -82,32 +83,25 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
 
 ### Time Tree {.active}
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-r2d3(data=timeTreeJsonObj, 
+  r2d3(data=timeTreeJsonObj, 
      script="js/tree.js", container="div", elementId="ttree-element")
 ```
 
 ### XBB* time tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-r2d3(data=recombTimeTreeJsonObj, 
+    r2d3(data=recombTimeTreeJsonObj, 
      script="js/tree.js", container="div", elementId="recombttree-element")
 
 ```
 
 ### Diversity Tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-r2d3(data=diversityTreeJsonObj, 
+    r2d3(data=diversityTreeJsonObj, 
      script="js/tree.js", container="div", elementId="mltree-element")
 ```
 
-### Omicron diversity tree
+### Omicron Diversity Tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-r2d3(data=OmicrondiversityTreeJsonObj, 
+    r2d3(data=OmicrondiversityTreeJsonObj, 
      script="js/tree.js", container="div", elementId="omimltree-element")
-
 ```
-
-
-<!-- # Evolution and growth of SARS-CoV-2 in Canada   -->
-  
-  <!-- There are various methods to investigate changes in evolutionary rates of VOC/VOIs and to compare their relative fitness in an epidemiological context. Here we present two of such methods. -->
-  
