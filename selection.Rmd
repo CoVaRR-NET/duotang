@@ -1,6 +1,4 @@
-
-
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE}
 source("scripts/plot_selection_estimator.R")
 
 startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
