@@ -51,6 +51,10 @@ while [[ $# -gt 0 ]]; do
       DOWNLOADONLY="YES"
       shift # past argument
       ;;
+	--skipgsd)
+      SKIPGSD="YES"
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -74,6 +78,7 @@ if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
+if [ "$SKIPGSD" = "YES" ]; then SKIPGSD="YES"; else SKIPGSD="NO"; fi
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
@@ -105,6 +110,7 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
+echo "Skip GSD download?: ${DOWNLOADONLY}"
 echo "Main branch build mode: ${BUILDMAIN}"
 echo "Clean up mode: ${BUILDMAIN}"
 echo "Not using Conda?: ${NOCONDA}"
@@ -245,7 +251,15 @@ wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -
 gzip -f ${data_dir}/AgeCaseCount*.csv
 
 echo "casecount" > $checkPointFile
+
 #casecount:
+if [ "$SKIPGSD" = "NO" ]; then 
+	echo "downloading GSD metadata"
+	python script/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz-compressed
+fi
+echo "gsddownloaded" > $checkPointFile
+
+#gsddownloaded:
 if [ "$DOWNLOADONLY" = "YES" ]; then
 	echo "Data download complete, exiting..."
 	exit 0
@@ -322,14 +336,14 @@ Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$da
 echo "duotangsandboxbuilt" > $checkPointFile
 
 #duotangsandboxbuilt:
-if [ -f ".secret" ]; then
-    secret=`cat .secret`
+if [ -f ".secret/sandbox" ]; then
+    secret=`cat .secret/sandbox`
 	python3 scripts/encrypt.py duotang-sandbox.html $secret
 	mv duotang-sandbox-protected.html duotang-sandbox.html
 else
 	echo ".secret file not found, unable to encrypt."
-	echo "Make a .secret text file at root directory, put a password in it. "
-	echo "For example e.g. echo 'Hunter2' > .secret"
+	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
+	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
 	echo "DO NOT ADD THIS FILE TO GIT."
 	rm -f duotang-sandbox.html
 	echo "duotangbuilt" > $checkPointFile
@@ -348,6 +362,7 @@ if [ "$BUILDMAIN" = "YES" ]; then
 	git status
 	git add *.html
 	git add archive/*.html
+	git add archive/readme.md
 	git commit -m "Update: $datestamp"
 	git push origin main
 fi

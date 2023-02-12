@@ -59,6 +59,7 @@ Arguments can also be provided for custom build functions:
  * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing.
  * `--downloadonly` Flag used to download data only. Script will exit once all external resources had been downloaded. 
  * `--noconda` Flag used to run the update script with system level dependencies. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
+ * `--skipgsd` Flag used to skip the GSD metadata download. Note: using update.sh without this flag requires selenium, webdriver_manager, and firefox for dependencies.
 
 # Step by step instruction to obtain data, and to generate phylogenies
 

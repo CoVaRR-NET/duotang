@@ -17,6 +17,10 @@ params:
   input: date
   format: yyyy-mm-dd
   value: "2023-01-30"
+ datadir:
+  label: "DataDir"
+  input: text
+  value: "data_needed/"
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
@@ -35,6 +39,7 @@ library(r2d3)  # used for passing data to JavaScript D3 framework
 library(jsonlite)
 library(tidyverse)
 library(reshape2) #used to plot case count selection plots
+library(DT)
 
 theme_set(theme_classic())
 
@@ -55,26 +60,7 @@ Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
 
-VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
-
-# FIXME: this should be stored as an external CSV file
-VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
-VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
-VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
-VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
-VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
-
-VOCVOI=add.pango.group("Omicron BA.1", "BA.1*", '#8B0000')
-VOCVOI=add.pango.group("Omicron BA.2", "BA.2*", '#FF0000')
-VOCVOI=add.pango.group("Omicron BA.4", "BA.4*", '#BC544B')
-VOCVOI=add.pango.group("Omicron BA.5", "BA.5*", '#CC66FF')
-VOCVOI=add.pango.group("Omicron BQ", "BQ*", '#9CB329')
-VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
-#VOCVOI=add.pango.group("Omicron BF","BF*",'#9F2B11')
-
-VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
-VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
-VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
+VOCVOI <- read.csv("resources/vocvoi.csv")
 
 all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
@@ -127,7 +113,7 @@ These analyses are subject to frequent change given new data and updated lineage
 #Download metadata from VirusSeq, put the date here:
 
 # this can be made more compact for faster loading
-meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"), sep="\t")
+meta <- read.csv(gzfile(paste0(params$datadir,"virusseq.metadata.csv.gz")), sep="\t")
 meta$province <- meta$geo_loc_name_state_province_territory
 
 # Select only the column we want to use later
@@ -177,6 +163,45 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 
 
   
+```
+## Pango lineage description table
+
+```{r function for displaying lineage informaiton, warning=FALSE, message=FALSE}
+lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F) %>% 
+  mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=,)")) %>% 
+  mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) 
+
+lineageDescriptions <- lineageDescriptions %>% 
+  left_join((lineageDescriptions %>% select(Lineage, alias)), by=c("parentAlias"="alias"), na_matches = "never") %>%
+  mutate(Parent = ifelse(is.na(Lineage.y), parentAlias, Lineage.y)) %>% 
+  select(Lineage.x, Parent, Description)
+
+colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description")
+
+print_datatable <- function(data) {
+  # Find the row index containing the string "this is it"
+  idx <- grep("B.1.1.529.5.3.1.1.1.1.1.1.5.1", data$Description)
+  
+  # Add a new column with hyperlinks that link to the row containing the string "this is it"
+  data$link <- sprintf('<a href="#row_%s">link to row %s</a>', idx, idx)
+  
+  # Print the datatable
+  datatable(data, escape = FALSE, 
+            options = list(
+              columnDefs = list(list(targets = 3, searchable = FALSE, orderable = FALSE)),
+              paging = FALSE,
+              info = FALSE
+            ),
+            rownames = FALSE,
+            callback = JS("table.on('order.dt search.dt', function () {
+                          table.column(0, {search:'applied', order:'applied'}).nodes().each(function (cell, i) {
+                            cell.innerHTML = i+1;
+                          });
+                        }).draw();")
+  )
+}
+#print_datatable(lineageDescriptions)
+DT::datatable(lineageDescriptions, filter = 'top', rownames = F, options = list( dom='ip',pageLength = 5, autoWidth = TRUE))
 ```
 
 ## Selection on Omicron {.tabset}  
@@ -280,7 +305,7 @@ apply(dataAvailable.regions,1,function(reg){
 
 ```{r case count selection estimator setup}
 source("scripts/plot_case_count_selection_estimator.R")
-caseData <- parseCaseData(maxdate)
+caseData <- parseCaseData(maxdate, params$datadir)
 populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
   #caseCountData <- caseData$Canada
