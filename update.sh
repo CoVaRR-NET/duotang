@@ -55,6 +55,15 @@ while [[ $# -gt 0 ]]; do
       SKIPGSD="YES"
       shift # past argument
       ;;
+	--liststeps)
+      LISTSTEPS="YES"
+      shift # past argument
+      ;;
+	--gotostep)
+      GOTOSTEP="$2"
+      shift # past argument
+      shift # past value
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -79,6 +88,12 @@ if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$SKIPGSD" = "YES" ]; then SKIPGSD="YES"; else SKIPGSD="NO"; fi
+if [ "$LISTSTEPS" = "YES" ]; then 
+	echo "Available checkpoint steps are: "
+	echo $(cat update.sh | grep '^#.*:$' | sed 's/#//' | sed 's/://')
+	exit 0
+fi
+
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
@@ -114,6 +129,8 @@ echo "Skip GSD download?: ${DOWNLOADONLY}"
 echo "Main branch build mode: ${BUILDMAIN}"
 echo "Clean up mode: ${BUILDMAIN}"
 echo "Not using Conda?: ${NOCONDA}"
+if [ ! -z "$GOTOSTEP" ]; then echo "Skipping to step $GOTOSTEP"; fi
+
 echo ""
 echo ""
 datestamp=$DATE
@@ -131,14 +148,27 @@ function jumpTo ()
     exit
 }
 
+if [ ! -z "$GOTOSTEP" ]; then 
+	echo "Skipping to step $GOTOSTEP"
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
+	jumpTo $GOTOSTEP 
+fi
+
 if [ "$BUILDMAIN" = "YES" ]; then 
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
 	jumpTo treecleaned 
 fi
 if [ "$CLEAN" = "YES" ]; then 
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
 	jumpTo cleanup
 fi
 
