@@ -415,7 +415,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   scurvesPlotData=scurvesPlotData %>% melt(id="date")
   p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
-    
+  
   if (any(!is.na(fit$sample))) {  
     p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[1], alpha=0.5)
     if(ncol(lo95) > 2) {
@@ -427,7 +427,13 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   
   p<-p + theme_bw() +     
     labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
-    theme(legend.position="bottom", legend.title=element_blank(), legend.text=element_text(size=12), text = element_text(size = 20)) 
+    theme(legend.position=c(0.35, 0.90), legend.title=element_blank(), 
+          legend.text=element_text(size=20), 
+          legend.background = element_blank(), 
+          legend.key=element_blank(),
+          legend.spacing.y = unit(0.5, "cm"),
+          legend.key.size = unit(2, "cm"),
+          text = element_text(size = 20)) 
   
   # second plot - logit transform
   options(scipen=1000000)
@@ -457,8 +463,13 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
 
   p2<-p2 + theme_bw() + 
     labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
-    theme(legend.position="bottom", legend.title=element_blank(), legend.text=element_text(size=12), text = element_text(size = 20)) 
-  
+    theme(legend.position=c(0.35, 0.90), legend.title=element_blank(), 
+          legend.text=element_text(size=20), 
+          legend.background = element_blank(), 
+          legend.key=element_blank(),
+          legend.spacing.y = unit(0.5, "cm"),
+          legend.key.size = unit(2, "cm"),
+          text = element_text(size = 20)) 
 
   return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col, "region"=region, "plot1"=p, "plot2"=p2))
   # Bends suggest a changing selection over time (e.g., due to the impact of 

@@ -7,8 +7,14 @@ require(lubridate)
 #' @param sublineage:  char, vector of lineage names for subsetting
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
-plot.subvariants <- function(region='Canada', sublineage=c(name1), 
+plot.subvariants <- function(region='Canada', sublineage, 
                              scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
+  #sublineage <- set
+  #region = 'Canada'
+  #scaled=FALSE
+  #col=NA
+  #mindate=mindate
+  #maxdate=maxdate
   if(is.na(maxdate)){
     maxdate=max(meta$sample_collection_date)
   }
@@ -61,19 +67,24 @@ plot.subvariants <- function(region='Canada', sublineage=c(name1),
     #epi$week <- cut(as.Date(epi$date), 'week')
     #cases.wk <- sapply(split(epi$numtoday, epi$week), sum)
     cases.wk <- epi$numtotal_last7
-    
     # match case counts to variant freq data and rescale as 2nd axis
     idx <- match(floor_date(epi$date, "weeks", week_start=1),
                  floor_date(as.Date(levels(varmeta1$week)), "weeks", week_start=1))
+    
+
+    barplot(tab, col=pal, 
+            border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
+            ylab="Sequenced cases per week") -> mp
+    
     y <- cases.wk[!is.na(idx)]
     y[is.na(y)] <- 0 #sometimes there is no data for a given week 
     lab.y <- pretty(y)  # for drawing axis
     max.count <- max(apply(tab, 2, sum))
     y2 <- (y-min(y)) / (max(y)-min(y)) * max.count  # scale to variant counts
     at.y <- (lab.y-min(lab.y)) / (max(y)-min(y)) * max.count
-    barplot(tab, col=pal, 
-            border=NA, las=2, cex.names=0.6, cex.axis=0.8, 
-            ylab="Sequenced cases per week") -> mp
+    if (length(y2) != length(mp)){
+      y2 <- c(y2, rep(0, length(mp)-length(y2)))
+    }
     lines(mp, y2, xpd=NA, col=rgb(0,0,0,0.5), lwd=3)
     axis(side=4, at=at.y, labels=format(lab.y, scientific=F), hadj=0,
          las=1, cex.axis=0.7, col='grey50', col.ticks='grey50',

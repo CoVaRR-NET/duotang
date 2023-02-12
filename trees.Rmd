@@ -1,0 +1,107 @@
+Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
+The x-axis of the time tree represents the estimated number of years from today for which the root emerged. Due to the low number of XBB sequences, this estimate may not be accurate for the XBB* time tree. The x-axis of the diversity trees shows the number of mutations from the outgroup. 
+
+```{r message=FALSE}
+### metadata and trees
+source("scripts/tree.r")
+
+# load trees from files
+mltree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk")
+ttree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.timetree.nwk")
+recombTTree <- read.tree("./data_needed/aligned_recombinant_XBBS_sample1.timetree.nwk")
+#stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
+
+# tips are labeled with [fasta name]_[lineage]_[coldate]
+# extracting just the first part makes it easier to link to metadata
+mltree$tip.label <- reduce.tipnames(mltree$tip.label)
+ttree$tip.label <- reduce.tipnames(ttree$tip.label)
+recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
+
+
+fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
+               "sample_collected_by", "purpose_of_sampling",
+               "lineage", "pango_group","month","week", "GID", "isolate")
+# extract rows from metadata table that correspond to ttree 
+metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
+
+# sort rows to match tip labels in tree
+metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
+
+#omi tree metadata
+metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
+
+#recomb tree metadata
+mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
+mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$fasta_header_name), ]
+
+#scale to number of mutations
+mltree$edge.length <- mltree$edge.length*29903
+mltree <- ladderize(mltree, FALSE)
+
+###Time Tree
+ttree$edge.length[ttree$edge.length == 0] <- 1e-4
+#ttree <- ladderize(ttree, FALSE)
+recombTTree$edge.length[recombTTree$edge.length == 0] <- 1e-4
+#recombTTree <- ladderize(recombTTree, FALSE)
+
+hab=unique(meta$host_age_bin)
+hab=hab[order(hab)]
+months=unique(meta$month)
+months=as.character(months[order(months)])
+weeks=unique(meta$week)
+weeks=as.character(weeks[order(weeks)])
+presetColors=data.frame(name=c("other",
+                               VOCVOI$name,
+                               hab,
+                               months,
+                               weeks), 
+                        color=c("#777777",
+                                VOCVOI$color,
+                                rev(hcl.colors(length(hab)-1, "Berlin")),"#777777",
+                                hcl.colors(length(months), "Berlin"),
+                                hcl.colors(length(weeks), "Berlin")
+                                ))
+
+#suppressWarnings({
+#  res <- ace(metasub1$pango.group, ttree2, type="discrete", model="ER")
+#})
+#idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
+#anc <- levels(as.factor(metasub1$pango.group))[idx]
+timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames=fieldnames)
+recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, "lineage", fieldnames= fieldnames)
+
+#diversity ML tree
+diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
+
+### omicron diversity tree
+MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
+
+OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
+```
+
+
+### Time Tree {.active}
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+  r2d3(data=timeTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="ttree-element")
+```
+
+### XBB* time tree
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=recombTimeTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="recombttree-element")
+
+```
+
+### Diversity Tree
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=diversityTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="mltree-element")
+```
+
+### Omicron Diversity Tree
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=OmicrondiversityTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="omimltree-element")
+```

@@ -1,6 +1,14 @@
 #! /bin/bash -e
 #get the good tar command depending of bash or macos
-tarcmd=$(case "$(uname -s)" in Darwin)  echo 'gtar';;  Linux) echo 'tar';; esac)
+unamestr=$(uname -s)
+if [[ "$unamestr" == "Darwin" ]]; then
+   tarcmd='gtar'
+elif [[ "$unamestr" == "Linux" ]]; then
+   tarcmd='tar'
+else
+   echo "Unsupported OS"
+fi
+#tarcmd=$(case "$(uname -s)" in Darwin) echo 'gtar'; Linux echo 'tar'; esac)
 
 #get the timestamp for file name
 datestamp=$(date --utc +%Y-%m-%dT%H_%M_%S)

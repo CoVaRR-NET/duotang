@@ -35,8 +35,20 @@ while [[ $# -gt 0 ]]; do
       OVERWRITE="YES"
       shift # past argument
       ;;
+	--clean)
+      CLEAN="YES"
+      shift # past argument
+      ;;
 	--buildmain)
       BUILDMAIN="YES"
+      shift # past argument
+      ;;
+	--noconda)
+      NOCONDA="YES"
+      shift # past argument
+      ;;
+	--downloadonly)
+      DOWNLOADONLY="YES"
       shift # past argument
       ;;
     -*|--*)
@@ -60,15 +72,47 @@ if [ -z "$data_dir" ]; then data_dir="data_needed"; fi
 if [ -z "$scripts_dir" ]; then scripts_dir="scripts"; fi
 if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
+if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
+if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
+if [ "$NOCONDA" = "YES" ]; then 
+	NOCONDA="YES"; 
+	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
+	if [[ -n $(which python) ]]; then 
+		echo "Using python at $(which python)"
+	else
+		if [[ -n $(which python3) ]]; then 
+			echo "Using python at $(which python3)"
+			alias python="python3"
+		else
+			echo "Python not found, please check your dependencies"
+			exit 1
+		fi
+	fi
+else 
+	if [[ -n $(which conda) ]]; then 
+		NOCONDA="NO"; 
+	else 
+		echo "Conda not found, make sure conda is in $PATH or use the --noconda flag"
+		exit 1
+	fi
+fi
+
+echo -e "\n\nHere are the config being used: \n"
 
 echo "Datestamp used: ${DATE}"
-echo "Date source: ${SOURCE}"
+echo "Data source: ${SOURCE}"
 echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
+echo "Download data only?: ${DOWNLOADONLY}"
 echo "Main branch build mode: ${BUILDMAIN}"
-
+echo "Clean up mode: ${BUILDMAIN}"
+echo "Not using Conda?: ${NOCONDA}"
+echo ""
+echo ""
 datestamp=$DATE
+
+read -p "Press any key to start the update, or ctrl+C to adjust config"
 
 #function as a hack for labels and goto statements.
 #labels start with '#' and end with ':' to avoid syntax errors. e.g. "#LabelName:"
@@ -84,19 +128,25 @@ function jumpTo ()
 if [ "$BUILDMAIN" = "YES" ]; then 
 	eval "$(conda shell.bash hook)"
 	conda activate duotang
-	jumpTo nex2nwk 
+	jumpTo treecleaned 
+fi
+if [ "$CLEAN" = "YES" ]; then 
+	eval "$(conda shell.bash hook)"
+	conda activate duotang
+	jumpTo cleanup
 fi
 
 #checkpoint logics
 if [ -f $checkPointFile ]; then
-
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
     echo "checkpoint file found..."
     step=`cat $checkPointFile`;
     #echo $step
     if [ $step = "finish" ]; then
-        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data. exiting"
+        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data, or use the --overwrite flag. exiting"
         exit 0
     else
         echo "attempting to restart workflow from $step"
@@ -105,8 +155,10 @@ if [ -f $checkPointFile ]; then
     fi
 else
     #no checkpoint, start fresh
-	eval "$(conda shell.bash hook)"
-	conda activate duotang
+	if [ "$NOCONDA" = "NO" ]; then 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
+	fi
     jumpTo begin
 fi
 
@@ -118,6 +170,7 @@ echo "begin" > $checkPointFile
 echo version will be stamped as : $datestamp
 
 #get the json containing aliases
+wget -O ${data_dir}/lineageNotes.tsv https://raw.githubusercontent.com/cov-lineages/pango-designation/master/lineage_notes.txt
 wget -O ${data_dir}/alias_key.json https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  #> /dev/null 2>&1
 cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print "alias",$1,$2}' >  ${data_dir}/pango_designation_alias_key.json
 echo "alias" > $checkPointFile
@@ -189,10 +242,14 @@ wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/
 wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv
 wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv
 wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
-gzip -f ${data_dir}/AgeCaseCount*
+gzip -f ${data_dir}/AgeCaseCount*.csv
 
 echo "casecount" > $checkPointFile
 #casecount:
+if [ "$DOWNLOADONLY" = "YES" ]; then
+	echo "Data download complete, exiting..."
+	exit 0
+fi
 
 echo "dataloaded" > $checkPointFile
 
@@ -241,9 +298,15 @@ echo "cleaning trees..."
 for treefile in `ls $data_dir/aligned_*.treefile`; do
 	name=${treefile%.*};
 	name=${name%.*};
+	recombString="recombinant"
+	keeproot="--keep-root"
+	echo $keeproot
+	if [[ "$name" == *"$recombString"* ]];then
+		keeproot=""
+	fi
 	echo $name
 	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
-	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 --keep-root --outdir ${name}.treetime_dir;
+	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
 	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
 echo "treecleaned" > $checkPointFile
@@ -264,7 +327,12 @@ if [ -f ".secret" ]; then
 	python3 scripts/encrypt.py duotang-sandbox.html $secret
 	mv duotang-sandbox-protected.html duotang-sandbox.html
 else
-	echo ".secret file not found, unable to encrypt"
+	echo ".secret file not found, unable to encrypt."
+	echo "Make a .secret text file at root directory, put a password in it. "
+	echo "For example e.g. echo 'Hunter2' > .secret"
+	echo "DO NOT ADD THIS FILE TO GIT."
+	rm -f duotang-sandbox.html
+	echo "duotangbuilt" > $checkPointFile
 	exit 1
 fi
 echo "htmlencrypted" > $checkPointFile
@@ -277,12 +345,27 @@ echo "archive" > $checkPointFile
 
 #archive
 if [ "$BUILDMAIN" = "YES" ]; then 
+	git status
 	git add *.html
-	git commit -m "update: $datestamp"
+	git add archive/*.html
+	git commit -m "Update: $datestamp"
 	git push origin main
 fi
 
 echo "Update completed successfully"
 echo "finish" > $checkPointFile
 
-conda deactivate
+
+#cleanup:
+if [ "$CLEAN" = "YES" ]; then 
+	echo "Removing temporary files..."
+	mkdir -p ${data_dir}/$datestamp
+	cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
+	cp ${data_dir}/*.nwk ${data_dir}/$datestamp
+	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
+	cp ${data_dir}/virusseq.metadata.fasta.xz ${data_dir}/$datestamp
+fi
+
+if [ "$NOCONDA" = "NO" ]; then 
+	conda deactivate
+fi

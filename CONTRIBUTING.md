@@ -25,6 +25,10 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
    * [bbmle](https://cran.r-project.org/web/packages/bbmle/index.html)
    * [HelpersMG](https://cran.r-project.org/web/packages/HelpersMG/index.html)
    * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
+   * [DT](https://cran.r-project.org/web/packages/DT/index.html)
+   * [shiny](https://cran.r-project.org/web/packages/shiny/index.html)
+   * [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
+   * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
@@ -40,13 +44,21 @@ The update script `update.sh` is available at the root of this repo. This script
 Provided that a duotang conda environment is available, run the following command at the root directory:
 `update.sh`
 
+The conda environment can be created using the environment.yaml file at the root of this repo. 
+
+If the dependencies are installed at the system level, you can bypass the Conda requirement by using the `--noconda` flag. i.e. `./update.sh --noconda`
+
+To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. i.e. `./update.sh --downloadonly`
+
 Arguments can also be provided for custom build functions:
  * `-d|--date` String in format "YYYY-MM-DD", this will be the datestamped used throughout the build process (default: $CurrentUTCDate)
  * `-s|--source` The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
  * `-o|--outdir` The output directory of all but the HTML files (default: ./data_needed). 
  * `-f|--scriptdir` The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
- * `--overwrite` Flag for discarding current checkpoints and restart update from beginning"
- * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing."
+ * `--overwrite` Flag for discarding current checkpoints and restart update from beginning
+ * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing.
+ * `--downloadonly` Flag used to download data only. Script will exit once all external resources had been downloaded. 
+ * `--noconda` Flag used to run the update script with system level dependencies. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
 
 # Step by step instruction to obtain data, and to generate phylogenies
 
@@ -58,7 +70,7 @@ Note `<datetime>` is a placeholder for the date and time associated with downloa
 |---------|-------------|---------|---------------|
 | `sh data_needed/download.sh <ViralAi>` |  download data release from VirusSeq (or ViralAI if argument is provided), separate and re-compress, download also also data from ncov viralai and add pango designations | `ncov-open.$datestamp.fasta.xz`     `viralai.$datestamp.withalias.csv` `virusseq.$datestamp.fasta.xz` `ncov-open.$datestamp.withalias.tsv.gz` `virusseq.$datestamp.metadata.tsv.gz` |  ~20 minutes |
 | `datestamp=$(ls data_needed/virusseq.*fasta.xz \| tail -1 \| cut -d. -f2)` | set the `datestamp` variable | | 1 second |
-| `for i in 1 2 3; do python3 scripts/alignment.py data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/sample$i.fasta; done` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample1.fasta` `sample2.fasta` `sample3.fasta` | ~2 minutes |
+| `python3 scripts/alignment.py data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/ --samplenum 3 --reffile resources/NC_045512.fa` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample1.fasta` `sample2.fasta` `sample3.fasta` | ~2 minutes |
 
 
 ## To generate phylogenies (ML and time-scaled)

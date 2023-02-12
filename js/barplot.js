@@ -101,7 +101,7 @@ var plotheight = 480,
         .attr("height", plotheight+"px")
 
 // append a new group to SVG with nice margins (where axis labels are drawn)
-var margin = {top: 0, right: 50, bottom: 20, left: 50},
+var margin = {top: 0, right: 60, bottom: 100, left: 60},
     width = width - margin.left - margin.right,
     height = plotheight - margin.top - margin.bottom,
     g = bpsvg.append("g")
@@ -248,7 +248,6 @@ g.append("g")
    .attr("transform", "translate(0," + height + ")")
    .call(xAxis);
 
-  
 // draw y-axis
 g.append("g")
    .attr("class", "yl_axis")
@@ -258,6 +257,24 @@ g.append("g")
    .attr("class", "yr_axis")
    .attr("transform", "translate(" + width + ", 0)")
    .call(d3.axisRight(yScale));
+
+
+// add axis labels
+bpsvg.append("text")
+     .attr("class", "x label")
+     .attr("text-anchor", "middle")
+     .attr("x", width/2 + margin.left)
+     .attr("y", height + 40)
+     .text("Sampling date");
+ 
+bpsvg.append("text")
+     .attr("class", "y label")
+     .attr("transform", "rotate(-90)")
+     .attr("text-anchor", "middle")
+     .attr("x", -(height/2) - margin.top)
+     .attr("y", 10)
+     .text("Number of genomes");
+ 
 
 // bind option values to function calls
 const offsets = {
