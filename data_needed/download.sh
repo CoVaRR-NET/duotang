@@ -22,6 +22,7 @@ scripts_dir=${PWD}/scripts
 wget -O ${data_dir}/alias_key.json https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  #> /dev/null 2>&1
 cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  sed 's\[^A-Z0-9\.\/]\ \g' | awk '
    function fullname(s){split(s,ss,".");for(j=NR-1;j>0;j--){if(ss[1]==n[j]){gsub(ss[1],p[j],s);break}};return(s)}
+   BEGIN{print "lineage raw_lineage"}
    NF==2{n[NR]=$1;p[NR]=$2}
    NF>2{
       root=fullname($2);
@@ -36,7 +37,7 @@ cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  
       p[NR]=root"."$1
    }
    {print n[NR],p[NR]}
-' >  ${data_dir}/pango_designation_alias_key.tsv
+' | tr ' ' '\t' >  ${data_dir}/pango_designation_alias_key.tsv
 
 #(
  #get the fasta from ncov
