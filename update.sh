@@ -207,24 +207,44 @@ echo version will be stamped as : $datestamp
 
 #get the json containing aliases
 wget -O ${data_dir}/lineageNotes.tsv https://raw.githubusercontent.com/cov-lineages/pango-designation/master/lineage_notes.txt
+
 wget -O ${data_dir}/alias_key.json https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  #> /dev/null 2>&1
-cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print "alias",$1,$2}' >  ${data_dir}/pango_designation_alias_key.json
+cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  sed 's\[^A-Z0-9\.\/]\ \g' | awk '
+   function fullname(s){split(s,ss,".");for(j=NR-1;j>0;j--){if(ss[1]==n[j]){gsub(ss[1],p[j],s);break}};return(s)}
+   BEGIN{print "alias lineage"}
+   NF==2{n[NR]=$1;p[NR]=$2}
+   NF>2{
+      root=fullname($2);
+      for(i=3;i<=NF;i++){
+         split(fullname($i),sf,".")
+         split(root,sr,".")
+         root=sf[1]
+         k=2
+         while(sf[k]==sr[k]){root=root"."sf[k];k++}
+      }
+      n[NR]=$1
+      p[NR]=root"."$1
+   }
+   {print n[NR],p[NR]}
+' | tr ' ' '\t' >  ${data_dir}/pango_designation_alias_key.tsv
+
+
 echo "alias" > $checkPointFile
 #alias:
 
 #get the fasta from ncov
 wget -O ${data_dir}/ncov-open.$datestamp.fasta.xz https://data.nextstrain.org/files/ncov/open/sequences.fasta.xz  #> /dev/null 2>&1
-echo "ncovfasta" > $checkPointFile
-#ncovfasta:
+echo "ncovdata" > $checkPointFile
 
+#ncovdata:
+#get the metadata from ncov and add a column with raw names (eg: BA.5 is B.1.1.529.5)
 wget -O ${data_dir}/ncov-open.$datestamp.tsv.gz https://data.nextstrain.org/files/ncov/open/metadata.tsv.gz # > /dev/null 2>&1
-echo "ncovmetadata" > $checkPointFile
-#ncovmetadata:
-
-(cat ${data_dir}/pango_designation_alias_key.json;
-zcat ${data_dir}/ncov-open.$datestamp.tsv.gz | tr ' ' '_' | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g'| sed 's/\t$/\tNA/g')|
-awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"raw_lineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
-tr ' ' '\t'  | gzip > ${data_dir}/ncov-open.$datestamp.withalias.tsv.gz
+	(
+	  cat ${data_dir}/pango_designation_alias_key.tsv;
+	  zcat ${data_dir}/ncov-open.$datestamp.tsv.gz | tr ' ' '_' | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g'| sed 's/\t$/\tNA/g'
+	  ) |
+	awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"raw_lineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
+	tr ' ' '\t'  | gzip > ${data_dir}/ncov-open.$datestamp.withalias.tsv.gz
 echo "ncovclean" > $checkPointFile
 #ncovclean:
 
@@ -233,38 +253,34 @@ if [[ $SOURCE == "viralai" ]]; then
 	dnastack config set collections.url https://viral.ai/api/
 	dnastack config set drs.url https://viral.ai/
 
-	echo "Data source is ViralAi"
-	cat  ${data_dir}/alias_key.json | sed 's\[":,]\\g' | awk 'NF==2 && substr($1,1,1)!="X"{print $1,$2}' |  tr ' ' \\t  >  ${data_dir}/pango_designation_alias_key_viralai1.tsv
-	cat ${data_dir}/pango_designation_alias_key_viralai1.tsv ${data_dir}/alias_key.json | awk 'NF==2 && substr($1,1,1)!="\""{dico[$1]=$2}NF==2 && substr($1,1,2)=="\"X"{split(substr($2,1,length($2)-1),t,",");for(i in t){split(t[i],tt,"\"");e=split(tt[2],ttt,".");res=ttt[1];if(res in dico){res=dico[res]};for (j=2; j<=e;j++){res=res"."ttt[j]};t[i]=res}alias=substr($1,2,length($1)-3);printf alias" ";for(i in t){printf "%s ",t[i]}print " "}' | awk '{r=$2;for(i=3;i<=NF;i++){l=split(r,t1,".");split($i,t2,".");r=t1[1];k=2;while(t1[k]==t2[k]){r=r"."t1[k];k++}}r=r"."$1;printf "%s\t%s\n",$1,r}' > ${data_dir}/pango_designation_alias_key_viralai2.tsv
-	(echo 'alias	lineage';cat ${data_dir}/pango_designation_alias_key_viralai1.tsv ${data_dir}/pango_designation_alias_key_viralai2.tsv) > ${data_dir}/pango_designation_alias_key_viralai.tsv
-	#rm  ${data_dir}/alias_key.json ${data_dir}/pango_designation_alias_key_viralai1.tsv ${data_dir}/pango_designation_alias_key_viralai2.tsv
-	(
-	  python  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key_viralai.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
-	)
-	(
-	  mkdir -p  ${data_dir}/temp
-	  python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
-	  dnastack files download -i  ${data_dir}/temp/fasta_drl.$datestamp.txt -o ${data_dir}/temp
-	  mv ${data_dir}/temp/*.xz ${data_dir}/virusseq.$datestamp.fasta.xz
-	  rm -r  ${data_dir}/temp
-	)
+    echo "Data source is ViralAi"
+    (
+      python  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
+    )
+    (
+      mkdir -p  ${data_dir}/temp
+      python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
+      dnastack files download -i  ${data_dir}/temp/fasta_drl.$datestamp.txt -o ${data_dir}/temp
+      mv ${data_dir}/temp/*.xz ${data_dir}/virusseq.$datestamp.fasta.xz
+      rm -r  ${data_dir}/temp
+    )
 else
 	(
-	  echo "Data source is VirusSeq"
-	  # download tarball from VirusSeq
-	  wget -O ${data_dir}/virusseq.$datestamp.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all # > /dev/null 2>&1
-	  # scan tarball for filenames
-	  tar -ztf ${data_dir}/virusseq.$datestamp.tar.gz > ${data_dir}/.list_filenames$datestamp
-	  # stream metadata into gz-compressed file
-	  $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat ${data_dir}/.list_filenames$datestamp | grep tsv$) | gzip > ${data_dir}/virusseq.$datestamp.metadata.tsv.gz
-	  # stream FASTA data into xz-compressed file
-	  $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat ${data_dir}/.list_filenames$datestamp | grep fasta$) | perl -p -e "s/\r//g" | xz -T0 > ${data_dir}/virusseq.$datestamp.fasta.xz
-	  # delete tarball
-	  rm ${data_dir}/virusseq.$datestamp.tar.gz ${data_dir}/.list_filenames$datestamp
-	  dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.samples" --format csv > ${data_dir}/viralai.$datestamp.csv
-	  (cat ${data_dir}/pango_designation_alias_key.json;cat ${data_dir}/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
-	  tr ' ' ',' | sed 's/lineage,lineage/raw_lineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
-	  python3 scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
+      echo "Data source is VirusSeq"
+      # download tarball from VirusSeq
+      wget -O ${data_dir}/virusseq.$datestamp.tar.gz https://singularity.virusseq-dataportal.ca/download/archive/all # > /dev/null 2>&1
+      # scan tarball for filenames
+      tar -ztf ${data_dir}/virusseq.$datestamp.tar.gz > ${data_dir}/.list_filenames$datestamp
+      # stream metadata into gz-compressed file
+      $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat ${data_dir}/.list_filenames$datestamp | grep tsv$) | gzip > ${data_dir}/virusseq.$datestamp.metadata.tsv.gz
+      # stream FASTA data into xz-compressed file
+      $tarcmd -axf ${data_dir}/virusseq.$datestamp.tar.gz -O $(cat ${data_dir}/.list_filenames$datestamp | grep fasta$) | perl -p -e "s/\r//g" | xz -T0 > ${data_dir}/virusseq.$datestamp.fasta.xz
+      # delete tarball
+      rm ${data_dir}/virusseq.$datestamp.tar.gz ${data_dir}/.list_filenames$datestamp
+      dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.samples" --format csv > ${data_dir}/viralai.$datestamp.csv
+      (cat ${data_dir}/pango_designation_alias_key.tsv;cat ${data_dir}/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
+      tr ' ' ',' | sed 's/lineage,lineage/raw_lineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
+      python3 scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
 	)
 fi
 echo "getdata" > $checkPointFile
@@ -285,7 +301,7 @@ echo "casecount" > $checkPointFile
 #casecount:
 if [ "$SKIPGSD" = "NO" ]; then 
 	echo "downloading GSD metadata"
-	python script/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz-compressed
+	python ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
 fi
 echo "gsddownloaded" > $checkPointFile
 

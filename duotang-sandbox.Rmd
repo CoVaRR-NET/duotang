@@ -367,7 +367,12 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filen
   colnames(line) <- c("Reported_Date", "n", "type")
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
-  population <- as.numeric(populationData[2,selectionEstimateObject$region])
+  if (selectionEstimateObject$region == "Canada"){
+    population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
+  } 
+  else {
+    population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
+  }
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,filename=filename )
 }
 
