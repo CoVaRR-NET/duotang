@@ -23,15 +23,18 @@ if __name__ == "__main__":
         
     if not (os.path.exists(".secret/gsduser") and os.path.exists(".secret/gsdpass")):
         print ("you need to create a 'gsduser' and 'gsdpass' file inside of the .secret folder at root of this repo. ")
-        print ("gsduser should contain the username and gsdpass should contain pass ")
+        print ("gsduser should contain the username and gsdpass should contain pass.")
+        print ("remeber to not push them into git.")
         sys.exit("User/Pass not found.")
 
     options = SeleniumOptions()
     options.headless = True
-    options.set_preference("general.useragent.override","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0")
-    options.set_preference("dom.webdriver.enabled", False)
+    #This script is a shall identify legit computer :)
+    options.set_preference("general.useragent.override","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0") 
+    options.set_preference("dom.webdriver.enabled", False) 
     options.set_preference('useAutomationExtension', False)
-    options.set_preference("browser.download.folderList", 2)
+    #force download to go to PWD    
+    options.set_preference("browser.download.folderList", 2) 
     options.set_preference("browser.download.manager.showWhenStarting", False)
     options.set_preference("browser.download.dir", os.getcwd())
     options.set_preference("browser.helperApps.neverAsk.saveToDisk", True)
