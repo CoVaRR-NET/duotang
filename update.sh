@@ -125,9 +125,9 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
-echo "Skip GSD download?: ${DOWNLOADONLY}"
+echo "Skip GSD download?: ${SKIPGSD}"
 echo "Main branch build mode: ${BUILDMAIN}"
-echo "Clean up mode: ${BUILDMAIN}"
+echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
 if [ ! -z "$GOTOSTEP" ]; then echo "Skipping to step $GOTOSTEP"; fi
 

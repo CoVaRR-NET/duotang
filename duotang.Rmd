@@ -25,6 +25,20 @@ params:
 
 
 ```{r setup, include=FALSE, warning=FALSE}
+list.of.packages <- c("ggfree")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) {
+  require(devtools)
+  devtools::install_github("ArtPoon/ggfree")
+}
+
+list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) {
+  install.packages(new.packages)
+}
+
+
 library(tidyr)
 library(knitr) # Needed to set root directory
 library(lubridate)  # dates are awful
