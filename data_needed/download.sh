@@ -20,7 +20,7 @@ scripts_dir=${PWD}/scripts
 
 #get the json containing aliases
 wget -O ${data_dir}/alias_key.json https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json  #> /dev/null 2>&1
-cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  sed 's\[^A-Z0-9\.\/]\ \g' | awk '
+cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  sed 's\[^A-Z0-9\.\/]\ \g' | awk 'NF>1' | awk '
    function fullname(s){split(s,ss,".");for(j=NR-1;j>0;j--){if(ss[1]==n[j]){gsub(ss[1],p[j],s);break}};return(s)}
    BEGIN{print "alias lineage"}
    NF==2{n[NR]=$1;p[NR]=$2}
