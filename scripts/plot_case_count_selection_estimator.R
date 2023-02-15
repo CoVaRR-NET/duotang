@@ -1,9 +1,6 @@
 library(splines)
 
 parseCaseData<- function(maxDate = NA, datadir = "data_needed"){
-  if (is.na(maxDate)){
-    stop("Expected a max cutoff date, got None")
-  }
   #maxDate = maxdate
   BC<-read.csv(gzfile(paste0(datadir, "/AgeCaseCountBC.csv.gz")), header=T)%>% 
     filter(Age_Group %in% c("90+", "80-89","70-79")) %>% #keep only the 70+ case counts
@@ -67,30 +64,18 @@ parseCaseData<- function(maxDate = NA, datadir = "data_needed"){
 
 #get smooth fit of casecounts
 getCaseCountSmoothFit <- function(countData, knots=5){
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   return (smooth.spline(countData$Reported_Date, countData$n,nknots=knots))
 }
 
 getCaseCountSmoothFitWithLambda<-function(countData, lambda=0.001){
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   return(smooth.spline(log10(countData$n),lambda=lambda))
 }
 
 getCaseCountSmoothFitWithSpar<-function(countData, spar=0.8){
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   return(smooth.spline(log10(countData$n),spar=0.8))
 }
 
 CubicSplSmooth <- function(countData, df=7) {
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   #if (is.na(df)){df = ceiling(length(countData$n) / 20)}
   bs <- (lm(n ~ bs(Reported_Date, df = df), data = countData )$fit)
   return(bs)
@@ -130,10 +115,6 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
   #countData <- caseCountData
   #lineFits <-rev(caseSelectionLines)
   #filename = "test"
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
-  
   colors = list()
   rValues = list()
   for (i in seq(1:length(lineFits))){
