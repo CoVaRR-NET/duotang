@@ -383,15 +383,15 @@ echo "aligned" > $checkPointFile
 
 #aligned:
 if command -v iqtree2 &> /dev/null; then
-	iqtreecmd='iqtree2'
+	iqtreecmd='iqtree2 --redo'
 else
-	iqtreecmd='iqtree'
+	iqtreecmd='iqtree -redo'
 fi
 
 for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 	echo $alignedFasta
 	date
-	$iqtreecmd -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 4 --redo; 
+	$iqtreecmd -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8; 
 done
 echo "treebuilt" > $checkPointFile
 
