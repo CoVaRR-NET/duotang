@@ -47,6 +47,11 @@ while [[ $# -gt 0 ]]; do
       NOCONDA="YES"
       shift # past argument
       ;;
+  	--venvpath)
+      VENVPATH="$2"
+      shift # past argument
+      shift # past value
+      ;;
 	--downloadonly)
       DOWNLOADONLY="YES"
       shift # past argument
@@ -94,18 +99,25 @@ if [ "$LISTSTEPS" = "YES" ]; then
 	exit 0
 fi
 
+
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
 	if [[ -n $(which python) ]]; then 
 		echo "Using python at $(which python)"
 	else
-		if [[ -n $(which python3) ]]; then 
-			echo "Using python at $(which python3)"
-			alias python="python3"
+		if [ ! -z "$VENVPATH" ]; then
+			echo "Using the venv: ${VENVPATH}";
+			source ${VENVPATH}/bin/activate
 		else
-			echo "Python not found, please check your dependencies"
-			exit 1
+			echo "Not using Conda and venv path is not specified with --venvpath, attempt to use dependencies with system level installs"
+			if [[ -n $(which python3) ]]; then 
+				echo "Using python at $(which python3)"
+				alias python="python3"
+			else
+				echo "Python not found, please check your dependencies"
+				exit 1
+			fi
 		fi
 	fi
 else 
@@ -129,6 +141,7 @@ echo "Skip GSD download?: ${SKIPGSD}"
 echo "Main branch build mode: ${BUILDMAIN}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
+if [ ! -z "$VENVPATH" ]; then echo "VENV path is: ${VENVPATH}"; fi
 if [ ! -z "$GOTOSTEP" ]; then echo "Skipping to step $GOTOSTEP"; fi
 
 echo ""
