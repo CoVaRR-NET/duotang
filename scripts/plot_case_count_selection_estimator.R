@@ -118,9 +118,6 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
   colors = list()
   rValues = list()
   for (i in seq(1:length(lineFits))){
-    if (!c("line", "color", "names") %in% names(lineFits[[i]])){
-      stop("Possible corrupted lineFits Expected key: line, color, name")
-    }
     fitData <- lineFits[[i]]$line
     colnames(fitData) <- c("Reported_Date", lineFits[[i]]$names, "type")
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T)
