@@ -69,6 +69,10 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
+	--help)
+      HELPFLAG="YES"
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 2
@@ -96,6 +100,23 @@ if [ "$SKIPGSD" = "YES" ]; then SKIPGSD="YES"; else SKIPGSD="NO"; fi
 if [ "$LISTSTEPS" = "YES" ]; then 
 	echo "Available checkpoint steps are: "
 	echo $(cat update.sh | grep '^#.*:$' | sed 's/#//' | sed 's/://')
+	exit 0
+fi
+if [ "$HELPFLAG" = "YES" ]; then 
+	echo -e "This script attempts to automate the data download, data processing, and knitting process of building CoVaRR-Net Duotang.\n\n"
+	echo "Available arguments:"
+	echo "[-d|--date] String in format 'YYYY-MM-DD'. This will be the datestamped used throughout the build process (default: CurrentUTCDate)"
+	echo "[-s|--source] String. The value can be 'viralai' or 'virusseq', this will be the genomic datasource used (default: viralai)."
+	echo "[-o|--outdir] String. The output directory of all but the HTML files (default: ./data_needed). "
+	echo "[-f|--scriptdir] String. The ABSOLUTE path to the scripts directory (default: \${PWD}/scripts)."
+	echo "[--overwrite] Flag for discarding current checkpoints and restart update from beginning"
+	echo "[--buildmain] Flag used to knit the RMD and push the changes to the main branch for publishing."
+	echo "[--downloadonly] Flag used to download data only. Script will exit once all external resources had been downloaded. "
+	echo "[--noconda] Flag used to run the update script without conda. Note: The dependencies should exist in \$PATH and this script makes no attempt to ensure that they exist. "
+	echo "[--venvpath] String. The ABSOLUTE path to the venv containing dependencies. Should be used with '--noconda'."
+	echo "[--skipgsd] Flag used to skip the GSD metadata download. "
+	echo "[--liststeps] Prints the available checkpoint steps in this script. You can use this for the '--gotostep' argument."	
+	echo "[--gotostep] Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use '--liststeps' to see all the available checkpoints. "
 	exit 0
 fi
 
@@ -148,7 +169,8 @@ echo ""
 echo ""
 datestamp=$DATE
 
-read -p "Press any key to start the update, or ctrl+C to adjust config"
+#this doesnt work when backgrounded.
+#read -p "Press any key to start the update, or ctrl+C to adjust config"
 
 #function as a hack for labels and goto statements.
 #labels start with '#' and end with ':' to avoid syntax errors. e.g. "#LabelName:"
@@ -359,6 +381,10 @@ python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${d
 echo "aligned" > $checkPointFile
 
 #aligned:
+if ! command -v iqtree2 &> /dev/null; then
+	alias iqtree2="iqtree"
+done
+
 for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 	echo $alignedFasta
 	date
