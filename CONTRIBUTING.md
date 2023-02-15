@@ -12,8 +12,6 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 
 ## Dependencies
 * [Python 3.9+](https://www.python.org/downloads/)
-   * [BioPython](https://biopython.org/)
-   * [dnastack](https://docs.viral.ai/analysis/)
 * [R 4.0.2+](https://cran.r-project.org/)
    * [ape](https://cran.r-project.org/web/packages/ape/index.html)
    * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
@@ -33,6 +31,14 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [TreeTime](https://github.com/neherlab/treetime)
 
+The following are needed as part of the update script and should be installed via PIP in a virtual environment if Conda is not being used.
+* [BioPython](https://pypi.org/project/biopython/)
+* [dnastack](https://docs.viral.ai/analysis/)
+* [Pandas](https://pypi.org/project/pandas/)
+* [Selenium](https://pypi.org/project/selenium/)
+* [Webdriver-Manager](https://pypi.org/project/webdriver-manager/)
+* [pycrypto](https://pypi.org/project/pycrypto/)
+
 ## Conda Environment
 
 These dependencies can also be installed from the environment.yaml using `conda env create -f conda-env.yaml`
@@ -41,25 +47,33 @@ These dependencies can also be installed from the environment.yaml using `conda 
 
 The update script `update.sh` is available at the root of this repo. This script attempts to automate the data download, data processing, and knitting process of building CoVaRR-Net Duotang.
 
-Provided that a duotang conda environment is available, run the following command at the root directory:
+The conda environment can be created using the environment.yaml file at the root of this repo. If a duotang conda environment is available, run the following command at the root directory:
 `update.sh`
 
-The conda environment can be created using the environment.yaml file at the root of this repo. 
+If conda is not available, but dependencies are install via python virtual env, run the script with the `--noconda` flag and specify a venv that the script should load for the needed dependencies via `--venvpath`.
+`update.sh --noconda --venvpath /path/to/duotang/venv`
 
-If the dependencies are installed at the system level, you can bypass the Conda requirement by using the `--noconda` flag. i.e. `./update.sh --noconda`
+If all dependencies are install system wide, use the `--noconda` flag only.
+`update.sh --noconda`
+Note: the script might throw unreasonable errors should a dependency be missing in this mode.
 
-To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. i.e. `./update.sh --downloadonly`
+## Download Data Only
+To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. The above section dealing with flags for dependencies still apply.
+`./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`. 
 
 Arguments can also be provided for custom build functions:
- * `-d|--date` String in format "YYYY-MM-DD", this will be the datestamped used throughout the build process (default: $CurrentUTCDate)
- * `-s|--source` The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
- * `-o|--outdir` The output directory of all but the HTML files (default: ./data_needed). 
- * `-f|--scriptdir` The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
+ * `-d|--date` String in format "YYYY-MM-DD". This will be the datestamped used throughout the build process (default: $CurrentUTCDate)
+ * `-s|--source` String. The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
+ * `-o|--outdir` String. The output directory of all but the HTML files (default: ./data_needed). 
+ * `-f|--scriptdir` String. The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
  * `--overwrite` Flag for discarding current checkpoints and restart update from beginning
  * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing.
  * `--downloadonly` Flag used to download data only. Script will exit once all external resources had been downloaded. 
- * `--noconda` Flag used to run the update script with system level dependencies. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
- * `--skipgsd` Flag used to skip the GSD metadata download. Note: using update.sh without this flag requires selenium, webdriver_manager, and firefox for dependencies.
+ * `--noconda` Flag used to run the update script without conda. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
+ * `--venvpath` String. The ABSOLUTE path to the venv containing dependencies. Should be used with `--noconda`.
+ * `--skipgsd` Flag used to skip the GSD metadata download. 
+ * `--liststeps` Prints the available checkpoint steps in this script. You can use this for the `--gotostep` argument.
+ * `--gotostep` Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use `--liststeps` to see all the available checkpoints. 
 
 # Step by step instruction to obtain data, and to generate phylogenies
 
