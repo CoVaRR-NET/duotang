@@ -383,7 +383,7 @@ echo "aligned" > $checkPointFile
 #aligned:
 if ! command -v iqtree2 &> /dev/null; then
 	alias iqtree2="iqtree"
-done
+fi
 
 for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 	echo $alignedFasta
