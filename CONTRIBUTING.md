@@ -32,7 +32,7 @@ The following dependencies should be installed system-wide (or at user level) if
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [Firefox] (https://www.mozilla.org/en-CA/firefox/products/)
 
-The following are needed as part of the update script and it is best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
+The following dependences are best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
 * [BioPython](https://pypi.org/project/biopython/)
 * [dnastack](https://docs.viral.ai/analysis/)
 * [Pandas](https://pypi.org/project/pandas/)

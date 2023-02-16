@@ -395,7 +395,6 @@ echo "treebuilt" > $checkPointFile
 
 #treebuilt:
 echo "cleaning trees..."
-	echo python
 
 for treefile in `ls $data_dir/aligned_*.treefile`; do
 	name=${treefile%.*};

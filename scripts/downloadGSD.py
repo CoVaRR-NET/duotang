@@ -41,8 +41,9 @@ if __name__ == "__main__":
     
     print("Connecting to GSD...")
     driver = webdriver.Firefox(options=options, service=FirefoxService(GeckoDriverManager().install()))
-    queryLink = "https://www.epicov.org/epi3/frontend#13a7f9"
+    queryLink = "https://www.epicov.org/epi3/frontend"
     driver.get(queryLink)
+    time.sleep(2)
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "elogin")))
     time.sleep(1)
     username = driver.find_element(By.ID, "elogin")
