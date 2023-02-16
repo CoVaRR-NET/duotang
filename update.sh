@@ -120,22 +120,20 @@ if [ "$HELPFLAG" = "YES" ]; then
 	exit 0
 fi
 
-
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
 	if command -v python; then 
 		echo "Using python at $(command -v python)"
-		pythoncmd='python'
 	else
 		if [ ! -z "$VENVPATH" ]; then
 			echo "Using the venv: ${VENVPATH}";
 			source ${VENVPATH}/bin/activate
 		else
 			echo "Not using Conda and venv path is not specified with --venvpath, attempt to use dependencies with system level installs"
-			if command -v python3; then 
-				echo "Using python at $(which python3)"
-				pythoncmd='python3'
+			if command -v python; then 
+				echo "Using python at $(which python)"
+				pythoncmd='python'
 			else
 				echo "Python not found, please check your dependencies"
 				exit 1
@@ -291,11 +289,11 @@ if [[ $SOURCE == "viralai" ]]; then
 
     echo "Data source is ViralAi"
     (
-      $pythoncmd  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
+      python  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
     )
     (
       mkdir -p  ${data_dir}/temp
-      $pythoncmd  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
+      python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
       dnastack files download -i  ${data_dir}/temp/fasta_drl.$datestamp.txt -o ${data_dir}/temp
       mv ${data_dir}/temp/*.xz ${data_dir}/virusseq.$datestamp.fasta.xz
       rm -r  ${data_dir}/temp
@@ -316,7 +314,7 @@ else
       dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.samples" --format csv > ${data_dir}/viralai.$datestamp.csv
       (cat ${data_dir}/pango_designation_alias_key.tsv;cat ${data_dir}/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
       tr ' ' ',' | sed 's/lineage,lineage/raw_lineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
-      $pythoncmd scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
+      python scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
 	)
 fi
 echo "getdata" > $checkPointFile
@@ -337,7 +335,7 @@ echo "casecount" > $checkPointFile
 #casecount:
 if [ "$SKIPGSD" = "NO" ]; then 
 	echo "downloading GSD metadata"
-	$pythoncmd ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
+	python ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
 fi
 echo "gsddownloaded" > $checkPointFile
 
@@ -354,7 +352,7 @@ echo "dataloaded" > $checkPointFile
 #removes the recombinants
 date
 echo "separating out the recombinants from the data..."
-$pythoncmd ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
+python ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
 
 echo "removerecomb" > $checkPointFile
 
@@ -364,7 +362,7 @@ date
 echo "aligning sequences..."
 
 #All Sequences
-$pythoncmd ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
+python ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
 
 #selected recombinants
 for variant in `ls $data_dir/*regex*.fasta.xz`; do
@@ -373,11 +371,11 @@ for variant in `ls $data_dir/*regex*.fasta.xz`; do
 	name=${name%.*};
 	name=`echo $name|cut -d '_' -f3-`;
 	echo $variant
-	$pythoncmd ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+	python ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
 done
 
 #non-recombinants
-$pythoncmd ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
+python ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
 
 echo "aligned" > $checkPointFile
 
@@ -397,19 +395,20 @@ echo "treebuilt" > $checkPointFile
 
 #treebuilt:
 echo "cleaning trees..."
+	echo python
+
 for treefile in `ls $data_dir/aligned_*.treefile`; do
 	name=${treefile%.*};
 	name=${name%.*};
 	recombString="recombinant"
 	keeproot="--keep-root"
-	echo $keeproot
 	if [[ "$name" == *"$recombString"* ]];then
 		keeproot=""
 	fi
 	echo $name
 	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
 	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
-	$pythoncmd ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
+	python ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
 echo "treecleaned" > $checkPointFile
 
@@ -426,7 +425,7 @@ echo "duotangsandboxbuilt" > $checkPointFile
 #duotangsandboxbuilt:
 if [ -f ".secret/sandbox" ]; then
     secret=`cat .secret/sandbox`
-	$pythoncmd scripts/encrypt.py duotang-sandbox.html $secret
+	python scripts/encrypt.py duotang-sandbox.html $secret
 	mv duotang-sandbox-protected.html duotang-sandbox.html
 else
 	echo ".secret file not found, unable to encrypt."
