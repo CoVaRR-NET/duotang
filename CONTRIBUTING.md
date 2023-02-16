@@ -11,6 +11,7 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 # To set up a development/test environment
 
 ## Dependencies
+The following dependencies should be installed system-wide (or at user level) if Conda is not being used. These must be discoverable in $PATH.
 * [Python 3.9+](https://www.python.org/downloads/)
 * [R 4.0.2+](https://cran.r-project.org/)
    * [ape](https://cran.r-project.org/web/packages/ape/index.html)
@@ -29,15 +30,18 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
    * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
-* [TreeTime](https://github.com/neherlab/treetime)
+* [Firefox] (https://www.mozilla.org/en-CA/firefox/products/)
 
-The following are needed as part of the update script and should be installed via PIP in a virtual environment if Conda is not being used.
+The following are needed as part of the update script and it is best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
 * [BioPython](https://pypi.org/project/biopython/)
 * [dnastack](https://docs.viral.ai/analysis/)
 * [Pandas](https://pypi.org/project/pandas/)
 * [Selenium](https://pypi.org/project/selenium/)
 * [Webdriver-Manager](https://pypi.org/project/webdriver-manager/)
 * [pycrypto](https://pypi.org/project/pycrypto/)
+* [TreeTime](https://github.com/neherlab/treetime)
+
+A virtual environment can be created via: `python -m venv /path/to/duotang/venv`. Above programs can be installed using `pip install`. 
 
 ## Conda Environment
 
@@ -48,19 +52,23 @@ These dependencies can also be installed from the environment.yaml using `conda 
 The update script `update.sh` is available at the root of this repo. This script attempts to automate the data download, data processing, and knitting process of building CoVaRR-Net Duotang.
 
 The conda environment can be created using the environment.yaml file at the root of this repo. If a duotang conda environment is available, run the following command at the root directory:
-`update.sh`
+
+`./update.sh`
 
 If conda is not available, but dependencies are install via python virtual env, run the script with the `--noconda` flag and specify a venv that the script should load for the needed dependencies via `--venvpath`.
-`update.sh --noconda --venvpath /path/to/duotang/venv`
 
-If all dependencies are install system wide, use the `--noconda` flag only.
-`update.sh --noconda`
-Note: the script might throw unreasonable errors should a dependency be missing in this mode.
+`./update.sh --noconda --venvpath /path/to/duotang/venv`
+
+If all dependencies are install system wide, use the `--noconda` flag only. Note: the script might throw unreasonable errors should a dependency be missing in this mode.
+
+`./update.sh --noconda`
 
 ## Download Data Only
-To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. The above section dealing with flags for dependencies still apply.
-`./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`. 
+To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. The above section dealing with dependencies apply.
 
+`./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`
+
+## Arguments available for the download script. 
 Arguments can also be provided for custom build functions:
  * `-d|--date` String in format "YYYY-MM-DD". This will be the datestamped used throughout the build process (default: $CurrentUTCDate)
  * `-s|--source` String. The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
