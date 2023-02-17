@@ -38,7 +38,8 @@ The following dependences are best to be installed via PIP in a virtual environm
 * [Pandas](https://pypi.org/project/pandas/)
 * [Selenium](https://pypi.org/project/selenium/)
 * [Webdriver-Manager](https://pypi.org/project/webdriver-manager/)
-* [pycrypto](https://pypi.org/project/pycrypto/)
+* [pycryptodome 3.16](https://pypi.org/project/pycryptodome/)
+* [PBKDF2](https://pypi.org/project/pbkdf2/)
 * [TreeTime](https://github.com/neherlab/treetime)
 
 A virtual environment can be created via: `python -m venv /path/to/duotang/venv`. Above programs can be installed using `pip install`. 
