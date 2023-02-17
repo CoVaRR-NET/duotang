@@ -91,4 +91,6 @@ if __name__ == "__main__":
     while (len(glob.glob("metadata*.xz.part")) != 0):
         time.sleep(10)
     shutil.move(glob.glob("metadata*.xz")[0], args.outfile)
+    
+    driver.quit()
     print("GSD metadata download completed.")
