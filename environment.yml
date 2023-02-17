@@ -431,5 +431,3 @@ dependencies:
     - requests-toolbelt==0.10.0
     - soupsieve==2.3.2.post1
     - urllib3==1.26.12
-variables:
-  RSTUDIO_PANDOC: /home/jjjjia/miniconda3/envs/duotang/bin/pandoc
