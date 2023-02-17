@@ -124,6 +124,8 @@ if [ "$HELPFLAG" = "YES" ]; then
 	echo "[--noconda] Flag used to run the update script without conda. Note: The dependencies should exist in \$PATH and this script makes no attempt to ensure that they exist. "
 	echo "[--venvpath] String. The ABSOLUTE path to the venv containing dependencies. Should be used with '--noconda'."
 	echo "[--skipgsd] Flag used to skip the GSD metadata download. "
+	echo "[--skipgitpush] Flag used to skip the git push actions within this script."
+	echo "[--clean] [BROKEN] Flag used to clean the data_needed directory after update. Currently it just dumps the new data_needed files into a tarball at root."
 	echo "[--liststeps] Prints the available checkpoint steps in this script. You can use this for the '--gotostep' argument."	
 	echo "[--gotostep] Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use '--liststeps' to see all the available checkpoints. "
 	exit 0
@@ -131,6 +133,8 @@ fi
 
 if [ "$GITPULL" = "YES" ]; then 
 	echo "Pulling in the latest changes. This flag should only be used if there are no changes in git status."
+	echo "Actually I don't know why this is even a flag in the first place. I can see so many issues with including this as part of the update script"
+	echo "You just shouldn't use this flag, or expect the script to act funky."
 	git pull
 fi
 
@@ -204,7 +208,7 @@ if [ ! -z "$GOTOSTEP" ]; then
 fi
 
 if [ "$BUILDMAIN" = "YES" ]; then 
-	jumpTo archive 
+	jumpTo knitduotang 
 fi
 
 #checkpoint logics
@@ -235,11 +239,11 @@ fi
 
 
 #begin:
-echo "begin" > $checkPointFile
-
 #get the timestamp for file name
 echo version will be stamped as : $datestamp
+echo "lineagedata" > $checkPointFile
 
+#lineagedata:
 #get the json containing aliases
 wget -O ${data_dir}/lineageNotes.tsv https://raw.githubusercontent.com/cov-lineages/pango-designation/master/lineage_notes.txt
 
@@ -264,14 +268,14 @@ cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  
 ' | tr ' ' '\t' >  ${data_dir}/pango_designation_alias_key.tsv
 
 
-echo "alias" > $checkPointFile
-#alias:
+echo "ncovfasta" > $checkPointFile
+#ncovfasta:
 
 #get the fasta from ncov
 wget -O ${data_dir}/ncov-open.$datestamp.fasta.xz https://data.nextstrain.org/files/ncov/open/sequences.fasta.xz  #> /dev/null 2>&1
-echo "ncovdata" > $checkPointFile
+echo "ncovmetadata" > $checkPointFile
 
-#ncovdata:
+#ncovmetadata:
 #get the metadata from ncov and add a column with raw names (eg: BA.5 is B.1.1.529.5)
 wget -O ${data_dir}/ncov-open.$datestamp.tsv.gz https://data.nextstrain.org/files/ncov/open/metadata.tsv.gz # > /dev/null 2>&1
 	(
@@ -280,8 +284,8 @@ wget -O ${data_dir}/ncov-open.$datestamp.tsv.gz https://data.nextstrain.org/file
 	  ) |
 	awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"raw_lineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
 	tr ' ' '\t'  | gzip > ${data_dir}/ncov-open.$datestamp.withalias.tsv.gz
-echo "ncovclean" > $checkPointFile
-#ncovclean:
+echo "virusseq" > $checkPointFile
+#virusseq:
 
 if [[ $SOURCE == "viralai" ]]; then
 	#set the endpoints for dnastack databases. Only required on first run. 
@@ -318,8 +322,8 @@ else
       python scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
 	)
 fi
-echo "getdata" > $checkPointFile
-#getdata:
+echo "epidata" > $checkPointFile
+#epidata:
 
 #fetch epidata from multiple sources, These link might change at any time, especially the ON and QC ones. 
 wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv
@@ -331,34 +335,31 @@ wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/da
 wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
 gzip -f ${data_dir}/AgeCaseCount*.csv
 
-echo "casecount" > $checkPointFile
+echo "gsdmetadata" > $checkPointFile
 
-#casecount:
+#gsdmetadata:
 if [ "$SKIPGSD" = "NO" ]; then 
 	echo "downloading GSD metadata"
 	python ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
 fi
-echo "gsddownloaded" > $checkPointFile
+echo "filterseq" > $checkPointFile
 
-#gsddownloaded:
 if [ "$DOWNLOADONLY" = "YES" ]; then
 	echo "Data download complete, exiting..."
+	echo "finish" > $checkPointFile
 	exit 0
 fi
 
-echo "dataloaded" > $checkPointFile
-
-#dataloaded:
-
+#filterseq:
 #removes the recombinants
-date
+
 echo "separating out the recombinants from the data..."
 python ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
 
-echo "removerecomb" > $checkPointFile
+echo "alignseq" > $checkPointFile
 
 
-#removerecomb:
+#alignseq:
 date
 echo "aligning sequences..."
 
@@ -378,17 +379,17 @@ done
 #non-recombinants
 python ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
 
-echo "aligned" > $checkPointFile
+echo "buildtree" > $checkPointFile
 
-#aligned:
+#buildtree:
 for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 	echo $alignedFasta
 	date
 	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo; 
 done
-echo "treebuilt" > $checkPointFile
+echo "cleantree" > $checkPointFile
 
-#treebuilt:
+#cleantree:
 echo "cleaning trees..."
 
 for treefile in `ls $data_dir/aligned_*.treefile`; do
@@ -404,19 +405,19 @@ for treefile in `ls $data_dir/aligned_*.treefile`; do
 	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
 	python ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
-echo "treecleaned" > $checkPointFile
+echo "knitduotang" > $checkPointFile
 
-#treecleaned:
+#knitduotang:
 date
 echo "knitting the Rmd..."
 Rscript -e "rmarkdown::render('duotang.Rmd',params=list(datestamp="\"$datestamp\""))"
-echo "duotangbuilt" > $checkPointFile
+echo "knitsandbox" > $checkPointFile
 
-#duotangbuilt:
+#knitsandbox:
 Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
-echo "duotangsandboxbuilt" > $checkPointFile
+echo "encrypt" > $checkPointFile
 
-#duotangsandboxbuilt:
+#encrypt:
 if [ -f ".secret/sandbox" ]; then
     secret=`cat .secret/sandbox`
 	python scripts/encrypt.py duotang-sandbox.html $secret
@@ -430,27 +431,26 @@ else
 	echo "duotangbuilt" > $checkPointFile
 	exit 1
 fi
-echo "htmlencrypted" > $checkPointFile
+echo "gitpush" > $checkPointFile
 
-#htmlencrypted:
+#gitpush:
 if [ "$SKIPGITPUSH" = "NO" ]; then 
-	git status
-	git add .
-	git commit -m "Update $datestamp"
-	git push origin dev
+	if [ "$BUILDMAIN" = "YES" ]; then 
+		scripts/getPastDuotangVersions.sh
+		git status
+		git add *.html
+		git add archive/*.html
+		git add archive/readme.md
+		git commit -m "Update: $datestamp"
+		git push origin main
+	else
+		git status
+		git add .
+		git commit -m "Update $datestamp"
+		git push origin dev
+	fi
 fi
-echo "updatemain" > $checkPointFile
 
-#updatemain:
-if [ "$BUILDMAIN" = "YES" ]; then 
-	scripts/getPastDuotangVersions.sh
-	git status
-	git add *.html
-	git add archive/*.html
-	git add archive/readme.md
-	git commit -m "Update: $datestamp"
-	git push origin main
-fi
 echo "cleanup" > $checkPointFile
 
 #cleanup:
