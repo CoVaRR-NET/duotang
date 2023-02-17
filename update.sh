@@ -360,7 +360,6 @@ echo "alignseq" > $checkPointFile
 
 
 #alignseq:
-date
 echo "aligning sequences..."
 
 #All Sequences
@@ -384,7 +383,6 @@ echo "buildtree" > $checkPointFile
 #buildtree:
 for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 	echo $alignedFasta
-	date
 	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo; 
 done
 echo "cleantree" > $checkPointFile
@@ -408,7 +406,6 @@ done
 echo "knitduotang" > $checkPointFile
 
 #knitduotang:
-date
 echo "knitting the Rmd..."
 Rscript -e "rmarkdown::render('duotang.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "knitsandbox" > $checkPointFile
