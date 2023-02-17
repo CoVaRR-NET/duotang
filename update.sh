@@ -60,6 +60,14 @@ while [[ $# -gt 0 ]]; do
       SKIPGSD="YES"
       shift # past argument
       ;;
+	--gitpull)
+      GITPULL="YES"
+      shift # past argument
+      ;;
+  	--skipgitpush)
+      SKIPGITPUSH="YES"
+      shift # past argument
+      ;;
 	--liststeps)
       LISTSTEPS="YES"
       shift # past argument
@@ -97,6 +105,7 @@ if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$SKIPGSD" = "YES" ]; then SKIPGSD="YES"; else SKIPGSD="NO"; fi
+if [ "$SKIPGITPUSH" = "YES" ]; then SKIPGITPUSH="YES"; else SKIPGITPUSH="NO"; fi
 if [ "$LISTSTEPS" = "YES" ]; then 
 	echo "Available checkpoint steps are: "
 	echo $(cat update.sh | grep '^#.*:$' | sed 's/#//' | sed 's/://')
@@ -117,6 +126,12 @@ if [ "$HELPFLAG" = "YES" ]; then
 	echo "[--skipgsd] Flag used to skip the GSD metadata download. "
 	echo "[--liststeps] Prints the available checkpoint steps in this script. You can use this for the '--gotostep' argument."	
 	echo "[--gotostep] Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use '--liststeps' to see all the available checkpoints. "
+	exit 0
+fi
+
+if [ "$GITPULL" = "YES" ]; then 
+	echo "Pulling in the latest changes. This flag should only be used if there are no changes in git status."
+	git pull
 	exit 0
 fi
 
@@ -437,7 +452,7 @@ if [ "$BUILDMAIN" = "YES" ]; then
 fi
 echo "archive" > $checkPointFile
 
-#archive
+#archive:
 if [ "$BUILDMAIN" = "YES" ]; then 
 	git status
 	git add *.html
@@ -445,6 +460,12 @@ if [ "$BUILDMAIN" = "YES" ]; then
 	git add archive/readme.md
 	git commit -m "Update: $datestamp"
 	git push origin main
+fi
+
+if [ "$SKIPGITPUSH" = "YES" ]; then 
+	git add .
+	git commit -m "Update $datestamp"
+	git push origin dev
 fi
 
 echo "Update completed successfully"
