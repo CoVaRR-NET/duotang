@@ -30,7 +30,7 @@ The following dependencies should be installed system-wide (or at user level) if
    * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
-* [Firefox] (https://www.mozilla.org/en-CA/firefox/products/)
+* [Firefox](https://www.mozilla.org/en-CA/firefox/products/)
 
 The following dependences are best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
 * [BioPython](https://pypi.org/project/biopython/)
@@ -38,7 +38,7 @@ The following dependences are best to be installed via PIP in a virtual environm
 * [Pandas](https://pypi.org/project/pandas/)
 * [Selenium](https://pypi.org/project/selenium/)
 * [Webdriver-Manager](https://pypi.org/project/webdriver-manager/)
-* [pycryptodome 3.16](https://pypi.org/project/pycryptodome/)
+* [pycryptodome 3.16](https://pypi.org/project/pycryptodome/) (note ONLY version 3.16 works.)
 * [PBKDF2](https://pypi.org/project/pbkdf2/)
 * [TreeTime](https://github.com/neherlab/treetime)
 

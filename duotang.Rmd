@@ -252,8 +252,6 @@ XBB.1.5 continues to grow steadily and significantly. Some other select variants
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
 
-
-
 ```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
 source("scripts/subtype_plotter.R")
@@ -463,6 +461,21 @@ There are two Pango lineages that have a Canadian origin and that predominately 
 ## Root-to-tip analyses  
 
 ```{r rtt, child="rtt.Rmd"}
+```
+
+## Pango lineage description table
+
+Here we present a searchable table that provides a short description of each lineage as well information on the ancestor of that lineage.
+
+```{r function for displaying lineage informaiton, warning=FALSE, message=FALSE}
+source("scripts/scanlineages.R")
+lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F) %>% 
+  mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>% 
+  mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
+  dplyr::select(Lineage, Parent, Description) 
+colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description")
+
+DT::datatable(lineageDescriptions, filter = 'top', rownames = F, options = list( dom='ip',pageLength = 5, autoWidth = TRUE))
 ```
 
 # Future development

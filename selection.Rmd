@@ -85,6 +85,106 @@ apply(dataAvailable.regions,1,function(reg){
 
 ## {.unlisted .unnumbered}
 
+## Selection by Case Count {.tabset}
+
+```{r case count selection estimator setup}
+source("scripts/plot_case_count_selection_estimator.R")
+caseData <- parseCaseData(maxdate, params$datadir)
+populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
+plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
+  #caseCountData <- caseData$Canada
+  #selectionEstimateObject<- selectionEstimateFits$Canada
+  #filename=NA
+  if (selectionEstimateObject$region == "Canada"){dayToCut = 2} else { dayToCut = 5 }
+  caseCountData$report_type <- "Accurate"
+  caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
+  caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))
+  caseFitLinePredictedValues <- c((10^(predict(caseFitModel, data.frame(x=(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)))[[2]]))$x)
+  caseFitLineValues <- 10^(caseFitModel$y)
+  caseCountFitLine<-data.frame(caseCountData$Reported_Date, c(caseFitLineValues, c(caseFitLinePredictedValues)), caseCountData$report_type)
+  colnames(caseCountFitLine) <- c("Reported_Date", "n", "type")
+  caseCountFitLine <- caseCountFitLine %>% mutate(type = ifelse(type=="UnderReported", "Projected", "Actual"))
+  
+  selectionFit <- selectionEstimateObject$fit
+  selectionScurves <- selectionEstimateObject$scurves
+  selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
+  if (selectionEstimateObject$region == "Canada"){
+      selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
+      selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
+  }
+  selectionNames <- selectionEstimateObject$names
+  selectionColors <- selectionEstimateObject$color
+  caseSelectionLines <- list()
+  #build to total case line.
+  caseSelectionLines[[1]] <- list("line"=caseCountFitLine, "names" = "CaseCount", "color"="limegreen")
+
+  #build line for each variant
+  for (i in seq(from=2, to=ncol(selectionScurves))){
+      x = caseCountData$Reported_Date
+      actual = caseCountFitLine$n[1:length(selectionScurves[,i])] * selectionScurves[,i]
+      actual <- actual[!is.na(actual)]
+      if (length(actual) == length(caseCountData$Reported_Date)){
+        proj = NULL
+      } else{
+        proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] *   selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseCountFitLine$n)]
+        proj <- proj[!is.na(proj)]
+      }
+      y = c(actual, proj)
+      #type <- c(c(rep("actual",length(selectionScurves[,i]))), c(rep("projection", length(caseFit) - length(selectionScurves[,i]))))
+      line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
+      colnames(line) <- c("Reported_Date", "n", "type")
+      caseSelectionLines[[i]] <- list("line"=line, "names" = selectionNames[[i-1]], "color"=selectionColors[i-1])
+  }
+
+  #build the line for  "the rest"
+  x <- caseCountData$Reported_Date
+  actual = caseCountFitLine$n[1:length(selectionScurves[,1])] * selectionScurves[,1]
+  actual <- actual[!is.na(actual)]
+  if (length(actual) == length(caseCountData$Reported_Date)){
+    proj = NULL
+  } else{
+    proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseCountFitLine$n)]
+    proj <- proj[!is.na(proj)]
+  }
+  y = unique(c(actual, proj))
+  line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
+  colnames(line) <- c("Reported_Date", "n", "type")
+  caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
+  
+  if (selectionEstimateObject$region == "Canada"){
+    population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
+  } 
+  else {
+    population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
+  }
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,filename=filename )
+}
+
+```
+
+These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts.  The fit from the “Selection on Omicron” section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001.
+
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis'}
+dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
+apply(dataAvailable.regions,1,function(reg){
+  cat("###", reg[["shortname"]], "\n")
+  cat("####",reg[["name"]],"\n","\n")
+  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1)){
+    cat("Not enough genomic data available.")
+  } else if (reg[["shortname"]] %in% names(caseData)){
+      p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
+      print(p)
+  } else {
+    cat("No case count data available.")
+  }
+
+  cat("\n\n")})
+  
+```
+
+
+## {.unlisted .unnumbered}
+
 ### BA.2 sublineages selection {.tabset}
 
 ```{r general settings for selection estimator BA.2}
