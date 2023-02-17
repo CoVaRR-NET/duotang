@@ -141,19 +141,18 @@ fi
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
-	if command -v python; then 
-		echo "Using python at $(command -v python)"
+	if command -v python3; then 
+		echo "Using python3 at $(command -v python3)"
 	else
 		if [ ! -z "$VENVPATH" ]; then
 			echo "Using the venv: ${VENVPATH}";
 			source ${VENVPATH}/bin/activate
 		else
 			echo "Not using Conda and venv path is not specified with --venvpath, attempt to use dependencies with system level installs"
-			if command -v python; then 
-				echo "Using python at $(which python)"
+			if command -v python3; then 
+				echo "Using python3 at $(which python3)"
 			else
-				echo "Python not found, please check your dependencies"
-				echo "if python3 is present, alias it to python using 'alias python=\"python3\"'"
+				echo "Python3 not found, please check your dependencies"
 				exit 1
 			fi
 		fi
@@ -294,11 +293,11 @@ if [[ $SOURCE == "viralai" ]]; then
 
     echo "Data source is ViralAi"
     (
-      python  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
+      python3  ${scripts_dir}/viralai_fetch_metadata.py --alias ${data_dir}/pango_designation_alias_key.tsv --csv ${data_dir}/virusseq.metadata.csv.gz
     )
     (
       mkdir -p  ${data_dir}/temp
-      python  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
+      python3  ${scripts_dir}/viralai_fetch_fasta_url.py --seq ${data_dir}/temp/fasta_drl.$datestamp.txt
       dnastack files download -i  ${data_dir}/temp/fasta_drl.$datestamp.txt -o ${data_dir}/temp
       mv ${data_dir}/temp/*.xz ${data_dir}/virusseq.$datestamp.fasta.xz
       rm -r  ${data_dir}/temp
@@ -319,7 +318,7 @@ else
       dnastack collections query virusseq "SELECT isolate, lineage, pangolin_version FROM collections.virusseq.samples" --format csv > ${data_dir}/viralai.$datestamp.csv
       (cat ${data_dir}/pango_designation_alias_key.tsv;cat ${data_dir}/viralai.$datestamp.csv | tr ',' ' ') | awk  '$1=="alias"{t[$2]=$3}$1!="alias"{rem=$2;split($2,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $2)}print $1,$2,rem,$3}' |
       tr ' ' ',' | sed 's/lineage,lineage/raw_lineage,lineage/g'> ${data_dir}/viralai.$datestamp.withalias.csv
-      python scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
+      python3 scripts/pango2vseq.py ${data_dir}/virusseq.$datestamp.metadata.tsv.gz ${data_dir}/viralai.$datestamp.withalias.csv ${data_dir}/virusseq.metadata.csv.gz
 	)
 fi
 echo "epidata" > $checkPointFile
@@ -340,7 +339,7 @@ echo "gsdmetadata" > $checkPointFile
 #gsdmetadata:
 if [ "$SKIPGSD" = "NO" ]; then 
 	echo "downloading GSD metadata"
-	python ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
+	python3 ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
 	# Extract GISAID id and collection date 
 	zcat ${data_dir}/virusseq.metadata.csv.gz | cut -f19,38 | grep EPI | sort -k1,1 > ${data_dir}/temp_vssampledate
 	#Extracting Canadian sequences in last GISAID metadata 
@@ -369,7 +368,7 @@ fi
 #removes the recombinants
 
 echo "separating out the recombinants from the data..."
-python ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
+python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
 
 echo "alignseq" > $checkPointFile
 
@@ -378,7 +377,7 @@ echo "alignseq" > $checkPointFile
 echo "aligning sequences..."
 
 #All Sequences
-python ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
+python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
 
 #selected recombinants
 for variant in `ls $data_dir/*regex*.fasta.xz`; do
@@ -387,11 +386,11 @@ for variant in `ls $data_dir/*regex*.fasta.xz`; do
 	name=${name%.*};
 	name=`echo $name|cut -d '_' -f3-`;
 	echo $variant
-	python ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
 done
 
 #non-recombinants
-python ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
+python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
 
 echo "buildtree" > $checkPointFile
 
@@ -416,7 +415,7 @@ for treefile in `ls $data_dir/aligned_*.treefile`; do
 	echo $name
 	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
 	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
-	python ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
+	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
 echo "knitduotang" > $checkPointFile
 
@@ -432,7 +431,7 @@ echo "encrypt" > $checkPointFile
 #encrypt:
 if [ -f ".secret/sandbox" ]; then
     secret=`cat .secret/sandbox`
-	python scripts/encrypt.py duotang-sandbox.html $secret
+	python3 scripts/encrypt.py duotang-sandbox.html $secret
 	mv duotang-sandbox-protected.html duotang-sandbox.html
 else
 	echo ".secret file not found, unable to encrypt."
