@@ -151,9 +151,9 @@ if [ "$NOCONDA" = "YES" ]; then
 			echo "Not using Conda and venv path is not specified with --venvpath, attempt to use dependencies with system level installs"
 			if command -v python; then 
 				echo "Using python at $(which python)"
-				pythoncmd='python'
 			else
 				echo "Python not found, please check your dependencies"
+				echo "if python3 is present, alias it to python using 'alias python=\"python3\"'"
 				exit 1
 			fi
 		fi
