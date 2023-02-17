@@ -132,7 +132,6 @@ fi
 if [ "$GITPULL" = "YES" ]; then 
 	echo "Pulling in the latest changes. This flag should only be used if there are no changes in git status."
 	git pull
-	exit 0
 fi
 
 if [ "$NOCONDA" = "YES" ]; then 
@@ -158,6 +157,8 @@ if [ "$NOCONDA" = "YES" ]; then
 else 
 	if command -v conda; then 
 		NOCONDA="NO"; 
+		eval "$(conda shell.bash hook)"
+		conda activate duotang
 	else 
 		echo "Conda not found, make sure conda is in $PATH or use the --noconda flag"
 		exit 1
@@ -199,26 +200,11 @@ function jumpTo ()
 
 if [ ! -z "$GOTOSTEP" ]; then 
 	echo "Skipping to step $GOTOSTEP"
-	if [ "$NOCONDA" = "NO" ]; then 
-		eval "$(conda shell.bash hook)"
-		conda activate duotang
-	fi
 	jumpTo $GOTOSTEP 
 fi
 
 if [ "$BUILDMAIN" = "YES" ]; then 
-	if [ "$NOCONDA" = "NO" ]; then 
-		eval "$(conda shell.bash hook)"
-		conda activate duotang
-	fi
-	jumpTo treecleaned 
-fi
-if [ "$CLEAN" = "YES" ]; then 
-	if [ "$NOCONDA" = "NO" ]; then 
-		eval "$(conda shell.bash hook)"
-		conda activate duotang
-	fi
-	jumpTo cleanup
+	jumpTo archive 
 fi
 
 #checkpoint logics
@@ -231,7 +217,7 @@ if [ -f $checkPointFile ]; then
     step=`cat $checkPointFile`;
     #echo $step
     if [ $step = "finish" ]; then
-        echo "A previous data download finished without error, delete the checkpoint file to overwrite the data, or use the --overwrite flag. exiting"
+        echo "A previous update finished without error, delete the checkpoint file to overwrite the data, or use the --overwrite flag. exiting"
         exit 0
     else
         echo "attempting to restart workflow from $step"
@@ -447,13 +433,17 @@ fi
 echo "htmlencrypted" > $checkPointFile
 
 #htmlencrypted:
+if [ "$SKIPGITPUSH" = "NO" ]; then 
+	git status
+	git add .
+	git commit -m "Update $datestamp"
+	git push origin dev
+fi
+echo "updatemain" > $checkPointFile
+
+#updatemain:
 if [ "$BUILDMAIN" = "YES" ]; then 
 	scripts/getPastDuotangVersions.sh
-fi
-echo "archive" > $checkPointFile
-
-#archive:
-if [ "$BUILDMAIN" = "YES" ]; then 
 	git status
 	git add *.html
 	git add archive/*.html
@@ -461,16 +451,7 @@ if [ "$BUILDMAIN" = "YES" ]; then
 	git commit -m "Update: $datestamp"
 	git push origin main
 fi
-
-if [ "$SKIPGITPUSH" = "YES" ]; then 
-	git add .
-	git commit -m "Update $datestamp"
-	git push origin dev
-fi
-
-echo "Update completed successfully"
-echo "finish" > $checkPointFile
-
+echo "cleanup" > $checkPointFile
 
 #cleanup:
 if [ "$CLEAN" = "YES" ]; then 
@@ -478,10 +459,17 @@ if [ "$CLEAN" = "YES" ]; then
 	mkdir -p ${data_dir}/$datestamp
 	cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
 	cp ${data_dir}/*.nwk ${data_dir}/$datestamp
+	cp ${data_dir}/CanadianEpiData.csv ${data_dir}/$datestamp
+	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
-	cp ${data_dir}/virusseq.metadata.fasta.xz ${data_dir}/$datestamp
+	cp ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/$datestamp
+	tar -cvf - ${data_dir}/$datestamp | xz -9 - > update.$datestamp.tar.xz
+	rm -rf ${data_dir}/$datestamp
 fi
 
 if [ "$NOCONDA" = "NO" ]; then 
 	conda deactivate
 fi
+
+echo "Update completed successfully"
+echo "finish" > $checkPointFile
