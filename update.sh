@@ -141,9 +141,9 @@ fi
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
 	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
-	if command -v python3; then 
-		echo "Using python3 at $(command -v python3)"
-	else
+	#if command -v python3; then 
+#		echo "Using python3 at $(command -v python3)"
+	#else
 		if [ ! -z "$VENVPATH" ]; then
 			echo "Using the venv: ${VENVPATH}";
 			source ${VENVPATH}/bin/activate
@@ -156,7 +156,7 @@ if [ "$NOCONDA" = "YES" ]; then
 				exit 1
 			fi
 		fi
-	fi
+	#fi
 else 
 	if command -v conda; then 
 		NOCONDA="NO"; 
