@@ -114,3 +114,24 @@ The following steps should be applied to all three replicates from the preceding
 |---------|-------------|---------|---------------|
 | `for i in 1 2 4 5; do python3 scripts/get-mutations.py --pango rawlineage data_needed/virusseq.$datestamp.fasta.xz B.1.1.529.$i data_needed/virusseq.metadata.csv.gz data_needed/raphgraph/canada-BA$i.var; ; done` | Generate a frequency table of nucleotides at all positions for Canadian genomes of user-specified lineage, aligned against the reference | `canada-BA1.var` | ~1 minute |
 | `for i in 1 2 4 5; do python3 scripts/get-mutations.py --seqname strain --delimiter "\t" --pango rawlineage data_needed/ncov-open.$datestamp.fasta.xz B.1.1.529.$i data_needed/ncov-open.$datestamp.withalias.tsv.gz data_needed/raphgraph/global-BA$i.var ; done` | Generate the corresponding nucleotide frequency table for global data set | `global-BA1.var` |  |
+
+# Using the extractSequences.py script to filter sequences of interest from FASTA file.
+The extractSequences.py is located at `scripts/extractSequences.py`. This scripts allows you to use regex to remove and/or keep certain sequences with specific lineage or ID. This script should be ran at the root of the repo.
+
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output [--extractregex '^SomeRegex$' --keepregex '^SomeRegex1$' --keepregex '^SomeRegex2$' --extractbyid]
+
+This script will then output at least 5 files:
+ * `Sequences_remainder.fasta.xz` FASTA file containing all sequences not matching the --extractregex regex.
+ * `Sequences_regex_\*.fasta.xz` FASTA file containing all sequences matching the --keepregex regex.
+ * `SequenceMetadata_remainder.tsv.gz` Metadata for sequences in Sequences_remainder.fasta.xz
+ * `SequenceMetadata_regex_\*.tsv.gz` Metadata for sequences in Sequences_regex_\*.fasta.xz
+ * `SequenceMetadata_matched.tsv` Metadata for the sequences that were extracted but not kept. There is no associated FASTA for this.
+
+Optional arguments can also be provided:
+ * `--extractregex` This will be the regex used to remove sequences. e.g. '^X\S\*$' will remove all lineages starting with X
+ * `--keepregex` This will be the regex used to put sequences removed by --extractregex in a different file. e.g. '^XBB\S\*$' will keep the lineages starting with XBB and output them. This argument can be specified multiple times, resulting in one output file for each regex.
+ * `--extractbyid` By default, the regex is applied to the lineage column, this will change the behavior so that the regex filtering is applied to the sample ID.
+ 
+Examples:
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output --extractregex '^X\S*$' --keepregex '^XBB\S*$' --keepregex '^XAC\S*$']
+ 

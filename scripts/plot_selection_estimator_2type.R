@@ -191,63 +191,6 @@ estimate.selection <- function(region, startdate, reference, mutants, startpar, 
 
 
 
-
-plot.selection <- function(plotparam, col=c('red', 'blue')) {
-  toplot=plotparam$toplot
-  fit=plotparam$fit
-  # Once we get the set of {p,s} values, we can run them through the s-shaped 
-  # curve of selection
-  nvar <- length(fit$fit)/2
-  
-  # generate sigmoidal (S-shaped) curves of selection
-  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
-  
-  #if (any(!is.na(fit$sample))) {  
-  # calculate 95% confidence intervals from sampled parameters
-  s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
-    row <- as.numeric(x)
-    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
-  })
-  qcurve <- function(q) {
-    sapply(1:ncol(scurves), function(i) {
-      apply(sapply(s95, function(x) x[,i]), 1, 
-            function(y) quantile(y, q)) 
-    })
-  } 
-  lo95 <- qcurve(0.025)
-  hi95 <- qcurve(0.975)  
-  #}
-  
-  par(mfrow=c(1,1), mar=c(5,5,1,1))
-  
-  # display counts
-  plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
-       pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
-       xlab="Sample collection date", 
-       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$ref[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
-  # show trendlines
-  lines(toplot$date, scurves[,2])
-  if (ncol(scurves) > 2) {
-    lines(toplot$date, scurves[,3])
-  }
-  
-  #if (!is.na(fit$sample)) {
-  # display confidence intervals
-  polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,2], rev(hi95[,2])),
-          col=alpha(col[1], 0.5))
-  if(ncol(lo95) > 2) {
-    polygon(x=c(toplot$date, rev(toplot$date)), y=c(lo95[,3], rev(hi95[,3])),
-            col=alpha(col[2], 0.5))
-  }
-  #}
-  
-  # report parameter estimates on plot
-  str2 <- sprintf("%s: %s {%s, %s}", plotparam$mut[[1]],
-                  format(round(fit$fit[["s1"]],3), nsmall=3), 
-                  format(round(fit$confint["s1", "2.5 %"], 3), nsmall=3),
-                  format(round(fit$confint["s1", "97.5 %"], 3), nsmall=3))
-  text(x=toplot$date[1], y=0.95, str2, col=col[1], pos=4, cex = 1)
-}
 # Bends suggest a changing selection over time (e.g., due to the impact of 
 # vaccinations differentially impacting the variants). Sharper turns are more 
 # often due to NPI measures . 

@@ -54,14 +54,17 @@ opts_knit$set(root.dir = getwd())
 ############################
 
 source("scripts/utils.R")
-#Date of the VirusSeq release
+#Date of the VirusSeq release, load from params passed in during CLI command
 VirusSeq_release=format(as.Date(params$datestamp),"%B %d, %Y")
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
 
+
+#read in the color data for variants.
 VOCVOI <- read.csv("resources/vocvoi.csv")
 
+#define canadian provinces that are available. 
 all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
                                 "Quebec", "Nova Scotia", "New Brunswick",
@@ -345,7 +348,6 @@ tmp=apply(all.regions,1,function(reg){
 ```
 
 
-
 ### Plot (non stricto)  {.tabset}
       
 This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
@@ -411,21 +413,13 @@ DT::datatable(plot_growing_lineage(paramselectedV,makeplot=FALSE), caption = 'Vi
 
 ```
 
+***
+***
 
-# Future development
+The following are dev changes to existing plots for VirusSeq Data ONLY.
 
-We are in the process of adding or would like to develop code for some of the following analyses:   
+## Selection on Omicron {.tabset}  
 
-* dN/dS (by variant and by gene/domains)  
-* Tajima's D over time  
-* clustering analyses
-* genomically inferred epidemiological parameters: R0, serial interval, etc.
-
-With anonymized data on vaccination status, severity/outcome, reason for sequencing (*e.g.*, outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving.
-Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
-
-# [Duotang Sandbox!](https://www.rstudio.com)
-link to sandbox.
 
 # Methodology {.tabset} 
 

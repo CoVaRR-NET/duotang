@@ -8,7 +8,7 @@ try:
 	from Crypto.Protocol.KDF import PBKDF2
 	from Crypto.Hash import SHA256	
 except:
-	print("install pycrypto: \"pip3 install pycrypto\"")
+	print("Missing dependencies, please see CONTRIBUTING.md")
 	exit(1)
 import os, sys
 from base64 import b64encode
