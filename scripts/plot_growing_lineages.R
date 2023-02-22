@@ -36,23 +36,17 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
     colScale=scale_colour_manual(name="sequence_count",values=couleur)
     d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
     maxdate=max((meta %>%  filter(province %in% get.province.list(r[[1]]$region)))$sample_collection_date)
-    title=paste("Recently designated lineages showing most growth\n -> most recent sequence:",format(maxdate, "%B %d, %Y"))
+    title=paste("Most recent sequence date:",format(maxdate, "%B %d, %Y"))
     p <- ggplot(d, aes(x=lineage, y=sel_coeff,colour=sequence_count))+
     geom_point(size=5)+
     geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
     geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 10% per day to mark doubling in < week
-    annotate("rect", xmin = 0, xmax = nrow(d)
-             +1, ymin = 0, ymax = 5,
-               alpha = .05,fill = "blue")+
-    annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 5, ymax = 10,
-               alpha = .1,fill = "pink")+
-    annotate("rect", xmin = 0, xmax = nrow(d)+1, ymin = 10, ymax = max(d$high_CI,11),
-               alpha = .05,fill = "orange")+
+
     scale_y_continuous(breaks=seq(max((round(min(d$sel_coeff)/5))*5,-5),min(round(max(d$high_CI,11,na.rm = TRUE)/5)*5,15),5))+
     coord_flip()+ colScale+
     ggtitle(title)+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", reference, " with 95% CI bars"))+theme_bw()
-    plot(p)
-    return()
+    #plot(p)
+    return(p)
   }
   else{
     return(d)

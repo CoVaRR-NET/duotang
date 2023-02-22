@@ -630,7 +630,13 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
           legend.spacing.y = unit(0.5, "cm"),
           legend.key.size = unit(2, "cm"),
           text = element_text(size = 20)) 
+  
+  #plotData$lines<-scurvesPlotData$value
+  #plotData <- plotData %>% dplyr::select(date, variable, value, lines)
+  #colnames(plotData) <- c("date", "variable", "points", "lines")
   return(p)
+  
+  #return(list("plot" = p, "data" = plotData))
 
 }
 
