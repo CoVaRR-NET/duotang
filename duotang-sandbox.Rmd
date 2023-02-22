@@ -376,20 +376,19 @@ tmp=apply(all.regions,1,function(reg){
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
   paramselectedV=allparamsV[sapply(allparamsV,function(x){selectparam(x,reg[["name"]])})]
 
-  n=min(25,length(paramselected))
+    n=min(25,length(paramselected))
   if(n!=0){
-    a=plot_growing_lineage(paramselected[1:n])
+    print(plot_growing_lineage(paramselected[1:n]))
   }else{
-    cat("![<img height=\"100\"/>](../img/NotEnoughData.jpg)")
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
   }
   
   nV=min(25,length(paramselectedV))
   if(nV!=0){
-    b=plot_growing_lineage(paramselectedV[1:nV])
+    print(plot_growing_lineage(paramselectedV[1:nV]))
   }else{
-    cat("![<img height=\"100\"/>](../img/NotEnoughData.jpg)")
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
   }
-  
   cat("\n\n")})
 
 ```
