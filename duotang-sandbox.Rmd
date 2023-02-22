@@ -356,6 +356,7 @@ Again, background shading illustrates sub-variants that we need to keep an eye o
 
 Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
 
+**Left plot is GISAID, Right plot is VirusSeq**
 
 ```{r general fits for selection estimator 3, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis', error=TRUE}
 source("./scripts/plot_growing_lineages.R")
