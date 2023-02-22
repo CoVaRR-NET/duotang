@@ -64,8 +64,8 @@ while [[ $# -gt 0 ]]; do
       GITPULL="YES"
       shift # past argument
       ;;
-  	--skipgitpush)
-      SKIPGITPUSH="YES"
+  	--gitpush)
+      GITPUSH="YES"
       shift # past argument
       ;;
 	--liststeps)
@@ -105,7 +105,7 @@ if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$SKIPGSD" = "YES" ]; then SKIPGSD="YES"; else SKIPGSD="NO"; fi
-if [ "$SKIPGITPUSH" = "YES" ]; then SKIPGITPUSH="YES"; else SKIPGITPUSH="NO"; fi
+if [ "$GITPUSH" = "YES" ]; then GITPUSH="YES"; else GITPUSH="NO"; fi
 if [ "$LISTSTEPS" = "YES" ]; then 
 	echo "Available checkpoint steps are: "
 	echo $(cat update.sh | grep '^#.*:$' | sed 's/#//' | sed 's/://')
@@ -124,7 +124,7 @@ if [ "$HELPFLAG" = "YES" ]; then
 	echo "[--noconda] Flag used to run the update script without conda. Note: The dependencies should exist in \$PATH and this script makes no attempt to ensure that they exist. "
 	echo "[--venvpath] String. The ABSOLUTE path to the venv containing dependencies. Should be used with '--noconda'."
 	echo "[--skipgsd] Flag used to skip the GSD metadata download. "
-	echo "[--skipgitpush] Flag used to skip the git push actions within this script."
+	echo "[--gitpush] Flag used to automatically commit changes and push to dev."
 	echo "[--clean] [BROKEN] Flag used to clean the data_needed directory after update. Currently it just dumps the new data_needed files into a tarball at root."
 	echo "[--liststeps] Prints the available checkpoint steps in this script. You can use this for the '--gotostep' argument."	
 	echo "[--gotostep] Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use '--liststeps' to see all the available checkpoints. "
@@ -177,7 +177,7 @@ echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
 echo "Skip GSD download?: ${SKIPGSD}"
-echo "Main branch build mode: ${BUILDMAIN}"
+echo "Push changes to dev?: ${GITPUSH}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
 if [ ! -z "$VENVPATH" ]; then echo "VENV path is: ${VENVPATH}"; fi
@@ -442,25 +442,6 @@ else
 	echo "duotangbuilt" > $checkPointFile
 	exit 1
 fi
-echo "gitpush" > $checkPointFile
-
-#gitpush:
-if [ "$SKIPGITPUSH" = "NO" ]; then 
-	if [ "$BUILDMAIN" = "YES" ]; then 
-		scripts/getPastDuotangVersions.sh
-		git status
-		git add *.html
-		git add archive/*.html
-		git add archive/readme.md
-		git commit -m "Update: $datestamp"
-		git push origin main
-	else
-		git status
-		git add .
-		git commit -m "Update $datestamp"
-		git push origin dev
-	fi
-fi
 
 echo "cleanup" > $checkPointFile
 
@@ -474,9 +455,32 @@ if [ "$CLEAN" = "YES" ]; then
 	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/$datestamp
+	cp ${data_dir}/GSDMetadataCleaned.tsv.gz ${data_dir}/$datestamp
 	tar -cvf - ${data_dir}/$datestamp | xz -9 - > update.$datestamp.tar.xz
 	rm -rf ${data_dir}/$datestamp
 fi
+
+echo "gitpush" > $checkPointFile
+
+#gitpush:
+if [ "$GITPUSH" = "YES" ]; then 
+	#if [ "$BUILDMAIN" = "YES" ]; then 
+	bash -e scripts/getPastDuotangVersions.sh
+	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
+	git status
+	git add -f data_needed/*.nwk
+	git add -f data_needed/virusseq.metadata.csv.gz
+	git add -f data_needed/AgeCaseCount*
+	git add -f data_needed/CanadianEpiData.csv
+	git add -f data_needed/lineageNotes.tsv
+	git add -f data_needed/virusseq.fasta.xz
+	git add -f archive/*.html
+	git add -f archive/readme.md
+	git add -f duotang*html
+	git commit -m "Update: $datestamp"
+	git push origin dev
+fi
+
 
 if [ "$NOCONDA" = "NO" ]; then 
 	conda deactivate

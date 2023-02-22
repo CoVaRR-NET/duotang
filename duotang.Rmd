@@ -34,7 +34,7 @@ if(length(new.packages)>0) {
   devtools::install_github("ArtPoon/ggfree")
 }
 
-list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly")
+list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) {
   install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -53,6 +53,8 @@ library(tidyverse)
 library(reshape2) #used to plot case count selection plots
 library(DT)
 library(plotly)
+library(splines)
+library(grid)
 
 theme_set(theme_classic())
 
