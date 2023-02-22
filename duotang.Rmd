@@ -37,7 +37,7 @@ if(length(new.packages)>0) {
 list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) {
-  install.packages(new.packages)
+  install.packages(new.packages, repos = "http://cran.us.r-project.org")
 }
 
 #load libraries
