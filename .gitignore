@@ -8,7 +8,6 @@ data_needed/*
 duotang_files/*
 scripts/__pycache__
 # the HTML is the public facing document, to be reviewed before release
-duotang.html
 index.html
 duotang.md
 .vs
@@ -25,3 +24,8 @@ update.*.log
 update.*.xz
 wget*
 update.log
+duotang-sandbox.md
+geckdriver.log
+geckodriver.log
+duotang.md
+duotang-sandbox.md
