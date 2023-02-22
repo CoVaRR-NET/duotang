@@ -377,14 +377,14 @@ tmp=apply(all.regions,1,function(reg){
 
   n=min(25,length(paramselected))
   if(n!=0){
-    print(plot_growing_lineage(paramselected[1:n]))
+    a=plot_growing_lineage(paramselected[1:n])
   }else{
     cat("![<img height=\"100\"/>](../img/NotEnoughData.jpg)")
   }
   
   nV=min(25,length(paramselectedV))
   if(nV!=0){
-    printplot_growing_lineage(paramselectedV[1:nV]))
+    b=plot_growing_lineage(paramselectedV[1:nV])
   }else{
     cat("![<img height=\"100\"/>](../img/NotEnoughData.jpg)")
   }
