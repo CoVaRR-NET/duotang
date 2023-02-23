@@ -80,7 +80,7 @@ all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Quebec", "Nova Scotia", "New Brunswick",
                                 "Newfoundland and Labrador"),
                          shortname=c("Canada","BC", "AB",
-                                     "SK", "MA", "ON", 
+                                     "SK", "MB", "ON", 
                                      "QC", "NS", "NB","NL"))
 
 #define a color palatte for variants used throughout the RMD
