@@ -233,13 +233,10 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
-***[Note a new analysis is now available below of a time tree limited to XBB and its descendents]***
-
-XBB.1.5 continues to grow steadily and significantly. Some other select variants with the S:F486P mutation are also showing growth in some regions such as CJ.1 and XBF. BQ.1.1 is increasing again in some regions of Canada along with some other select BQ.1 subvariants, BW.1.1, and CH.1.1. Differences between some provinces continue - see also the evolving plots below of “Fastest growing lineages in Canada”, per province.
+XBB.1.5 continues to grow steadily and significantly, and is now the most common lineage in some regions of Canada. Some other select variants with the S:F486P mutation are also showing growth in some regions, or need to be tracked due to their international growth, such as XBB.1.9.1 and XBF. BQ.1.1 and some subvariants are increasing again in some regions of Canada along with some other select BQ.1 and CH.1.1 subvariants. Differences between some provinces continue - see also the evolving plots below of “Fastest growing lineages in Canada”, per province.
 
 **Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada):
 
-* BA.2 and BA.2.75 new subvariants, including possible misclassifications of XBB.1.5 as BA.2.10.1.
 * BE.1.1 and other BA.5-type variants with S:F486P
 * BM.1.1.1
 * BM.2 (high predicted affinity for the human ACE2 receptor)
@@ -249,16 +246,16 @@ XBB.1.5 continues to grow steadily and significantly. Some other select variants
 * BW.1, BW.1.1 (descendants of BA.5.6, with S:F486A)
 * CH.1.1 (descendant of BM which is BA.2.75.3 with S:L452R) and sublineages
 * CJ.1 with S:F486P
-* DN.1/DN.1.1 (BQ.1.1.5 descendants with S:K147N) - that also has S:Y453F (and so is actually DN.1.1.1 but this isn't in databases yet)
+* DN.1/DN.1.1 (BQ.1.1.5 descendants with S:K147N) - that also has S:Y453F (and so is actually DN.1.1.1 but this isn’t in databases yet)
 * DN.1.1.1 (highest predicted affinity for the human ACE2 receptor)
 * DS.1 (highest predicted immune evasion)
 * XAY.2 (BA.2/Delta recombinant with Delta’s S:L452R mutation plus the S:F486P mutation)
 * XAY.3 (BA.2/Delta that also has S:F486P - a first case detected in Canada but not now showing growth)
-* XBB.1, XBB.1.5, XBB.1.9.1, XBB.1.12, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
+* XBB.1, XBB.1.5, XBB.1.9.1, XBB.1.10, XBB.1.12, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
 * XBF (BA.5.2/CJ.1 recombinant; has S:F486P and immune evasion like XBB.1.5)
 * XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
 * XBM (first cases detected in Canada and the US; BA.2.76 / BF.3 recombinant, but growth not notable)
-* …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:R346T, S:K147N, S:Y453F, S:F486P), particularly those variants with sets of immune evasive mutations of interest.
+* …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:K147N, S:R346T, S:R403K, S:Y453F, S:F486P; S:Q613H), particularly those variants with sets of immune evasive mutations of interest.
 
 ## Omicron sublineages in Canada {.tabset} 
 
