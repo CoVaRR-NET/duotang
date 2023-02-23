@@ -8,6 +8,41 @@ For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preex
 These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
 
 ```{r, warning=FALSE, message=FALSE}
+source("scripts/plot_selection_estimator_2type.R")
+#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
+
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+
+latelineage_pangotree <- makepangotree(unique(
+  meta$raw_lineage[
+    meta$sample_collection_date > max(meta$sample_collection_date) - days(60) 
+    ]
+  ))
+
+reference <- getStrictoSubLineages("BQ.1", meta)
+startpar2 <- list(p=0.5, s=0.05)
+
+#calculates the selection model for ALL variants.
+allparams <- mclapply(latelineage_pangotree, function(l) {
+  lineagelist <- getStrictoSubLineages(l, meta)
+  lapply(rev(all.regions$name), function(region) {
+    if(length(intersect(reference, lineagelist)) == 0) {
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    } else {
+      NA
+    }
+  })
+}, mc.cores=8)
+
+allparams <- do.call(c, allparams)  # same structure as below
+allparams <- allparams[!is.na(allparams)]
+#print(Sys.time() - t0)
+
+allparams <- allparams[order(sapply(allparams, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
+
+
 source("scripts/plot_selection_estimator.R")
 
 #define starting parameters (p,s) for making the selection estimates
@@ -61,6 +96,84 @@ for (i in 1:length(all.regions$name)){
 
 ```
 
+```{r testm, warning=FALSE, echo=FALSE, message=FALSE}
+
+library(plotly)
+p1<-ggplotly(selectionEstimateFits[["Canada"]]$plot1)
+p2<-ggplotly(selectionEstimateFits[["Canada"]]$plot2)
+
+fig <- p1 %>% add_trace(p2)
+
+menu <- list(
+  title = 'Data:',
+  x = 0.1,
+  y = 0.9,
+  buttons = list(
+    list(method = 'update',
+         args = list(list(visible = c(TRUE, FALSE)), 
+                     list(title = "Data 1")),
+         label = 'Data 1'),
+    list(method = 'update',
+         args = list(list(visible = c(FALSE, TRUE)), 
+                     list(title = "Data 2")),
+         label = 'Data 2')
+  )
+)
+
+layout <- list(
+  updatemenus = list(menu)
+)
+
+plot <- subplot(p1, p2, nrows = 1, shareX = T, shareY = T)
+
+# Add the layout to the plot object
+plot <- plot %>% layout(
+  updatemenus = list(menu)
+)
+plot
+
+library(ggplot2)
+library(plotly)
+
+plot_dropdown <- function(plot1, plot2) {
+  # Convert the ggplot objects to plotly objects
+  p1 <- ggplotly(plot1)
+  p2 <- ggplotly(plot2)
+
+  # Combine the two plotly objects and add a dropdown menu to switch between them
+  fig <- subplot(p1, p2, nrows = 2)
+  fig <- fig %>% layout(
+    updatemenus = list(
+      list(
+        buttons = list(
+          list(method = "update",
+               args = list(list(visible = c(TRUE, FALSE)), list(title = "Plot 1"))),
+          list(method = "update",
+               args = list(list(visible = c(FALSE, TRUE)), list(title = "Plot 2")))
+        ),
+        direction = "down",
+        showactive = TRUE,
+        x = 0.1,
+        xanchor = "left",
+        y = 1.1,
+        yanchor = "top"
+      )
+    )
+  )
+  
+  # Return the interactive plot
+  return(fig)
+}
+
+# Create two ggplot objects
+plot1 <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+plot2 <- ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()
+
+# Call the plot_dropdown function with the two ggplot objects
+plot_dropdown(plot1, plot2)
+
+```
+
 ## {.unlisted .unnumbered}
 
 ### BA.2 sublineages selection {.tabset}
@@ -95,9 +208,11 @@ individualSublineageSelectionPlots.BA5 <- list()
 for (i in 1:length(all.regions$name)){
   minCount = ifelse(all.regions$shortname[[i]] == "Canada", 50, 20)
   individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", maxdate)
-  individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", maxdate)
+  #individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", maxdate)
 }
-
+ #individualSublineageSelectionPlots.BA2[[all.regions$shortname[[1]]]][[1]]$variant
+ #view(individualSublineageSelectionPlots.BA2[[all.regions$shortname[[1]]]][[1]]$plot$data)
+ #view(individualSublineageSelectionPlots.BA2[[all.regions$shortname[[1]]]][[1]]$plot$line)
 
 ```
 

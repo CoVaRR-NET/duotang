@@ -417,11 +417,12 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   #plot the count data (circles)
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
-    scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
+    scale_fill_manual(label =c(levels(plotData$variable)), values = unname(col)) +
     xlab("Sample collection date") +
     ylab(paste0("Proportion in ", est$region)) + 
     ylim(0,1) +
-    xlim(min(plotData$date), maxdate)
+    xlim(min(plotData$date), maxdate) 
+
   
   #format the fit (line)
   scurvesPlotData <- cbind(toplot[,"date", drop=F], scurves[,2:ncol(scurves)])
@@ -440,18 +441,17 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
       }
     }
   }
-  
   #define theme
   p<-p + theme_bw() +     
     labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
-    theme(legend.position=c(0.35, 0.90), legend.title=element_blank(), 
-          legend.text=element_text(size=20), 
+    theme(legend.position=c(0.4, 0.90), legend.title=element_blank(), 
+          legend.text=element_text(size=18), 
           legend.background = element_blank(), 
           legend.key=element_blank(),
           legend.spacing.y = unit(0.5, "cm"),
-          legend.key.size = unit(2, "cm"),
-          text = element_text(size = 20)) 
-  
+          legend.key.size = unit(0.75, "cm"),
+          text = element_text(size = 20)) +
+    guides(color = guide_legend(override.aes = list(size = 4, shape = 22, linetype=NA)))  
   # second plot - logit transform
   options(scipen=1000000)
 
@@ -483,13 +483,14 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   #define plot theme
   p2<-p2 + theme_bw() + 
     labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
-    theme(legend.position=c(0.35, 0.90), legend.title=element_blank(), 
-          legend.text=element_text(size=20), 
+    theme(legend.position=c(0.4, 0.90), legend.title=element_blank(), 
+          legend.text=element_text(size=18), 
           legend.background = element_blank(), 
           legend.key=element_blank(),
           legend.spacing.y = unit(0.5, "cm"),
-          legend.key.size = unit(2, "cm"),
-          text = element_text(size = 20)) 
+          legend.key.size = unit(0.75, "cm"),
+          text = element_text(size = 20)) +
+    guides(color = guide_legend(override.aes = list(size = 4, shape = 22, linetype=NA)))  
 
   #returns all the necessary information as a named list. 
   return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col, "region"=region, "plot1"=p, "plot2"=p2))
@@ -531,7 +532,7 @@ plot.selection <- function(plotparam, col=c('red', 'blue')) {
   plot(toplot$date, toplot$n2/toplot$tot, xlim=c(min(toplot$date), max(toplot$date)), ylim=c(0, 1), 
        pch=21, col='black', bg=alpha(col[1], 0.7), cex=sqrt(toplot$n2)/5, 
        xlab="Sample collection date", 
-       ylab=paste0("growth advantage (s% per day) relative to ",plotparam$ref[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
+       ylab=paste0("growth advantage (s% per day) relative to ", plotparam$ref[[1]]," (stricto)\nin ", plotparam$region, ", with 95% CI bars"))
   # show trendlines
   lines(toplot$date, scurves[,2])
   if (ncol(scurves) > 2) {
@@ -629,8 +630,14 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
           legend.key=element_blank(),
           legend.spacing.y = unit(0.5, "cm"),
           legend.key.size = unit(2, "cm"),
-          text = element_text(size = 20)) 
+          text = element_text(size = 20)) +
+    guides(color = guide_legend(override.aes = list(shape = NA, linetype=NA)))  
+  #plotData$lines<-scurvesPlotData$value
+  #plotData <- plotData %>% dplyr::select(date, variable, value, lines)
+  #colnames(plotData) <- c("date", "variable", "points", "lines")
   return(p)
+  
+  #return(list("plot" = p, "data" = plotData))
 
 }
 

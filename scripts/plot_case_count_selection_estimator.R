@@ -111,7 +111,7 @@ CubicSplSmooth3 <- function(data, lambda=10^3) {
 
 
 #plot the casecount by selection estimate. 
-plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
+plotCaseCountByDate2 <- function(countData, lineFits, population, region=NA, saveToFile=F){
   #countData <- caseCountData
   #lineFits <-rev(caseSelectionLines)
   #filename = "test"
@@ -123,7 +123,11 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T)
     colors[lineFits[[i]]$names] = lineFits[[i]]$color
     rValues[lineFits[[i]]$names] = round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2)
+    if (region == "Canada"){
+      rValues[lineFits[[i]]$names] = as.numeric(rValues[lineFits[[i]]$names]) / 7
+    }
   }
+  
   
   countData$type <- lineFits[[2]]$line$type
   
@@ -165,9 +169,9 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
                           "\n Last day of accurate case counts (lighter colours) is ", max((d %>% filter(report_type=="Accurate"))$Reported_Date))) +
     theme(legend.text=element_text(size=12), text = element_text(size = 20)) 
   
-    if (!is.na(filename)){
-      p <- p + ggtitle(paste0("Dataset: ", filename))
-      ggsave(paste0("casecount_",filename, ".png"), plot = p, width = 11, height = 8)
+    if (saveToFile){
+      p <- p + ggtitle(paste0("Dataset: ", region))
+      ggsave(paste0("casecount_",region, ".png"), plot = p, width = 11, height = 8)
     }
   return (p)
 }

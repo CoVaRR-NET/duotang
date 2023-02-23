@@ -69,6 +69,15 @@ To download external data only (e.g. FASTA, metadata, etc.), use the `--download
 
 `./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`
 
+## Download data and update Duotang without building new trees.
+First we download new data:
+ 
+`./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`
+
+Then, skip to the step in which we knit duotang. 
+`./update.sh --gotostep knitduotang [--noconda --venvpath /path/to/venv]`
+
+
 ## Arguments available for the download script. 
 Arguments can also be provided for custom build functions:
  * `-d|--date` String in format "YYYY-MM-DD". This will be the datestamped used throughout the build process (default: $CurrentUTCDate)
@@ -76,7 +85,6 @@ Arguments can also be provided for custom build functions:
  * `-o|--outdir` String. The output directory of all but the HTML files (default: ./data_needed). 
  * `-f|--scriptdir` String. The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
  * `--overwrite` Flag for discarding current checkpoints and restart update from beginning
- * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing.
  * `--downloadonly` Flag used to download data only. Script will exit once all external resources had been downloaded. 
  * `--noconda` Flag used to run the update script without conda. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
  * `--venvpath` String. The ABSOLUTE path to the venv containing dependencies. Should be used with `--noconda`.
