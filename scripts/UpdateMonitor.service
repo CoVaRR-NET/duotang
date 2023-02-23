@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+#activate the venv
+source ~/duotang_venv/bin/activate
+
 #get the last duotang update date and convert to epoch
 echo `date`
 
@@ -24,10 +27,17 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
 		cd ~/duotang
 		git pull
-		#bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush
 	else
 		echo "Found update on ViralAI, but it's not the latest update found on virusseq" 
 	fi
 else
 	echo "no update" 
 fi
+
+sleep 10s
+
+#crontab entry
+#30 * * * *  /usr/bin/flock -n /tmp/DuotangUpdate.lck /home/jjjjia/duotang/scripts/UpdateMonitor.service
+
+/usr/bin/flock -n ./updatemonitor.log -c "/bin/bash -e ./scripts/UpdateMonitor.service > updatemonitor.log 2>&1"
