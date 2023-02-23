@@ -38,6 +38,4 @@ fi
 sleep 10s
 
 #crontab entry
-#30 * * * *  /usr/bin/flock -n /tmp/DuotangUpdate.lck /home/jjjjia/duotang/scripts/UpdateMonitor.service
-
-/usr/bin/flock -n ./updatemonitor.log -c "/bin/bash -e ./scripts/UpdateMonitor.service > updatemonitor.log 2>&1"
+#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service > ~/duotang/updatemonitor.log 2>&1"
