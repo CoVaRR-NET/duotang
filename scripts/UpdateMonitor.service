@@ -2,6 +2,7 @@
 
 #activate the venv
 source ~/duotang_venv/bin/activate
+cd ~/duotang
 
 #get the last duotang update date and convert to epoch
 echo `date`
@@ -25,7 +26,6 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	virusseqid=`curl -s -X GET "https://singularity.virusseq-dataportal.ca/archives?createdAfterEpochSec=$duotangverepoch&sortDirection=DESC" -H  "accept: application/json" | python3 -c "import sys, json; a=(json.load(sys.stdin)); print(a['content'][0]['id'].strip());"`
 	if [ "$viralaiid" = "$virusseqid" ]; then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
-		cd ~/duotang
 		git pull
 		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush
 	else
@@ -38,4 +38,4 @@ fi
 sleep 10s
 
 #crontab entry
-#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service > ~/duotang/updatemonitor.log 2>&1"
+#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service >> ~/duotang/updatemonitor.log 2>&1"
