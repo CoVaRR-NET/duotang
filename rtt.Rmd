@@ -13,14 +13,14 @@ get.tipnames <- function(tip.label) {
 }
 
 source("scripts/fit-rtt.R")
-fit1 <- fit.rtt("./data_needed/aligned_allSeqs_sample1.rtt.nwk", plot=TRUE)
+fit1 <- fit.rtt(paste0(params$datadir, "/aligned_allSeqs_sample1.rtt.nwk"), plot=TRUE)
 
 ```
 
 
 ```{r}
-fit2 <- fit.rtt("data_needed/aligned_allSeqs_sample2.rtt.nwk", plot=FALSE)
-fit3 <- fit.rtt("data_needed/aligned_allSeqs_sample3.rtt.nwk", plot=FALSE)
+fit2 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample2.rtt.nwk"), plot=FALSE)
+fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"), plot=FALSE)
 ```
 
 

@@ -11,9 +11,8 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
 # To set up a development/test environment
 
 ## Dependencies
+The following dependencies should be installed system-wide (or at user level) if Conda is not being used. These must be discoverable in $PATH.
 * [Python 3.9+](https://www.python.org/downloads/)
-   * [BioPython](https://biopython.org/)
-   * [dnastack](https://docs.viral.ai/analysis/)
 * [R 4.0.2+](https://cran.r-project.org/)
    * [ape](https://cran.r-project.org/web/packages/ape/index.html)
    * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
@@ -31,7 +30,19 @@ Resources (metadata, trees, mutation frequency tables) can be updated with new d
    * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
+* [Firefox](https://www.mozilla.org/en-CA/firefox/products/)
+
+The following dependences are best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
+* [BioPython](https://pypi.org/project/biopython/)
+* [dnastack](https://docs.viral.ai/analysis/)
+* [Pandas](https://pypi.org/project/pandas/)
+* [Selenium](https://pypi.org/project/selenium/)
+* [Webdriver-Manager](https://pypi.org/project/webdriver-manager/)
+* [pycryptodome 3.16](https://pypi.org/project/pycryptodome/) (note ONLY version 3.16 works.)
+* [PBKDF2](https://pypi.org/project/pbkdf2/)
 * [TreeTime](https://github.com/neherlab/treetime)
+
+A virtual environment can be created via: `python -m venv /path/to/duotang/venv`. Above programs can be installed using `pip install`. 
 
 ## Conda Environment
 
@@ -41,24 +52,45 @@ These dependencies can also be installed from the environment.yaml using `conda 
 
 The update script `update.sh` is available at the root of this repo. This script attempts to automate the data download, data processing, and knitting process of building CoVaRR-Net Duotang.
 
-Provided that a duotang conda environment is available, run the following command at the root directory:
-`update.sh`
+The conda environment can be created using the environment.yaml file at the root of this repo. If a duotang conda environment is available, run the following command at the root directory:
 
-The conda environment can be created using the environment.yaml file at the root of this repo. 
+`./update.sh`
 
-If the dependencies are installed at the system level, you can bypass the Conda requirement by using the `--noconda` flag. i.e. `./update.sh --noconda`
+If conda is not available, but dependencies are install via python virtual env, run the script with the `--noconda` flag and specify a venv that the script should load for the needed dependencies via `--venvpath`.
 
-To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. i.e. `./update.sh --downloadonly`
+`./update.sh --noconda --venvpath /path/to/duotang/venv`
 
+If all dependencies are install system wide, use the `--noconda` flag only. Note: the script might throw unreasonable errors should a dependency be missing in this mode.
+
+`./update.sh --noconda`
+
+## Download Data Only
+To download external data only (e.g. FASTA, metadata, etc.), use the `--downloadonly` flag. The above section dealing with dependencies apply.
+
+`./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`
+
+## Download data and update Duotang without building new trees.
+First we download new data:
+ 
+`./update.sh --downloadonly [--noconda --venvpath /path/to/venv]`
+
+Then, skip to the step in which we knit duotang. 
+`./update.sh --gotostep knitduotang [--noconda --venvpath /path/to/venv]`
+
+
+## Arguments available for the download script. 
 Arguments can also be provided for custom build functions:
- * `-d|--date` String in format "YYYY-MM-DD", this will be the datestamped used throughout the build process (default: $CurrentUTCDate)
- * `-s|--source` The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
- * `-o|--outdir` The output directory of all but the HTML files (default: ./data_needed). 
- * `-f|--scriptdir` The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
+ * `-d|--date` String in format "YYYY-MM-DD". This will be the datestamped used throughout the build process (default: $CurrentUTCDate)
+ * `-s|--source` String. The value can be `viralai` or `virusseq`, this will be the genomic datasource used (default: viralai).
+ * `-o|--outdir` String. The output directory of all but the HTML files (default: ./data_needed). 
+ * `-f|--scriptdir` String. The ABSOLUTE path to the scripts directory (default: ${PWD}/scripts).
  * `--overwrite` Flag for discarding current checkpoints and restart update from beginning
- * `--buildmain` Flag used to knit the RMD and push the changes to the main branch for publishing.
  * `--downloadonly` Flag used to download data only. Script will exit once all external resources had been downloaded. 
- * `--noconda` Flag used to run the update script with system level dependencies. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
+ * `--noconda` Flag used to run the update script without conda. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
+ * `--venvpath` String. The ABSOLUTE path to the venv containing dependencies. Should be used with `--noconda`.
+ * `--skipgsd` Flag used to skip the GSD metadata download. 
+ * `--liststeps` Prints the available checkpoint steps in this script. You can use this for the `--gotostep` argument.
+ * `--gotostep` Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use `--liststeps` to see all the available checkpoints. 
 
 # Step by step instruction to obtain data, and to generate phylogenies
 
@@ -90,3 +122,24 @@ The following steps should be applied to all three replicates from the preceding
 |---------|-------------|---------|---------------|
 | `for i in 1 2 4 5; do python3 scripts/get-mutations.py --pango rawlineage data_needed/virusseq.$datestamp.fasta.xz B.1.1.529.$i data_needed/virusseq.metadata.csv.gz data_needed/raphgraph/canada-BA$i.var; ; done` | Generate a frequency table of nucleotides at all positions for Canadian genomes of user-specified lineage, aligned against the reference | `canada-BA1.var` | ~1 minute |
 | `for i in 1 2 4 5; do python3 scripts/get-mutations.py --seqname strain --delimiter "\t" --pango rawlineage data_needed/ncov-open.$datestamp.fasta.xz B.1.1.529.$i data_needed/ncov-open.$datestamp.withalias.tsv.gz data_needed/raphgraph/global-BA$i.var ; done` | Generate the corresponding nucleotide frequency table for global data set | `global-BA1.var` |  |
+
+# Using the extractSequences.py script to filter sequences of interest from FASTA file.
+The extractSequences.py is located at `scripts/extractSequences.py`. This scripts allows you to use regex to remove and/or keep certain sequences with specific lineage or ID. This script should be ran at the root of the repo.
+
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output [--extractregex '^SomeRegex$' --keepregex '^SomeRegex1$' --keepregex '^SomeRegex2$' --extractbyid]
+
+This script will then output at least 5 files:
+ * `Sequences_remainder.fasta.xz` FASTA file containing all sequences not matching the --extractregex regex.
+ * `Sequences_regex_\*.fasta.xz` FASTA file containing all sequences matching the --keepregex regex.
+ * `SequenceMetadata_remainder.tsv.gz` Metadata for sequences in Sequences_remainder.fasta.xz
+ * `SequenceMetadata_regex_\*.tsv.gz` Metadata for sequences in Sequences_regex_\*.fasta.xz
+ * `SequenceMetadata_matched.tsv` Metadata for the sequences that were extracted but not kept. There is no associated FASTA for this.
+
+Optional arguments can also be provided:
+ * `--extractregex` This will be the regex used to remove sequences. e.g. '^X\S\*$' will remove all lineages starting with X
+ * `--keepregex` This will be the regex used to put sequences removed by --extractregex in a different file. e.g. '^XBB\S\*$' will keep the lineages starting with XBB and output them. This argument can be specified multiple times, resulting in one output file for each regex.
+ * `--extractbyid` By default, the regex is applied to the lineage column, this will change the behavior so that the regex filtering is applied to the sample ID.
+ 
+Examples:
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output --extractregex '^X\S*$' --keepregex '^XBB\S*$' --keepregex '^XAC\S*$']
+ 

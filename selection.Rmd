@@ -1,35 +1,27 @@
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BQ\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.\*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BQ\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
-For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+For comparison, Alpha had a selective advantage of s \~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
-**Caveat:**
-These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
+**Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
 
 ```{r, warning=FALSE, message=FALSE}
 source("scripts/plot_selection_estimator.R")
 
+#define starting parameters (p,s) for making the selection estimates
 startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-#startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
 
-setAll=getAllStrictoLineages(meta)
-#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
-sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
-sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
+#filter samples with variants of interest
+setAll=getAllStrictoLineages(meta) 
+sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
+sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
+setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 
-#setAll=setAll[!setAll %in% sublineages_BA5]
-setAll=setAll[!setAll %in% sublineages_BQ]
-setAll=setAll[!setAll %in% sublineages_XBB]
-
+#define the mutants
 mutants = list(sublineages_BQ, sublineages_XBB)
-mutantNames = list("BQ*", "XBB*", "the rest") #"
-col <- c(pal["Omicron BQ"], "XBB"="lightblue")
-
-#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
-#mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
-#color for each lineage
-#col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
+mutantNames = list("BQ*", "XBB*", "the rest") #
+col <- c(pal["Omicron BQ"], "XBB"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
@@ -37,44 +29,49 @@ col <- c(pal["Omicron BQ"], "XBB"="lightblue")
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
 
+#wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
 sub.plot.selection.estimate <- function(region,maxdate=NA){
-  obj=plot.selection.estimate.ggplot(region=region,
+  #plot.selection.estimate.ggplot() returns a named list of data used for plotting the case count selection curves, see the function documentation for details. 
+  obj <- tryCatch(
+    {
+        obj=plot.selection.estimate.ggplot(region=region,
                                         startdate=startdate, startpar=startpar,
                                         reference=c(setAll),
                                         mutants=mutants,
                                         names=mutantNames,
                                         maxdate=maxdate, col=col)
+    },
+    error=function(cond){
+        #print(cond)
+        obj= (list("plot1"=NULL, "plot2"=cond))
+    })
   return(obj)
 }
 
-selectionEstimateFits <- list()
+#calculate estimates for each province
+selectionEstimateFits <- list() #named list to store estimates for different provinces
 selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
-maxdate=selectionEstimateFits[["Canada"]]$date
-selectionEstimateFits[["BC"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
-selectionEstimateFits[["BC"]]$plot1 <- NULL
-#sub.plot.selection.estimate(region="British Columbia",maxdate=maxdate)
-selectionEstimateFits[["AB"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate)
-selectionEstimateFits[["SK"]] <- sub.plot.selection.estimate(region="Alberta",maxdate=maxdate) #temp hax to get this to build
-selectionEstimateFits[["SK"]]$plot1 <- NULL
+maxdate = selectionEstimateFits[["Canada"]]$date
 
-selectionEstimateFits[["MB"]] <- sub.plot.selection.estimate(region="Manitoba",maxdate=maxdate)
-selectionEstimateFits[["ON"]] <- sub.plot.selection.estimate(region="Ontario",maxdate=maxdate)
-selectionEstimateFits[["QC"]] <- sub.plot.selection.estimate(region="Quebec",maxdate=maxdate)
-selectionEstimateFits[["East"]] <- sub.plot.selection.estimate(region="East provinces (NL+NS+NB)",maxdate=maxdate)
-#####################################################
-# tabs for displaying in notebook
-#each PT tab should have curve plot and breakpoint plot side by side
+for (i in 1:length(all.regions$name)){
+  selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]])
+}
+
+
 ```
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis'}
+#define provinces to show selection plots for.
 dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
+#display all selection plots with each province as a tab.
 apply(dataAvailable.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
-  {cat("Not enough data available")}
+  {print(getEmptyErrorPlotWithMessage("Not enough Data Available"))
+    print(getEmptyErrorPlotWithMessage("Not enough Data Available"))}
   else {
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
@@ -83,110 +80,228 @@ apply(dataAvailable.regions,1,function(reg){
   
 ```
 
-## {.unlisted .unnumbered}
+##  {.unlisted .unnumbered}
+
+## Selection by Case Count {.tabset}
+
+```{r case count selection estimator setup}
+source("scripts/plot_case_count_selection_estimator.R")
+
+#loads in the case count data for each province into a named list.
+caseData <- parseCaseData(maxdate, params$datadir)
+#loads in population data for /100000invidivudal normalization
+populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
+
+#' function used to generate data required case count selection plots.
+#' @param caseCountData The case counts for a specific province. i.e. one item in variable caseData
+#' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
+#' @param filename String. If not NA, it will save a local copy of a plot to $PWD
+plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
+  #caseCountData <- caseData$AB
+  #selectionEstimateObject<- selectionEstimateFits$AB
+  #filename=NA
+  if (selectionEstimateObject$region == "Canada"){dayToCut = 2} else { dayToCut = 5 } #define the number of days since most recent data date as "underreported"
+  
+  #populate a column with reporting accuracy (Accurate | UnderReported])
+  caseCountData$report_type <- "Accurate"
+  caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
+  #construct a spline fit for the accurate case counts only
+  caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))
+  #extract the y-values for the fit
+  caseFitLineValues <- 10^(caseFitModel$y)
+  #extend the previous fit for the "underreported dates" and extract the y values
+  caseFitLinePredictedValues <- c((10^(predict(caseFitModel, data.frame(x=(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)))[[2]]))$x)
+  #merge the accurate and underreported case count fit lines and construct a DF with X, and metadata
+  caseCountFitLine<-data.frame(caseCountData$Reported_Date, c(caseFitLineValues, c(caseFitLinePredictedValues)), caseCountData$report_type)
+  colnames(caseCountFitLine) <- c("Reported_Date", "n", "type")
+  #replaces UnderReported with Projected in the "type" column
+  caseCountFitLine <- caseCountFitLine %>% mutate(type = ifelse(type=="UnderReported", "Projected", "Actual"))
+
+  #get the selection estimate fits, scurves and extended scurves from the selection estimate object
+  selectionFit <- selectionEstimateObject$fit
+  selectionScurves <- selectionEstimateObject$scurves
+  selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
+  
+  #since canada only have data once every 7 days, modify the estimate fit to reflect that.
+  if (selectionEstimateObject$region == "Canada"){
+      selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
+      selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
+  }
+  #assign names and colors 
+  selectionNames <- selectionEstimateObject$names
+  selectionColors <- selectionEstimateObject$color
+  
+  #now we beging constructing the object that contains data for different lines to plot.
+  caseSelectionLines <- list()
+  #build to total case line.
+  caseSelectionLines[[1]] <- list("line"=caseCountFitLine, "names" = "CaseCount", "color"="limegreen")
+
+  #build line for each variant
+  for (i in seq(from=2, to=ncol(selectionScurves))){
+      x = caseCountData$Reported_Date
+      actual = caseCountFitLine$n[1:length(selectionScurves[,i])] * selectionScurves[,i]
+      actual <- actual[!is.na(actual)]
+      if (length(actual) == length(caseCountData$Reported_Date)){
+        proj = NULL
+      } else{
+        proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] *   selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseCountFitLine$n)]
+        proj <- proj[!is.na(proj)]
+      }
+      y = c(actual, proj)
+      #type <- c(c(rep("actual",length(selectionScurves[,i]))), c(rep("projection", length(caseFit) - length(selectionScurves[,i]))))
+      line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
+      colnames(line) <- c("Reported_Date", "n", "type")
+      caseSelectionLines[[i]] <- list("line"=line, "names" = selectionNames[[i-1]], "color"=selectionColors[i-1])
+  }
+
+  #build the line for  "the rest"
+  x <- caseCountData$Reported_Date
+  actual = caseCountFitLine$n[1:length(selectionScurves[,1])] * selectionScurves[,1]
+  actual <- actual[!is.na(actual)]
+  if (length(actual) == length(caseCountData$Reported_Date)){
+    proj = NULL
+  } else{
+    proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseCountFitLine$n)]
+    proj <- proj[!is.na(proj)]
+  }
+  y = unique(c(actual, proj))
+  line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
+  colnames(line) <- c("Reported_Date", "n", "type")
+  caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
+  
+  #gather the population data for /100000 individual normalization
+  if (selectionEstimateObject$region == "Canada"){
+    population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
+  } 
+  else {
+    population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
+  }
+  
+  #pass the lines into the plotting function
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, saveToFile=saveToFile)
+}
+
+```
+
+These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001.
+
+```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis'}
+#plots the case count selection plots with each pronvince as a tab.
+apply(all.regions,1,function(reg){
+  cat("###", reg[["shortname"]], "\n")
+  cat("####",reg[["name"]],"\n","\n")
+  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1)){
+    print(getEmptyErrorPlotWithMessage("Not enough genomic data available."))
+  } else if (reg[["shortname"]] %in% names(caseData)){
+      p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
+      print(p)
+  } else {
+      print(getEmptyErrorPlotWithMessage("No case count data available."))
+  }
+  cat("\n\n")})
+  
+```
+
+##  {.unlisted .unnumbered}
 
 ### BA.2 sublineages selection {.tabset}
 
-```{r general settings for selection estimator BA.2}
+```{r general settings for selection estimator BA.2, warning=FALSE, echo=FALSE, message=FALSE}
 source("scripts/scanlineages.R")
-plotsubvariant <- function(region,min,parentalnode){
-  nplot=0
-  for(p in allparams) {
-    if(!any(is.na(p$fit)) && 
-       p$region==region && 
-       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
-       isSubLineage(parentalnode,p$mut[[1]])){
-      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
-          plot.selection(plotparam=p)
-          nplot=nplot+1
+source("scripts/plot_selection_estimator.R")
+
+#function to plot all the indivudal variant's selection plot
+plotIndividualSublineageSelection <- function(region, minimumSampleCount, parentalNodes, maxdate){
+  allSublineagePlots <- list()
+  plotCounter <- 0
+  #loop through all params and find...
+  for(i in seq(1:length(allparams))) {
+    if(!any(is.na(allparams[[i]]$fit)) && # fit not NA
+       allparams[[i]]$region==region &&  #region is the same as what we want
+       substr(allparams[[i]]$mut[[1]], nchar(allparams[[i]]$mut[[1]]), nchar(allparams[[i]]$mut[[1]]))!="*" && #is the same lineage
+       isSubLineage(parentalNodes,allparams[[i]]$mut[[1]])){ #is child lineage of parentalNodes 
+      if((allparams[[i]]$fit)$fit[["s1"]]>0 && sum(allparams[[i]]$toplot$n2)>minimumSampleCount){ #the numebr of samples are greater than the minimum we want.
+          plotCounter <- plotCounter + 1
+          #plot all the variants and save them to a named list
+          allSublineagePlots[[plotCounter]] <- list("variant" = allparams[[i]]$mut[[1]], "plot" = plotIndividualSelectionPlots.ggplot(plotparam=allparams[[i]], maxdate = maxdate))
       }
     }
   }
-  if(nplot==0){
-    print("Not enough data available")
-  }
+  return(allSublineagePlots)
 }
 
-
-plotba2 <- function(region,min){
-  plotsubvariant(region,min,"BA.2*")
-}
-
-
-
-plotba5 <- function(region,min){
-  plotsubvariant(region,min,"BA.5*")
-}
-
-
-plotothers <- function(region,min){
-  nplot=0
-  for(p in allparams) {
-    if(!any(is.na(p$fit)) && 
-       p$region==region && 
-       substr(p$mut[[1]], nchar(p$mut[[1]]), nchar(p$mut[[1]]))!="*" &&
-       !isSubLineage("BA.2*",p$mut[[1]])){
-      if((p$fit)$fit[["s1"]]>0 && sum(p$toplot$n2)>min){
-          plot.selection(plotparam=p)
-          nplot=nplot+1
-      }
-    }
-  }
-  if(nplot==0){
-    print("Not enough data available")
-  }
+#generate  selection variant plots for BA2 and BA5 variants for each province
+individualSublineageSelectionPlots.BA2 <- list() 
+individualSublineageSelectionPlots.BA5 <- list() 
+for (i in 1:length(all.regions$name)){
+  minCount = ifelse(all.regions$shortname[[i]] == "Canada", 50, 20)
+  individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", maxdate)
+  individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", maxdate)
 }
 
 
 ```
 
+Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
-Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
-
-
-```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-tmp=apply(all.regions,1,function(reg){
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+#prints the BA.2 plots
+apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
   cat("#####",reg[["name"]],"\n","\n")
-  plotba2(reg[["name"]],n_min)
+  if (length(individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]])>0){
+      for (plot in individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]]){
+        print(plot$plot)
+      }
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
+  }
   cat("\n\n")})
-  
+
 ```
-
-
 
 ### BA.5 sublineages selection {.tabset}
 
-Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
-
-
-```{r, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
-tmp=apply(all.regions,1,function(reg){
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+#prints the BA.5 Plots
+apply(all.regions,1,function(reg){
   cat("####", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"(n>",n_min,")\n","\n")
-  plotba5(reg[["name"]],n_min)
+  cat("#####",reg[["name"]],"\n","\n")
+  if (length(individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]])>0){
+      for (plot in individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]]){
+        print(plot$plot)
+      }
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
+  }
   cat("\n\n")})
-  
+
 ```
 
 <!-- ### Other sublineages selection {.tabset} -->
 
 <!-- Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection. -->
 
-
-
 <!-- ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'} -->
+
 <!-- tmp=apply(all.regions,1,function(reg){ -->
+
 <!--   cat("####", reg[["shortname"]], "\n") -->
+
 <!--   n_min=20 -->
+
 <!--   if(reg[["name"]]=="Canada"){n_min=50} -->
+
 <!--   cat("#####",reg[["name"]],"(n>",n_min,")\n","\n") -->
+
 <!--   plotothers(reg[["name"]],n_min) -->
+
 <!--   cat("\n\n")}) -->
 
 <!-- ``` -->

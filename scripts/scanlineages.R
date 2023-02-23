@@ -48,7 +48,7 @@ makepangotree <- function(raw_lineagelist){
   return(fulltree)
 }
 
-
+#alias to ancestor
 rawtoreallineage <- function(lineage) {
   # FIXME: dico should be passed as an argument, not an implicit global var
   sub.dico <- dico[sapply(dico$fullname, function(x) { grepl(x, lineage) } ), ]
@@ -64,7 +64,7 @@ rawtoreallineage <- function(lineage) {
   return(lineage)
 }
 
-
+#ancestor to alias
 realtorawlineage <- function(lineage){
   #Since * could be directly add to the first part : eg BA*
   if(substr(lineage, nchar(lineage), nchar(lineage))=="*"){

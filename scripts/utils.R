@@ -24,3 +24,21 @@ printest <-function(x){
 add.pango.group <-  function(n,p,c) {
   return(rbind(VOCVOI,data.frame(name=n,pangodesignation=p,color=c)))
 }
+
+#' This function generates an empty ggplot object with a text message in the middle.
+#' @param message. String. Message to be displayed on the plot.
+getEmptyErrorPlotWithMessage <- function(message){
+  emptyErrorPlot<- ggplot() + theme_bw() + 
+    annotate("text", x=8, y=8, label = message) +
+    theme(legend.position=c(0.35, 0.90), legend.title=element_blank(), 
+          legend.text=element_text(size=20), 
+          legend.background = element_blank(), 
+          legend.key=element_blank(),
+          legend.spacing.y = unit(0.5, "cm"),
+          legend.key.size = unit(2, "cm"),
+          axis.title=element_blank(),
+          axis.text=element_blank(),
+          axis.ticks=element_blank(),
+          text = element_text(size = 30)) 
+  return (emptyErrorPlot)
+}

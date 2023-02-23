@@ -17,6 +17,10 @@ params:
   input: date
   format: yyyy-mm-dd
   value: "2023-01-30"
+ datadir:
+  label: "DataDir"
+  input: text
+  value: "data_needed/"
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
@@ -35,6 +39,7 @@ library(r2d3)  # used for passing data to JavaScript D3 framework
 library(jsonlite)
 library(tidyverse)
 library(reshape2) #used to plot case count selection plots
+library(DT)
 
 theme_set(theme_classic())
 
@@ -49,33 +54,17 @@ opts_knit$set(root.dir = getwd())
 ############################
 
 source("scripts/utils.R")
-#Date of the VirusSeq release
-VirusSeq_release=params$date
+#Date of the VirusSeq release, load from params passed in during CLI command
+VirusSeq_release=format(as.Date(params$datestamp),"%B %d, %Y")
 Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
 
 pangoversion="4.2 (Viral AI)"
 
-VOCVOI = data.frame(name=character(), pangodesignation=character(), color=character())
 
-# FIXME: this should be stored as an external CSV file
-VOCVOI=add.pango.group("Alpha", "Q*", '#B29C71')
-VOCVOI=add.pango.group("Beta", "B.1.351*", '#F08C3A')
-VOCVOI=add.pango.group("Gamma", "B.1.1.28.1*", '#0000FF')
-VOCVOI=add.pango.group("Delta", "AY*", '#A6CEE3')
-VOCVOI=add.pango.group("Lambda", "B.1.1.1*", '#FFFF00')
+#read in the color data for variants.
+VOCVOI <- read.csv("resources/vocvoi.csv")
 
-VOCVOI=add.pango.group("Omicron BA.1", "BA.1*", '#8B0000')
-VOCVOI=add.pango.group("Omicron BA.2", "BA.2*", '#FF0000')
-VOCVOI=add.pango.group("Omicron BA.4", "BA.4*", '#BC544B')
-VOCVOI=add.pango.group("Omicron BA.5", "BA.5*", '#CC66FF')
-VOCVOI=add.pango.group("Omicron BQ", "BQ*", '#9CB329')
-VOCVOI=add.pango.group("Omicron BA.2.75", "BA.2.75*", "#FBCEB1")
-#VOCVOI=add.pango.group("Omicron BF","BF*",'#9F2B11')
-
-VOCVOI=add.pango.group("A.23.1", "A.23.1*", '#9AD378')
-VOCVOI=add.pango.group("B.1.438.1", "B.1.438.1*", '#3EA534')
-VOCVOI=add.pango.group("Recombinants", "X*", '#000000')
-
+#define canadian provinces that are available. 
 all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
                                 "Saskatchawan", "Manitoba", "Ontario", 
                                 "Quebec", "Nova Scotia", "New Brunswick",
@@ -87,6 +76,67 @@ all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 pal["other"] <- 'grey' # named character vector
+
+## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
+#Download metadata from VirusSeq, put the date here:
+
+# this can be made more compact for faster loading
+meta <- read.csv(gzfile(paste0(params$datadir, "/GSDMetadataCleaned.tsv.gz")), sep="\t")
+meta$province <- meta$geo_loc_name_state_province_territory
+# Select only the column we want to use later
+columnlist=c("fasta_header_name", "province", "sample_collection_date",
+             "lineage", "raw_lineage")
+meta <- meta[ , columnlist]
+
+
+### metadata cleaning 
+unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
+                 "Not Applicable","","NA","unknown")
+meta <- as.data.frame(apply(meta, 2, function(x) {
+  x[is.element(x, unknown.str)] <- "Unknown"
+  x
+}))
+
+meta$sample_collection_date <- as.Date(meta$sample_collection_date)
+meta$week <- cut(meta$sample_collection_date, 'week')
+meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
+
+source("./scripts/scanlineages.R")
+meta$pango_group <- create.pango.group(VOCVOI, meta)
+meta$pango_group <- as.factor(meta$pango_group)
+
+
+metaV <- read.csv(gzfile(paste0(params$datadir, "/virusseq.metadata.csv.gz")), sep="\t")
+metaV$province <- metaV$geo_loc_name_state_province_territory
+metaV <- metaV[ , columnlist]
+metaV <- as.data.frame(apply(metaV, 2, function(x) {x[is.element(x, unknown.str)] <- "Unknown";return(x)}))
+metaV$sample_collection_date <- as.Date(metaV$sample_collection_date)
+metaV$week <- cut(metaV$sample_collection_date, 'week')
+metaV$month <- gsub("-..$","",as.character(cut(metaV$sample_collection_date, 'month')))
+metaV$pango_group <- create.pango.group(VOCVOI, metaV)
+metaV$pango_group <- as.factor(metaV$pango_group)
+
+
+## 2. LOAD epidemiological data (PHAC)
+
+epidataCANall <- read.csv(paste0(params$datadir, "/CanadianEpiData.csv"))
+epidataCANall$date <- as.Date(epidataCANall$date)
+epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
+epidate <- tail(epidataCANall,1)$date #download date
+
+epidataCANall$previousvalue <- 0
+#small loop to get the numtoday column from previous versions of this file from the cumulative cases
+for(row in 1:nrow(epidataCANall)) {
+  p <- epidataCANall[row, "prname"]
+  subdf <- epidataCANall[which( 
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+    ), ]
+  if(nrow(subdf) != 0) {
+    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
+  }
+}
+epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 ```
 
 ##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
@@ -121,267 +171,255 @@ Therefore, from this time onward, case counts are likely underestimated and the 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
 
-```{r load_data}
 
-## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
-#Download metadata from VirusSeq, put the date here:
+```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+source("./scripts/plot_selection_estimator_2type.R")
+source("./scripts/scanlineages.R")
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(0) ]))
+reference <- getStrictoSubLineages("BQ.1",meta)
 
-# this can be made more compact for faster loading
-meta <- read.csv(gzfile("data_needed/virusseq.metadata.csv.gz"), sep="\t")
-meta$province <- meta$geo_loc_name_state_province_territory
+startdate <- max(meta$sample_collection_date) - days(120)
 
-# Select only the column we want to use later
-columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin",
-             "sample_collection_date", "sample_collected_by", 
-             "purpose_of_sampling", "purpose_of_sequencing","lineage", 
-             "raw_lineage")
-meta <- meta[ , columnlist]
-
-
-### metadata cleaning 
-unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
-                 "Not Applicable","","NA","unknow")
-meta <- as.data.frame(apply(meta, 2, function(x) {
-  x[is.element(x, unknown.str)] <- "Unknown"
-  x
-}))
-
-meta$sample_collection_date <- as.Date(meta$sample_collection_date)
-meta$week <- cut(meta$sample_collection_date, 'week')
-meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
-
-source("scripts/scanlineages.R")
-meta$pango_group <- create.pango.group(VOCVOI, meta)
-meta$pango_group <- as.factor(meta$pango_group)
-## 2. LOAD epidemiological data (PHAC)
-
-#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
-epidataCANall <- read.csv(url("https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv"))
-epidataCANall$date <- as.Date(epidataCANall$date)
-epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
-epidate <- tail(epidataCANall,1)$date #download date
-
-epidataCANall$previousvalue <- 0
-#small loop to get the numtoday column from previous versions of this file from the cumulative cases
-for(row in 1:nrow(epidataCANall)) {
-  p <- epidataCANall[row, "prname"]
-  subdf <- epidataCANall[which( 
-    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
-    ), ]
-  if(nrow(subdf) != 0) {
-    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
-    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
-  }
-}
-epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
-
-
-  
 ```
+# SARS-CoV-2 in Canada
+
+## Omicron sublineages in Canada {.tabset} 
+
+
+```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis', error=TRUE}
+
+source("./scripts/subtype_plotter2_gsd.R")
+
+sublineagestoplot = data.frame(name=c("B.1.1.7*","B.1.1.28.1*","AY*","B*",
+                                      "BA.1*","BA.2*","BA.2*",
+                                      "BA.4*","BA.5.1*","BA.5.2*",
+                                      "BQ*","BA.5*","B*","B*"),
+                               tabname=c("Alpha","Gamma","Delta","2020",
+                                         "BA.1","BA.2(early)","BA.2(late)",
+                                         "BA.4","BA.5.1","BA.5.2",
+                                         "BQ","BA.5(rest)","Rest","recent"),
+                               mindate=c("","","2021-03-01","2020-02-01",
+                                         "","","2022-08-01",
+                                         "","","",
+                                         "","","2022-03-01","2022-11-01"),
+                               maxdate=c("","","2022-01-01","2021-06-01",
+                                         "2022-06-01","2022-08-01","",
+                                         "","","",
+                                         "","","",""),
+                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,TRUE,
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,TRUE,TRUE,FALSE))
+
+#sublineagestoplot = data.frame(name=c("B*"),tabname=c("recent"),mindate=c("2022-12-12"),maxdate=c(""),exclude_previously_plotted=c(FALSE))
+
+tmp=apply(all.regions[1,],1,function(reg){
+  cat("###", reg[["shortname"]], "\n")
+  cat("#### in",reg[["name"]],"{.tabset} \n\n")
+  plotted=c()
+  tmp=apply(sublineagestoplot,1,function(sub){
+    cat("#####", sub[["tabname"]], "\n")
+    cat("######", sub[["tabname"]],"sublineages in",reg[["name"]])
+    mindate=NA
+    maxdate=as.Date("2023-01-03")
+    if(sub[["mindate"]]!=""){
+      cat(" from",sub[["mindate"]])
+      mindate=as.Date(sub[["mindate"]])
+    }
+    if(sub[["maxdate"]]!=""){
+      cat(" until",sub[["maxdate"]])
+      maxdate=as.Date(sub[["maxdate"]])
+    }
+    cat(" \n\n")
+    set=getStrictoSubLineages(sub[["name"]],meta)
+    if(sub[["exclude_previously_plotted"]]){
+      set=set[!set %in% plotted]
+    }
+    plotted_set=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate)
+    plotted_set=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
+    #if(rarelineages_names!=""){
+    #  cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
+    #}
+    plotted <<- unique(c(plotted,plotted_set))
+    cat("\n\n")
+  })
+cat("\n\n")})
+    
+```
+
+## Fastest growing lineages in Canada {.tabset}
+
+```{r general fits for selection estimator 1, figures-side,  warning=FALSE, fig.width=5,  out.width="50%",results='asis', error=TRUE}
+source("./scripts/plot_selection_estimator_2type.R")
+source("./scripts/scanlineages.R")
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(30) ]))
+reference <- getStrictoSubLineages("BQ.1",meta)
+#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
+startpar2 <- list(p=0.5, s=0.05)
+
+startdate <- max(meta$sample_collection_date) - days(120)
+
+#t0 <- Sys.time()
+allparams <- mclapply(latelineage_pangotree, function(l) {
+  lineagelist <- getStrictoSubLineages(l, meta)
+  lapply(rev(all.regions$name), function(region) {
+    if(length(intersect(reference, lineagelist)) == 0) {
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    } else {
+      NA
+    }
+  })
+}, mc.cores=8)
+allparams <- do.call(c, allparams)  # same structure as below
+allparams <- allparams[!is.na(allparams)]
+
+allparams <- allparams[order(sapply(allparams, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
+
+
+fullpangotreeV <- makepangotree(unique(metaV$raw_lineage))
+latelineage_pangotreeV<- makepangotree(unique(metaV$raw_lineage[metaV$sample_collection_date > max(metaV$sample_collection_date) - days(30) ]))
+
+allparamsV <- mclapply(latelineage_pangotreeV, function(l) {
+  lineagelist <- getStrictoSubLineages(l, metaV)
+  lapply(rev(all.regions$name), function(region) {
+    if(length(intersect(reference, lineagelist)) == 0) {
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    } else {
+      NA
+    }
+  })
+}, mc.cores=8)
+allparamsV <- do.call(c, allparamsV)  # same structure as below
+allparamsV <- allparamsV[!is.na(allparamsV)]
+
+allparamsV <- allparamsV[order(sapply(allparamsV, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
+```
+
+Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto (i.e., sequences designated as `r reference[[1]]` and not its descendants, like `r reference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+
+### Plot (stricto) {.tabset}
+
+Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+**Left plot is GISAID, Right plot is VirusSeq**
+
+```{r general fits for selection estimator 2, figures-side,  warning=FALSE, fig.width=5, out.width="50%",results='asis', error=TRUE}
+
+source("./scripts/plot_growing_lineages.R")
+selectparam <- function(p,reg){
+  if(!any(is.na(p$fit))){
+    x=p$mut[[1]];
+    p$region==reg&
+    (p$fit)$fit[["s1"]]>0 & 
+    sum(p$toplot$n2)>10&
+    substr(x, nchar(x), nchar(x))!="*"
+  }else{FALSE}
+}
+
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  cat("##### Plot single lineages in",reg[["name"]],"\n","\n")
+  paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
+  paramselectedV=allparamsV[sapply(allparamsV,function(x){selectparam(x,reg[["name"]])})]
+
+  n=min(25,length(paramselected))
+  if(n!=0){
+    print(plot_growing_lineage(paramselected[1:n]))
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
+  }
+  
+  nV=min(25,length(paramselectedV))
+  if(nV!=0){
+    print(plot_growing_lineage(paramselectedV[1:nV]))
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
+  }
+  cat("\n\n")})
+
+```
+
+
+### Plot (non stricto)  {.tabset}
+      
+This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
+
+Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
+
+Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+
+**Left plot is GISAID, Right plot is VirusSeq**
+
+```{r general fits for selection estimator 3, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis', error=TRUE}
+source("./scripts/plot_growing_lineages.R")
+selectparam <- function(p,reg){
+  if(!any(is.na(p$fit))){
+    x=p$mut[[1]];
+    p$region==reg&
+    (p$fit)$fit[["s1"]]>0 & 
+    sum(p$toplot$n2)>10&
+    substr(x, nchar(x), nchar(x))=="*"
+  }else{FALSE}
+  }
+
+tmp=apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  cat("##### Plot monophyletic groups of lineages in",reg[["name"]],"\n","\n")
+  paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
+  paramselectedV=allparamsV[sapply(allparamsV,function(x){selectparam(x,reg[["name"]])})]
+
+    n=min(25,length(paramselected))
+  if(n!=0){
+    print(plot_growing_lineage(paramselected[1:n]))
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
+  }
+  
+  nV=min(25,length(paramselectedV))
+  if(nV!=0){
+    print(plot_growing_lineage(paramselectedV[1:nV]))
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
+  }
+  cat("\n\n")})
+
+```
+
+### Table of all the selection estimates 
+
+```{r overview of the selection estimator table}
+
+paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10
+  }else{FALSE}})]
+DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE), caption = 'GISAID Data.')
+
+paramselectedV=allparamsV[sapply(allparamsV,function(p){if(!any(is.na(p$fit))){
+  x=p$mut[[1]];
+  (p$fit)$fit[["s1"]]>0 & 
+  sum(p$toplot$n2)>10
+  }else{FALSE}})]
+DT::datatable(plot_growing_lineage(paramselectedV,makeplot=FALSE), caption = 'VirusSeq Data.')
+
+```
+
+***
+***
+
+The following are dev changes to existing plots for VirusSeq Data ONLY.
 
 ## Selection on Omicron {.tabset}  
 
-```{r setting function for selection estimator, warning=FALSE, message=FALSE, }
-source("scripts/plot_selection_estimator.R")
-#startpar <- list(p=c(0.1, 0.01), s=c(0.05, 0.05))
-
-startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-#startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0, 0.05, 0.05))
-
-setAll=getAllStrictoLineages(meta)
-#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
-sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
-sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
-
-#setAll=setAll[!setAll %in% sublineages_BA5]
-setAll=setAll[!setAll %in% sublineages_BQ]
-setAll=setAll[!setAll %in% sublineages_XBB]
-
-mutants = list(sublineages_BQ, sublineages_XBB)
-mutantNames = list("BQ*", "XBB*", "the rest") #"
-col <- c(pal["Omicron BQ"], "XBB"="lightblue")
-
-#startpar <- list(p=c(0.5, 0.1, 0.05), s=c(0, 0, 0.05))
-
-#setAll=getAllStrictoLineages(meta)
-#sublineages_BA5 <- getStrictoSubLineages("BA.5*",meta)
-#sublineages_BQ <- getStrictoSubLineages("BQ*",meta)
-#sublineages_XBB <- getStrictoSubLineages("XBB*",meta)
-
-#setAll=setAll[!setAll %in% sublineages_BA5]
-#setAll=setAll[!setAll %in% sublineages_BQ]
-#setAll=setAll[!setAll %in% sublineages_XBB]
-#sublineages_BA5=sublineages_BA5[!sublineages_BA5 %in% sublineages_BQ]
-
-#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
-#mutantNames = list("BA.5*","BQ*", "XBB*", "the rest") #"
-col <- c(pal["Omicron BA.5"], pal["Omicron BQ"], "XBB"="lightblue")
-
-#mutants = list(sublineages_BA5, sublineages_BQ, sublineages_XBB)
-#mutantNames = list("BQ*", "XBB*", "the rest") #"
-#col <- c(pal["Omicron BQ"], "XBB"="lightblue")
-#Set a starting date
-#Note that the startdate shouldn't be too much before both alleles become common
-#or rare migration events that die off could throw off the estimation procedure 
-#(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
-
-sub.plot.selection.estimate <- function(region,maxdate=NA){
-  obj=plot.selection.estimate.ggplot(region=region,
-                                        startdate=startdate, startpar=startpar,
-                                        reference=c(setAll),
-                                        mutants=mutants,
-                                        names=mutantNames,
-                                        maxdate=maxdate, col=col)
-  return(obj)
-}
-
-selectionEstimateFits <- list()
-selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
-maxdate=selectionEstimateFits[["Canada"]]$date
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("BC", "AB", "SK", "MA", "ON", "QC", "East"))
-for (i in seq(1:nrow(dataAvailable.regions))){
-  tryCatch(
-    expr = {
-      selectionEstimateFits[[dataAvailable.regions[i,2]]] = sub.plot.selection.estimate(region=dataAvailable.regions[i,1],maxdate=maxdate)
-    },
-    error = function(e){
-      selectionEstimateFits[[dataAvailable.regions[i,2]]]$plot1 <- NULL
-    }
-  )  
-}
-
-#####################################################
-# tabs for displaying in notebook
-#each PT tab should have curve plot and breakpoint plot side by side
-```
-selection plot display
-```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis'}
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
-apply(dataAvailable.regions,1,function(reg){
-  cat("###", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("####",reg[["name"]],"\n","\n")
-  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
-  {cat("Not enough data available")}
-  else {
-    print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
-    print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
-  }
-  cat("\n\n")})
-
-```
-
-
-## {.unlisted .unnumbered}
-
-### Case count selection {.tabset}
-
-```{r case count selection estimator setup}
-source("scripts/plot_case_count_selection_estimator.R")
-caseData <- parseCaseData(maxdate)
-populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
-plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, filename=NA){
-  #caseCountData <- caseData$Canada
-  #selectionEstimateObject<- selectionEstimateFits$Canada
-  #filename=NA
-  if (selectionEstimateObject$region == "Canada"){dayToCut = 2} else { dayToCut = 5 }
-  caseCountData$report_type <- "Accurate"
-  caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
-  caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))
-  caseFitLinePredictedValues <- c((10^(predict(caseFitModel, data.frame(x=(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)))[[2]]))$x)
-  caseFitLineValues <- 10^(caseFitModel$y)
-  caseCountFitLine<-data.frame(caseCountData$Reported_Date, c(caseFitLineValues, c(caseFitLinePredictedValues)), caseCountData$report_type)
-  colnames(caseCountFitLine) <- c("Reported_Date", "n", "type")
-  caseCountFitLine <- caseCountFitLine %>% mutate(type = ifelse(type=="UnderReported", "Projected", "Actual"))
-  
-  selectionFit <- selectionEstimateObject$fit
-  selectionScurves <- selectionEstimateObject$scurves
-  selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
-  if (selectionEstimateObject$region == "Canada"){
-      selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
-      selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
-  }
-  selectionNames <- selectionEstimateObject$names
-  selectionColors <- selectionEstimateObject$color
-  caseSelectionLines <- list()
-  #build to total case line.
-  caseSelectionLines[[1]] <- list("line"=caseCountFitLine, "names" = "CaseCount", "color"="limegreen")
-
-  #build line for each variant
-  for (i in seq(from=2, to=ncol(selectionScurves))){
-      x = caseCountData$Reported_Date
-      actual = caseCountFitLine$n[1:length(selectionScurves[,i])] * selectionScurves[,i]
-      actual <- actual[!is.na(actual)]
-      if (length(actual) == length(caseCountData$Reported_Date)){
-        proj = NULL
-      } else{
-        proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] *   selectionScurvesExtended[,i][(length(selectionScurves[,i])+1):length(caseCountFitLine$n)]
-        proj <- proj[!is.na(proj)]
-      }
-      y = c(actual, proj)
-      #type <- c(c(rep("actual",length(selectionScurves[,i]))), c(rep("projection", length(caseFit) - length(selectionScurves[,i]))))
-      line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
-      colnames(line) <- c("Reported_Date", "n", "type")
-      caseSelectionLines[[i]] <- list("line"=line, "names" = selectionNames[[i-1]], "color"=selectionColors[i-1])
-  }
-
-  #build the line for  "the rest"
-  x <- caseCountData$Reported_Date
-  actual = caseCountFitLine$n[1:length(selectionScurves[,1])] * selectionScurves[,1]
-  actual <- actual[!is.na(actual)]
-  if (length(actual) == length(caseCountData$Reported_Date)){
-    proj = NULL
-  } else{
-    proj = caseCountFitLine$n[(length(selectionScurves[,i])+1):length(caseCountFitLine$n)] * selectionScurvesExtended[,1][(length(selectionScurves[,1])+1):length(caseCountFitLine$n)]
-    proj <- proj[!is.na(proj)]
-  }
-  y = unique(c(actual, proj))
-  line <- data.frame(x,y, c(rep("Actual", length(actual)), rep("Projected", length(proj))))
-  colnames(line) <- c("Reported_Date", "n", "type")
-  caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
-  
-  population <- as.numeric(populationData[2,selectionEstimateObject$region])
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,filename=filename )
-}
-
-```
-
-These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts.  The fit from the “Selection on Omicron” section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001.
-
-```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis'}
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
-apply(dataAvailable.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  cat("#####",reg[["name"]],"\n","\n")
-  if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1)){
-    cat("Not enough genomic data available.")
-  } else if (reg[["shortname"]] %in% names(caseData)){
-      p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
-      print(p)
-  } else {
-    cat("No case count data available.")
-  }
-
-  cat("\n\n")})
-  
-```
-
-# Future development
-
-We are in the process of adding or would like to develop code for some of the following analyses:   
-
-* dN/dS (by variant and by gene/domains)  
-* Tajima's D over time  
-* clustering analyses
-* genomically inferred epidemiological parameters: R0, serial interval, etc.
-
-With anonymized data on vaccination status, severity/outcome, reason for sequencing (*e.g.*, outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving.
-Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
-
-# [Duotang Sandbox!](https://www.rstudio.com)
-link to sandbox.
 
 # Methodology {.tabset} 
 

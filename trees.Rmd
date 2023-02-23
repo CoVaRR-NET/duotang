@@ -6,9 +6,9 @@ The x-axis of the time tree represents the estimated number of years from today 
 source("scripts/tree.r")
 
 # load trees from files
-mltree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.rtt.nwk")
-ttree <- read.tree("./data_needed/aligned_nonrecombinant_sample1.timetree.nwk")
-recombTTree <- read.tree("./data_needed/aligned_recombinant_XBBS_sample1.timetree.nwk")
+mltree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.rtt.nwk"))
+ttree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.timetree.nwk"))
+recombTTree <- read.tree(paste0(params$datadir,"/aligned_recombinant_XBBS_sample1.timetree.nwk"))
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 

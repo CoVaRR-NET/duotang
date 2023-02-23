@@ -1,0 +1,282 @@
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
+
+Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BQ\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+
+For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+
+**Caveat:**
+These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
+
+```{r, warning=FALSE, message=FALSE}
+source("scripts/plot_selection_estimator_2type.R")
+#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
+
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+
+latelineage_pangotree <- makepangotree(unique(
+  meta$raw_lineage[
+    meta$sample_collection_date > max(meta$sample_collection_date) - days(60) 
+    ]
+  ))
+
+reference <- getStrictoSubLineages("BQ.1", meta)
+startpar2 <- list(p=0.5, s=0.05)
+
+#calculates the selection model for ALL variants.
+allparams <- mclapply(latelineage_pangotree, function(l) {
+  lineagelist <- getStrictoSubLineages(l, meta)
+  lapply(rev(all.regions$name), function(region) {
+    if(length(intersect(reference, lineagelist)) == 0) {
+      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    } else {
+      NA
+    }
+  })
+}, mc.cores=8)
+
+allparams <- do.call(c, allparams)  # same structure as below
+allparams <- allparams[!is.na(allparams)]
+#print(Sys.time() - t0)
+
+allparams <- allparams[order(sapply(allparams, function(p) { 
+  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+  }), decreasing = TRUE)]
+
+
+source("scripts/plot_selection_estimator.R")
+
+#define starting parameters (p,s) for making the selection estimates
+startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
+
+#filter samples with variants of interest
+setAll=getAllStrictoLineages(meta) 
+sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
+sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
+setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
+
+#define the mutants
+mutants = list(sublineages_BQ, sublineages_XBB)
+mutantNames = list("BQ*", "XBB*", "the rest") #
+col <- c(pal["Omicron BQ"], "XBB"="lightblue") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+
+#Set a starting date
+#Note that the startdate shouldn't be too much before both alleles become common
+#or rare migration events that die off could throw off the estimation procedure 
+#(so that the parameter estimates account for the presence of those alleles long in the past).
+startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
+
+#wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
+sub.plot.selection.estimate <- function(region,maxdate=NA){
+  #plot.selection.estimate.ggplot() returns a named list of data used for plotting the case count selection curves, see the function documentation for details. 
+  obj <- tryCatch(
+    {
+        obj=plot.selection.estimate.ggplot(region=region,
+                                        startdate=startdate, startpar=startpar,
+                                        reference=c(setAll),
+                                        mutants=mutants,
+                                        names=mutantNames,
+                                        maxdate=maxdate, col=col)
+    },
+    error=function(cond){
+        #message(cond)
+        obj= (list("plot1"=NULL, "plot2"=cond))
+    })
+  return(obj)
+}
+
+#calculate estimates for each province
+selectionEstimateFits <- list() #named list to store estimates for different provinces
+selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
+maxdate = selectionEstimateFits[["Canada"]]$date
+
+for (i in 1:length(all.regions$name)){
+  selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]])
+}
+
+
+```
+
+```{r testm, warning=FALSE, echo=FALSE, message=FALSE}
+
+library(plotly)
+p1<-ggplotly(selectionEstimateFits[["Canada"]]$plot1)
+p2<-ggplotly(selectionEstimateFits[["Canada"]]$plot2)
+
+fig <- p1 %>% add_trace(p2)
+
+menu <- list(
+  title = 'Data:',
+  x = 0.1,
+  y = 0.9,
+  buttons = list(
+    list(method = 'update',
+         args = list(list(visible = c(TRUE, FALSE)), 
+                     list(title = "Data 1")),
+         label = 'Data 1'),
+    list(method = 'update',
+         args = list(list(visible = c(FALSE, TRUE)), 
+                     list(title = "Data 2")),
+         label = 'Data 2')
+  )
+)
+
+layout <- list(
+  updatemenus = list(menu)
+)
+
+plot <- subplot(p1, p2, nrows = 1, shareX = T, shareY = T)
+
+# Add the layout to the plot object
+plot <- plot %>% layout(
+  updatemenus = list(menu)
+)
+plot
+
+library(ggplot2)
+library(plotly)
+
+plot_dropdown <- function(plot1, plot2) {
+  # Convert the ggplot objects to plotly objects
+  p1 <- ggplotly(plot1)
+  p2 <- ggplotly(plot2)
+
+  # Combine the two plotly objects and add a dropdown menu to switch between them
+  fig <- subplot(p1, p2, nrows = 2)
+  fig <- fig %>% layout(
+    updatemenus = list(
+      list(
+        buttons = list(
+          list(method = "update",
+               args = list(list(visible = c(TRUE, FALSE)), list(title = "Plot 1"))),
+          list(method = "update",
+               args = list(list(visible = c(FALSE, TRUE)), list(title = "Plot 2")))
+        ),
+        direction = "down",
+        showactive = TRUE,
+        x = 0.1,
+        xanchor = "left",
+        y = 1.1,
+        yanchor = "top"
+      )
+    )
+  )
+  
+  # Return the interactive plot
+  return(fig)
+}
+
+# Create two ggplot objects
+plot1 <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+plot2 <- ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()
+
+# Call the plot_dropdown function with the two ggplot objects
+plot_dropdown(plot1, plot2)
+
+```
+
+## {.unlisted .unnumbered}
+
+### BA.2 sublineages selection {.tabset}
+
+```{r general settings for selection estimator BA.2, warning=FALSE, echo=FALSE, message=FALSE}
+source("scripts/scanlineages.R")
+source("scripts/plot_selection_estimator.R")
+
+#function to plot all the indivudal variant's selection plot
+plotIndividualSublineageSelection <- function(region, minimumSampleCount, parentalNodes, maxdate){
+  allSublineagePlots <- list()
+  plotCounter <- 0
+  #loop through all params and find...
+  for(i in seq(1:length(allparams))) {
+    if(!any(is.na(allparams[[i]]$fit)) && # fit not NA
+       allparams[[i]]$region==region &&  #region is the same as what we want
+       substr(allparams[[i]]$mut[[1]], nchar(allparams[[i]]$mut[[1]]), nchar(allparams[[i]]$mut[[1]]))!="*" && #is the same lineage
+       isSubLineage(parentalNodes,allparams[[i]]$mut[[1]])){ #is child lineage of parentalNodes 
+      if((allparams[[i]]$fit)$fit[["s1"]]>0 && sum(allparams[[i]]$toplot$n2)>minimumSampleCount){ #the numebr of samples are greater than the minimum we want.
+          plotCounter <- plotCounter + 1
+          #plot all the variants and save them to a named list
+          allSublineagePlots[[plotCounter]] <- list("variant" = allparams[[i]]$mut[[1]], "plot" = plotIndividualSelectionPlots.ggplot(plotparam=allparams[[i]], maxdate = maxdate))
+      }
+    }
+  }
+  return(allSublineagePlots)
+}
+
+#generate  selection variant plots for BA2 and BA5 variants for each province
+individualSublineageSelectionPlots.BA2 <- list() 
+individualSublineageSelectionPlots.BA5 <- list() 
+for (i in 1:length(all.regions$name)){
+  minCount = ifelse(all.regions$shortname[[i]] == "Canada", 50, 20)
+  individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", maxdate)
+  #individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", maxdate)
+}
+ #individualSublineageSelectionPlots.BA2[[all.regions$shortname[[1]]]][[1]]$variant
+ #view(individualSublineageSelectionPlots.BA2[[all.regions$shortname[[1]]]][[1]]$plot$data)
+ #view(individualSublineageSelectionPlots.BA2[[all.regions$shortname[[1]]]][[1]]$plot$line)
+
+```
+
+
+Here we show the trends of the various BA.2.* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+#prints the BA.2 plots
+apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("#####",reg[["name"]],"\n","\n")
+  if (length(individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]])>0){
+      for (plot in individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]]){
+        print(plot$plot)
+      }
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
+  }
+  cat("\n\n")})
+
+```
+
+
+
+### BA.5 sublineages selection {.tabset}
+
+Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection.
+
+
+
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
+#prints the BA.5 Plots
+apply(all.regions,1,function(reg){
+  cat("####", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("#####",reg[["name"]],"\n","\n")
+  if (length(individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]])>0){
+      for (plot in individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]]){
+        print(plot$plot)
+      }
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
+  }
+  cat("\n\n")})
+
+```
+
+<!-- ### Other sublineages selection {.tabset} -->
+
+<!-- Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection. -->
+
+
+
+<!-- ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'} -->
+<!-- tmp=apply(all.regions,1,function(reg){ -->
+<!--   cat("####", reg[["shortname"]], "\n") -->
+<!--   n_min=20 -->
+<!--   if(reg[["name"]]=="Canada"){n_min=50} -->
+<!--   cat("#####",reg[["name"]],"(n>",n_min,")\n","\n") -->
+<!--   plotothers(reg[["name"]],n_min) -->
+<!--   cat("\n\n")}) -->
+
+<!-- ``` -->

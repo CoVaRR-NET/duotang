@@ -1,11 +1,8 @@
 library(splines)
 
-parseCaseData<- function(maxDate = NA){
-  if (is.na(maxDate)){
-    stop("Expected a max cutoff date, got None")
-  }
+parseCaseData<- function(maxDate = NA, datadir = "data_needed"){
   #maxDate = maxdate
-  BC<-read.csv(gzfile("data_needed/AgeCaseCountBC.csv.gz"), header=T)%>% 
+  BC<-read.csv(gzfile(paste0(datadir, "/AgeCaseCountBC.csv.gz")), header=T)%>% 
     filter(Age_Group %in% c("90+", "80-89","70-79")) %>% #keep only the 70+ case counts
     group_by(Reported_Date) %>% #group data by reported date
     summarize(n=n()) %>% #get total count of num cases per day
@@ -13,7 +10,7 @@ parseCaseData<- function(maxDate = NA){
     mutate (Reported_Date = as.Date(Reported_Date)) %>% #format the column as dates
     drop_na() #drop row if any col is NA
   
-  AB <- read.csv(gzfile("data_needed/AgeCaseCountAB.csv.gz"), header=T)%>% 
+  AB <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountAB.csv.gz")), header=T)%>% 
     filter(`Age.group` %in% c("80+ years","70-79 years")) %>% #keep only the 70+ case counts
     group_by(`Date.reported`) %>% #group data by reported date
     summarize(n=n()) %>% #get total count of num cases per day
@@ -22,7 +19,7 @@ parseCaseData<- function(maxDate = NA){
     rename(Reported_Date = `Date.reported`) %>% #relabel date column.
     drop_na() #drop row if any col is NA
   
-  QC <- read.csv(gzfile("data_needed/AgeCaseCountQC.csv.gz"), header=T)%>% 
+  QC <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T)%>% 
     filter(Date != "Date inconnue") %>%
     filter(Nom %in% c("70-79 ans","80-89 ans","90 ans et plus")) %>% #keep only the 70+ case counts
     group_by(Date) %>%#group data by reported date
@@ -33,7 +30,7 @@ parseCaseData<- function(maxDate = NA){
     drop_na() #drop row if any col is NA
 
     #Case_Reported_Date, Age_Group
-  ON <-read.csv(gzfile("data_needed/AgeCaseCountON.csv.gz"), header=T)%>% 
+  ON <-read.csv(gzfile(paste0(datadir,"/AgeCaseCountON.csv.gz")), header=T)%>% 
    filter(Age_Group%in% c("70s","80s","90+")) %>% #keep only the 70+ case counts
     group_by(Case_Reported_Date) %>%#group data by reported date
     summarize(n = n())%>% #get total count of num cases per day
@@ -42,7 +39,7 @@ parseCaseData<- function(maxDate = NA){
     rename(Reported_Date = Case_Reported_Date) %>% #relabel date column.
     drop_na() #drop row if any col is NA
   
-  Canada <- read.csv(gzfile("data_needed/AgeCaseCountCAN.csv.gz"), header=T)%>% 
+  Canada <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountCAN.csv.gz")), header=T)%>% 
     filter(status == "cases") %>%
     filter(gender == "all") %>%
     filter(age_group %in% c("70 to 79","80+")) %>% #keep only the 70+ case counts
@@ -67,30 +64,18 @@ parseCaseData<- function(maxDate = NA){
 
 #get smooth fit of casecounts
 getCaseCountSmoothFit <- function(countData, knots=5){
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   return (smooth.spline(countData$Reported_Date, countData$n,nknots=knots))
 }
 
 getCaseCountSmoothFitWithLambda<-function(countData, lambda=0.001){
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   return(smooth.spline(log10(countData$n),lambda=lambda))
 }
 
 getCaseCountSmoothFitWithSpar<-function(countData, spar=0.8){
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   return(smooth.spline(log10(countData$n),spar=0.8))
 }
 
 CubicSplSmooth <- function(countData, df=7) {
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
   #if (is.na(df)){df = ceiling(length(countData$n) / 20)}
   bs <- (lm(n ~ bs(Reported_Date, df = df), data = countData )$fit)
   return(bs)
@@ -126,26 +111,23 @@ CubicSplSmooth3 <- function(data, lambda=10^3) {
 
 
 #plot the casecount by selection estimate. 
-plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
+plotCaseCountByDate2 <- function(countData, lineFits, population, region=NA, saveToFile=F){
   #countData <- caseCountData
   #lineFits <-rev(caseSelectionLines)
   #filename = "test"
-  if (!c("Reported_Date", "n") %in% colnames(countData)){
-    stop("Possible corrupted countData. Expected column: Reported_Date and n.")
-  }
-  
   colors = list()
   rValues = list()
   for (i in seq(1:length(lineFits))){
-    if (!c("line", "color", "names") %in% names(lineFits[[i]])){
-      stop("Possible corrupted lineFits Expected key: line, color, name")
-    }
     fitData <- lineFits[[i]]$line
     colnames(fitData) <- c("Reported_Date", lineFits[[i]]$names, "type")
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T)
     colors[lineFits[[i]]$names] = lineFits[[i]]$color
     rValues[lineFits[[i]]$names] = round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2)
+    if (region == "Canada"){
+      rValues[lineFits[[i]]$names] = as.numeric(rValues[lineFits[[i]]$names]) / 7
+    }
   }
+  
   
   countData$type <- lineFits[[2]]$line$type
   
@@ -176,7 +158,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
 
-    ylim(0, max(d$CaseCount) + 100) + 
+    ylim(0, 75) + 
     xlab("Sample collection date") +
     ylab("Age 70+ cases per 100,000 individuals") +
 
@@ -187,9 +169,9 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, filename=NA){
                           "\n Last day of accurate case counts (lighter colours) is ", max((d %>% filter(report_type=="Accurate"))$Reported_Date))) +
     theme(legend.text=element_text(size=12), text = element_text(size = 20)) 
   
-    if (!is.na(filename)){
-      p <- p + ggtitle(paste0("Dataset: ", filename))
-      ggsave(paste0("casecount_",filename, ".png"), plot = p, width = 11, height = 8)
+    if (saveToFile){
+      p <- p + ggtitle(paste0("Dataset: ", region))
+      ggsave(paste0("casecount_",region, ".png"), plot = p, width = 11, height = 8)
     }
   return (p)
 }
