@@ -9,13 +9,13 @@ else
 	exit
 fi
 
-if git rev-parse --abbrev-ref HEAD | grep -q 'main'; then
-    echo "check:on main branch. - YES"
-else
-    echo "check:on main branch. - NO"
-	echo "Make sure this script is ran at the root of the main branch."
-	exit
-fi
+#if git rev-parse --abbrev-ref HEAD | grep -q 'main'; then
+#    echo "check:on main branch. - YES"
+#else
+#    echo "check:on main branch. - NO"
+#	echo "Make sure this script is ran at the root of the main branch."
+#	exit
+#fi
 
 #pull all commits with changes to duotang.html
 git log --pretty=%ad,%H --date=short --name-only -- duotang.html | tr ':' '_'> commitHistory.txt
