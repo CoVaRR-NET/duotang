@@ -75,7 +75,7 @@ const palette = data["legend"];
 delete(data.legend);
 var legend = div.append("svg")
                 .attr("width", div.attr("width"))
-                .attr("height", "70px");
+                .attr("height", "80px");
 
 legend.selectAll("mydots")
       .data(Object.entries(palette))
@@ -259,7 +259,7 @@ g.append("g")
    .call(d3.axisRight(yScale));
 
 
-// add axis labels
+// add axis labels - #73
 bpsvg.append("text")
      .attr("class", "x label")
      .attr("text-anchor", "middle")
