@@ -465,6 +465,7 @@ echo "gitpush" > $checkPointFile
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
+	git checkout -b UpdatePreview
 	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
@@ -478,7 +479,8 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f archive/readme.md
 	git add -f duotang*html
 	git commit -m "Update: $datestamp"
-	git push origin dev
+	git push -u origin UpdatePreview
+	git checkout dev
 fi
 
 

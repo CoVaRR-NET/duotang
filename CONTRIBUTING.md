@@ -92,6 +92,12 @@ Arguments can also be provided for custom build functions:
  * `--liststeps` Prints the available checkpoint steps in this script. You can use this for the `--gotostep` argument.
  * `--gotostep` Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use `--liststeps` to see all the available checkpoints. 
 
+## Setup cron job for automated updates
+
+**First, you must modify the duotang folder paths in `scripts/UpdateMonitor.service file`**
+Insert the following into your crontab: 
+`30 * * * *  /usr/bin/flock -n /path/to/duotang/updatemonitor.log -c "/bin/bash -e /path/to/duotang/scripts/UpdateMonitor.service >> /path/to/duotang/updatemonitor.log 2>&1"`
+
 # Step by step instruction to obtain data, and to generate phylogenies
 
 ## To obtain required data
