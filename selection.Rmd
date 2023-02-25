@@ -82,7 +82,7 @@ apply(dataAvailable.regions,1,function(reg){
 
 ##  {.unlisted .unnumbered}
 
-## Selection by Case Count {.tabset}
+## Case count trends by variant {.tabset}
 
 ```{r case count selection estimator setup}
 source("scripts/plot_case_count_selection_estimator.R")
