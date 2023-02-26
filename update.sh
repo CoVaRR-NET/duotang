@@ -466,7 +466,7 @@ echo "$datestamp" > duotangCurVer
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
-	git checkout -b UpdatePreview
+	git checkout -b UpdatePreview.$datestamp
 	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
@@ -481,7 +481,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotang*html
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
-	git push -u origin UpdatePreview
+	git push -u origin UpdatePreview.$datestamp
 	git checkout dev
 fi
 
