@@ -233,6 +233,8 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
+[Note some new analyses have been incorporated, including case count trends by variant.]
+
 XBB.1.5 continues to grow steadily and significantly, and is now the most common lineage in some regions of Canada. Some other select variants with the S:F486P mutation are also showing growth in some regions, or need to be tracked due to their international growth, such as XBB.1.9.1 and XBF. BQ.1.1 and some subvariants are increasing again in some regions of Canada along with some other select BQ.1 and CH.1.1 subvariants. Differences between some provinces continue - see also the evolving plots below of “Fastest growing lineages in Canada”, per province.
 
 **Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada):
@@ -321,9 +323,7 @@ Here we show the selection estimates and their 95% confidence intervals for Pang
 
 ### Plot (stricto) {.tabset}
 
-Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
-
-Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting s one to two week doubling time and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. These estimates should with lower sequence counts in one region should be considered as very preliminary.
 
 
 ```{r, results='asis', echo = F, warning=FALSE, fig.height=7}
@@ -361,11 +361,9 @@ for (i in 1:length(all.regions[["name"]])) {
 
 ### Plot (non stricto)  {.tabset}
       
-This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
+This plot highlights the groups of related lineages that are growing fastest (e.g., BQ.1* is the monophyletic clade that includes BQ.1.1 and all other BQ.1 sublineages. 
 
-Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
-
-Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
+Again, growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting s one to two week doubling time and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. These estimates should with lower sequence counts in one region should be considered as very preliminary.
 
 
 ```{r tabs, results='asis', warning=FALSE, fig.height=7}
@@ -463,13 +461,14 @@ rm(meta1)
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
 By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
 The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
-See below for jurisdictional differences of these plots.   
 
 There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
 
 * A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
 * B.1.2 - a USA lineage that spread well in Canada  
 * B.1.160 - an European lineages that spread well in Canada  
+
+This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
 ## Canadian trees {.tabset}  
 

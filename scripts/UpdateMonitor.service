@@ -27,7 +27,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	if [ "$viralaiid" = "$virusseqid" ]; then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
 		git pull
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush --overwrite
 	else
 		echo "Found update on ViralAI, but it's not the latest update found on virusseq" 
 	fi

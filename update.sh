@@ -178,7 +178,7 @@ echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
 echo "Skip GSD download?: ${SKIPGSD}"
-echo "Push changes to dev?: ${GITPUSH}"
+echo "Push changes to git?: ${GITPUSH}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
 if [ ! -z "$VENVPATH" ]; then echo "VENV path is: ${VENVPATH}"; fi
@@ -461,6 +461,7 @@ if [ "$CLEAN" = "YES" ]; then
 fi
 
 echo "gitpush" > $checkPointFile
+echo "$datestamp" > duotangCurVer
 
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
@@ -478,6 +479,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f archive/*.html
 	git add -f archive/readme.md
 	git add -f duotang*html
+	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
 	git push -u origin UpdatePreview
 	git checkout dev
@@ -489,5 +491,4 @@ if [ "$NOCONDA" = "NO" ]; then
 fi
 
 echo "Update completed successfully"
-echo "$datestamp" > duotangCurVer
 echo "finish" > $checkPointFile

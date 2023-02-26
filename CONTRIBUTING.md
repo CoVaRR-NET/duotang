@@ -96,7 +96,15 @@ Arguments can also be provided for custom build functions:
 
 **First, you must modify the duotang folder paths in `scripts/UpdateMonitor.service file`**
 Insert the following into your crontab: 
+
 `30 * * * *  /usr/bin/flock -n /path/to/duotang/updatemonitor.log -c "/bin/bash -e /path/to/duotang/scripts/UpdateMonitor.service >> /path/to/duotang/updatemonitor.log 2>&1"`
+
+This will push changes into a new branch called `UpdatePreview`. Once changes are approved, PR this preview branch into `dev`, then PR `dev` into `main`.
+
+**Due to `crond` using minimal environments, you may need to define the PATH variable in order for your programs to be found.**
+For example, you can insert the following into your crontab prior to the above line.
+
+`PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin`
 
 # Step by step instruction to obtain data, and to generate phylogenies
 

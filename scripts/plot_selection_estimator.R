@@ -468,7 +468,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
     scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
     xlab("Sample collection date") +
-    ylab(paste0("Proportion in ", est$region)) + 
+    ylab(paste0("Proportion in ", est$region, "(log)")) + 
     scale_y_log10(limits=c(0.001,1000), breaks = c(0.001, 0.01, 0.1, 1, 10, 100, 1000), labels = c(0.001, 0.01, 0.1, 1, 10, 100, 1000)) +
     xlim(min(plotData$date), maxdate)
   
