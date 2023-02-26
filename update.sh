@@ -466,7 +466,7 @@ echo "$datestamp" > duotangCurVer
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
-	git checkout -b UpdatePreview.$datestamp
+	git checkout -B UpdatePreview.$datestamp
 	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
