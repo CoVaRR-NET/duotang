@@ -233,7 +233,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ## Current Situation
 
-[Note some new analyses have been incorporated, including case count trends by variant.]
+**[Note some new analyses have been incorporated, including case count trends by variant.]**
 
 XBB.1.5 continues to grow steadily and significantly, and is now the most common lineage in some regions of Canada. Some other select variants with the S:F486P mutation are also showing growth in some regions, or need to be tracked due to their international growth, such as XBB.1.9.1 and XBF. BQ.1.1 and some subvariants are increasing again in some regions of Canada along with some other select BQ.1 and CH.1.1 subvariants. Differences between some provinces continue - see also the evolving plots below of “Fastest growing lineages in Canada”, per province.
 
@@ -323,7 +323,7 @@ Here we show the selection estimates and their 95% confidence intervals for Pang
 
 ### Plot (stricto) {.tabset}
 
-Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting s one to two week doubling time and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. These estimates should with lower sequence counts in one region should be considered as very preliminary.
+Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
 
 
 ```{r, results='asis', echo = F, warning=FALSE, fig.height=7}
@@ -363,7 +363,7 @@ for (i in 1:length(all.regions[["name"]])) {
       
 This plot highlights the groups of related lineages that are growing fastest (e.g., BQ.1* is the monophyletic clade that includes BQ.1.1 and all other BQ.1 sublineages. 
 
-Again, growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting s one to two week doubling time and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. These estimates should with lower sequence counts in one region should be considered as very preliminary.
+Again, Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
 
 
 ```{r tabs, results='asis', warning=FALSE, fig.height=7}
