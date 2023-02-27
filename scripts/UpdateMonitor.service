@@ -26,7 +26,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	virusseqid=`curl -s -X GET "https://singularity.virusseq-dataportal.ca/archives?createdAfterEpochSec=$duotangverepoch&sortDirection=DESC" -H  "accept: application/json" | python3 -c "import sys, json; a=(json.load(sys.stdin)); print(a['content'][0]['id'].strip());"`
 	if [ "$viralaiid" = "$virusseqid" ]; then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
-		python scripts/duoli.py --message "ViralAI updated to $viralaidate2, with id $viralaiid. Starting update process..."
+		python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Starting update process..."
 		git pull
 		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush --overwrite > update.log
 		status=$( tail -n 1 update.log )

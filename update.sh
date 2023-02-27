@@ -482,8 +482,8 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotang*html
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
-	git push -u origin UpdatePreview dev
-	python scripts/duoli.py --message "Update complete, here are the HTMLs." --file duotang.html --file duotang-sandbox.html
+	git push -u origin UpdatePreview
+	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html
 	git checkout dev
 fi
 
