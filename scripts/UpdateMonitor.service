@@ -26,8 +26,15 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	virusseqid=`curl -s -X GET "https://singularity.virusseq-dataportal.ca/archives?createdAfterEpochSec=$duotangverepoch&sortDirection=DESC" -H  "accept: application/json" | python3 -c "import sys, json; a=(json.load(sys.stdin)); print(a['content'][0]['id'].strip());"`
 	if [ "$viralaiid" = "$virusseqid" ]; then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
+		python scripts/duoli.py --message "ViralAI updated to $viralaidate2, with id $viralaiid. Starting update process..."
 		git pull
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush --overwrite
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush --overwrite > update.log
+		status=$( tail -n 1 update.log )
+		if [[ "$status" == "Update completed successfully" ]]; then
+			python scripts/duoli.py --message "Update complete, see preview branch https://github.com/CoVaRR-NET/duotang/tree/UpdatePreview"
+		else
+			python scripts/duoli.py --message "There was an issue with the update, see logs attached." --file "update.log"
+		fi
 	else
 		echo "Found update on ViralAI, but it's not the latest update found on virusseq" 
 	fi
@@ -38,4 +45,4 @@ fi
 sleep 10s
 
 #crontab entry
-#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service >> ~/duotang/updatemonitor.log 2>&1"
+#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service > ~/duotang/updatemonitor.log 2>&1"

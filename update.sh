@@ -56,8 +56,8 @@ while [[ $# -gt 0 ]]; do
       DOWNLOADONLY="YES"
       shift # past argument
       ;;
-	--skipgsd)
-      SKIPGSD="YES"
+	--includegsd)
+      INCLUDEGSD="YES"
       shift # past argument
       ;;
 	--gitpull)
@@ -104,7 +104,7 @@ if [ "$OVERWRITE" = "YES" ]; then rm $checkPointFile; else OVERWRITE="NO"; fi
 if [ "$BUILDMAIN" = "YES" ]; then BUILDMAIN="YES"; else BUILDMAIN="NO"; fi
 if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
-if [ "$SKIPGSD" = "YES" ]; then SKIPGSD="YES"; else SKIPGSD="NO"; fi
+if [ "$INCLUDEGSD" = "YES" ]; then INCLUDEGSD="YES"; else INCLUDEGSD="NO"; fi
 if [ "$GITPUSH" = "YES" ]; then GITPUSH="YES"; else GITPUSH="NO"; fi
 if [ "$LISTSTEPS" = "YES" ]; then 
 	echo "Available checkpoint steps are: "
@@ -123,7 +123,7 @@ if [ "$HELPFLAG" = "YES" ]; then
 	echo "[--downloadonly] Flag used to download data only. Script will exit once all external resources had been downloaded. "
 	echo "[--noconda] Flag used to run the update script without conda. Note: The dependencies should exist in \$PATH and this script makes no attempt to ensure that they exist. "
 	echo "[--venvpath] String. The ABSOLUTE path to the venv containing dependencies. Should be used with '--noconda'."
-	echo "[--skipgsd] Flag used to skip the GSD metadata download. "
+	echo "[--includegsd] Flag used to include the GSD metadata download. "
 	echo "[--gitpush] Flag used to automatically commit changes and push to dev."
 	echo "[--clean] [BROKEN] Flag used to clean the data_needed directory after update. Currently it just dumps the new data_needed files into a tarball at root."
 	echo "[--liststeps] Prints the available checkpoint steps in this script. You can use this for the '--gotostep' argument."	
@@ -177,7 +177,7 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
-echo "Skip GSD download?: ${SKIPGSD}"
+echo "Include GSD download?: ${SKIPGSD}"
 echo "Push changes to git?: ${GITPUSH}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
@@ -338,7 +338,7 @@ gzip -f ${data_dir}/AgeCaseCount*.csv
 echo "gsdmetadata" > $checkPointFile
 
 #gsdmetadata:
-if [ "$SKIPGSD" = "NO" ]; then 
+if [ "$INCLUDEGSD" = "YES" ]; then 
 	echo "downloading GSD metadata"
 	python3 ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
 	# Extract GISAID id and collection date 
@@ -466,7 +466,8 @@ echo "$datestamp" > duotangCurVer
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
-	git checkout -B UpdatePreview.$datestamp
+	git remote prune origin
+	git checkout -B UpdatePreview
 	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
@@ -481,7 +482,8 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotang*html
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
-	git push -u origin UpdatePreview.$datestamp
+	git push -u origin UpdatePreview dev
+	python scripts/duoli.py --message "Update complete, here are the HTMLs." --file duotang.html --file duotang-sandbox.html
 	git checkout dev
 fi
 
@@ -489,6 +491,7 @@ fi
 if [ "$NOCONDA" = "NO" ]; then 
 	conda deactivate
 fi
+
 
 echo "Update completed successfully"
 echo "finish" > $checkPointFile

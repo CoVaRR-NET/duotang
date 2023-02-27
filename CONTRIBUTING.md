@@ -87,7 +87,7 @@ Arguments can also be provided for custom build functions:
  * `--downloadonly` Flag used to download data only. Script will exit once all external resources had been downloaded. 
  * `--noconda` Flag used to run the update script without conda. Note: The dependencies should exist in $PATH and this script makes no attempt to ensure that they exist. 
  * `--venvpath` String. The ABSOLUTE path to the venv containing dependencies. Should be used with `--noconda`.
- * `--skipgsd` Flag used to skip the GSD metadata download. 
+ * `--includegsd` Flag used to include the GSD metadata download. Requires GSD secrets located in .secret/
  * `--liststeps` Prints the available checkpoint steps in this script. You can use this for the `--gotostep` argument.
  * `--gotostep` Jumps to a checkpoint step in the script, specify it as '#StepName:'. You must include the # at beginning and : at end. Use `--liststeps` to see all the available checkpoints. 
 
@@ -100,22 +100,57 @@ Insert the following into your crontab:
 
 This will push changes into a new branch called `UpdatePreview.$DATESTAMP`. Once changes are approved, PR this preview branch into `main`, then merge `main` into `dev` to resync the development branch.
 
-**Due to `crond` using minimal environments, you may need to define the PATH variable in order for your programs to be found.**
-For example, you can insert the following into your crontab prior to the above line.
+(NOTE) Due to `crond` using minimal environments, you may need to define the PATH variable in order for your programs to be found.
+For example, you can insert the following into your crontab list prior to the above line.
 
 `PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin`
 
 # Step by step instruction to obtain data, and to generate phylogenies
 
+Note `$datetime` is a placeholder for the date and time associated with downloading VirusSeq data, *e.g.*, `2022-03-16`.
+
 ## To obtain required data
 
-Note `<datetime>` is a placeholder for the date and time associated with downloading VirusSeq data, *e.g.*, `2022-03-16T15:17:45`.
+Use the update.sh script located at the root of the repo. This script, when in downloadonly mode, will download all relevant metadata required to build Duotang.
+`./update.sh --downloadonly [--noconda --venvpath /path/to/venv] --date $datetime`
+
+(The following instructions still works but will be deprecated soon.)
 
 | Command | Description | Outputs | Expected time |
 |---------|-------------|---------|---------------|
 | `sh data_needed/download.sh <ViralAi>` |  download data release from VirusSeq (or ViralAI if argument is provided), separate and re-compress, download also also data from ncov viralai and add pango designations | `ncov-open.$datestamp.fasta.xz`     `viralai.$datestamp.withalias.csv` `virusseq.$datestamp.fasta.xz` `ncov-open.$datestamp.withalias.tsv.gz` `virusseq.$datestamp.metadata.tsv.gz` |  ~20 minutes |
 | `datestamp=$(ls data_needed/virusseq.*fasta.xz \| tail -1 \| cut -d. -f2)` | set the `datestamp` variable | | 1 second |
 | `python3 scripts/alignment.py data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/ --samplenum 3 --reffile resources/NC_045512.fa` | downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA | `sample1.fasta` `sample2.fasta` `sample3.fasta` | ~2 minutes |
+
+## Using the extractSequences.py script to filter sequences of interest from FASTA file.
+The extractSequences.py is located at `scripts/extractSequences.py`. This scripts allows you to use regex to remove and/or keep certain sequences with specific lineage or ID. This script should be ran at the root of the repo. An example use case might be to remove recombinants before constructing phylogenetic trees. 
+
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output [--extractregex '^SomeRegex$' --keepregex '^SomeRegex1$' --keepregex '^SomeRegex2$' --extractbyid]
+
+This script will then output at least 5 files:
+ * `Sequences_remainder.fasta.xz` FASTA file containing all sequences not matching the --extractregex regex.
+ * `Sequences_regex_\*.fasta.xz` FASTA file containing all sequences matching the --keepregex regex.
+ * `SequenceMetadata_remainder.tsv.gz` Metadata for sequences in Sequences_remainder.fasta.xz
+ * `SequenceMetadata_regex_\*.tsv.gz` Metadata for sequences in Sequences_regex_\*.fasta.xz
+ * `SequenceMetadata_matched.tsv` Metadata for the sequences that were extracted but not kept. There is no associated FASTA for this.
+
+Optional arguments can also be provided:
+ * `--extractregex` This will be the regex used to remove sequences. e.g. '^X\S\*$' will remove all lineages starting with X
+ * `--keepregex` This will be the regex used to put sequences removed by --extractregex in a different file. e.g. '^XBB\S\*$' will keep the lineages starting with XBB and output them. This argument can be specified multiple times, resulting in one output file for each regex.
+ * `--extractbyid` By default, the regex is applied to the lineage column, this will change the behavior so that the regex filtering is applied to the sample ID.
+ 
+Example:
+The following will remove all lineages starting with 'X' (i.e. recombinants) from the FASTA but will output removed lineages starting with 'XBB' and 'XAC' into a separate file. 
+
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output --extractregex '^X\S*$' --keepregex '^XBB\S*$' --keepregex '^XAC\S*$']
+
+## Perform subsampling and alignment
+
+This step downsample genomes, use `minimap2` to align pairwise to reference and write result to FASTA.
+
+`python3 scripts/alignment.py data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.metadata.csv.gz data_needed/ --samplenum 3 --reffile resources/NC_045512.fa`
+
+The output of this is three FASTA containing aligned sequences (`sample1.fasta` `sample2.fasta` `sample3.fasta`)
 
 
 ## To generate phylogenies (ML and time-scaled)
@@ -135,24 +170,3 @@ The following steps should be applied to all three replicates from the preceding
 |---------|-------------|---------|---------------|
 | `for i in 1 2 4 5; do python3 scripts/get-mutations.py --pango rawlineage data_needed/virusseq.$datestamp.fasta.xz B.1.1.529.$i data_needed/virusseq.metadata.csv.gz data_needed/raphgraph/canada-BA$i.var; ; done` | Generate a frequency table of nucleotides at all positions for Canadian genomes of user-specified lineage, aligned against the reference | `canada-BA1.var` | ~1 minute |
 | `for i in 1 2 4 5; do python3 scripts/get-mutations.py --seqname strain --delimiter "\t" --pango rawlineage data_needed/ncov-open.$datestamp.fasta.xz B.1.1.529.$i data_needed/ncov-open.$datestamp.withalias.tsv.gz data_needed/raphgraph/global-BA$i.var ; done` | Generate the corresponding nucleotide frequency table for global data set | `global-BA1.var` |  |
-
-# Using the extractSequences.py script to filter sequences of interest from FASTA file.
-The extractSequences.py is located at `scripts/extractSequences.py`. This scripts allows you to use regex to remove and/or keep certain sequences with specific lineage or ID. This script should be ran at the root of the repo.
-
-`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output [--extractregex '^SomeRegex$' --keepregex '^SomeRegex1$' --keepregex '^SomeRegex2$' --extractbyid]
-
-This script will then output at least 5 files:
- * `Sequences_remainder.fasta.xz` FASTA file containing all sequences not matching the --extractregex regex.
- * `Sequences_regex_\*.fasta.xz` FASTA file containing all sequences matching the --keepregex regex.
- * `SequenceMetadata_remainder.tsv.gz` Metadata for sequences in Sequences_remainder.fasta.xz
- * `SequenceMetadata_regex_\*.tsv.gz` Metadata for sequences in Sequences_regex_\*.fasta.xz
- * `SequenceMetadata_matched.tsv` Metadata for the sequences that were extracted but not kept. There is no associated FASTA for this.
-
-Optional arguments can also be provided:
- * `--extractregex` This will be the regex used to remove sequences. e.g. '^X\S\*$' will remove all lineages starting with X
- * `--keepregex` This will be the regex used to put sequences removed by --extractregex in a different file. e.g. '^XBB\S\*$' will keep the lineages starting with XBB and output them. This argument can be specified multiple times, resulting in one output file for each regex.
- * `--extractbyid` By default, the regex is applied to the lineage column, this will change the behavior so that the regex filtering is applied to the sample ID.
- 
-Examples:
-`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output --extractregex '^X\S*$' --keepregex '^XBB\S*$' --keepregex '^XAC\S*$']
- 
