@@ -2,7 +2,7 @@
 ####################BIG BOLDED WARNING MESSAGE######################
 #  This script contains onErrorResume functionality.               # 
 #  Labels for these goto function start with '#' and end with ':'  #
-#  For example: "#LabelName:", "#datalabel:"						   #
+#  For example: "#LabelName:", "#datalabel:"					   #
 #  They must be the same as content of the checkpoint file         #
 #  THEY ARE NOT COMMENTS, DO NOT DELETE THEM.					   #
 ####################################################################
@@ -135,12 +135,13 @@ if [ "$GITPULL" = "YES" ]; then
 	echo "Pulling in the latest changes. This flag should only be used if there are no changes in git status."
 	echo "Actually I don't know why this is even a flag in the first place. I can see so many issues with including this as part of the update script"
 	echo "You just shouldn't use this flag, or expect the script to act funky."
-	git pull
+	#git pull
+	exit 1
 fi
 
 if [ "$NOCONDA" = "YES" ]; then 
 	NOCONDA="YES"; 
-	echo -e "\n\nThis script is running without Conda, make sure dependencies are installed at a system level and discoverable in PATH"
+	echo -e "\n\nThis script is running without Conda, make sure dependencies are set up according to CONTRIBUTING.md"
 	#if command -v python3; then 
 #		echo "Using python3 at $(command -v python3)"
 	#else
@@ -177,7 +178,7 @@ echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
 echo "Skip GSD download?: ${SKIPGSD}"
-echo "Push changes to dev?: ${GITPUSH}"
+echo "Push changes to git?: ${GITPUSH}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
 if [ ! -z "$VENVPATH" ]; then echo "VENV path is: ${VENVPATH}"; fi
@@ -356,13 +357,13 @@ if [ "$SKIPGSD" = "NO" ]; then
 	join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' |  gzip > ${data_dir}/GSDMetadataCleaned.tsv.gz
 fi
 
-echo "filterseq" > $checkPointFile
-
 if [ "$DOWNLOADONLY" = "YES" ]; then
 	echo "Data download complete, exiting..."
 	echo "finish" > $checkPointFile
 	exit 0
 fi
+
+echo "filterseq" > $checkPointFile
 
 #filterseq:
 #removes the recombinants
@@ -371,7 +372,6 @@ echo "separating out the recombinants from the data..."
 python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
 
 echo "alignseq" > $checkPointFile
-
 
 #alignseq:
 echo "aligning sequences..."
@@ -461,11 +461,13 @@ if [ "$CLEAN" = "YES" ]; then
 fi
 
 echo "gitpush" > $checkPointFile
+echo "$datestamp" > duotangCurVer
 
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
-	bash -e scripts/getPastDuotangVersions.sh
+	git checkout -B UpdatePreview.$datestamp
+	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
 	git add -f data_needed/*.nwk
@@ -477,8 +479,10 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f archive/*.html
 	git add -f archive/readme.md
 	git add -f duotang*html
+	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
-	git push origin dev
+	git push -u origin UpdatePreview.$datestamp
+	git checkout dev
 fi
 
 

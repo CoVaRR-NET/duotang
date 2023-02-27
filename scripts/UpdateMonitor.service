@@ -1,0 +1,41 @@
+#!/bin/bash -e
+
+#activate the venv
+source ~/duotang_venv/bin/activate
+cd ~/duotang
+
+#get the last duotang update date and convert to epoch
+echo `date`
+
+duotangver=`cat duotangCurVer`
+duotangverepoch=`date --date="${duotangver}" +"%s"`
+
+#get the virusseq version from the latest viral ai update.
+dnastack collections list | python3 -c "import sys, json; a=(json.load(sys.stdin)); b=[child for child in a if child['slugName']=='virusseq']; c=b[0]['description']; d=c[c.find('Release:'):].split('('); releaseDate=d[0].replace('Release:','').replace('</strong>','').replace('&nbsp;',' ').strip(); hash=d[1].replace('identifier:','').replace(')</p>','').strip(); print (releaseDate); print (hash)" > viralaiver
+
+#convert the date to epoch
+viralaidate=`sed -n '1p' viralaiver`
+viralaidate2=`date --date="${viralaidate}" +'%B %d, %Y'`
+viralaiepoch=`date --date="${viralaidate2}" +"%s"`
+viralaiid=`sed -n '2p' viralaiver`
+
+rm viralaiver
+
+if (( $viralaiepoch > $duotangverepoch )); then
+	#query the virusseq data portal for their latest update. 
+	virusseqid=`curl -s -X GET "https://singularity.virusseq-dataportal.ca/archives?createdAfterEpochSec=$duotangverepoch&sortDirection=DESC" -H  "accept: application/json" | python3 -c "import sys, json; a=(json.load(sys.stdin)); print(a['content'][0]['id'].strip());"`
+	if [ "$viralaiid" = "$virusseqid" ]; then
+		echo "Update found. Release $viralaidate2, ID: $virusseqid"
+		git pull
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --clean --gitpush --overwrite
+	else
+		echo "Found update on ViralAI, but it's not the latest update found on virusseq" 
+	fi
+else
+	echo "no update" 
+fi
+
+sleep 10s
+
+#crontab entry
+#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service >> ~/duotang/updatemonitor.log 2>&1"

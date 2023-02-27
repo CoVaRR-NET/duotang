@@ -82,7 +82,7 @@ apply(dataAvailable.regions,1,function(reg){
 
 ##  {.unlisted .unnumbered}
 
-## Selection by Case Count {.tabset}
+## Case count trends by variant {.tabset}
 
 ```{r case count selection estimator setup}
 source("scripts/plot_case_count_selection_estimator.R")
@@ -264,7 +264,7 @@ apply(all.regions,1,function(reg){
 
 ### BA.5 sublineages selection {.tabset}
 
-Here we show the trends of the various BA.5# sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
 ```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 #prints the BA.5 Plots
