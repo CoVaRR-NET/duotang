@@ -405,7 +405,35 @@ paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
   (p$fit)$fit[["s1"]]>0 & 
   sum(p$toplot$n2)>10
   }else{FALSE}})]
-DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE))
+DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE), extensions = 'Buttons', options = list(dom = 'Blfrtip',
+                                pageLength = 5, autoWidth = TRUE,
+                                #searchCols = list(NULL, list(search = 'regex')),
+                                search = list(regex = TRUE),
+                                buttons = list(
+                                              list(
+                                                text = 'Export Displayed',
+                                                extend = 'csvHtml5',
+                                                filename = 'table',
+                                                exportOptions = list(
+                                                  modifier = list(
+                                                    page = 'current'
+                                                  )
+                                                )
+                                              ),
+                                              list(
+                                                text = 'Export All',
+                                                extend = 'csvHtml5',
+                                                filename = 'table',
+                                                exportOptions = list(
+                                                  modifier = list(
+                                                    page = 'all'
+                                                  )
+                                                )
+                                              )
+                                            ),
+                                 lengthMenu = list(c(5,25,50,-1),
+                                                 c(5,25,50,"All"))),
+                                filter = 'top', rownames = F)
 
 ```
 
@@ -495,7 +523,35 @@ lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep
 colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description")
 
 #show the table as paged and column searchable.
-DT::datatable(lineageDescriptions, filter = 'top', rownames = F, options = list( dom='ip',pageLength = 5, autoWidth = TRUE))
+DT::datatable(lineageDescriptions, extensions = 'Buttons', options = list(dom = 'Blfrtip',
+                                pageLength = 5, autoWidth = TRUE,
+                                #searchCols = list(NULL, list(search = 'regex')),
+                                search = list(regex = TRUE),
+                                buttons = list(
+                                              list(
+                                                text = 'Export Displayed',
+                                                extend = 'csvHtml5',
+                                                filename = 'table',
+                                                exportOptions = list(
+                                                  modifier = list(
+                                                    page = 'current'
+                                                  )
+                                                )
+                                              ),
+                                              list(
+                                                text = 'Export All',
+                                                extend = 'csvHtml5',
+                                                filename = 'table',
+                                                exportOptions = list(
+                                                  modifier = list(
+                                                    page = 'all'
+                                                  )
+                                                )
+                                              )
+                                            ),
+                                 lengthMenu = list(c(5,25,50,-1),
+                                                 c(5,25,50,"All"))),
+                                filter = 'top', rownames = F)
 ```
 
 # Future development
