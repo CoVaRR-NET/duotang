@@ -40,6 +40,7 @@ library(jsonlite)
 library(tidyverse)
 library(reshape2) #used to plot case count selection plots
 library(DT)
+library(plotly)
 
 theme_set(theme_classic())
 
@@ -139,6 +140,17 @@ for(row in 1:nrow(epidataCANall)) {
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 ```
 
+
+```{r, include=FALSE}
+#hack to make plotly display plots using a for loop
+#This is the "official" workaround for this lol. See:
+#https://github.com/plotly/plotly.R/issues/273#issuecomment-195611009
+#https://stackoverflow.com/questions/60685631/using-ggplotly-and-dt-from-a-for-loop-in-rmarkdown
+htmltools::tagList(ggplotly(ggplot()))
+htmltools::tagList(DT::datatable(cars))
+
+```
+
 ##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
 
 ### Contributing authors:  
@@ -171,13 +183,86 @@ Therefore, from this time onward, case counts are likely underestimated and the 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
 
-<details>
-  <summary>Click to show/hide content</summary>
-  
-  This is the content that will be hidden or shown based on user input.
-  
-</details>
+## Omicron sublineages in Canada {.tabset} 
 
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
+
+```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
+
+source("scripts/subtype_plotter.R")
+sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
+                                      "BA.4*","BA.5.1*","BA.5.2*",
+                                      "BQ*","BA.5*","B*"),
+                               tabname=c("BA.1","early BA.2","late BA.2",
+                                         "BA.4","BA.5.1","BA.5.2",
+                                         "BQ","Other BA.5","Divergent lineages"),
+                               mindate=c("","","2022-08-01",
+                                         "","","",
+                                         "","","2022-03-01"),
+                               maxdate=c("2022-06-01","2022-08-01","",
+                                         "","","",
+                                         "","",""),
+                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,
+                                                            FALSE,FALSE,FALSE,
+                                                            FALSE,TRUE,TRUE))
+
+plotted=c()
+frequencyTable <- data.frame()
+for (i in 1:nrow(sublineagestoplot)) {
+  cat("###", sublineagestoplot[[i,"tabname"]], "\n")
+  cat("####", sublineagestoplot[[i,"tabname"]],"sublineages")
+  mindate=NA
+  maxdate=NA
+  if(sublineagestoplot[[i,"mindate"]]!=""){
+    cat(" from",sublineagestoplot[[i,"mindate"]])
+    mindate=as.Date(sublineagestoplot[[i,"mindate"]])
+  }
+  if(sublineagestoplot[[i,"maxdate"]]!=""){
+    cat(" until",sublineagestoplot[[i,"maxdate"]])
+    maxdate=as.Date(sublineagestoplot[[i,"maxdate"]])
+  }
+  cat("\n\n")
+  set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta)
+  if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
+    set=set[!set %in% plotted]
+  }
+  subVariantData=plot.subvariants.ggplot(sublineage=set,mindate=mindate,maxdate=maxdate)
+  
+  ay <- list(
+  tickfont = list(size=11.7),
+  titlefont=list(size=14.6),
+  overlaying = "y",
+  nticks = 5,
+  side = "right",
+  title = "Second y axis"
+  )
+  print(htmltools::tagList(ggplotly(subVariantData$absolute, height = 400)))
+  #%>% add_lines(x=~Date, y=~`TotalCases(*10e2)`, colors="grey", yaxis="y2", data=subVariantData$data, showlegend=F, inherit=F) %>% layout(yaxis2=ay)))
+  print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
+  cat("\n\n")
+  
+  if (nrow(frequencyTable) == 0){
+      frequencyTable <- subVariantData$data %>% dplyr::select(Date, Lineage, Frequency,`% Frequency`)
+  }else{
+    frequencyTable <- rbind(frequencyTable, (subVariantData$data %>% dplyr::select(Date, Lineage, Frequency,`% Frequency`)) )
+  }
+  
+  #printing the datatable here works but for some reason the download buttons gets dropped and search dont work properly. 
+  #To get it working, we need to print a table of everything after this loop. see below
+  print(htmltools::tagList(DisplayHTMLTable(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`), width="100%")))
+  cat("\n\n")
+  plotted <<- unique(c(plotted,set))
+}
+
+#DO NOT DELETE THESE 3 LINES
+#this is stupid. If you dont display this table after the for loop, the tables printed out via the above loop breaks???????????????????????????????
+cat("###", "Frequency Table", "\n")
+cat("####", "Frequency Table")
+DisplayHTMLTable(frequencyTable)
+cat("\n\n")
+#DO NOT DELETE THESE 3 LINES ABOVE
+
+```
 The following are dev changes to existing plots for VirusSeq Data ONLY.
 
 ## Selection on Omicron {.tabset}  

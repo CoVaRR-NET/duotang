@@ -1,10 +1,10 @@
 
 ---
 title: |
-  ![Duotang - Sandbox](img/CoVaRR-Net_Logo-600.png){width=1lm}
+  ![Duotang - GSD](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang - GSD, a notebook for genomic epidemiology analyses and mathematical modelling with GSD data."
 author: "Pillar 6"
-output:Sandbox
+output:
   html_document:
     keep_md: true
     code_folding: hide

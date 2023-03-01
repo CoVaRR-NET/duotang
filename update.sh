@@ -428,6 +428,10 @@ echo "knitsandbox" > $checkPointFile
 Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "encrypt" > $checkPointFile
 
+#knitgsd:
+Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
+echo "encrypt" > $checkPointFile
+
 #encrypt:
 if [ -f ".secret/sandbox" ]; then
     secret=`cat .secret/sandbox`
@@ -483,7 +487,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
 	git push -u origin UpdatePreview
-	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html
+	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
 	git checkout dev
 fi
 

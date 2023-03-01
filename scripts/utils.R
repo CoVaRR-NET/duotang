@@ -45,8 +45,9 @@ getEmptyErrorPlotWithMessage <- function(message){
 
 #' This function generates an DT:datatable object to show tables on the HTML output
 #' @param dataframe dataframe to be dispalyed.
-DisplayHTMLTable <- function(dataframe){
+DisplayHTMLTable <- function(dataframe, width="100%"){
   DT::datatable(dataframe, 
+                width = width,
                 extensions = 'Buttons', 
                 options = list(dom = 'Blfrtip',
                               pageLength = 5, autoWidth = TRUE,

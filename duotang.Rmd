@@ -165,6 +165,8 @@ epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 #https://github.com/plotly/plotly.R/issues/273#issuecomment-195611009
 #https://stackoverflow.com/questions/60685631/using-ggplotly-and-dt-from-a-for-loop-in-rmarkdown
 htmltools::tagList(ggplotly(ggplot()))
+htmltools::tagList(DT::datatable(meta))
+
 ```
 
 ##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
@@ -262,7 +264,6 @@ XBB.1.5 continues to grow steadily and significantly, and is now the most common
 ## Omicron sublineages in Canada {.tabset} 
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
-
 ```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
 source("scripts/subtype_plotter.R")
@@ -283,34 +284,63 @@ sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
                                                             FALSE,TRUE,TRUE))
 
 plotted=c()
-tmp=apply(sublineagestoplot,1,function(sub){
-  cat("###", sub[["tabname"]], "\n")
-  cat("####", sub[["tabname"]],"sublineages")
+frequencyTable <- data.frame()
+for (i in 1:nrow(sublineagestoplot)) {
+  cat("###", sublineagestoplot[[i,"tabname"]], "\n")
+  cat("####", sublineagestoplot[[i,"tabname"]],"sublineages")
   mindate=NA
   maxdate=NA
-  if(sub[["mindate"]]!=""){
-    cat(" from",sub[["mindate"]])
-    mindate=as.Date(sub[["mindate"]])
+  if(sublineagestoplot[[i,"mindate"]]!=""){
+    cat(" from",sublineagestoplot[[i,"mindate"]])
+    mindate=as.Date(sublineagestoplot[[i,"mindate"]])
   }
-  if(sub[["maxdate"]]!=""){
-    cat(" until",sub[["maxdate"]])
-    maxdate=as.Date(sub[["maxdate"]])
+  if(sublineagestoplot[[i,"maxdate"]]!=""){
+    cat(" until",sublineagestoplot[[i,"maxdate"]])
+    maxdate=as.Date(sublineagestoplot[[i,"maxdate"]])
   }
   cat("\n\n")
-  set=getStrictoSubLineages(sub[["name"]],meta)
-  if(sub[["exclude_previously_plotted"]]){
+  set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta)
+  if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
     set=set[!set %in% plotted]
   }
-  rarelineages_names=plot.subvariants(sublineage=set,mindate=mindate,maxdate=maxdate)
-  rarelineages_names=plot.subvariants(sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
-  plotted <<- unique(c(plotted,set))
-  if(rarelineages_names!=""){
-    cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
+  subVariantData=plot.subvariants.ggplot(sublineage=set,mindate=mindate,maxdate=maxdate)
+  
+  ay <- list(
+  tickfont = list(size=11.7),
+  titlefont=list(size=14.6),
+  overlaying = "y",
+  nticks = 5,
+  side = "right",
+  title = "Second y axis"
+  )
+  print(htmltools::tagList(ggplotly(subVariantData$absolute, height = 400)))
+  #%>% add_lines(x=~Date, y=~`TotalCases(*10e2)`, colors="grey", yaxis="y2", data=subVariantData$data, showlegend=F, inherit=F) %>% layout(yaxis2=ay)))
+  print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
+  cat("\n\n")
+  
+  if (nrow(frequencyTable) == 0){
+      frequencyTable <- subVariantData$data %>% dplyr::select(Date, Lineage, Frequency,`% Frequency`)
+  }else{
+    frequencyTable <- rbind(frequencyTable, (subVariantData$data %>% dplyr::select(Date, Lineage, Frequency,`% Frequency`)) )
   }
-  cat("\n\n")})
+  
+  cat("\n**Lineage frequencies table for the above chart:**\n\n")
+  #printing the datatable here works but for some reason the download buttons gets dropped and search dont work properly. 
+  #To get it working, we need to print a table of everything after this loop. see below
+  print(htmltools::tagList(DisplayHTMLTable(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`), width="100%")))
+  plotted <<- unique(c(plotted,set))
+}
 
 
+```
 
+```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
+#DO NOT DELETE THESE 3 LINES
+#this is stupid. If you dont display this table after the for loop, the tables printed out via the above loop breaks???????????????????????????????
+#something to do with the required javascript library not being loaded properly. 
+cat("###", "Frequency Table", "\n")
+cat("####", "Frequency Table")
+DisplayHTMLTable(frequencyTable)
 ```
 
 ## Fastest growing lineages in Canada {.tabset}
