@@ -152,7 +152,6 @@ source("scripts/tree.r")
 
 # load trees from files
 mltree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.rtt.nwk"))
-dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
 # tips are labeled with [fasta name]_[lineage]_[coldate]
 # extracting just the first part makes it easier to link to metadata
@@ -167,23 +166,21 @@ mltree <- ladderize(mltree, FALSE)
 
 
 # extract rows from metadata table that correspond to ttree 
-metasub1 <- meta[meta$fasta_header_name%in% mltree$tip.label, fieldnames]
+metasub1 <- meta[meta$fasta_header_name %in% mltree$tip.label, fieldnames]
 
 # sort rows to match tip labels in tree
 metasub1 <- metasub1[match(mltree$tip.label, metasub1$fasta_header_name), ]
 
-
-
-require(ggfree)
 tips <- data.frame(
   label = mltree$tip.label,
-  div = node.depth.edgelength(mltree)[1:Ntip(mltree)] * 29907,
+  pango = metasub1$pango_group,
+  div = node.depth.edgelength(mltree)[1:Ntip(mltree)],
   coldate = metasub1$week
 )
 rownames(tips) <- NULL
 
-jsonObj <- toJSON(tips)
+# TODO: add recombinant sequences
 
-r2d3(data=jsonObj, script="js/rtt.js", container="div", elementId="rtt-element")
+r2d3(data=toJSON(tips), script="js/rtt.js", container="div", elementId="rtt-element")
 ```
 
