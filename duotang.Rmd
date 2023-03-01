@@ -336,8 +336,8 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 #DO NOT DELETE THESE 3 LINES
-#this is stupid. If you dont display this table after the for loop, the tables printed out via the above loop breaks???????????????????????????????
-#something to do with the required javascript library not being loaded properly. 
+#If you dont display this table after the for loop, the tables printed out via the above loop are missing features.
+#something to do with the required javascript library not being loaded properly. See the "official workaround" section above.
 cat("###", "Frequency Table", "\n")
 cat("####", "Frequency Table")
 DisplayHTMLTable(frequencyTable)
