@@ -3,7 +3,7 @@ The slope of root-to-tip plots over time provide an estimate of the substitution
 A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
 ```{r, dpi=300}
-
+require(MASS)
 get.tipnames <- function(tip.label) {
   sapply(tip.label, function(x) {
     tokens <- strsplit(x, "_")[[1]]

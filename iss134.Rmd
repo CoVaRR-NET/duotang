@@ -1,0 +1,189 @@
+
+---
+title: |
+  ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
+subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
+author: "Pillar 6"
+output:
+  html_document:
+    keep_md: true
+    code_folding: hide
+    theme: cerulean
+    toc: true
+    toc_float: true
+params:
+ datestamp:
+  label: "Datestamp"
+  input: date
+  format: yyyy-mm-dd
+  value: "2023-01-30"
+ datadir:
+  label: "DataDir"
+  input: text
+  value: "data_needed/"
+---
+
+
+```{r setup, include=FALSE, warning=FALSE}
+#load libraries
+library(tidyr)
+library(knitr) # Needed to set root directory
+library(lubridate)  # dates are awful
+library(parallel)  # speed up selection plotting (#133)
+library(ggplot2)  # Work-horse plotting package
+library(ggfree) # used for constructing the data required for interactive phylo tree.
+library(r2d3)  # used for passing data to JavaScript D3 framework
+library(jsonlite) 
+library(tidyverse)
+library(reshape2) #used to plot case count selection plots
+library(DT)
+library(plotly)
+library(splines)
+library(grid)
+
+theme_set(theme_classic())
+
+# You would need to change this folder to be wherever you wanted the html file to be written.
+opts_knit$set(root.dir = getwd())
+```
+
+```{r load_data}
+############################
+##### GLOBAL VARIABLES #####
+############################
+
+source("scripts/utils.R")
+#Date of the VirusSeq release, load from params passed in during CLI command
+VirusSeq_release=format(as.Date(params$datestamp),"%B %d, %Y")
+Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
+
+pangoversion="4.2 (Viral AI)" #this should probably be passed in via params
+
+# load variant designations and colour palette from file
+VOCVOI <- read.csv("resources/vocvoi.csv")
+
+#define canadian provinces that are available and can be shown. 
+all.regions = data.frame(name=c("Canada","British Columbia", "Alberta",
+                                "Saskatchawan", "Manitoba", "Ontario", 
+                                "Quebec", "Nova Scotia", "New Brunswick",
+                                "Newfoundland and Labrador"),
+                         shortname=c("Canada","BC", "AB",
+                                     "SK", "MB", "ON", 
+                                     "QC", "NS", "NB","NL"))
+
+#define a color palatte for variants used throughout the RMD
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+pal["other"] <- 'grey' 
+
+## 1. LOAD processed metadata of Canadian sequences (with latest pangolin, division, and full seq IDs)
+#Download metadata from VirusSeq, put the date here:
+meta <- read.csv(gzfile(paste0(params$datadir, "virusseq.metadata.csv.gz")), sep="\t")
+meta$province <- meta$geo_loc_name_state_province_territory
+# Select only the column we want to use later
+columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin",
+             "sample_collection_date", "sample_collected_by", 
+             "purpose_of_sampling", "purpose_of_sequencing","lineage", 
+             "raw_lineage", "gisaid_accession", "isolate")
+meta <- meta[ , columnlist]
+
+### metadata cleaning 
+unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
+                 "Not Applicable","","NA","unknow")
+meta <- as.data.frame(apply(meta, 2, function(x) {
+  x[is.element(x, unknown.str)] <- "Unknown"
+  x
+}))
+
+meta$sample_collection_date <- as.Date(meta$sample_collection_date)
+meta$week <- cut(meta$sample_collection_date, 'week')
+meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
+
+startdate <- max(meta$sample_collection_date) - days(120)
+
+
+## parse PANGO lineages
+source("scripts/scanlineages.R")
+meta$pango_group <- create.pango.group(VOCVOI, meta)
+meta$pango_group <- as.factor(meta$pango_group)
+
+meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
+
+
+fullpangotree <- makepangotree(unique(meta$raw_lineage))
+
+latelineage_pangotree <- makepangotree(unique(
+  meta$raw_lineage[
+    meta$sample_collection_date > max(meta$sample_collection_date) - days(60) 
+    ]
+  ))
+
+reference <- getStrictoSubLineages("BQ.1", meta)
+
+
+## 2. LOAD epidemiological data (PHAC)
+
+#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
+epidataCANall <- read.csv(paste0(params$datadir, "/CanadianEpiData.csv"))
+epidataCANall$date <- as.Date(epidataCANall$date)
+epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
+epidate <- tail(epidataCANall,1)$date #download date
+
+epidataCANall$previousvalue <- 0
+#small loop to get the numtoday column from previous versions of this file from the cumulative cases
+for(row in 1:nrow(epidataCANall)) {
+  p <- epidataCANall[row, "prname"]
+  subdf <- epidataCANall[which( 
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+    ), ]
+  if(nrow(subdf) != 0) {
+    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
+  }
+}
+epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
+```
+
+
+
+```{r}
+source("scripts/tree.r")
+
+
+# load trees from files
+mltree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.rtt.nwk"))
+dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
+
+# tips are labeled with [fasta name]_[lineage]_[coldate]
+# extracting just the first part makes it easier to link to metadata
+mltree$tip.label <- reduce.tipnames(mltree$tip.label)
+fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
+               "sample_collected_by", "purpose_of_sampling",
+               "lineage", "pango_group","month","week", "GID", "isolate")
+
+#scale to number of mutations
+mltree$edge.length <- mltree$edge.length*29903
+mltree <- ladderize(mltree, FALSE)
+
+
+# extract rows from metadata table that correspond to ttree 
+metasub1 <- meta[meta$fasta_header_name%in% mltree$tip.label, fieldnames]
+
+# sort rows to match tip labels in tree
+metasub1 <- metasub1[match(mltree$tip.label, metasub1$fasta_header_name), ]
+
+
+
+require(ggfree)
+tips <- data.frame(
+  label = mltree$tip.label,
+  div = node.depth.edgelength(mltree)[1:Ntip(mltree)] * 29907,
+  coldate = metasub1$week
+)
+rownames(tips) <- NULL
+
+jsonObj <- toJSON(tips)
+
+r2d3(data=jsonObj, script="js/rtt.js", container="div", elementId="rtt-element")
+```
+
