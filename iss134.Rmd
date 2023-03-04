@@ -179,8 +179,12 @@ tips <- data.frame(
 )
 rownames(tips) <- NULL
 
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+
 # TODO: add recombinant sequences
 
-r2d3(data=toJSON(tips), script="js/rtt.js", container="div", elementId="rtt-element")
+r2d3(data=toJSON(list(tips=tips, palette=as.list(pal))), 
+     script="js/rtt.js", container="div", elementId="rtt-element")
 ```
 
