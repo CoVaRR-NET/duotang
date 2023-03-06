@@ -49,17 +49,16 @@ rtt_input.selectAll("label")
 rtt_input.selectAll(".rtt_cb")
   .on("change", function() {
     if (this.checked) {
-      console.log("restore", this.value);
       // restore group from original data
       var pgroup = tips.filter(x => x.pango == this.value);
-      console.log(pgroup);
       filtered_tips = filtered_tips.concat(pgroup);
     } else {
-      console.log("remove", this.value);
       // remove group from data
       filtered_tips = filtered_tips.filter(x => x.pango != this.value);
     }
     console.log(filtered_tips);
+    console.log(tips);
+    rtt_update();
   })
 
 
@@ -83,45 +82,22 @@ var rttg = rttsvg.append("g")
                        margin.top + ")");
                        
 // set up plotting scales
-var ymax = d3.max(tips, d => +d.div),
-    ymin = d3.min(tips, d => +d.div),
+var ymax = d3.max(filtered_tips, d => +d.div),
+    ymin = d3.min(filtered_tips, d => +d.div),
     yScale = d3.scaleLinear().domain([ymin, ymax]).range([gheight, 0]);
 
 // parse dates
 var dateparser = d3.timeParse("%Y-%m-%d"),
-    dates = tips.map(d => dateparser(d.coldate));
+    dates = filtered_tips.map(d => dateparser(d.coldate));
 
 // map date range to graph region width
 var xScale = d3.scaleLinear()
                .domain(d3.extent(dates))
                .range([0, gwidth]);
 
-// draw points, coloured by PANGO group
-var rttplot = rttg.selectAll("circle")
-                  .data(tips)
-                  .enter();
-                  
-rttplot.append("circle")
-       .attr("cx", function(d, i) { 
-         // i is an iteration count
-         return xScale(dates[i]); 
-       })
-       .attr("cy", function(d) { return yScale(d.div); })
-       .attr("r", 3)
-       .style("stroke", "black")
-       .style("fill", "none");       
 
-rttplot.append("circle")
-       .attr("cx", function(d, i) { return xScale(dates[i]); })
-       .attr("cy", function(d) { return yScale(d.div); })
-       .attr("r", 3)
-       .style("fill", function(d) {
-         if (d.pango in palette) {
-           return palette[d.pango][0];
-         } else {
-           return "#777";
-         }
-       });
+rtt_update();
+
 
 // draw axes labels
 var rtt_xaxis = d3.axisBottom(xScale)
@@ -141,5 +117,39 @@ rttsvg.append("text")
       .attr("x", gwidth/2 + margin.left)
       .attr("y", gheight + margin.top + margin.bottom - 10)
       .text("Sampling date");
+
+
+function rtt_update() {
+  console.log("update");
+  dates = filtered_tips.map(d => dateparser(d.coldate));
+  var rttplot = rttg.selectAll("circle")
+                  .data(filtered_tips);
+                  
+  rttplot.enter().append("circle").attr("class", "data_point");
+  rttplot.exit().remove();
+  
+  rttplot.attr("cx", function(d, i) { 
+           // i is an iteration count
+           return xScale(dates[i]); 
+         })
+         .attr("cy", function(d) { return yScale(d.div); })
+         .attr("r", 3)
+         .style("stroke", "black")
+         .style("fill", "none");
+  
+  rttplot.enter()
+         .append("circle")
+         .attr("cx", function(d, i) { return xScale(dates[i]); })
+         .attr("cy", function(d) { return yScale(d.div); })
+         .attr("r", 3)
+         .style("fill", function(d) {
+           if (d.pango in palette) {
+             return palette[d.pango][0];
+           } else {
+             return "#777";
+           }
+         });
+       
+}
 
 
