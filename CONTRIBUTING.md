@@ -28,19 +28,21 @@ The following dependencies should be installed system-wide (or at user level) if
    * [shiny](https://cran.r-project.org/web/packages/shiny/index.html)
    * [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
    * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
+   * [plotly] (https://plotly.com/r/)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
-* [Firefox](https://www.mozilla.org/en-CA/firefox/products/)
+* [Firefox](https://www.mozilla.org/en-CA/firefox/products/) [Optional] Required for getting the GSD data.
 
 The following dependences are best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
 * [BioPython](https://pypi.org/project/biopython/)
 * [dnastack](https://docs.viral.ai/analysis/)
 * [Pandas](https://pypi.org/project/pandas/)
-* [Selenium](https://pypi.org/project/selenium/)
-* [Webdriver-Manager](https://pypi.org/project/webdriver-manager/)
+* [Selenium](https://pypi.org/project/selenium/) [Optional] Required for getting the GSD data.
+* [Webdriver-Manager](https://pypi.org/project/webdriver-manager/) [Optional] Required for getting the GSD data.
 * [pycryptodome 3.16](https://pypi.org/project/pycryptodome/) (note ONLY version 3.16 works.)
 * [PBKDF2](https://pypi.org/project/pbkdf2/)
 * [TreeTime](https://github.com/neherlab/treetime)
+* [Slack-Bolt] (https://pypi.org/project/slack-bolt/) [Optional] Required for slack integration.
 
 A virtual environment can be created via: `python -m venv /path/to/duotang/venv`. Above programs can be installed using `pip install`. 
 
