@@ -4,7 +4,7 @@ Here we show the selection estimates and their 95% confidence intervals for Pang
 
 
 
-### Plot (stricto) {.tabset}
+## Plot (stricto) {.tabset}
 
 Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
 
@@ -24,8 +24,8 @@ selectparam <- function(p,reg){
 
 
 for (i in 1:length(all.regions[["name"]])) {
-  cat("####", all.regions[['shortname']][[i]], "\n")
-  cat("##### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
+  cat("###", all.regions[['shortname']][[i]], "\n")
+  cat("#### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,all.regions[['name']][[i]])})]
   n=min(25,length(paramselected))
   if(n!=0){
@@ -42,7 +42,7 @@ for (i in 1:length(all.regions[["name"]])) {
 
 
 
-### Plot (non stricto)  {.tabset}
+## Plot (non stricto)  {.tabset}
       
 This plot highlights the groups of related lineages that are growing fastest (e.g., BQ.1* is the monophyletic clade that includes BQ.1.1 and all other BQ.1 sublineages. 
 
@@ -62,8 +62,8 @@ selectparam <- function(p,reg){
   }
 
 for (i in 1:length(all.regions[["name"]])) {
-  cat("####", all.regions[['shortname']][[i]], "\n")
-  cat("##### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
+  cat("###", all.regions[['shortname']][[i]], "\n")
+  cat("#### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,all.regions[['name']][[i]])})]
   n=min(25,length(paramselected))
   if(n!=0){
@@ -79,19 +79,20 @@ for (i in 1:length(all.regions[["name"]])) {
 
 ```
 
-### Table of all the selection estimates 
+## Table of all the selection estimates 
 
 ```{r overview of the selection estimator table}
-
 paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
-  x=p$mut[[1]];
-  (p$fit)$fit[["s1"]]>0 & 
-  sum(p$toplot$n2)>10
-  }else{FALSE}})]
+x=p$mut[[1]];
+(p$fit)$fit[["s1"]]>0 & 
+sum(p$toplot$n2)>10
+}else{FALSE}})]
 
-DisplayHTMLTable(plot_growing_lineage(paramselected,makeplot=FALSE))
+link = DisplayHTMLTableDownloadLink(plot_growing_lineage(paramselected,makeplot=FALSE), "GrowingLineages")
+#DisplayHTMLTable(plot_growing_lineage(paramselected,makeplot=FALSE))
 ```
 
+[Please click here to download table of all the selection estimates](./downloads/GrowingLineages.tsv)
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -147,9 +148,9 @@ for (i in 1:length(all.regions$name)){
 
 
 ```
-##  {.unlisted .unnumbered}
+# Sublineages selection 
 
-### BA.2 sublineages selection {.tabset}
+## BA.2 sublineages selection {.tabset}
 
 ```{r general settings for selection estimator BA.2, warning=FALSE, echo=FALSE, message=FALSE}
 source("scripts/scanlineages.R")
@@ -192,10 +193,10 @@ Here we show the trends of the various BA.2.\* sublineages over time, relative t
 ```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 #prints the BA.2 plots
 apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
+  cat("###", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"\n","\n")
+  cat("####",reg[["name"]],"\n","\n")
   if (length(individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]])>0){
       i = 0
       for (plot in individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]]){
@@ -215,17 +216,17 @@ apply(all.regions,1,function(reg){
 
 ```
 
-### BA.5 sublineages selection {.tabset}
+## BA.5 sublineages selection {.tabset}
 
 Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
 ```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis'}
 #prints the BA.5 Plots
 apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
+  cat("###", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
-  cat("#####",reg[["name"]],"\n","\n")
+  cat("####",reg[["name"]],"\n","\n")
   if (length(individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]])>0){
       i = 0
       for (plot in individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]]){
@@ -246,7 +247,7 @@ apply(all.regions,1,function(reg){
 ```
 
 
-## Selection on Omicron {.tabset}  
+# Selection on Omicron
 
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
@@ -255,6 +256,8 @@ Currently, the major group of Omicron lineages rising in frequency are the XBB.\
 For comparison, Alpha had a selective advantage of s \~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
 **Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
+
+## Selection trends by variant {.tabset}  
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis'}
 #define provinces to show selection plots for.
@@ -275,8 +278,6 @@ apply(dataAvailable.regions,1,function(reg){
   cat("\n\n")})
   
 ```
-
-##  {.unlisted .unnumbered}
 
 ## Case count trends by variant {.tabset}
 
