@@ -30,7 +30,7 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pang
   
   edges <- merge(tt.layout$edges, v.edges, all=TRUE)  # tips, internals
   
-  jsonObj <- toJSON(list(nodes=tt.layout$nodes, edges=edges, treetype=treeType, defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
+  jsonObj <- toJSON(list(nodes=NA, edges=edges, treetype=treeType, ntips=nrow(subset(tt.layout$nodes, n.tips == 0)), defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
   
   return(jsonObj)
 }

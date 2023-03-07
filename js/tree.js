@@ -180,7 +180,7 @@ var tooltip = div.append("div")
 
 // set up plotting scales
 var xmax = d3.max(data.edges, e => +e.x1),
-    ntips = data.nodes.filter(x => x['n.tips'] == 0).length,
+    ntips = data.ntips,
     xScale = d3.scaleLinear().domain([0, xmax]).range([0, (gwidth-100) ]),
     yScale = d3.scaleLinear().domain([0, ntips]).range([gheight, 40]),
     xlScale = d3.scaleLinear().domain([0, xmax]).range([0, 100 ]),
