@@ -41,18 +41,23 @@ if __name__ == "__main__":
     
     channel_id = args.channel
     message_text = args.message
-    files = args.file
+    fileList = args.file
     
-    filesJson = []
-    for file in files:
-        filesJson.append({"file": file, "title":os.path.basename(file)})
+    #filesJson = []
+    #for file in files:
+    #    filesJson.append({"file": file, "title":os.path.basename(file)})
     
     #filesJsonString=json.dumps(filesJson)
     #print(filesJsonString)
     
     try:
-        if (len(files) >0):
-            response = client.files_upload_v2(channel=channel_id,initial_comment=message_text,file_uploads=filesJson)
+        if (len(fileList) >0):
+            for file in fileList:
+                upload=client.files_upload_v2(file=file,filename=file)
+                message_text=message_text+" <"+upload['file']['permalink']+"| > "
+            #print(message_text)
+            response = client.chat_postMessage(channel=channel_id,text=message_text)
+            #response = client.files_upload_v2(channel=channel_id,initial_comment=message_text,file_uploads=filesJson)
         else:
             response = client.chat_postMessage(channel=channel_id,text=message_text)
         print(response)
