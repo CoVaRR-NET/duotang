@@ -488,6 +488,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f data_needed/virusseq.fasta.xz
 	git add -f archive/*.html
 	git add -f archive/readme.md
+	git add -f downloads/*
 	git add -f duotang*html
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
