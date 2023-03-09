@@ -42,3 +42,46 @@ getEmptyErrorPlotWithMessage <- function(message){
           text = element_text(size = 30)) 
   return (emptyErrorPlot)
 }
+
+#' This function generates an DT:datatable object to show tables on the HTML output
+#' @param dataframe dataframe to be dispalyed.
+DisplayHTMLTable <- function(dataframe, width="100%"){
+  DT::datatable(dataframe, 
+                width = width,
+                extensions = 'Buttons', 
+                options = list(dom = 'Blfrtip',
+                              pageLength = 5, autoWidth = TRUE,
+                              #searchCols = list(NULL, list(search = 'regex')),
+                              search = list(regex = TRUE),
+                              buttons = list(
+                                list(
+                                  text = 'Export Displayed',
+                                  extend = 'csvHtml5',
+                                  filename = 'table',
+                                  exportOptions = list(
+                                    modifier = list(
+                                      page = 'current'
+                                    )
+                                  )
+                                ),
+                                list(
+                                  text = 'Export All',
+                                  extend = 'csvHtml5',
+                                  filename = 'table',
+                                  exportOptions = list(
+                                    modifier = list(
+                                      page = 'all'
+                                    )
+                                  )
+                                )
+                              ),
+                              lengthMenu = list(c(5,25,50,-1),
+                                                c(5,25,50,"All"))),
+                filter = 'top', rownames = F)
+}
+
+DisplayHTMLTableDownloadLink<- function(dataframe, name){
+  filename <- paste0("./downloads/", name, ".tsv")
+  write.table(dataframe, file = filename, sep = '\t', row.names = F, col.names = T)
+  return(filename)
+}

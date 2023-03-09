@@ -40,6 +40,7 @@ library(jsonlite)
 library(tidyverse)
 library(reshape2) #used to plot case count selection plots
 library(DT)
+library(plotly)
 
 theme_set(theme_classic())
 
@@ -139,286 +140,34 @@ for(row in 1:nrow(epidataCANall)) {
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 ```
 
-##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
+## SARS-CoV-2 in Canada
 
-### Contributing authors:  
+## Current Situation
 
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Justin Jia, Zohaib Anwar and Erin Gill.
-Input and direction by other members of Pillar 6 (https://covarrnet.ca/our-team/#pillar-6 ), which include: Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and William Hsiao. 
+**[NOTE: Barplots for lineage frequencies are now interactive, and new tables were added. All tables are now searchable, and the data downloadable.]**
 
-Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
-A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
+XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P, are still collectively growing in all regions of Canada. This collective set includes XBB.1.9.1, and XBF subvariants. Some BQ.1 subvariants are increasing in some regions of Canada along with CH.1.1. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada):
 
-# Introduction  
+* BM.1.1.1
+* BM.2 (high predicted affinity for the human ACE2 receptor)
+* BN.1* subvariants due to high predicted immune evasion
+* BQ.1.8 with S:F486P and S:L452R (seen recently in Ontario)
+* BQ.1* select new descendants, particularly BQ.1.1.5 with S:Y453F
+* BW.1, BW.1.1, BW.1.1.2 (descendants of BA.5.6, with S:F486A)
+* CH.1.1 (descendant of BM which is BA.2.75.3 with S:L452R) and sublineages
+* DN.1/DN.1.1 (BQ.1.1.5 descendants with S:K147N) - that also has S:Y453F (and so is actually DN.1.1.1 but this isn’t in databases yet)
+* DN.1.1.1 (highest predicted affinity for the human ACE2 receptor)
+* DS.1 (highest predicted immune evasion)
+* EF.1 (BQ.1.1.13 subvariant)
+* EG.1 (a XBB.1.9.1 subvariant)
+* EK variants (subvariants ofXBB.1.5.13)
+* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.9.1, XBB.1.10, XBB.1.12, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
+* * * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
+* XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
+* …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:K147N, S:R346T, S:R403K, S:L452R, S:Y453F, S:F486P, S:490P, S:Q613H), particularly those variants with sets of immune evasive mutations of interest.
 
-This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
-It is for discussion with pillar 6's team and for sharing with collaborators, e.g. public health labs.
-These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
-
-Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
-Only representations of aggregate data will be posted here.
-
-**Important caveats and disclaimers:**  
-These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
-Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
-
-For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
-When possible, these differences in sampling strategies are mentioned but they are not always known.
-With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
-Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
-
-Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
-These analyses are subject to frequent change given new data and updated lineage designations.
-
-
-```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-source("./scripts/plot_selection_estimator_2type.R")
-source("./scripts/scanlineages.R")
-fullpangotree <- makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(0) ]))
-reference <- getStrictoSubLineages("BQ.1",meta)
-
-startdate <- max(meta$sample_collection_date) - days(120)
-
-```
-# SARS-CoV-2 in Canada
-
-## Omicron sublineages in Canada {.tabset} 
-
-
-```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis', error=TRUE}
-
-source("./scripts/subtype_plotter2_gsd.R")
-
-sublineagestoplot = data.frame(name=c("B.1.1.7*","B.1.1.28.1*","AY*","B*",
-                                      "BA.1*","BA.2*","BA.2*",
-                                      "BA.4*","BA.5.1*","BA.5.2*",
-                                      "BQ*","BA.5*","B*","B*"),
-                               tabname=c("Alpha","Gamma","Delta","2020",
-                                         "BA.1","BA.2(early)","BA.2(late)",
-                                         "BA.4","BA.5.1","BA.5.2",
-                                         "BQ","BA.5(rest)","Rest","recent"),
-                               mindate=c("","","2021-03-01","2020-02-01",
-                                         "","","2022-08-01",
-                                         "","","",
-                                         "","","2022-03-01","2022-11-01"),
-                               maxdate=c("","","2022-01-01","2021-06-01",
-                                         "2022-06-01","2022-08-01","",
-                                         "","","",
-                                         "","","",""),
-                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,TRUE,
-                                                            FALSE,FALSE,FALSE,
-                                                            FALSE,FALSE,FALSE,
-                                                            FALSE,TRUE,TRUE,FALSE))
-
-#sublineagestoplot = data.frame(name=c("B*"),tabname=c("recent"),mindate=c("2022-12-12"),maxdate=c(""),exclude_previously_plotted=c(FALSE))
-
-tmp=apply(all.regions[1,],1,function(reg){
-  cat("###", reg[["shortname"]], "\n")
-  cat("#### in",reg[["name"]],"{.tabset} \n\n")
-  plotted=c()
-  tmp=apply(sublineagestoplot,1,function(sub){
-    cat("#####", sub[["tabname"]], "\n")
-    cat("######", sub[["tabname"]],"sublineages in",reg[["name"]])
-    mindate=NA
-    maxdate=as.Date("2023-01-03")
-    if(sub[["mindate"]]!=""){
-      cat(" from",sub[["mindate"]])
-      mindate=as.Date(sub[["mindate"]])
-    }
-    if(sub[["maxdate"]]!=""){
-      cat(" until",sub[["maxdate"]])
-      maxdate=as.Date(sub[["maxdate"]])
-    }
-    cat(" \n\n")
-    set=getStrictoSubLineages(sub[["name"]],meta)
-    if(sub[["exclude_previously_plotted"]]){
-      set=set[!set %in% plotted]
-    }
-    plotted_set=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate)
-    plotted_set=plot.subvariants(region=reg[["name"]],sublineage=set,mindate=mindate,maxdate=maxdate,scale=T)
-    #if(rarelineages_names!=""){
-    #  cat("The grey zone represent rare lineages (not in top 15) : ",rarelineages_names)
-    #}
-    plotted <<- unique(c(plotted,plotted_set))
-    cat("\n\n")
-  })
-cat("\n\n")})
-    
-```
-
-## Fastest growing lineages in Canada {.tabset}
-
-```{r general fits for selection estimator 1, figures-side,  warning=FALSE, fig.width=5,  out.width="50%",results='asis', error=TRUE}
-source("./scripts/plot_selection_estimator_2type.R")
-source("./scripts/scanlineages.R")
-fullpangotree <- makepangotree(unique(meta$raw_lineage))
-latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(30) ]))
-reference <- getStrictoSubLineages("BQ.1",meta)
-#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
-startpar2 <- list(p=0.5, s=0.05)
-
-startdate <- max(meta$sample_collection_date) - days(120)
-
-#t0 <- Sys.time()
-allparams <- mclapply(latelineage_pangotree, function(l) {
-  lineagelist <- getStrictoSubLineages(l, meta)
-  lapply(rev(all.regions$name), function(region) {
-    if(length(intersect(reference, lineagelist)) == 0) {
-      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
-    } else {
-      NA
-    }
-  })
-}, mc.cores=8)
-allparams <- do.call(c, allparams)  # same structure as below
-allparams <- allparams[!is.na(allparams)]
-
-allparams <- allparams[order(sapply(allparams, function(p) { 
-  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
-  }), decreasing = TRUE)]
-
-
-fullpangotreeV <- makepangotree(unique(metaV$raw_lineage))
-latelineage_pangotreeV<- makepangotree(unique(metaV$raw_lineage[metaV$sample_collection_date > max(metaV$sample_collection_date) - days(30) ]))
-
-allparamsV <- mclapply(latelineage_pangotreeV, function(l) {
-  lineagelist <- getStrictoSubLineages(l, metaV)
-  lapply(rev(all.regions$name), function(region) {
-    if(length(intersect(reference, lineagelist)) == 0) {
-      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
-    } else {
-      NA
-    }
-  })
-}, mc.cores=8)
-allparamsV <- do.call(c, allparamsV)  # same structure as below
-allparamsV <- allparamsV[!is.na(allparamsV)]
-
-allparamsV <- allparamsV[order(sapply(allparamsV, function(p) { 
-  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
-  }), decreasing = TRUE)]
-```
-
-Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto (i.e., sequences designated as `r reference[[1]]` and not its descendants, like `r reference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
-
-### Plot (stricto) {.tabset}
-
-Background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
-
-Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
-
-**Left plot is GISAID, Right plot is VirusSeq**
-
-```{r general fits for selection estimator 2, figures-side,  warning=FALSE, fig.width=5, out.width="50%",results='asis', error=TRUE}
-
-source("./scripts/plot_growing_lineages.R")
-selectparam <- function(p,reg){
-  if(!any(is.na(p$fit))){
-    x=p$mut[[1]];
-    p$region==reg&
-    (p$fit)$fit[["s1"]]>0 & 
-    sum(p$toplot$n2)>10&
-    substr(x, nchar(x), nchar(x))!="*"
-  }else{FALSE}
-}
-
-tmp=apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  cat("##### Plot single lineages in",reg[["name"]],"\n","\n")
-  paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
-  paramselectedV=allparamsV[sapply(allparamsV,function(x){selectparam(x,reg[["name"]])})]
-
-  n=min(25,length(paramselected))
-  if(n!=0){
-    print(plot_growing_lineage(paramselected[1:n]))
-  }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data available."))
-  }
-  
-  nV=min(25,length(paramselectedV))
-  if(nV!=0){
-    print(plot_growing_lineage(paramselectedV[1:nV]))
-  }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data available."))
-  }
-  cat("\n\n")})
-
-```
-
-
-### Plot (non stricto)  {.tabset}
-      
-This plot highlights the groups of related lineages that are growing fastest (e.g., BE.1.1.1* is the monophyletic clade that includes BE.1.1.1 and BQ.1*).
-
-Again, background shading illustrates sub-variants that we need to keep an eye on in blue (s ~ 0-5%, corresponding to doubling times of more than two weeks), those whose rapid growth is likely to displace currently common strains in pink (s ~ 5-10% with one to two week doubling times), and those with a growth advantage characteristic of a variant of concern in orange (s > 10%+ with less than one week doubling times).
-
-Estimating selection of sub-variants with low sequence counts (10-100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one regions as selection. These estimates should be considered as very preliminary.
-
-**Left plot is GISAID, Right plot is VirusSeq**
-
-```{r general fits for selection estimator 3, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis', error=TRUE}
-source("./scripts/plot_growing_lineages.R")
-selectparam <- function(p,reg){
-  if(!any(is.na(p$fit))){
-    x=p$mut[[1]];
-    p$region==reg&
-    (p$fit)$fit[["s1"]]>0 & 
-    sum(p$toplot$n2)>10&
-    substr(x, nchar(x), nchar(x))=="*"
-  }else{FALSE}
-  }
-
-tmp=apply(all.regions,1,function(reg){
-  cat("####", reg[["shortname"]], "\n")
-  cat("##### Plot monophyletic groups of lineages in",reg[["name"]],"\n","\n")
-  paramselected=allparams[sapply(allparams,function(x){selectparam(x,reg[["name"]])})]
-  paramselectedV=allparamsV[sapply(allparamsV,function(x){selectparam(x,reg[["name"]])})]
-
-    n=min(25,length(paramselected))
-  if(n!=0){
-    print(plot_growing_lineage(paramselected[1:n]))
-  }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data available."))
-  }
-  
-  nV=min(25,length(paramselectedV))
-  if(nV!=0){
-    print(plot_growing_lineage(paramselectedV[1:nV]))
-  }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data available."))
-  }
-  cat("\n\n")})
-
-```
-
-### Table of all the selection estimates 
-
-```{r overview of the selection estimator table}
-
-paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
-  x=p$mut[[1]];
-  (p$fit)$fit[["s1"]]>0 & 
-  sum(p$toplot$n2)>10
-  }else{FALSE}})]
-DT::datatable(plot_growing_lineage(paramselected,makeplot=FALSE), caption = 'GISAID Data.')
-
-paramselectedV=allparamsV[sapply(allparamsV,function(p){if(!any(is.na(p$fit))){
-  x=p$mut[[1]];
-  (p$fit)$fit[["s1"]]>0 & 
-  sum(p$toplot$n2)>10
-  }else{FALSE}})]
-DT::datatable(plot_growing_lineage(paramselectedV,makeplot=FALSE), caption = 'VirusSeq Data.')
-
-```
-
-***
-***
-
-The following are dev changes to existing plots for VirusSeq Data ONLY.
-
-## Selection on Omicron {.tabset}  
 
 
 # Methodology {.tabset} 

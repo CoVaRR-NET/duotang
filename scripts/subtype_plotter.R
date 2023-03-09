@@ -1,8 +1,6 @@
 require(lubridate)
 
-
-
-#' generate stacked barplot of a subset of lineages
+#' DEPRECATED. Use plot.subvariants.ggplot() to generate stacked barplot of a subset of lineages
 #' @param region:  char, can be used to select samples for a specific province
 #' @param sublineage:  char, vector of lineage names for subsetting
 #' @param scaled:  bool, display absolute or relative frequencies per week
@@ -93,4 +91,91 @@ plot.subvariants <- function(region='Canada', sublineage,
   return(rarelineages_names)
 }
 
+
+#' generate stacked barplot of a subset of lineages
+#' @param region:  char, can be used to select samples for a specific province
+#' @param sublineage:  char, vector of lineage names for subsetting
+#' @param scaled:  bool, display absolute or relative frequencies per week
+#' @param mindate:  Date, exclude counts preceding this date
+plot.subvariants.ggplot <- function(region='Canada', sublineage, 
+                             scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
+  #sublineage <- set
+  #region = 'Canada'
+  #scaled=FALSE
+  #col=NA
+  #mindate=mindate
+  #maxdate=maxdate
+  if(is.na(maxdate)){
+    maxdate=max(meta$sample_collection_date)
+  }
+  if(is.na(mindate)){
+    mindate=as.Date("2021-01-01")  
+  }
+  varmeta1 <- meta %>%  filter(lineage %in% sublineage, sample_collection_date>mindate, sample_collection_date<=maxdate, province %in% get.province.list(region))
+  varmeta1$pango_group <- varmeta1$lineage
+  
+  lineagecount=varmeta1 %>% group_by(lineage) %>% count()
+  max=15
+  if(nrow(lineagecount)>max){ 
+    lineagecount=as_data_frame(lineagecount)
+    rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-max) #filter(n<0.01*nrow(varmeta1))
+    rarelineages_names=sapply(list(paste(rarelineages$lineage,"(",rarelineages$n,")",sep="")), paste, collapse = ", ")
+    varmeta1$pango_group<-replace(varmeta1$pango_group, varmeta1$pango_group  %in% rarelineages$lineage, "other lineages")
+  } else{
+    rarelineages_names=""
+  }
+  
+  varmeta1$pango_group <- as.factor(varmeta1$pango_group)
+  varmeta1$week <- cut(varmeta1$sample_collection_date, 'week')
+  varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
+  
+  if (is.na(col)) {
+    set.seed(320) #setted for 15 colors were close shades are not contiguous
+    col <- sample(rainbow(length(levels(varmeta1$pango_group))))  # default colour palette
+  }
+  pal <- col
+  names(pal) <- levels(varmeta1$pango_group)
+  pal["other lineages"] <- 'grey'  # named character vector
+  pal <- pal[match(levels(varmeta1$pango_group), names(pal))]
+  
+  #bind everything into a table
+  tab <- as.data.frame(table(varmeta1$pango_group, as.Date(varmeta1$week)), stringsAsFactors = F) %>% left_join((data.frame(pal) %>% rownames_to_column()), by=c("Var1"="rowname"))
+  colnames(tab) <- c("Lineage", "Date", "Frequency", "Color")
+  tab$Date <- floor_date(as.Date(tab$Date), "weeks", week_start = 1)
+  #total case count data
+  epi <- epidataCANall[epidataCANall$prname==region, ] %>% dplyr::select(date, numtotal_last7) %>% mutate(date=floor_date(as.Date(date), "weeks", week_start = 1))
+  tab <- tab %>% left_join(epi, by=c("Date"="date")) 
+  #coefficient used to scale the total case so that it fits into the same graph. 
+  coeff <- max(tab$numtotal_last7) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
+  tab <- tab %>% mutate(numtotal_last7 = round(numtotal_last7/coeff,0)) 
+  totalCaseColName <- paste0("TotalCases(x",round(coeff,0),")")
+  colnames(tab) <- c("Lineage", "Date", "Frequency", "Color", totalCaseColName)
+  #secondary y axis scaling coefficient
+  coeff <- max(tab$TotalCases) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
+  tab <- tab %>% left_join((tab %>% group_by(Date) %>% summarize(total = sum(Frequency))), by="Date") %>%  mutate(`% Frequency` = paste0(round((100* Frequency/ total),0),"%"))
+  
+  options(scipen=1000000)
+
+absolute<- ggplot() + 
+    geom_bar(data=tab, mapping = aes(x = Date, y=Frequency,  fill = Lineage), position="stack", stat="identity") + 
+    scale_fill_manual(name = "Lineages", labels = tab$Lineage, values = tab$Color) +
+    geom_line(data=tab, mapping=aes(x=Date, y=.data[[totalCaseColName]]), color="grey") + 
+    scale_x_date(date_breaks = "1 month", label=scales::date_format("%b %Y"), limits = c(min(tab$Date), max = max(tab$Date)))+
+    scale_y_continuous(name = "Sequenced cases per week", sec.axis = sec_axis(~., name="Total cases per week", breaks = scales::pretty_breaks(n=6))) +
+    #ylab("Sequences cases per week \n(fraction)") +
+    theme_bw() +
+    labs(caption = paste0("Last day of data is ", max(tab$Date))) +
+    theme(legend.text=element_text(size=10), text = element_text(size = 10),axis.text.x = element_text(angle = 90)) 
+  
+  relative<- ggplot(tab, aes(x=Date, y=Frequency, fill=Lineage)) + 
+    geom_bar(position="fill", stat="identity") + 
+    scale_fill_manual(name = "Lineages", labels = tab$Lineage, values = tab$Color) +
+    scale_x_date(date_breaks = "1 month", label=scales::date_format("%b %Y"), limits = c(min(tab$Date), max = max(tab$Date)))+
+    ylab("Sequences cases per week \n(fraction)") +
+    theme_bw() +
+    labs(caption = paste0("Last day of data is ", max(tab$Date))) +
+    theme(legend.text=element_text(size=10), text = element_text(size = 10),axis.text.x = element_text(angle = 90)) 
+  
+  return(list("absolute"=absolute, "relative"=relative, "data"=tab))
+}
 
