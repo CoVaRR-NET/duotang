@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 #activate the venv
 source ~/duotang_venv/bin/activate
@@ -46,4 +46,4 @@ fi
 sleep 10s
 
 #crontab entry
-#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash -e ~/duotang/scripts/UpdateMonitor.service > ~/duotang/updatemonitor.log 2>&1"
+#30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash ~/duotang/scripts/UpdateMonitor.service > ~/duotang/updatemonitor.log 2>&1"
