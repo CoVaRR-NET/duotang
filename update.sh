@@ -475,8 +475,8 @@ echo "$datestamp" > duotangCurVer
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
-	git remote prune origin
-	git checkout -B UpdatePreview
+	#git remote prune origin
+	#git checkout -B UpdatePreview
 	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
@@ -492,9 +492,9 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotang*html
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
-	git push -u origin UpdatePreview
+	git push origin dev
 	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
-	git checkout dev
+	#git checkout dev
 fi
 
 
