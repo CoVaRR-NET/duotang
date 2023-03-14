@@ -16,7 +16,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2023-01-30"
+  value: "1994-01-01"
  datadir:
   label: "DataDir"
   input: text
@@ -62,7 +62,7 @@ theme_set(theme_classic())
 opts_knit$set(root.dir = getwd())
 ```
 
-```{r load_data}
+```{r load_data, echo=FALSE}
 ############################
 ##### GLOBAL VARIABLES #####
 ############################
@@ -211,7 +211,6 @@ These analyses are subject to frequent change given new data and updated lineage
 
 The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
 
-
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
@@ -239,9 +238,9 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ```
 
-# SARS-CoV-2 in Canada
+<hr style="border:1px solid gray">
 
-# Current Situation
+# SARS-CoV-2 in Canada Current Situation
 
 **[NOTE: Barplots for lineage frequencies are now interactive, and new tables were added. All tables are now searchable, and the data downloadable.]**
 
@@ -270,7 +269,8 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 ## Omicron sublineages in Canada {.tabset} 
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
-```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
+
+```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
 source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
@@ -309,7 +309,7 @@ for (i in 1:nrow(sublineagestoplot)) {
   
   #outputs the text/plots into RMD
   cat("###", sublineagestoplot[[i,"tabname"]], "\n")
-  cat("####", sublineagestoplot[[i,"tabname"]],"sublineages")
+  cat("####", sublineagestoplot[[i,"tabname"]],"sublineages ")
   if (!is.na(mindate)){cat(" From",sublineagestoplot[[i,"mindate"]])}
   if (!is.na(maxdate)){cat(" Until",sublineagestoplot[[i,"maxdate"]])}
   cat("[ (Frequency Table Download)](", DisplayHTMLTableDownloadLink(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`),sublineagestoplot[[i,"tabname"]]),")")
@@ -340,9 +340,13 @@ for (i in 1:nrow(sublineagestoplot)) {
   #print(htmltools::tagList(DisplayHTMLTable(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`), width="100%")))
 
   plotted <<- unique(c(plotted,set))
+  
+  cat ("\n\n")
 }
 
 ```
+
+## {-}
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 #DO NOT DELETE THESE 3 LINES
@@ -353,9 +357,12 @@ for (i in 1:nrow(sublineagestoplot)) {
 # DisplayHTMLTable(frequencyTable)
 ```
 
-# Fastest growing lineages in Canada {.tabset}
-```{r selection, child="selection.Rmd"}
+<hr style="border:1px solid gray">
+
+```{r selection, , echo=FALSE, child="selection.Rmd"}
 ```
+
+<hr style="border:1px solid gray">
 
 # Mutational composition of Omicron
 
@@ -365,7 +372,7 @@ Tabulation of the most predominant mutational changes in Omicron, with adjacent 
 
 Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on the `r nrow(meta)` genomes available on VirusSeq on `r VirusSeq_release`).
 
-
+<hr style="border:1px solid gray">
 
 # Variants in Canada over time
 
@@ -410,25 +417,33 @@ There are two Pango lineages that have a Canadian origin and that predominately 
 
 This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
+<hr style="border:1px solid gray">
 
 # Canadian trees {.tabset}  
 
 ```{r trees, child="trees.Rmd"}
 ```
 
+
+<hr style="border:1px solid gray">
+
+
 # Root-to-tip analyses  
 
 ```{r rtt, child="rtt.Rmd"}
 ```
 
+<hr style="border:1px solid gray">
+
 # Pango lineage description table
 
 Here we present a searchable table that provides a short description of each lineage as well information on the ancestor of that lineage.
 
-```{r function for displaying lineage informaiton, warning=FALSE, message=FALSE}
+```{r function for displaying lineage informaiton, echo=FALSE, warning=FALSE, message=FALSE}
 #show the table as paged and column searchable.
 DisplayHTMLTable(lineageDescriptions)
 #cat (paste0("[Please click here to download data](",DisplayHTMLTableDownloadLink(lineageDescriptions, "LineageDescriptions"),")\n\n"))
+cat ("\n\n")
 
 ```
 
