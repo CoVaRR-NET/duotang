@@ -268,31 +268,23 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 
 ## Omicron sublineages in Canada {.tabset} 
 
-Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
+Here we take a look, sub-dividing the major sub-lineages circulates in Canada.
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
 source("scripts/subtype_plotter.R")
-sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
-                                      "BA.4*","BA.5.1*","BA.5.2*",
-                                      "BQ*","BA.5*","B*"),
-                               tabname=c("BA.1","Early BA.2","Late BA.2",
-                                         "BA.4","BA.5.1","BA.5.2",
-                                         "BQ","Other BA.5","Divergent lineages"),
-                               mindate=c("","","2022-08-01",
-                                         "","","",
-                                         "","","2022-03-01"),
-                               maxdate=c("2022-06-01","2022-08-01","",
-                                         "","","",
-                                         "","",""),
-                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,
-                                                            FALSE,FALSE,FALSE,
-                                                            FALSE,TRUE,TRUE))
-
+sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
+                                      "BA.4*","BA.5*","B*"),
+                               tabname=c("Last 120 days", "BA.1","BA.2",
+                                         "BA.4","BA.5","Recombinants"),
+                               mindate=c(as.character(startdate),"","","","",""),
+                               maxdate=c("","","","","",""),
+                               exclude_previously_plotted=c(F, FALSE,FALSE,FALSE,F,F),
+                               exclude_recombinants=c(F, T,T,T, T,F),
+                               recombinantsOnly=c(F, F,F,F, F,T))
 plotted=c()
 frequencyTable <- data.frame()
 for (i in 1:nrow(sublineagestoplot)) {
-
   mindate=NA
   maxdate=NA
   if(sublineagestoplot[[i,"mindate"]]!=""){
@@ -301,7 +293,9 @@ for (i in 1:nrow(sublineagestoplot)) {
   if(sublineagestoplot[[i,"maxdate"]]!=""){
     maxdate=as.Date(sublineagestoplot[[i,"maxdate"]])
   }
-  set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta)
+  set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta, 
+                            seperateRecombinant=sublineagestoplot[[i,"exclude_recombinants"]], 
+                            recombinantsOnly = sublineagestoplot[[i,"recombinantsOnly"]])
   if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
     set=set[!set %in% plotted]
   }
@@ -310,7 +304,7 @@ for (i in 1:nrow(sublineagestoplot)) {
   #outputs the text/plots into RMD
   cat("###", sublineagestoplot[[i,"tabname"]], "\n")
   cat("####", sublineagestoplot[[i,"tabname"]],"sublineages ")
-  if (!is.na(mindate)){cat(" from",sublineagestoplot[[i,"mindate"]])}
+  if (!is.na(mindate)){cat(" starting from",sublineagestoplot[[i,"mindate"]])}
   if (!is.na(maxdate)){cat(" until",sublineagestoplot[[i,"maxdate"]])}
   cat(" ")
   cat("[ (Frequency Table Download)](", DisplayHTMLTableDownloadLink(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`),sublineagestoplot[[i,"tabname"]]),")")

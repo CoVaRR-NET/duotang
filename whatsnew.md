@@ -7,6 +7,7 @@ Detailed changes:
 * Overall formatting changes, added section breaks and improve the usefulness of the table of content. (closes #157)
 * Order change. Variant graph and case trends are shown before the selection estimates by sub-variant. (closes #161)
 * Removed the last datapoint of the Canada case count over time plot. (closes #156)
+* Clean up the frequency barplots: BA.2 and BA.5s are merged together into a single tab. Recombinants are in it's own tab. The default tab now shows the frequency of all lineages in the last 120 days. (Closes #155)
 * Backend changes for improved update automation. (closes #160)
 
 ## duotang-sandbox.html:
