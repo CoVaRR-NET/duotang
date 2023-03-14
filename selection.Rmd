@@ -106,7 +106,12 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   #caseCountData <- caseData$AB
   #selectionEstimateObject<- selectionEstimateFits$AB
   #filename=NA
-  if (selectionEstimateObject$region == "Canada"){dayToCut = 2} else { dayToCut = 5 } #define the number of days since most recent data date as "underreported"
+  if (selectionEstimateObject$region == "Canada"){
+      dayToCut = 1
+      caseCountData <- head(caseCountData, -1)
+    } else { 
+      dayToCut = 5 
+    } #define the number of days since most recent data date as "underreported"
   
   #populate a column with reporting accuracy (Accurate | UnderReported])
   caseCountData$report_type <- "Accurate"
