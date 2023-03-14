@@ -493,7 +493,11 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotangCurVer
 	git commit -m "Update: $datestamp"
 	git push origin dev
+	sed  "s/{$updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
+	#gh pr create -B main -F ./whatsnew.md --title "Update: $datestamp"
 	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	#python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	rm ./whatsnew.send.md
 	#git checkout dev
 fi
 

@@ -19,6 +19,8 @@ if __name__ == "__main__":
                         help="The message to be sent")
     parser.add_argument("--file",action='extend', nargs="+",  default=[],
                         help="path to the file to be uploaded, can specify multiple")
+    parser.add_argument("--messagefile", type=str, default=None,
+                        help="The filepath for a text file to be sent as the message")
     parser.add_argument("--channel", type=str, default="C046T5JA48H",
                         help="Specify the channel that the message should be sent to, default: pillar6-duotang_github")
 
@@ -40,8 +42,14 @@ if __name__ == "__main__":
     client = WebClient(token=authToken)
     
     channel_id = args.channel
-    message_text = args.message
     fileList = args.file
+    message_filepath = args.messagefile
+    
+    if (message_filepath != None):
+        with open (message_filepath, 'r') as fh:
+            message_text = fh.read()
+    else:
+        message_text = args.message
     
     #filesJson = []
     #for file in files:
@@ -55,7 +63,7 @@ if __name__ == "__main__":
             for file in fileList:
                 upload=client.files_upload_v2(file=file,filename=file)
                 message_text=message_text+" <"+upload['file']['permalink']+"| > "
-            #print(message_text)
+            print(message_text)
             response = client.chat_postMessage(channel=channel_id,text=message_text)
             #response = client.files_upload_v2(channel=channel_id,initial_comment=message_text,file_uploads=filesJson)
         else:
