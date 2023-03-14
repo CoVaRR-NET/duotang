@@ -268,7 +268,7 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 
 ## Omicron sublineages in Canada {.tabset} 
 
-Here we take a look, sub-dividing the major sub-lineages circulates in Canada.
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
