@@ -361,9 +361,9 @@ apply(all.regions,1,function(reg){
       for (plot in individualSublineageSelectionPlots.BA2[[reg[["shortname"]]]]){
         i = i + 1
         if (i==4){
-          cat ("")
+          cat ("<P>")
           cat("<details>")
-          cat ("<summary><b>Only the variants with the 3 highest selection coefficients are displayed. Click here to see the rest.</b></summary>")
+          cat ("<summary><b>Only the three most strongly selected variants are displayed. Click here to see the rest.</b></summary>")
         }
         print(plot$plot)
       }
