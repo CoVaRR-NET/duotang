@@ -276,7 +276,7 @@ source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
                                       "BA.4*","BA.5.1*","BA.5.2*",
                                       "BQ*","BA.5*","B*"),
-                               tabname=c("BA.1","early BA.2","late BA.2",
+                               tabname=c("BA.1","Early BA.2","Late BA.2",
                                          "BA.4","BA.5.1","BA.5.2",
                                          "BQ","Other BA.5","Divergent lineages"),
                                mindate=c("","","2022-08-01",
@@ -310,8 +310,9 @@ for (i in 1:nrow(sublineagestoplot)) {
   #outputs the text/plots into RMD
   cat("###", sublineagestoplot[[i,"tabname"]], "\n")
   cat("####", sublineagestoplot[[i,"tabname"]],"sublineages ")
-  if (!is.na(mindate)){cat(" From",sublineagestoplot[[i,"mindate"]])}
-  if (!is.na(maxdate)){cat(" Until",sublineagestoplot[[i,"maxdate"]])}
+  if (!is.na(mindate)){cat(" from",sublineagestoplot[[i,"mindate"]])}
+  if (!is.na(maxdate)){cat(" until",sublineagestoplot[[i,"maxdate"]])}
+  cat(" ")
   cat("[ (Frequency Table Download)](", DisplayHTMLTableDownloadLink(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`),sublineagestoplot[[i,"tabname"]]),")")
 
   cat("\n\n")
