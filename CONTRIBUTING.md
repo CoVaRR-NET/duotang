@@ -20,7 +20,7 @@ The following dependencies should be installed system-wide (or at user level) if
    * [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html)
    * [r2d3](https://cran.r-project.org/web/packages/r2d3/index.html)
    * [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html)
-   * [ggfree](https://github.com/ArtPoon/ggfree) (note this is the only package not available on CRAN - installation instructions are provided in its README document)
+   * [ggfree](https://github.com/ArtPoon/ggfree) (note: this is the only package not available on CRAN - installation instructions are provided in its README document)
    * [bbmle](https://cran.r-project.org/web/packages/bbmle/index.html)
    * [HelpersMG](https://cran.r-project.org/web/packages/HelpersMG/index.html)
    * [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
@@ -28,21 +28,21 @@ The following dependencies should be installed system-wide (or at user level) if
    * [shiny](https://cran.r-project.org/web/packages/shiny/index.html)
    * [reshape2](https://cran.r-project.org/web/packages/reshape2/index.html)
    * [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
-   * [plotly] (https://plotly.com/r/)
+   * [plotly](https://plotly.com/r/)
 * [minimap2](https://github.com/lh3/minimap2)
 * [IQTREE2](http://www.iqtree.org/) - COVID-19 release
 * [Firefox](https://www.mozilla.org/en-CA/firefox/products/) [Optional] Required for getting the GSD data.
-
+* [Github CLI](https://github.com/cli/cli#installation) [Optional] Required for automatic updates.
 The following dependences are best to be installed via PIP in a virtual environment if Conda is not being used. If installed at system level, they must be discoverable in $PATH.
 * [BioPython](https://pypi.org/project/biopython/)
 * [dnastack](https://docs.viral.ai/analysis/)
 * [Pandas](https://pypi.org/project/pandas/)
 * [Selenium](https://pypi.org/project/selenium/) [Optional] Required for getting the GSD data.
 * [Webdriver-Manager](https://pypi.org/project/webdriver-manager/) [Optional] Required for getting the GSD data.
-* [pycryptodome 3.16](https://pypi.org/project/pycryptodome/) (note ONLY version 3.16 works.)
+* [pycryptodome=3.16](https://pypi.org/project/pycryptodome/) (note: ONLY version 3.16 works)
 * [PBKDF2](https://pypi.org/project/pbkdf2/)
 * [TreeTime](https://github.com/neherlab/treetime)
-* [Slack-Bolt] (https://pypi.org/project/slack-bolt/) [Optional] Required for slack integration.
+* [Slack-Bolt](https://pypi.org/project/slack-bolt/) [Optional] Required for slack integration.
 
 A virtual environment can be created via: `python -m venv /path/to/duotang/venv`. Above programs can be installed using `pip install`. 
 
@@ -98,9 +98,9 @@ Arguments can also be provided for custom build functions:
 **First, you must modify the duotang folder paths in `scripts/UpdateMonitor.service file`**
 Insert the following into your crontab: 
 
-`30 * * * *  /usr/bin/flock -n /path/to/duotang/updatemonitor.log -c "/bin/bash -e /path/to/duotang/scripts/UpdateMonitor.service >> /path/to/duotang/updatemonitor.log 2>&1"`
+`30 * * * *  /usr/bin/flock -n ~/duotang/updatemonitor.log -c "/bin/bash ~/duotang/scripts/UpdateMonitor.service > ~/duotang/updatemonitor.log 2>&1`
 
-This will push changes into a new branch called `UpdatePreview.$DATESTAMP`. Once changes are approved, PR this preview branch into `main`, then merge `main` into `dev` to resync the development branch.
+This will push changes into the `dev` branch. Once changes are approved, PR this branch into `main`.
 
 (NOTE) Due to `crond` using minimal environments, you may need to define the PATH variable in order for your programs to be found.
 For example, you can insert the following into your crontab list prior to the above line.
@@ -127,7 +127,7 @@ Use the update.sh script located at the root of the repo. This script, when in d
 ## Using the extractSequences.py script to filter sequences of interest from FASTA file.
 The extractSequences.py is located at `scripts/extractSequences.py`. This scripts allows you to use regex to remove and/or keep certain sequences with specific lineage or ID. This script should be ran at the root of the repo. An example use case might be to remove recombinants before constructing phylogenetic trees. 
 
-`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output [--extractregex '^SomeRegex$' --keepregex '^SomeRegex1$' --keepregex '^SomeRegex2$' --extractbyid]
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output [--extractregex '^SomeRegex$' --keepregex '^SomeRegex1$' --keepregex '^SomeRegex2$' --extractbyid]`
 
 This script will then output at least 5 files:
  * `Sequences_remainder.fasta.xz` FASTA file containing all sequences not matching the --extractregex regex.
@@ -142,9 +142,9 @@ Optional arguments can also be provided:
  * `--extractbyid` By default, the regex is applied to the lineage column, this will change the behavior so that the regex filtering is applied to the sample ID.
  
 Example:
-The following will remove all lineages starting with 'X' (i.e. recombinants) from the FASTA but will output removed lineages starting with 'XBB' and 'XAC' into a separate file. 
+The following will remove all lineages starting with 'X' (i.e. recombinants) from the FASTA but will keep the removed lineages starting with 'XBB' and 'XAC' into a separate file. 
 
-`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output --extractregex '^X\S*$' --keepregex '^XBB\S*$' --keepregex '^XAC\S*$']
+`python scripts/extractSequences.py --infile /path/to/fasta --metadata /path/to/metadata --outfile /dir/of/output --extractregex '^X\S*$' --keepregex '^XBB\S*$' --keepregex '^XAC\S*$']`
 
 ## Perform subsampling and alignment
 
