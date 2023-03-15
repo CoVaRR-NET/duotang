@@ -240,7 +240,9 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 <hr style="border:1px solid gray">
 
-# SARS-CoV-2 in Canada Current Situation
+# SARS-CoV-2 in Canada
+
+## Current situation
 
 **[NOTE: Barplots for lineage frequencies are now interactive, and new tables were added. All tables are now searchable, and the data downloadable.]**
 
