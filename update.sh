@@ -386,11 +386,11 @@ for variant in `ls $data_dir/*regex*.fasta.xz`; do
 	name=${name%.*};
 	name=`echo $name|cut -d '_' -f3-`;
 	echo $variant
-	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --samplenum 1 --reffile resources/NC_045512.fa; 
 done
 
 #non-recombinants
-python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
+python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 1  --reffile resources/NC_045512.fa; 
 
 echo "buildtree" > $checkPointFile
 
@@ -469,8 +469,11 @@ if [ "$CLEAN" = "YES" ]; then
 	rm -rf ${data_dir}/$datestamp
 fi
 
-echo "gitpush" > $checkPointFile
+echo "recordversion" > $checkPointFile
 echo "$datestamp" > duotangCurVer
+
+
+echo "gitpush" > $checkPointFile
 
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
@@ -495,8 +498,8 @@ if [ "$GITPUSH" = "YES" ]; then
 	git push origin dev
 	sed  "s/{$updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
 	#gh pr create -B main -F ./whatsnew.md --title "Update: $datestamp"
-	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
-	#python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	#python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
 	rm ./whatsnew.send.md
 	#git checkout dev
 fi
