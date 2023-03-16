@@ -7,7 +7,9 @@ cd ~/duotang
 #get the last duotang update date and convert to epoch
 echo `date`
 
-duotangver=`cat duotangCurVer`
+#duotangver=`cat duotangCurVer`
+duotangver=`python scripts/UpdateStatusManager.py --action get --key LastUpdated`
+
 duotangverepoch=`date --date="${duotangver}" +"%s"`
 
 #get the virusseq version from the latest viral ai update.
@@ -15,7 +17,7 @@ dnastack collections list | python3 -c "import sys, json; a=(json.load(sys.stdin
 
 #convert the date to epoch
 viralaidate=`sed -n '1p' viralaiver`
-viralaidate2=`date --date="${viralaidate}" +'%B %d, %Y'`
+viralaidate2=`date --date="${viralaidate}" +'%Y-%m-%d'`
 viralaiepoch=`date --date="${viralaidate2}" +"%s"`
 viralaiid=`sed -n '2p' viralaiver`
 
@@ -33,6 +35,10 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		echo $status
 		if [[ "$status" == "Update completed successfully" ]]; then
 			python scripts/duoli.py --message "Update complete, see dev branch https://github.com/CoVaRR-NET/duotang/tree/dev"
+			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
+			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid
+			python scripts/UpdateStatusManager.py --action set --key Rebuild --value "False"
+			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 		else
 			python scripts/duoli.py --message "There was an issue with the update, see logs attached." --file "update.log"
 		fi

@@ -470,8 +470,8 @@ if [ "$CLEAN" = "YES" ]; then
 fi
 
 echo "recordversion" > $checkPointFile
-echo "$datestamp" > duotangCurVer
-
+#echo "$datestamp" > duotangCurVer
+python scripts/UpdateStatusManager.py --action set --key LastUpdate --value $datestamp
 
 echo "gitpush" > $checkPointFile
 
@@ -494,6 +494,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f downloads/*
 	git add -f duotang*html
 	git add -f duotangCurVer
+	git add -f DuotangUpdateStatus.json
 	git commit -m "Update: $datestamp"
 	git push origin dev
 	sed  "s/{$updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
