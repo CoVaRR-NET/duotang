@@ -2,6 +2,8 @@ import re
 import argparse
 from Bio import Phylo
 from io import StringIO
+import sys
+sys. setrecursionlimit(100000)
 
 parser = argparse.ArgumentParser("Convert Treetime NEXUS to Newick file")
 parser.add_argument("infile", type=str, help="input, NEXUS file")
