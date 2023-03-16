@@ -263,7 +263,7 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 * EF.1 (BQ.1.1.13 subvariant)
 * EG.1 (a XBB.1.9.1 subvariant)
 * EK variants (subvariants ofXBB.1.5.13)
-* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.9.1, XBB.1.9.2, XBB.1.10, XBB.1.12, XBB.1.16, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
+* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.9.1, _XBB.1.9.2_, XBB.1.10, XBB.1.12, _XBB.1.16_, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
 * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
 * XBL (has S:F486P and immune evasion like XBB.1.5)
 
