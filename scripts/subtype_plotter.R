@@ -115,16 +115,15 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
-  max=15
+  max=25
   if(nrow(lineagecount)>max){ 
     lineagecount=as_data_frame(lineagecount)
     rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-max) #filter(n<0.01*nrow(varmeta1))
     rarelineages_names=sapply(list(paste(rarelineages$lineage,"(",rarelineages$n,")",sep="")), paste, collapse = ", ")
-    varmeta1$pango_group<-replace(varmeta1$pango_group, varmeta1$pango_group  %in% rarelineages$lineage, "other lineages")
+    varmeta1$pango_group<-replace(varmeta1$pango_group, varmeta1$pango_group  %in% rarelineages$lineage, " other lineages")
   } else{
     rarelineages_names=""
   }
-  
   varmeta1$pango_group <- as.factor(varmeta1$pango_group)
   varmeta1$week <- cut(varmeta1$sample_collection_date, 'week')
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
@@ -135,7 +134,7 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   }
   pal <- col
   names(pal) <- levels(varmeta1$pango_group)
-  pal["other lineages"] <- 'grey'  # named character vector
+  pal[" other lineages"] <- 'grey'  # named character vector
   pal <- pal[match(levels(varmeta1$pango_group), names(pal))]
   
   #bind everything into a table

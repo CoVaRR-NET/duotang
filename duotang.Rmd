@@ -16,7 +16,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2023-01-30"
+  value: "1994-01-01"
  datadir:
   label: "DataDir"
   input: text
@@ -62,7 +62,7 @@ theme_set(theme_classic())
 opts_knit$set(root.dir = getwd())
 ```
 
-```{r load_data}
+```{r load_data, echo=FALSE}
 ############################
 ##### GLOBAL VARIABLES #####
 ############################
@@ -211,7 +211,6 @@ These analyses are subject to frequent change given new data and updated lineage
 
 The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
 
-
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator_2type.R")
 #reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
@@ -239,60 +238,54 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 ```
 
+<hr style="border:1px solid gray">
+
 # SARS-CoV-2 in Canada
 
-# Current Situation
+## Current situation
 
-**[NOTE: Barplots for lineage frequencies are now interactive, and new tables were added. All tables are now searchable, and the data downloadable.]**
+**[NOTE: The order of some analyses below has changed. Frequency barplots now include a default tab showing the last 120 days.]**
 
-XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P, are still collectively growing in all regions of Canada. This collective set includes XBB.1.9.1, and XBF subvariants. Some BQ.1 subvariants are increasing in some regions of Canada along with CH.1.1. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
+XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P (like XBF), are still collectively growing in all regions of Canada. Some other select subvariants are also increasing in some regions of Canada, but not as significantly or with lower numbers. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada):
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics are points added since the last update):
 
 * BM.1.1.1
 * BM.2 (high predicted affinity for the human ACE2 receptor)
 * BN.1* subvariants due to high predicted immune evasion
-* BQ.1.8 with S:F486P and S:L452R (seen recently in Ontario)
+* BQ.1.8 with S:F486P and S:L452R (seen recently in Ontario and _now also in other provinces_)
 * BQ.1* select new descendants, particularly BQ.1.1.5 with S:Y453F
 * BW.1, BW.1.1, BW.1.1.2 (descendants of BA.5.6, with S:F486A)
-* CH.1.1 (descendant of BM which is BA.2.75.3 with S:L452R) and sublineages
+* CH.1.1 descendants (CH.1.1 is descendant of BM which is BA.2.75.3 with S:L452R) and sublineages
 * DN.1/DN.1.1 (BQ.1.1.5 descendants with S:K147N) - that also has S:Y453F (and so is actually DN.1.1.1 but this isn’t in databases yet)
 * DN.1.1.1 (highest predicted affinity for the human ACE2 receptor)
 * DS.1 (highest predicted immune evasion)
 * EF.1 (BQ.1.1.13 subvariant)
 * EG.1 (a XBB.1.9.1 subvariant)
 * EK variants (subvariants ofXBB.1.5.13)
-* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.9.1, XBB.1.10, XBB.1.12, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
+* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.9.1, _XBB.1.9.2_, XBB.1.10, XBB.1.12, _XBB.1.16_, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
 * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
-* XBK and XBL (have S:F486P and immune evasion like XBB.1.5)
-* …and other variants with mutations associated with immune evasion or higher binding affinity to the human ACE2 receptor (examples: S:K147N, S:R346T, S:R403K, S:L452R, S:Y453F, S:F486P, S:490P, S:Q613H), particularly those variants with sets of immune evasive mutations of interest.
+* XBL (has S:F486P and immune evasion like XBB.1.5)
 
 ## Omicron sublineages in Canada {.tabset} 
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
-```{r, figures-side,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
+
+```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
 source("scripts/subtype_plotter.R")
-sublineagestoplot = data.frame(name=c("BA.1*","BA.2*","BA.2*",
-                                      "BA.4*","BA.5.1*","BA.5.2*",
-                                      "BQ*","BA.5*","B*"),
-                               tabname=c("BA.1","early BA.2","late BA.2",
-                                         "BA.4","BA.5.1","BA.5.2",
-                                         "BQ","Other BA.5","Divergent lineages"),
-                               mindate=c("","","2022-08-01",
-                                         "","","",
-                                         "","","2022-03-01"),
-                               maxdate=c("2022-06-01","2022-08-01","",
-                                         "","","",
-                                         "","",""),
-                               exclude_previously_plotted=c(FALSE,FALSE,FALSE,
-                                                            FALSE,FALSE,FALSE,
-                                                            FALSE,TRUE,TRUE))
-
+sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
+                                      "BA.4*","BA.5*","B*"),
+                               tabname=c("Last 120 days", "BA.1","BA.2",
+                                         "BA.4","BA.5","Recombinants"),
+                               mindate=c(as.character(startdate),"","","","",""),
+                               maxdate=c("","","","","",""),
+                               exclude_previously_plotted=c(F, FALSE,FALSE,FALSE,F,F),
+                               exclude_recombinants=c(F, T,T,T, T,F),
+                               recombinantsOnly=c(F, F,F,F, F,T))
 plotted=c()
 frequencyTable <- data.frame()
 for (i in 1:nrow(sublineagestoplot)) {
-
   mindate=NA
   maxdate=NA
   if(sublineagestoplot[[i,"mindate"]]!=""){
@@ -301,7 +294,9 @@ for (i in 1:nrow(sublineagestoplot)) {
   if(sublineagestoplot[[i,"maxdate"]]!=""){
     maxdate=as.Date(sublineagestoplot[[i,"maxdate"]])
   }
-  set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta)
+  set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta, 
+                            seperateRecombinant=sublineagestoplot[[i,"exclude_recombinants"]], 
+                            recombinantsOnly = sublineagestoplot[[i,"recombinantsOnly"]])
   if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
     set=set[!set %in% plotted]
   }
@@ -309,9 +304,10 @@ for (i in 1:nrow(sublineagestoplot)) {
   
   #outputs the text/plots into RMD
   cat("###", sublineagestoplot[[i,"tabname"]], "\n")
-  cat("####", sublineagestoplot[[i,"tabname"]],"sublineages")
-  if (!is.na(mindate)){cat(" From",sublineagestoplot[[i,"mindate"]])}
-  if (!is.na(maxdate)){cat(" Until",sublineagestoplot[[i,"maxdate"]])}
+  cat("####", sublineagestoplot[[i,"tabname"]],"sublineages ")
+  if (!is.na(mindate)){cat(" starting from",sublineagestoplot[[i,"mindate"]])}
+  if (!is.na(maxdate)){cat(" until",sublineagestoplot[[i,"maxdate"]])}
+  cat(" ")
   cat("[ (Frequency Table Download)](", DisplayHTMLTableDownloadLink(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`),sublineagestoplot[[i,"tabname"]]),")")
 
   cat("\n\n")
@@ -340,9 +336,13 @@ for (i in 1:nrow(sublineagestoplot)) {
   #print(htmltools::tagList(DisplayHTMLTable(subVariantData$data %>% dplyr::select(Date, Lineage, Frequency, `% Frequency`), width="100%")))
 
   plotted <<- unique(c(plotted,set))
+  
+  cat ("\n\n")
 }
 
 ```
+
+## {-}
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 #DO NOT DELETE THESE 3 LINES
@@ -353,9 +353,12 @@ for (i in 1:nrow(sublineagestoplot)) {
 # DisplayHTMLTable(frequencyTable)
 ```
 
-# Fastest growing lineages in Canada {.tabset}
-```{r selection, child="selection.Rmd"}
+<hr style="border:1px solid gray">
+
+```{r selection, , echo=FALSE, child="selection.Rmd"}
 ```
+
+<hr style="border:1px solid gray">
 
 # Mutational composition of Omicron
 
@@ -365,7 +368,7 @@ Tabulation of the most predominant mutational changes in Omicron, with adjacent 
 
 Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on the `r nrow(meta)` genomes available on VirusSeq on `r VirusSeq_release`).
 
-
+<hr style="border:1px solid gray">
 
 # Variants in Canada over time
 
@@ -410,25 +413,33 @@ There are two Pango lineages that have a Canadian origin and that predominately 
 
 This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
+<hr style="border:1px solid gray">
 
 # Canadian trees {.tabset}  
 
 ```{r trees, child="trees.Rmd"}
 ```
 
+
+<hr style="border:1px solid gray">
+
+
 # Root-to-tip analyses  
 
 ```{r rtt, child="rtt.Rmd"}
 ```
 
+<hr style="border:1px solid gray">
+
 # Pango lineage description table
 
 Here we present a searchable table that provides a short description of each lineage as well information on the ancestor of that lineage.
 
-```{r function for displaying lineage informaiton, warning=FALSE, message=FALSE}
+```{r function for displaying lineage informaiton, echo=FALSE, warning=FALSE, message=FALSE}
 #show the table as paged and column searchable.
 DisplayHTMLTable(lineageDescriptions)
 #cat (paste0("[Please click here to download data](",DisplayHTMLTableDownloadLink(lineageDescriptions, "LineageDescriptions"),")\n\n"))
+cat ("\n\n")
 
 ```
 
@@ -603,7 +614,7 @@ We thank all the authors, developers, and contributors to the VirusSeq database 
 We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the VirusSeq database, on which this research is based.
 
 * The Canadian VirusSeq Data Portal (https://virusseq-dataportal.ca) 
-We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory (RRPL), Nova Scotia Health Authority, Alberta ProvLab North (APLN), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory (NML), Institut National de Sante Publique du Quebec (INSPQ), BCCDC Public Health Laboratory, Public Health Ontario (PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research (OICR), Provincial Public Health Laboratory Network of Nova Scotia, Centre Hospitalier Universitaire Georges L. Dumont - New Brunswick, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
+We wish to acknowledge the following organisations/laboratories for contributing data to the Portal: Canadian Public Health Laboratory Network (CPHLN), CanCOGGeN VirusSeq, Saskatchewan - Roy Romanow Provincial Laboratory (RRPL), Nova Scotia Health Authority, Alberta Precision Labs (APL), Queen's University / Kingston Health Sciences Centre, National Microbiology Laboratory (NML), Institut National de Sante Publique du Quebec (INSPQ), BCCDC Public Health Laboratory, Public Health Ontario (PHO), Newfoundland and Labrador - Eastern Health, Unity Health Toronto, Ontario Institute for Cancer Research (OICR), Provincial Public Health Laboratory Network of Nova Scotia, Centre Hospitalier Universitaire Georges L. Dumont - New Brunswick, and Manitoba Cadham Provincial Laboratory. Please see the complete list of laboratories included in this repository. 
 
 * Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
 
