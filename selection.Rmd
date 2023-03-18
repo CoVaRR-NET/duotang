@@ -62,13 +62,13 @@ For comparison, Alpha had a selective advantage of s \~ 6%-11% per day over pree
 
 **Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
 
-## Selection trends by variant {.tabset}  
+## Selection trends by variant {.tabset .tabset-fade}  
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis', echo=FALSE}
 #define provinces to show selection plots for.
 dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
 #display all selection plots with each province as a tab.
-apply(dataAvailable.regions,1,function(reg){
+apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
@@ -84,7 +84,7 @@ apply(dataAvailable.regions,1,function(reg){
   
 ```
 
-## Case count trends by variant {.tabset}
+## Case count trends by variant {.tabset .tabset-fade}
 
 These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001.
 
@@ -214,11 +214,11 @@ apply(all.regions,1,function(reg){
 
 <hr style="border:1px solid gray">
 
-# Fastest growing lineages in Canada {.tabset}
+# Fastest growing lineages in Canada {.tabset .tabset-fade}
 
-Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r reference[[1]]` stricto (i.e., sequences designated as `r reference[[1]]` and not its descendants, like `r reference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants, like `r individualSelectionPlotReference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
-## Plot (stricto) {.tabset}
+## Plot (stricto) {.tabset .tabset-fade}
 
 Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
 
@@ -255,7 +255,7 @@ for (i in 1:length(all.regions[["name"]])) {
 }
 ```
 
-## Plot (non stricto)  {.tabset}
+## Plot (non stricto)  {.tabset .tabset-fade}
       
 This plot highlights the groups of related lineages that are growing fastest (e.g., BQ.1* is the monophyletic clade that includes BQ.1.1 and all other BQ.1 sublineages. 
 
@@ -308,15 +308,15 @@ link = DisplayHTMLTableDownloadLink(plot_growing_lineage(paramselected,makeplot=
 
 <a href="./downloads/GrowingLineages.tsv" target="_blank" class="btn btn-primary">Download Table</a>
 
-# {-}
+## {-}
 
 <hr style="border:1px solid gray">
 
 # Sublineages selection 
 
-## BA.2 sublineages selection {.tabset}
+## BA.2 sublineages selection {.tabset .tabset-fade}
 
-Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.2, warning=FALSE, echo=FALSE, message=FALSE}
 source("scripts/scanlineages.R")
@@ -380,9 +380,9 @@ apply(all.regions,1,function(reg){
 
 ```
 
-## BA.5 sublineages selection {.tabset}
+## BA.5 sublineages selection {.tabset .tabset-fade}
 
-Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
+Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
 ```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=50}
 #prints the BA.5 Plots
@@ -411,26 +411,3 @@ apply(all.regions,1,function(reg){
 ```
 
 ## {-}
-
-
-<!-- ### Other sublineages selection {.tabset} -->
-
-<!-- Here we show the trends of the various other sublineages over time, relative to the frequency of `r reference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r reference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to  shifts in frequency that are not due to selection. -->
-
-<!-- ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.show="hold", fig.width=5, warning=FALSE, out.width="33%", results='asis'} -->
-
-<!-- tmp=apply(all.regions,1,function(reg){ -->
-
-<!--   cat("####", reg[["shortname"]], "\n") -->
-
-<!--   n_min=20 -->
-
-<!--   if(reg[["name"]]=="Canada"){n_min=50} -->
-
-<!--   cat("#####",reg[["name"]],"(n>",n_min,")\n","\n") -->
-
-<!--   plotothers(reg[["name"]],n_min) -->
-
-<!--   cat("\n\n")}) -->
-
-<!-- ``` -->

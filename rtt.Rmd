@@ -24,9 +24,9 @@ fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"), plot=
 ```
 
 
-## Molecular clock estimates (based on three independent subsamples)
+## Molecular clock estimates
 
-Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest, with their 95% confidence interval.
+Here we show the estimate of the substitution rate based on 3 independent subsamples of different variants of interest, with their 95% confidence interval.
 
 ```{r}
 

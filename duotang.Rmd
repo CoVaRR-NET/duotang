@@ -10,7 +10,8 @@ output:
     code_folding: hide
     theme: cerulean
     toc: true
-    toc_float: true
+    toc_float: 
+      collapsed: false
 params:
  datestamp:
   label: "Datestamp"
@@ -34,7 +35,7 @@ if(length(new.packages)>0) {
   devtools::install_github("ArtPoon/ggfree")
 }
 
-list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines")
+list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines", 'HelpersMG', "bbmle")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) {
   install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -133,9 +134,6 @@ latelineage_pangotree <- makepangotree(unique(
     ]
   ))
 
-reference <- getStrictoSubLineages("BQ.1", meta)
-
-
 ## 2. LOAD epidemiological data (PHAC)
 
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
@@ -212,16 +210,17 @@ These analyses are subject to frequent change given new data and updated lineage
 The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-source("scripts/plot_selection_estimator_2type.R")
-#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
+source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
+individualSelectionPlotReference <- getStrictoSubLineages("BQ.1", meta)
 
-#calculates the selection model for ALL variants.
+#saveRDS(allparams, "newallparams.rds")
+
 allparams <- mclapply(latelineage_pangotree, function(l) {
   lineagelist <- getStrictoSubLineages(l, meta)
   lapply(rev(all.regions$name), function(region) {
-    if(length(intersect(reference, lineagelist)) == 0) {
-      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    if(length(intersect(individualSelectionPlotReference, lineagelist)) == 0) {
+      generateAllParams(region=region, startdate=startdate, reference=individualSelectionPlotReference, mutants=lineagelist, startpar=startpar2)
     } else {
       NA
     }
@@ -267,9 +266,9 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
 * XBL (has S:F486P and immune evasion like XBB.1.5)
 
-## Omicron sublineages in Canada {.tabset} 
+## Omicron sublineages in Canada {.tabset .tabset-fade} 
 
-Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset.)
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
@@ -415,7 +414,7 @@ This historical analysis is not being further updated, as we focus on more inter
 
 <hr style="border:1px solid gray">
 
-# Canadian trees {.tabset}  
+# Canadian trees {.tabset .tabset-fade}  
 
 ```{r trees, child="trees.Rmd"}
 ```
@@ -458,7 +457,7 @@ With anonymized data on vaccination status, severity/outcome, reason for sequenc
 Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
 
 
-## Methodology {.tabset} 
+## Methodology {.tabset .tabset-fade} 
 
 Genome data and metadata are sourced from the [Canadian VirusSeq Data Portal](https://virusseq-dataportal.ca/).
 Pango lineage assignments are generated using the [pangoLEARN](https://github.com/cov-lineages/pangoLEARN) algorithm.
@@ -512,7 +511,7 @@ Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root
 
 
 
-## Data notes by province {.tabset}
+## Data notes by province {.tabset .tabset-fade}
 
 All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
 
@@ -593,7 +592,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 ## [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html)
 
-## Session info {.tabset}
+## Session info {.tabset .tabset-fade}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
 
 
