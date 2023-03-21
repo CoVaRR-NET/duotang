@@ -11,7 +11,7 @@ output:
     theme: cerulean
     toc: true
     toc_float: 
-      collapsed: false
+      collapsed: true
 params:
  datestamp:
   label: "Datestamp"
@@ -186,7 +186,9 @@ Sequence collection, generation, release, and feedback on analyses: Canadian lab
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
 
-# Introduction  
+# SARS-CoV-2 In Canada
+
+## Introduction
 
 This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
 It is for discussion with pillar 6's team and for sharing with collaborators, e.g. public health labs.
@@ -195,7 +197,7 @@ These analyses can spur further research within or across pillars, be used for r
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
 
-**Important caveats and disclaimers:**  
+## Important limitations
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
 Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
@@ -207,7 +209,7 @@ Therefore, from this time onward, case counts are likely underestimated and the 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
 
-The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
+**The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`**
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator.R")
@@ -239,9 +241,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 <hr style="border:1px solid gray">
 
-# SARS-CoV-2 in Canada
-
-## Current situation
+# Current situation
 
 **[NOTE: The order of some analyses below has changed. Frequency barplots now include a default tab showing the last 120 days.]**
 
@@ -266,7 +266,9 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
 * XBL (has S:F486P and immune evasion like XBB.1.5)
 
-## Omicron sublineages in Canada {.tabset .tabset-fade} 
+# Omicron sublineages in Canada 
+
+## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset.)
 
@@ -302,7 +304,7 @@ for (i in 1:nrow(sublineagestoplot)) {
   subVariantData=plot.subvariants.ggplot(sublineage=set,mindate=mindate,maxdate=maxdate)
   
   #outputs the text/plots into RMD
-  cat("###", sublineagestoplot[[i,"tabname"]], "\n")
+  cat("###", sublineagestoplot[[i,"tabname"]], " {.unlisted .unnumbered}\n")
   cat("####", sublineagestoplot[[i,"tabname"]],"sublineages ")
   if (!is.na(mindate)){cat(" starting from",sublineagestoplot[[i,"mindate"]])}
   if (!is.na(maxdate)){cat(" until",sublineagestoplot[[i,"maxdate"]])}
@@ -341,7 +343,7 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 ```
 
-## {-}
+### {-}
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 #DO NOT DELETE THESE 3 LINES
@@ -430,7 +432,7 @@ This historical analysis is not being further updated, as we focus on more inter
 
 <hr style="border:1px solid gray">
 
-# Pango lineage description table
+# Pango lineage table
 
 Here we present a searchable table that provides a short description of each lineage as well information on the ancestor of that lineage.
 

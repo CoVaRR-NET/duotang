@@ -54,6 +54,8 @@ for (i in 1:length(all.regions$name)){
 
 # Selection on Omicron
 
+## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
+
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
 Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.\*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BQ\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
@@ -62,14 +64,12 @@ For comparison, Alpha had a selective advantage of s \~ 6%-11% per day over pree
 
 **Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
 
-## Selection trends by variant {.tabset .tabset-fade}  
-
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis', echo=FALSE}
 #define provinces to show selection plots for.
 dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
 #display all selection plots with each province as a tab.
 apply(all.regions,1,function(reg){
-  cat("###", reg[["shortname"]], "\n")
+  cat("###", reg[["shortname"]], " {.unlisted .unnumbered}\n")
   n_min=20
   if(reg[["name"]]=="Canada"){n_min=50}
   cat("####",reg[["name"]],"\n","\n")
@@ -84,7 +84,9 @@ apply(all.regions,1,function(reg){
   
 ```
 
-## Case count trends by variant {.tabset .tabset-fade}
+# Case count trends by variant
+
+## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
 These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001.
 
@@ -210,11 +212,11 @@ apply(all.regions,1,function(reg){
   
 ```
 
-## {-}
+### {-}
 
 <hr style="border:1px solid gray">
 
-# Fastest growing lineages in Canada {.tabset .tabset-fade}
+# Fastest growing lineages {.tabset .tabset-fade}
 
 Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants, like `r individualSelectionPlotReference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
@@ -314,7 +316,7 @@ link = DisplayHTMLTableDownloadLink(plot_growing_lineage(paramselected,makeplot=
 
 # Sublineages selection 
 
-## BA.2 sublineages selection {.tabset .tabset-fade}
+## BA.2 sublineages {.tabset .tabset-fade}
 
 Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
@@ -380,7 +382,7 @@ apply(all.regions,1,function(reg){
 
 ```
 
-## BA.5 sublineages selection {.tabset .tabset-fade}
+## BA.5 sublineages {.tabset .tabset-fade}
 
 Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
