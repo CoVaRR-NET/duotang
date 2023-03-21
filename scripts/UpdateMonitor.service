@@ -40,8 +40,8 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key Rebuild --value "False"
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 		else
-			lastError=`tail -n 1 update.log`
-			python scripts/duoli.py --message "There was an issue with the update. Last line of log: $lastError . See logs attached." --file "update.log"
+			lastError=`tail -n 5 update.log`
+			python scripts/duoli.py --message "There was an issue with the update. See logs attached. Last 5 lines of log: $lastError ." --file "update.log"
 		fi
 	else
 		echo "Found update on ViralAI, but it's not the latest update found on virusseq" 
