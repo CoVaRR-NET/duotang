@@ -2,6 +2,7 @@ Duotang update {updatedate}:
 
 Detailed changes:
 ## duotang.html:
+* Update table of content (Closes #157)
 * Code clean up, remove deprecated functions, improved documentation, and merge the 2 plot_selection_estimator scripts (Closes #109)
 
 ## duotang-sandbox.html:
