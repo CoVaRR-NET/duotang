@@ -429,7 +429,7 @@ Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$da
 echo "encrypt" > $checkPointFile
 
 #knitgsd:
-Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
+#Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "encrypt" > $checkPointFile
 
 #encrypt:

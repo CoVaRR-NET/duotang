@@ -29,8 +29,13 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	if [ "$viralaiid" = "$virusseqid" ]; then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
 		git pull --recurse-submodules
-		python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Starting update process..."
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --includegsd --clean --gitpush --overwrite > update.log 2>&1
+		if read -r first_line < "checkpoint" && [[ "$first_line" == "finished" ]]; then
+			echo "" > checkpoint
+			python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Starting update process..."
+		else
+			python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Last update attempted failed, attempting to restart the update process..."
+		fi
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --includegsd --clean --gitpush > update.log 2>&1
 		status=$( tail -n 1 update.log )
 		echo $status
 		if [[ "$status" == "Update completed successfully" ]]; then
