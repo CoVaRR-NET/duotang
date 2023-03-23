@@ -177,7 +177,7 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
-echo "Include GSD download?: ${SKIPGSD}"
+echo "Include GSD download?: ${INCLUDEGSD}"
 echo "Push changes to git?: ${GITPUSH}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
@@ -497,7 +497,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f DuotangUpdateStatus.json
 	git commit -m "Update: $datestamp"
 	git push origin dev
-	sed  "s/{$updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
+	sed  "s/{updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
 	#gh pr create -B main -F ./whatsnew.md --title "Update: $datestamp"
 	#python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
 	python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
