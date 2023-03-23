@@ -25,6 +25,9 @@ if __name__ == "__main__":
                         help="The value")             
     parser.add_argument("--file", type=str,  default="./DuotangUpdateStatus.json",
                         help="path to json file.")
+    parser.add_argument("--new", action='store_true',
+                        help="path to json file.")
+
 
     args = parser.parse_args()
 
@@ -45,11 +48,16 @@ if __name__ == "__main__":
         else:
             sys.exit("Key doesnt exist, use --key argument.")
     
-    if (args.action == "set"):
+    if (args.action == "set" and not args.new):
         if (args.key in jsonObj):
             jsonObj[args.key] = args.value
             with open(args.file, 'w') as f:
                 json.dump(jsonObj, f)
             sys.exit(0)
         else:
-            sys.exit("Key doesnt exist, use --key argument.")
+            sys.exit("Key doesnt exist. Use --new if you want to set a new field.")
+    elif (args.action == "set" and args.new):
+        jsonObj[args.key] = args.value
+        with open(args.file, 'w') as f:
+            json.dump(jsonObj, f)
+        sys.exit(0)

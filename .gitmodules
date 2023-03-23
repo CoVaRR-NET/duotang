@@ -1,0 +1,4 @@
+[submodule "scripts/SARSCoV2_MutationnalGraph"]
+	path = scripts/SARSCoV2_MutationnalGraph
+	url = https://github.com/HussinLab/SARSCoV2_MutationnalGraph
+	branch = main

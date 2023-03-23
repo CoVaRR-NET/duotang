@@ -10,7 +10,8 @@ output:
     code_folding: hide
     theme: cerulean
     toc: true
-    toc_float: true
+    toc_float: 
+      collapsed: true
 params:
  datestamp:
   label: "Datestamp"
@@ -34,7 +35,7 @@ if(length(new.packages)>0) {
   devtools::install_github("ArtPoon/ggfree")
 }
 
-list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines")
+list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines", 'HelpersMG', "bbmle")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) {
   install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -133,9 +134,6 @@ latelineage_pangotree <- makepangotree(unique(
     ]
   ))
 
-reference <- getStrictoSubLineages("BQ.1", meta)
-
-
 ## 2. LOAD epidemiological data (PHAC)
 
 #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
@@ -188,7 +186,9 @@ Sequence collection, generation, release, and feedback on analyses: Canadian lab
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
 
-# Introduction  
+# SARS-CoV-2 In Canada
+
+## Introduction
 
 This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
 It is for discussion with pillar 6's team and for sharing with collaborators, e.g. public health labs.
@@ -197,7 +197,7 @@ These analyses can spur further research within or across pillars, be used for r
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
 
-**Important caveats and disclaimers:**  
+## Important limitations
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
 Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
 
@@ -209,19 +209,20 @@ Therefore, from this time onward, case counts are likely underestimated and the 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
 
-The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`
+**The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`**
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-source("scripts/plot_selection_estimator_2type.R")
-#reference <- list("BA.5.2.1","BA.5.2","BA.5.1")
+source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
+individualSelectionPlotReference <- getStrictoSubLineages("BQ.1", meta)
 
-#calculates the selection model for ALL variants.
+#saveRDS(allparams, "newallparams.rds")
+
 allparams <- mclapply(latelineage_pangotree, function(l) {
   lineagelist <- getStrictoSubLineages(l, meta)
   lapply(rev(all.regions$name), function(region) {
-    if(length(intersect(reference, lineagelist)) == 0) {
-      estimate.selection(region=region, startdate=startdate, reference=reference, mutants=lineagelist, startpar=startpar2)
+    if(length(intersect(individualSelectionPlotReference, lineagelist)) == 0) {
+      generateAllParams(region=region, startdate=startdate, reference=individualSelectionPlotReference, mutants=lineagelist, startpar=startpar2)
     } else {
       NA
     }
@@ -240,15 +241,13 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 <hr style="border:1px solid gray">
 
-# SARS-CoV-2 in Canada
-
-## Current situation
+# Current situation
 
 **[NOTE: The order of some analyses below has changed. Frequency barplots now include a default tab showing the last 120 days.]**
 
-XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P (like XBF), are still collectively growing in all regions of Canada. Some other select subvariants are also increasing in some regions of Canada, but not as significantly or with lower numbers. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
+XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P (like XBF, and XBB.1.9.1 which may have a further fitness advantage), are still collectively growing in all regions of Canada. Some other select subvariants are also increasing in some regions of Canada, but not as significantly or with lower numbers. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics are points added since the last update):
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics are variants of interest added since the last update of this summary):
 
 * BM.1.1.1
 * BM.2 (high predicted affinity for the human ACE2 receptor)
@@ -267,9 +266,11 @@ XBB.1.5, combined with its subvariants and other variants with the mutation S:F4
 * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
 * XBL (has S:F486P and immune evasion like XBB.1.5)
 
-## Omicron sublineages in Canada {.tabset} 
+# Omicron sublineages in Canada 
 
-Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada.
+## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
+
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset.)
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
@@ -303,7 +304,7 @@ for (i in 1:nrow(sublineagestoplot)) {
   subVariantData=plot.subvariants.ggplot(sublineage=set,mindate=mindate,maxdate=maxdate)
   
   #outputs the text/plots into RMD
-  cat("###", sublineagestoplot[[i,"tabname"]], "\n")
+  cat("###", sublineagestoplot[[i,"tabname"]], " {.unlisted .unnumbered}\n")
   cat("####", sublineagestoplot[[i,"tabname"]],"sublineages ")
   if (!is.na(mindate)){cat(" starting from",sublineagestoplot[[i,"mindate"]])}
   if (!is.na(maxdate)){cat(" until",sublineagestoplot[[i,"maxdate"]])}
@@ -342,7 +343,7 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 ```
 
-## {-}
+### {-}
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 #DO NOT DELETE THESE 3 LINES
@@ -415,7 +416,7 @@ This historical analysis is not being further updated, as we focus on more inter
 
 <hr style="border:1px solid gray">
 
-# Canadian trees {.tabset}  
+# Canadian trees {.tabset .tabset-fade}  
 
 ```{r trees, child="trees.Rmd"}
 ```
@@ -431,7 +432,7 @@ This historical analysis is not being further updated, as we focus on more inter
 
 <hr style="border:1px solid gray">
 
-# Pango lineage description table
+# Pango lineage table
 
 Here we present a searchable table that provides a short description of each lineage as well information on the ancestor of that lineage.
 
@@ -458,7 +459,7 @@ With anonymized data on vaccination status, severity/outcome, reason for sequenc
 Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
 
 
-## Methodology {.tabset} 
+## Methodology {.tabset .tabset-fade} 
 
 Genome data and metadata are sourced from the [Canadian VirusSeq Data Portal](https://virusseq-dataportal.ca/).
 Pango lineage assignments are generated using the [pangoLEARN](https://github.com/cov-lineages/pangoLEARN) algorithm.
@@ -512,7 +513,7 @@ Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root
 
 
 
-## Data notes by province {.tabset}
+## Data notes by province {.tabset .tabset-fade}
 
 All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
 
@@ -593,7 +594,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 ## [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html)
 
-## Session info {.tabset}
+## Session info {.tabset .tabset-fade}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
 
 
