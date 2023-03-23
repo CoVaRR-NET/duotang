@@ -247,7 +247,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P (like XBF, and XBB.1.9.1 which may have a further fitness advantage), are still collectively growing in all regions of Canada. Some other select subvariants are also increasing in some regions of Canada, but not as significantly or with lower numbers. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics are variants of intereste added since the last update of this summary):
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics are variants of interest added since the last update of this summary):
 
 * BM.1.1.1
 * BM.2 (high predicted affinity for the human ACE2 receptor)
