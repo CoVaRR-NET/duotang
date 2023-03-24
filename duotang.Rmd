@@ -191,7 +191,7 @@ A complete list of lab authors is in this repository, and more details are below
 ## Introduction
 
 This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
-It is for discussion with pillar 6's team and for sharing with collaborators, e.g. public health labs.
+It is for discussion with pillar 6/CAMEO's team and for sharing with collaborators, e.g. public health labs.
 These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
