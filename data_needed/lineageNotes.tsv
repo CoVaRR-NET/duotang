@@ -913,6 +913,7 @@ BN.1.3.7	Alias of B.1.1.529.2.75.5.1.3.7 ORF1a:T1429I
 BN.1.3.8	Alias of B.1.1.529.2.75.5.1.3.8 S:D1139H
 EJ.1	Alias of B.1.1.529.2.75.5.1.3.8.1, S:I1225V
 EJ.2	Alias of B.1.1.529.2.75.5.1.3.8.2, ORF1a:T4355I
+BN.1.3.9	Alias of B.1.1.529.2.75.5.1.3.9 S:V83F
 BN.1.4	Alias of B.1.1.529.2.75.5.1.4, India, 27501C
 BN.1.4.1	Alias of B.1.1.529.2.75.5.1.4.1, S:G261V & S:T678I, from #1417
 BN.1.4.2	Alias of B.1.1.529.2.75.5.1.4.2, S:Q1113K
@@ -1165,6 +1166,7 @@ CP.5	Alias of B.1.1.529.5.2.6.5, South Africa, S:C1247F
 CP.6	Alias of B.1.1.529.5.2.6.6, S:V1264L
 CP.7	Alias of B.1.1.529.5.2.6.7 found mainly in Japan, from pango-designation issue #1473
 CP.8	Alias of B.1.1.529.5.2.6.8 ORF1b:D1939G, C15240T, A15486G, C28651T, related to #1627
+CP.8.1	Alias of B.1.1.529.5.2.6.8.1 found mainly in the Australia and Japan, from pango-designation issue #1627
 BA.5.2.7	Alias of B.1.1.529.5.2.7, global lineage, from pango-designation issue #924
 CY.1	Alias of B.1.1.529.5.2.7.1, found mainly in Belgium, Netherlands and Luxembourg, from pango-designation issue #1247
 CY.2	Alias of B.1.1.529.5.2.7.2 found in Japan, from pango-designation issue #1474
@@ -1397,6 +1399,7 @@ BQ.1.7	Alias of B.1.1.529.5.3.1.1.1.1.1.7, defined by S:L54F
 BQ.1.8	Alias of B.1.1.529.5.3.1.1.1.1.1.8, defined by ORF1a:S505F and S:Y144-, issue #1202
 BQ.1.8.1	Alias of B.1.1.529.5.3.1.1.1.1.1.8.1, England/Australia, S:256L
 BQ.1.8.2	Alias of B.1.1.529.5.3.1.1.1.1.1.8.2, England/Scotland, S:A688V
+FF.1	Alias of B.1.1.529.5.3.1.1.1.1.1.8.2.1 found mainly in the UK, from pango-designation issue #1523
 BQ.1.9	Alias of B.1.1.529.5.3.1.1.1.1.1.9, US lineage, defined by ORF1a:V2604I followed by S:346T (independent from BQ.1.1)
 BQ.1.10	Alias of B.1.1.529.5.3.1.1.1.1.1.10, international lineage, 27600T
 BQ.1.10.1	Alias of B.1.1.529.5.3.1.1.1.1.1.10.1, Italy/England/Denmark, S:H146L, issue #1189
@@ -2602,6 +2605,9 @@ XBB.1.5.29	S:A348V, USA-NE
 XBB.1.5.30	S:A348T, USA
 EU.1	Alias of XBB.1.5.26.1, S:P521S, Germany/Netherlands, from #1688
 EU.1.1	Alias of XBB.1.5.26.1.1, S:I410V, Germany/Netherlands, from #1688
+XBB.1.5.31	T24976C, USA
+XBB.1.5.32	ORF1a:T2823I, USA
+XBB.1.5.33	G370A, USA
 XBB.1.6	USA, S:L216F, S:H146K, from issue #1428
 XBB.1.7	USA-NY, S:V608I
 XBB.1.8	Denmark, S:186insSGG, C3241T
@@ -2642,7 +2648,9 @@ XBB.1.27	Defined by S:478R, S:A890V, Mexico/US/India
 XBB.2	Defined by S:D253G, from issue #1173
 XBB.2.1	Defined by S:N764R (C23853G), two step mutation on top of C23854A (S:N764K defining of all Omicrons)
 XBB.2.2	Defined by S:Q613H
-XBB.2.3	Defined by S:P521S and S:S486P, India/Indonesia/Singapore/USA
+XBB.2.3	Defined by S:P521S and S:S486P, India/Indonesia/Singapore/USA, from #1776
+XBB.2.3.1	Defined by S:D80Y, England/Sweden/India
+XBB.2.3.2	Defined by S:G184V, ORF1a:R2159W, India
 XBB.2.4	Defined by S:S486P, Spain/Denmark/Germany
 XBB.2.5	S:Q613H, from https://github.com/jmcbroome/auto-pango-designation/pull/193
 XBB.2.6	Mostly Peru, C5144T, T5731A
