@@ -2,8 +2,8 @@ Duotang update {updatedate}:
 
 Detailed changes:
 ## duotang.html:
-* Update table of content (Closes #157)
-* Code clean up, remove deprecated functions, improved documentation, and merge the 2 plot_selection_estimator scripts (Closes #109)
+* Add a disclaimer that the page may take up to 30 seconds to load. (Closes #167)
+* Correct the values for the selection coefficients to not be given on percent basis. (Closes #165)
 
 ## duotang-sandbox.html:
 * No new additions.

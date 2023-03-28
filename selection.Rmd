@@ -302,7 +302,8 @@ x=p$mut[[1]];
 sum(p$toplot$n2)>10
 }else{FALSE}})]
 
-link = DisplayHTMLTableDownloadLink(plot_growing_lineage(paramselected,makeplot=FALSE), "GrowingLineages")
+dataDownload <- plot_growing_lineage(paramselected,makeplot=FALSE) %>% mutate(sel_coeff = sel_coeff / 100)  %>% mutate(low_CI = low_CI / 100)  %>% mutate(high_CI = high_CI / 100)
+link = DisplayHTMLTableDownloadLink(dataDownload, "GrowingLineages")
 #DisplayHTMLTable(plot_growing_lineage(paramselected,makeplot=FALSE))
 ```
 

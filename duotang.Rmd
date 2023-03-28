@@ -185,6 +185,7 @@ Input and direction by other members of [Pillar 6](https://covarrnet.ca/our-team
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
+**NOTE:** Due to the large amount of visualizations provided in this notebook, this page may take up to 30 seconds to load completly. We applogize for the inconvenience. 
 
 # SARS-CoV-2 In Canada
 
