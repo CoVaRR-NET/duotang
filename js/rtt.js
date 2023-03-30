@@ -3,8 +3,8 @@
 console = d3.window(div.node()).console;
 console.log(data);
 
-var tips = data.tips,
-    filtered_tips = tips, 
+var tips = data.tips.map(x => ({ ...x, display: true })),
+    //filtered_tips = tips, 
     palette = data.palette;
 
 // append entry for "other"
@@ -20,6 +20,7 @@ var ri_wide = 130,  // width of input column
                    .style("display", "inline-block");
 
 var rttdiv = div.append("div")
+                .attr("id", "rtt-div")
                 .style("width", width-ri_wide+"px")
                 .style("height", height+"px")
                 //.style("margin-top", "-30px")
@@ -48,25 +49,39 @@ rtt_input.selectAll("label")
 // bind event listener to checkboxes
 rtt_input.selectAll(".rtt_cb")
   .on("change", function() {
+    var pgroup = tips.filter(x => x.pango == this.value);
+    pgroup.map(x => x.display = this.checked);
+    
+    /*
     if (this.checked) {
       // restore group from original data
-      var pgroup = tips.filter(x => x.pango == this.value);
       filtered_tips = filtered_tips.concat(pgroup);
     } else {
       // remove group from data
       filtered_tips = filtered_tips.filter(x => x.pango != this.value);
     }
-    console.log(filtered_tips);
-    console.log(tips);
-    rtt_update();
+    */
+    
+    //console.log(filtered_tips);
+    //console.log(tips);
+    //rtt_update();
+    /*
+    rttsvg.selectAll("circle")
+          .data(tips)
+          .attr("r", function(d) d.display ? 3 : 0 );
+          */
   })
 
 
 // prepare SVG for scatterplot
-var rttsvg = rttdiv.append("svg")
+var rttsvg = d3.select("div#rtt-div")
+               .append("svg")
+//rttdiv.append("svg")
                    .attr("id", "rtt-svg")
                    .attr("width", (width-ri_wide)+"px")
                    .attr("height", (height)+"px");
+
+console.log(rttsvg);
 
 // add margins
 var margin = {top: 10, right: 10, bottom: 60, left: 60},
@@ -82,13 +97,13 @@ var rttg = rttsvg.append("g")
                        margin.top + ")");
                        
 // set up plotting scales
-var ymax = d3.max(filtered_tips, d => +d.div),
-    ymin = d3.min(filtered_tips, d => +d.div),
+var ymax = d3.max(tips, d => +d.div),
+    ymin = d3.min(tips, d => +d.div),
     yScale = d3.scaleLinear().domain([ymin, ymax]).range([gheight, 0]);
 
 // parse dates
 var dateparser = d3.timeParse("%Y-%m-%d"),
-    dates = filtered_tips.map(d => dateparser(d.coldate));
+    dates = tips.map(d => dateparser(d.coldate));
 
 // map date range to graph region width
 var xScale = d3.scaleLinear()
@@ -118,16 +133,31 @@ rttsvg.append("text")
       .attr("y", gheight + margin.top + margin.bottom - 10)
       .text("Sampling date");
 
+var rttplot = rttg.selectAll("circle")
+                  .data(tips);
+rttplot.enter()
+       .append("circle")
+       //.filter(function(d) { return d.display; })
+       .attr("cx", function(d, i) { return xScale(dates[i]); })
+       .attr("cy", function(d) { return yScale(d.div); })
+       .attr("r", 3)
+       .style("fill", function(d) {
+         if (d.pango in palette) {
+           return palette[d.pango][0];
+         } else {
+           return "#777";
+         }
+       });
 
 function rtt_update() {
-  console.log("update");
-  dates = filtered_tips.map(d => dateparser(d.coldate));
-  var rttplot = rttg.selectAll("circle")
-                  .data(filtered_tips);
+  //console.log("update");
+  //dates = filtered_tips.map(d => dateparser(d.coldate));
+
                   
-  rttplot.enter().append("circle").attr("class", "data_point");
-  rttplot.exit().remove();
+  //rttplot.enter().append("circle").attr("class", "data_point");
   
+  
+  /*
   rttplot.attr("cx", function(d, i) { 
            // i is an iteration count
            return xScale(dates[i]); 
@@ -136,20 +166,9 @@ function rtt_update() {
          .attr("r", 3)
          .style("stroke", "black")
          .style("fill", "none");
-  
-  rttplot.enter()
-         .append("circle")
-         .attr("cx", function(d, i) { return xScale(dates[i]); })
-         .attr("cy", function(d) { return yScale(d.div); })
-         .attr("r", 3)
-         .style("fill", function(d) {
-           if (d.pango in palette) {
-             return palette[d.pango][0];
-           } else {
-             return "#777";
-           }
-         });
-       
+  */
+
+  //rttplot.exit().remove();
 }
 
 
