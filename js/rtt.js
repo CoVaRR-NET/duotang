@@ -64,24 +64,15 @@ rtt_input.selectAll(".rtt_cb")
     
     //console.log(filtered_tips);
     //console.log(tips);
-    //rtt_update();
-    /*
-    rttsvg.selectAll("circle")
-          .data(tips)
-          .attr("r", function(d) d.display ? 3 : 0 );
-          */
+    rtt_update();
   })
 
 
 // prepare SVG for scatterplot
-var rttsvg = d3.select("div#rtt-div")
-               .append("svg")
-//rttdiv.append("svg")
+var rttsvg = rttdiv.append("svg")
                    .attr("id", "rtt-svg")
                    .attr("width", (width-ri_wide)+"px")
                    .attr("height", (height)+"px");
-
-console.log(rttsvg);
 
 // add margins
 var margin = {top: 10, right: 10, bottom: 60, left: 60},
@@ -111,7 +102,7 @@ var xScale = d3.scaleLinear()
                .range([0, gwidth]);
 
 
-rtt_update();
+//rtt_update();
 
 
 // draw axes labels
@@ -150,7 +141,17 @@ rttplot.enter()
        });
 
 function rtt_update() {
-  //console.log("update");
+  console.log("update");
+  //console.log(rttplot);
+  rttplot.selectAll("circle")
+                   .data(tips)
+                   .attr("r", function(d) {return 2;});
+  /*
+  rttplot.selectAll("circle")
+       .data(tips)
+       .attr("r", function(d) d.display ? 3 : 0);
+       */
+       
   //dates = filtered_tips.map(d => dateparser(d.coldate));
 
                   
