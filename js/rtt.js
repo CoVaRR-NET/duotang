@@ -116,7 +116,6 @@ rttg.append("g")
           "," + gheight + ")")
     .call(rtt_xaxis);
 
-
 rttsvg.append("text")
       .attr("class", "x label")
       .attr("text-anchor", "middle")
@@ -142,19 +141,20 @@ rttg.selectAll("circle")
 
 
 function rtt_update() {
-  console.log("update");
-  
   // recalculate plot region
-  /*
   dates = tips.filter(x => x.display).map(x => x.coldate);
+  xScale.domain(d3.extent(dates));
+  
   rttg.select(".xaxis")
       .transition().duration(500)
-      .call(xAxis);
-  */
+      .call(rtt_xaxis);
+  
   rttg.selectAll("circle")
       .data(tips)
-      .transition().duration(300)
-      .attr("r", function(d) { return d.display ? 3 : 0; } );
+      .transition().duration(500)
+      .attr("r", function(d) { return d.display ? 3 : 0; } )
+      .attr("cx", function(d) { return xScale(d.coldate); })
+      .attr("cy", function(d) { return yScale(d.div); });
 
   
   
