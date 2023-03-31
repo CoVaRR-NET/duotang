@@ -158,7 +158,7 @@ mltree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.rtt.n
 mltree$tip.label <- reduce.tipnames(mltree$tip.label)
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","month","week", "GID", "isolate")
+               "lineage", "pango_group", "month","week", "GID", "isolate")
 
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903

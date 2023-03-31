@@ -173,7 +173,7 @@ These analyses are subject to frequent change given new data and updated lineage
 
 
 ```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
-source("./scripts/plot_selection_estimator_2type.R")
+source("./scripts/plot_selection_estimator.R")
 source("./scripts/scanlineages.R")
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
 latelineage_pangotree <- makepangotree(unique(meta$raw_lineage[meta$sample_collection_date > max(meta$sample_collection_date) - days(0) ]))

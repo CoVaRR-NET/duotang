@@ -1,5 +1,11 @@
-#code used to draw interactive phylogenetic trees by Justin Jia https://github.com/bfjia
-
+#' Converts a phylogentic tree object into a Json file compatible with the interactive tree visulization js script.
+#' Return a Json object.
+#' @param tree:  Phylogenetic tree
+#' @param metadata: Metadata
+#' treeType: The type of tree being constructed.
+#' VOCVOI: the VOCVOI colro table.
+#' defaultColorField: The default category for the color. DEFAULT="pango_group"
+#' fieldnames: List of column names that should be displayed on the mouse hover-over box
 DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pango_group", fieldnames = c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
                                                     "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing",
                                                     "lineage", "pango.group")){
@@ -24,11 +30,16 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pang
   
   edges <- merge(tt.layout$edges, v.edges, all=TRUE)  # tips, internals
   
-  jsonObj <- toJSON(list(nodes=tt.layout$nodes, edges=edges, treetype=treeType, defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
+  jsonObj <- toJSON(list(nodes=NA, edges=edges, treetype=treeType, ntips=nrow(subset(tt.layout$nodes, n.tips == 0)), defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
   
   return(jsonObj)
 }
 
+
+#' remove collection dates to make it easier to link to metadata
+#' tips are labelled with [fasta_name]_[lineage]_[coldate]
+#' @param tip.label: character vector
+#' @return character vector
 reduce.tipnames <- function(tip.label) {
   sapply(tip.label, function(x) {
     tokens <- strsplit(x, "_")[[1]]

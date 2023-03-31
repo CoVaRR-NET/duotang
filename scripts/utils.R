@@ -80,3 +80,8 @@ DisplayHTMLTable <- function(dataframe, width="100%"){
                 filter = 'top', rownames = F)
 }
 
+DisplayHTMLTableDownloadLink<- function(dataframe, name){
+  filename <- paste0("./downloads/", name, ".tsv")
+  write.table(dataframe, file = filename, sep = '\t', row.names = F, col.names = T)
+  return(filename)
+}

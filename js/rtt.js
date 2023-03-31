@@ -182,27 +182,6 @@ function rtt_update() {
       .attr("r", function(d) { return d.display ? 3 : 0; } )
       .attr("cx", function(d) { return xScale(d.coldate); })
       .attr("cy", function(d) { return yScale(d.div); });
-
-  
-  
-  //dates = filtered_tips.map(d => dateparser(d.coldate));
-
-                  
-  //rttplot.enter().append("circle").attr("class", "data_point");
-  
-  
-  /*
-  rttplot.attr("cx", function(d, i) { 
-           // i is an iteration count
-           return xScale(dates[i]); 
-         })
-         .attr("cy", function(d) { return yScale(d.div); })
-         .attr("r", 3)
-         .style("stroke", "black")
-         .style("fill", "none");
-  */
-
-  //rttplot.exit().remove();
 }
 
 

@@ -177,7 +177,7 @@ echo "Data will be written to: ${data_dir}"
 echo "Script folder located at: ${scripts_dir}"
 echo "Overwrite checkpoints: ${OVERWRITE}"
 echo "Download data only?: ${DOWNLOADONLY}"
-echo "Include GSD download?: ${SKIPGSD}"
+echo "Include GSD download?: ${INCLUDEGSD}"
 echo "Push changes to git?: ${GITPUSH}"
 echo "Clean up mode: ${CLEAN}"
 echo "Not using Conda?: ${NOCONDA}"
@@ -386,11 +386,11 @@ for variant in `ls $data_dir/*regex*.fasta.xz`; do
 	name=${name%.*};
 	name=`echo $name|cut -d '_' -f3-`;
 	echo $variant
-	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --samplenum 1 --reffile resources/NC_045512.fa; 
 done
 
 #non-recombinants
-python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 3  --reffile resources/NC_045512.fa; 
+python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 1  --reffile resources/NC_045512.fa; 
 
 echo "buildtree" > $checkPointFile
 
@@ -429,20 +429,25 @@ Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$da
 echo "encrypt" > $checkPointFile
 
 #knitgsd:
-Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
+#Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "encrypt" > $checkPointFile
 
 #encrypt:
 if [ -f ".secret/sandbox" ]; then
     secret=`cat .secret/sandbox`
 	python3 scripts/encrypt.py duotang-sandbox.html $secret
+	python3 scripts/encrypt.py duotang-GSD.html $secret
+
 	mv duotang-sandbox-protected.html duotang-sandbox.html
+	mv duotang-GSD-protected.html duotang-GSD.html
+
 else
 	echo ".secret file not found, unable to encrypt."
 	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
 	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
 	echo "DO NOT ADD THIS FILE TO GIT."
 	rm -f duotang-sandbox.html
+	rm -f duotang-GSD.html
 	echo "duotangbuilt" > $checkPointFile
 	exit 1
 fi
@@ -464,14 +469,17 @@ if [ "$CLEAN" = "YES" ]; then
 	rm -rf ${data_dir}/$datestamp
 fi
 
+echo "recordversion" > $checkPointFile
+#echo "$datestamp" > duotangCurVer
+python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $datestamp
+
 echo "gitpush" > $checkPointFile
-echo "$datestamp" > duotangCurVer
 
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
-	git remote prune origin
-	git checkout -B UpdatePreview
+	#git remote prune origin
+	#git checkout -B UpdatePreview
 	bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
@@ -483,12 +491,18 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f data_needed/virusseq.fasta.xz
 	git add -f archive/*.html
 	git add -f archive/readme.md
+	git add -f downloads/*
 	git add -f duotang*html
 	git add -f duotangCurVer
+	git add -f DuotangUpdateStatus.json
 	git commit -m "Update: $datestamp"
-	git push -u origin UpdatePreview
-	python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
-	git checkout dev
+	git push origin dev
+	sed  "s/{updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
+	#gh pr create -B main -F ./whatsnew.md --title "Update: $datestamp"
+	#python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	rm ./whatsnew.send.md
+	#git checkout dev
 fi
 
 

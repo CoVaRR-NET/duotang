@@ -68,6 +68,8 @@ presetColors=data.frame(name=c("other",
 #})
 #idx <- apply(res$lik.anc, 1, which.max)[2:nrow(res$lik.anc)]  # exclude root edge
 #anc <- levels(as.factor(metasub1$pango.group))[idx]
+source("scripts/tree.r")
+
 timeTreeJsonObj <- DrawTree(ttree, metasub1, "timetree", presetColors, fieldnames=fieldnames)
 recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree", presetColors, "lineage", fieldnames= fieldnames)
 
@@ -81,27 +83,33 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
 ```
 
 
-### Time Tree {.active}
+## Time Tree {.active}
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
   r2d3(data=timeTreeJsonObj, 
      script="js/tree.js", container="div", elementId="ttree-element")
 ```
 
-### XBB* time tree
+## XBB* time tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
     r2d3(data=recombTimeTreeJsonObj, 
      script="js/tree.js", container="div", elementId="recombttree-element")
 
 ```
 
-### Diversity Tree
+## Diversity Tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
     r2d3(data=diversityTreeJsonObj, 
      script="js/tree.js", container="div", elementId="mltree-element")
 ```
 
-### Omicron Diversity Tree
+## Omicron Diversity Tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
     r2d3(data=OmicrondiversityTreeJsonObj, 
      script="js/tree.js", container="div", elementId="omimltree-element")
 ```
+
+## {-}
+
+<hr style="border:1px solid gray">
+
+##

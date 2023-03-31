@@ -85,12 +85,12 @@ getAllStrictoLineages <- function(meta) {
   unique(meta$lineage)
 }
 
-
-getStrictoSubLineages <- function(x, meta) {
+getStrictoSubLineages <- function(x, meta, seperateRecombinant=F, recombinantsOnly=F) {
+  #x <- "BA.1*"
   raw <- realtorawlineage(x)
   if (!endsWith(x, "*")) {
     return(list(rawtoreallineage(raw)))
-  }
+  } 
   else {
     raw <- substr(raw, 0, nchar(raw)-1)  # remove star
     # expand * to regular expression
@@ -100,6 +100,23 @@ getStrictoSubLineages <- function(x, meta) {
     if(length(l) > 1) {
       l <- append(rawtoreallineage(x), l)
     }
+    
+    if (recombinantsOnly){
+      idx <- grep("^X", l, value = FALSE)
+      if (!identical(idx, integer(0))) {
+        l <- l[idx] 
+      }
+      return(l)
+    }
+    
+    if (seperateRecombinant){
+      idx <- grep("^X", l, value = FALSE)
+      if (!identical(idx, integer(0))) {
+        l <- l[-idx]
+      }
+      return(l)
+    }
+    
     return(l)
   }
 }
