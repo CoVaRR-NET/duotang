@@ -104,7 +104,7 @@ var xScale = d3.scaleLinear()
                .range([0, gwidth]);
 
 
-// draw axes labels
+// draw x-axis (dates)
 var rtt_xaxis = d3.axisBottom(xScale)
                   .tickFormat(function(date) {
                     return d3.timeFormat('%b \'%y')(date);
@@ -117,12 +117,29 @@ rttg.append("g")
     .call(rtt_xaxis);
 
 rttsvg.append("text")
-      .attr("class", "x label")
+      .attr("class", "xlabel")
       .attr("text-anchor", "middle")
       .attr("x", gwidth/2 + margin.left)
       .attr("y", gheight + margin.top + margin.bottom - 10)
       .text("Sampling date");
 
+// draw y-axis (divergence)
+var rtt_yaxis = d3.axisLeft(yScale);
+
+rttg.append("g")
+    .attr("class", "yaxis")
+    .call(rtt_yaxis);
+
+// https://gist.github.com/mbostock/4403522
+rttsvg.append("text")
+      .attr("class", "ylabel")
+      .attr("x", 0)
+      .attr("y", margin.left - 30)
+      .attr("transform", "translate(0,"+(gheight/2)+")rotate(-90)")
+      .attr("text-anchor", "middle")
+      .text("Divergence from root");
+
+// draw points
 rttg.selectAll("circle")
     .data(tips)
     .enter()
@@ -142,12 +159,22 @@ rttg.selectAll("circle")
 
 function rtt_update() {
   // recalculate plot region
-  dates = tips.filter(x => x.display).map(x => x.coldate);
+  var filtered = tips.filter(x => x.display);
+  
+  dates = filtered.map(x => x.coldate);
   xScale.domain(d3.extent(dates));
+  
+  ymax = d3.max(filtered, d => +d.div),
+  ymin = d3.min(filtered, d => +d.div);
+  yScale.domain([ymin, ymax]);
   
   rttg.select(".xaxis")
       .transition().duration(500)
       .call(rtt_xaxis);
+      
+  rttg.select(".yaxis")
+      .transition().duration(500)
+      .call(rtt_yaxis);
   
   rttg.selectAll("circle")
       .data(tips)
