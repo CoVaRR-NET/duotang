@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 ####################BIG BOLDED WARNING MESSAGE######################
 #  This script contains onErrorResume functionality.               # 
 #  Labels for these goto function start with '#' and end with ':'  #
@@ -6,6 +6,8 @@
 #  They must be the same as content of the checkpoint file         #
 #  THEY ARE NOT COMMENTS, DO NOT DELETE THEM.					   #
 ####################################################################
+
+set -e #set the script to exit on error.
 
 # None of the arguments are required, defaults are set for all of them if they are not provided.
 POSITIONAL_ARGS=()
@@ -326,7 +328,11 @@ echo "epidata" > $checkPointFile
 #epidata:
 
 #fetch epidata from multiple sources, These link might change at any time, especially the ON and QC ones. 
+
+set +e #ontario's API sucks. dont crash the script if it times out and just continue. Better luck next week.
 wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
+set -e #set the stop on error flag back.
+
 wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv
 wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-data.csv
 wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648
