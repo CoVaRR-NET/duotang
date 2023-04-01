@@ -439,24 +439,24 @@ echo "knitgsd" > $checkPointFile
 echo "encrypt" > $checkPointFile
 
 #encrypt:
-if [ -f ".secret/sandbox" ]; then
-    secret=`cat .secret/sandbox`
-	python3 scripts/encrypt.py duotang-sandbox.html $secret
-	python3 scripts/encrypt.py duotang-GSD.html $secret
+#if [ -f ".secret/sandbox" ]; then
+#    secret=`cat .secret/sandbox`
+#	python3 scripts/encrypt.py duotang-sandbox.html $secret
+#	python3 scripts/encrypt.py duotang-GSD.html $secret
 
-	mv duotang-sandbox-protected.html duotang-sandbox.html
-	mv duotang-GSD-protected.html duotang-GSD.html
+#	mv duotang-sandbox-protected.html duotang-sandbox.html
+#	mv duotang-GSD-protected.html duotang-GSD.html
 
-else
-	echo ".secret file not found, unable to encrypt."
-	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
-	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
-	echo "DO NOT ADD THIS FILE TO GIT."
-	rm -f duotang-sandbox.html
-	rm -f duotang-GSD.html
-	echo "duotangbuilt" > $checkPointFile
-	exit 1
-fi
+#else
+#	echo ".secret file not found, unable to encrypt."
+#	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
+#	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
+#	echo "DO NOT ADD THIS FILE TO GIT."
+#	rm -f duotang-sandbox.html
+#	rm -f duotang-GSD.html
+#	echo "duotangbuilt" > $checkPointFile
+#	exit 1
+#fi
 
 echo "cleanup" > $checkPointFile
 
