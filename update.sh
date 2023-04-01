@@ -330,7 +330,7 @@ echo "epidata" > $checkPointFile
 #fetch epidata from multiple sources, These link might change at any time, especially the ON and QC ones. 
 
 set +e #ontario's API sucks. dont crash the script if it times out and just continue. Better luck next week.
-wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
+wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True || rm AgeCaseCountON.csv
 set -e #set the stop on error flag back.
 
 wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv
