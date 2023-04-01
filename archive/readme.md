@@ -1,4 +1,5 @@
 Here we store old versions of the duotang notebook:
+- [2023-03-24](2023-03-24.html)
 - [2023-03-22](2023-03-22.html)
 - [2023-03-22](2023-03-22.html)
 - [2023-03-22](2023-03-22.html)
