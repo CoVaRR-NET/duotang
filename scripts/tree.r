@@ -35,6 +35,11 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pang
   return(jsonObj)
 }
 
+
+#' remove collection dates to make it easier to link to metadata
+#' tips are labelled with [fasta_name]_[lineage]_[coldate]
+#' @param tip.label: character vector
+#' @return character vector
 reduce.tipnames <- function(tip.label) {
   sapply(tip.label, function(x) {
     tokens <- strsplit(x, "_")[[1]]
