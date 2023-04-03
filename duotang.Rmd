@@ -585,7 +585,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 
 ## [Previous Versions](https://covarr-net.github.io/duotang/archive/)
 
-## [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html)
+<!-- ## [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html) -->
 
 ## Session info {.tabset .tabset-fade}
 The version numbers of all packages in the current environment as well as information about the R install is reported below. 
