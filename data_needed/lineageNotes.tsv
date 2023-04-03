@@ -696,6 +696,8 @@ CM.8	Alias of B.1.1.529.2.3.20.8, S:G446S
 CM.8.1	Alias of B.1.1.529.2.3.20.8.1, Australia/England, S:F486S
 CM.8.1.1	Alias of B.1.1.529.2.3.20.8.1.1, Singapore/Malaysia, S:K147N
 CM.8.1.2	Alias of B.1.1.529.2.3.20.8.1.2, Germany/USA, S:K147I
+CM.8.1.3	Alias of B.1.1.529.2.3.20.8.1.3, USA, S:Y1272H
+CM.8.1.4	Alias of B.1.1.529.2.3.20.8.1.4, ORF1b:N1790D, Philippines, from #1554
 CM.9	Alias of B.1.1.529.2.3.20.9, USA/Canada/Israel, S:S256L
 CM.10	Alias of B.1.1.529.2.3.20.10, USA/South Korea/Singapore, S:K478T reversion, S:V445A
 CM.11	Alias of B.1.1.529.2.3.20.11, USA/South Korea, S:R346T, S:F486S, from #1509
@@ -813,6 +815,7 @@ BL.1.1	Alias of B.1.1.529.2.75.1.1.1, from pango-designation issue #1079, define
 BL.1.2	Alias of B.1.1.529.2.75.1.1.2, mainly Austria, issue #1066, defined by S:G261D, S:V308L
 BL.1.3	Alias of B.1.1.529.2.75.1.1.3, Switzerland, Israel, Canada, issue #1124, defined by S:F490L
 BL.1.4	Alias of B.1.1.529.2.75.1.1.4, India/England/New Zealand, defined by S:F490V
+BL.1.5	Alias of B.1.1.529.2.75.1.1.5, Japan, S:A475V
 BL.2	Alias of B.1.1.529.2.75.1.2, mainly found in India, defined by S:R346T on A26612T branch 
 BL.2.1	Alias of B.1.1.529.2.75.1.2.1, Australia/Belgium, defined by S:K182E
 BL.3	Alias of B.1.1.529.2.75.1.3, mainly found in India, defined by ORF1a:P2685S on A26612T branch 
@@ -876,6 +879,13 @@ CH.1.1.14	Alias of B.1.1.529.2.75.3.4.1.1.1.1.14, N:T362I
 CH.1.1.15	Alias of B.1.1.529.2.75.3.4.1.1.1.1.15, found mainly in Lithuania, Germany and UK, from pango-designation issue #1726
 CH.1.1.16	Alias of B.1.1.529.2.75.3.4.1.1.1.1.16, S:613H, ORF3a:S26L, on C193T branch, Germany/Sweden, from #1753
 CH.1.1.17	Alias of B.1.1.529.2.75.3.4.1.1.1.1.17, M:S212G, on C21811T branch, from #1753
+FK.1	Alias of B.1.1.529.2.75.3.4.1.1.1.1.17.1, found mainly in New Zealand and Australia, from pango-designation issue #1718
+CH.1.1.18	Alias of B.1.1.529.2.75.3.4.1.1.1.1.18, S:K187T, related to #1747
+CH.1.1.19	Alias of B.1.1.529.2.75.3.4.1.1.1.1.19, C2773T, Europe
+FJ.1	Alias of B.1.1.529.2.75.3.4.1.1.1.1.19.1, ORF1a:A1204V, England
+CH.1.1.20	Alias of B.1.1.529.2.75.3.4.1.1.1.1.20, England, T299I, R403K, D1165G, from #1736
+CH.1.1.21	Alias of B.1.1.529.2.75.3.4.1.1.1.1.21, England, S:N481Y, from #1799
+CH.1.1.22	Alias of B.1.1.529.2.75.3.4.1.1.1.1.22, found mainly in Denmark, from pango-designation issue #1670
 CH.2	Alias of B.1.1.529.2.75.3.4.1.1.2, defined by S:Q183H
 CH.3	Alias of B.1.1.529.2.75.3.4.1.1.3, defined by S:486P on ORF1b:Q2425R branch
 CH.3.1	Alias of B.1.1.529.2.75.3.4.1.1.3.1, S:S494P, Australia/Indonesia, from #1421
@@ -913,7 +923,8 @@ BN.1.3.7	Alias of B.1.1.529.2.75.5.1.3.7 ORF1a:T1429I
 BN.1.3.8	Alias of B.1.1.529.2.75.5.1.3.8 S:D1139H
 EJ.1	Alias of B.1.1.529.2.75.5.1.3.8.1, S:I1225V
 EJ.2	Alias of B.1.1.529.2.75.5.1.3.8.2, ORF1a:T4355I
-BN.1.3.9	Alias of B.1.1.529.2.75.5.1.3.9 S:V83F
+BN.1.3.9	Alias of B.1.1.529.2.75.5.1.3.9 S:V83F, #1748
+BN.1.3.10	Alias of B.1.1.529.2.75.5.1.3.10 ORF1a:Q1918R, C13608T, Asia/Oceania
 BN.1.4	Alias of B.1.1.529.2.75.5.1.4, India, 27501C
 BN.1.4.1	Alias of B.1.1.529.2.75.5.1.4.1, S:G261V & S:T678I, from #1417
 BN.1.4.2	Alias of B.1.1.529.2.75.5.1.4.2, S:Q1113K
@@ -1059,6 +1070,7 @@ BF.5.1	Alias of B.1.1.529.5.2.1.5.1 found mainly in Japan and Israel, from pango
 BF.5.2	Alias of B.1.1.529.5.2.1.5.2 found mainly in Japan, from pango-designation issue #1476
 BF.5.3	Alias of B.1.1.529.5.2.1.5.3 found mainly in Japan, from pango-designation issue #1526
 BF.5.4	Alias of B.1.1.529.5.2.1.5.4 Japan, ORF1a:K3839R
+BF.5.5	Alias of B.1.1.529.5.2.1.5.5 Europe, S:K147N
 BF.6	Alias of B.1.1.529.5.2.1.6, mainly found in England and Scotland, from pango-designation issue #821
 BF.7	Alias of B.1.1.529.5.2.1.7, mainly found in Belgium, England and Denmark, from pango-designation issue #827
 BF.7.1	Alias of B.1.1.529.5.2.1.7.1, mainly found in Germany, S:G261V, from pango-designation issue #1132
@@ -1288,6 +1300,8 @@ DN.1	Alias of B.1.1.529.5.3.1.1.1.1.1.1.5.1, S:K147N
 DN.1.1	Alias of B.1.1.529.5.3.1.1.1.1.1.1.5.1.1 found mainly in UK and Denmark, from pango-designation issue #1463
 DN.1.1.1	Alias of B.1.1.529.5.3.1.1.1.1.1.1.5.1.1.1 UK, S:Y453F
 DN.1.1.2	Alias of B.1.1.529.5.3.1.1.1.1.1.1.5.1.1.2 UK, S:P479L
+DN.1.1.3	Alias of B.1.1.529.5.3.1.1.1.1.1.1.5.1.1.3 S:S704L, UK
+DN.1.1.4	Alias of B.1.1.529.5.3.1.1.1.1.1.1.5.1.1.4 S:N481S, UK
 BQ.1.1.6	Alias of B.1.1.529.5.3.1.1.1.1.1.1.6, ORF1a:L681F
 BQ.1.1.7	Alias of B.1.1.529.5.3.1.1.1.1.1.1.7, ORF1a:S216Y
 DK.1	Alias of B.1.1.529.5.3.1.1.1.1.1.1.7.1, S:339N, ORF1a:A1809T
@@ -1429,6 +1443,7 @@ BQ.1.25	Alias of B.1.1.529.5.3.1.1.1.1.1.25, S:R346T, T8038C, T25569C, G26031A
 BQ.1.25.1	Alias of B.1.1.529.5.3.1.1.1.1.1.25.1, found mainly in USA, from pango-designation issue #1451
 BQ.1.26	Alias of B.1.1.529.5.3.1.1.1.1.1.26, found mainly in Denmark, from pango-designation issue #1315
 BQ.1.26.1	Alias of B.1.1.529.5.3.1.1.1.1.1.26.1, found mainly in Denmark, from pango-designation issue #1369
+BQ.1.26.2	Alias of B.1.1.529.5.3.1.1.1.1.1.26.2, Europe, S:F157L
 BQ.1.27	Alias of B.1.1.529.5.3.1.1.1.1.1.27, USA/England, S:V445A
 BQ.1.28	Alias of B.1.1.529.5.3.1.1.1.1.1.28, found mainly in USA, ins:S:247SWRM, from pango-designation issue #1415
 BQ.1.29	Alias of B.1.1.529.5.3.1.1.1.1.1.29, found mainly in USA, S:E554Q
@@ -2588,8 +2603,13 @@ EL.1	Alias of XBB.1.5.14.1, S:Q675H, Europe, from #1631
 XBB.1.5.15	G15957T, USA
 FD.1	Alias of XBB.1.5.15.1, ORF7b:E3*, England/Canada
 FD.1.1	Alias of XBB.1.5.15.1.1, S:F456L, Canada-QC
+FD.2	Alias of XBB.1.5.15.2, S:Q146K, ORF1a:G519S, USA, from #1600
 XBB.1.5.16	T14766C, USA
+FG.1	Alias of XBB.1.5.16.1, S:T284I, S:R403K, S:L513F, USA, from #1751
+FG.2	Alias of XBB.1.5.16.2, S:D178N, USA/Europe
+FG.3	Alias of XBB.1.5.16.3, S:I934V, England/Wales
 XBB.1.5.17	C23635T, USA
+FH.1	Alias of XBB.1.5.17.1, S:T883I, C4633T, USA
 XBB.1.5.18	ORF1a:T2300I, England/Europe
 XBB.1.5.19	ORF1b:R172C, USA
 XBB.1.5.20	C9532T, USA
@@ -2608,6 +2628,12 @@ EU.1.1	Alias of XBB.1.5.26.1.1, S:I410V, Germany/Netherlands, from #1688
 XBB.1.5.31	T24976C, USA
 XBB.1.5.32	ORF1a:T2823I, USA
 XBB.1.5.33	G370A, USA
+XBB.1.5.34	ORF1a:T1754I, USA
+XBB.1.5.35	S:N978S, USA, from #1699
+XBB.1.5.36	C9442T, USA
+XBB.1.5.37	S:K1045R, Europe
+XBB.1.5.38	S:I666V, ORF1a:T403I
+XBB.1.5.39	ORF1a:M3684T, USA/Canada
 XBB.1.6	USA, S:L216F, S:H146K, from issue #1428
 XBB.1.7	USA-NY, S:V608I
 XBB.1.8	Denmark, S:186insSGG, C3241T
@@ -2645,16 +2671,21 @@ XBB.1.24	Defined by S:F486P, on T13704C branch, from #1654
 XBB.1.25	Defined by C673T, G487T, on 28297C branch
 XBB.1.26	Defined by T10663C on 28297C branch, Canada
 XBB.1.27	Defined by S:478R, S:A890V, Mexico/US/India
+XBB.1.28	Defined by S:403K, Europe
+XBB.1.29	Defined by ORF1a:L3829F, S:A292S, Europe
+XBB.1.30	Defined by ORF1b:K2557R, South East Asia
 XBB.2	Defined by S:D253G, from issue #1173
 XBB.2.1	Defined by S:N764R (C23853G), two step mutation on top of C23854A (S:N764K defining of all Omicrons)
 XBB.2.2	Defined by S:Q613H
-XBB.2.3	Defined by S:P521S and S:S486P, India/Indonesia/Singapore/USA, from #1776
-XBB.2.3.1	Defined by S:D80Y, England/Sweden/India
-XBB.2.3.2	Defined by S:G184V, ORF1a:R2159W, India
+XBB.2.3	Defined by S:P521S and S:S486P, India/Indonesia/Singapore/USA
+XBB.2.3.1	Defined by S:D80Y, England/Sweden/India, #1775
+XBB.2.3.2	Defined by S:G184V, ORF1a:R2159W, India, from #1776
 XBB.2.4	Defined by S:S486P, Spain/Denmark/Germany
 XBB.2.5	S:Q613H, from https://github.com/jmcbroome/auto-pango-designation/pull/193
 XBB.2.6	Mostly Peru, C5144T, T5731A
 XBB.2.7	ORF1a:R3662H, parent of lineage proposed in #1725
+XBB.2.7.1	S:Y453F, S:K478Q, Singapore, #1725
+XBB.2.8	C6968T, Brunei
 XBB.3	Defined by ORF1b:I1988V on ORF1a:D82G branch
 XBB.3.1	Defined by S:Q677R, India-TN/Singapore, from issue #1241
 XBB.3.2	Defined by S:M177T
@@ -2691,6 +2722,7 @@ XBF.7	Global, N:T379I (not on ORF1a:K120N branch)
 XBF.7.1	S:T323I
 XBF.8	Australia, T9931C, C12970T
 XBF.8.1	Australia, S:P621S, from #1651
+XBF.9	Europe, ORF1b:S1003G
 XBG	Recombinant lineage of BA.2.76 and BA.5.2, predominantly in UK, from pango-designation issue #896
 XBH	Recombinant lineage of BA.2.3.17 and BA.2.75.2, predominantly in Brunei, from pango-designation issue #1229
 XBJ	Recombinant lineage of BA.2.3.20 and BA.5.2, possibly Philippines, from pango-designation issue #1268
@@ -2713,6 +2745,7 @@ XBU	Recombinant lineage of BA.2.75.3, BQ.1, BA.2.75.3, from issue #1425
 XBV	Recombinant lineage of CR.1, XBB.1, from issue #1460
 XBW	Recombinant lineage of XBB.1.5, BQ.1.14, from issue #1505
 XBY	Recombinant lineage of BR.2.1, XBF, from issue #1669
+XBZ	Recombinant lineage of BA.5.2* and EF.1.3, predominantly in Denmark, Germany and Austria, from pango-designation issue #1666
 *A.2.1	Withdrawn: Lineage with sequences predominantly from Panama
 *A.8	Withdrawn: Indian lineage merged with A.9
 *A.10	Withdrawn: Spanish lineage reassigned to A.5

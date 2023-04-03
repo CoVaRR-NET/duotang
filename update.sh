@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 ####################BIG BOLDED WARNING MESSAGE######################
 #  This script contains onErrorResume functionality.               # 
 #  Labels for these goto function start with '#' and end with ':'  #
@@ -6,6 +6,8 @@
 #  They must be the same as content of the checkpoint file         #
 #  THEY ARE NOT COMMENTS, DO NOT DELETE THEM.					   #
 ####################################################################
+
+set -e #set the script to exit on error.
 
 # None of the arguments are required, defaults are set for all of them if they are not provided.
 POSITIONAL_ARGS=()
@@ -326,13 +328,17 @@ echo "epidata" > $checkPointFile
 #epidata:
 
 #fetch epidata from multiple sources, These link might change at any time, especially the ON and QC ones. 
-wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv
-wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-data.csv
-wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648
-wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/cases/4565.csv
-wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv
-wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv
-wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True
+
+set +e #ontario's API sucks. dont crash the script if it times out and just continue. Better luck next week.
+wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True || rm AgeCaseCountON.csv
+set -e #set the stop on error flag back.
+
+wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv || rm AgeCaseCountON.csv
+wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-data.csv || rm AgeCaseCountAB.csv
+wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648 || rm AgeCaseCountQC.csv
+#wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/cases/4565.csv || rm AgeCaseCountON.csv
+wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm CanadianEpiData.csv
+wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv || rm AgeCaseCountCAN.csv
 gzip -f ${data_dir}/AgeCaseCount*.csv
 
 echo "gsdmetadata" > $checkPointFile
@@ -386,7 +392,7 @@ for variant in `ls $data_dir/*regex*.fasta.xz`; do
 	name=${name%.*};
 	name=`echo $name|cut -d '_' -f3-`;
 	echo $variant
-	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --samplenum 1 --reffile resources/NC_045512.fa; 
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
 done
 
 #non-recombinants
@@ -425,32 +431,32 @@ Rscript -e "rmarkdown::render('duotang.Rmd',params=list(datestamp="\"$datestamp\
 echo "knitsandbox" > $checkPointFile
 
 #knitsandbox:
-Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
-echo "encrypt" > $checkPointFile
+#Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
+echo "knitgsd" > $checkPointFile
 
 #knitgsd:
 #Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
 echo "encrypt" > $checkPointFile
 
 #encrypt:
-if [ -f ".secret/sandbox" ]; then
-    secret=`cat .secret/sandbox`
-	python3 scripts/encrypt.py duotang-sandbox.html $secret
-	python3 scripts/encrypt.py duotang-GSD.html $secret
+#if [ -f ".secret/sandbox" ]; then
+#    secret=`cat .secret/sandbox`
+#	python3 scripts/encrypt.py duotang-sandbox.html $secret
+#	python3 scripts/encrypt.py duotang-GSD.html $secret
 
-	mv duotang-sandbox-protected.html duotang-sandbox.html
-	mv duotang-GSD-protected.html duotang-GSD.html
+#	mv duotang-sandbox-protected.html duotang-sandbox.html
+#	mv duotang-GSD-protected.html duotang-GSD.html
 
-else
-	echo ".secret file not found, unable to encrypt."
-	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
-	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
-	echo "DO NOT ADD THIS FILE TO GIT."
-	rm -f duotang-sandbox.html
-	rm -f duotang-GSD.html
-	echo "duotangbuilt" > $checkPointFile
-	exit 1
-fi
+#else
+#	echo ".secret file not found, unable to encrypt."
+#	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
+#	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
+#	echo "DO NOT ADD THIS FILE TO GIT."
+#	rm -f duotang-sandbox.html
+#	rm -f duotang-GSD.html
+#	echo "duotangbuilt" > $checkPointFile
+#	exit 1
+#fi
 
 echo "cleanup" > $checkPointFile
 

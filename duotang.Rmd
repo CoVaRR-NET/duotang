@@ -185,6 +185,7 @@ Input and direction by other members of [Pillar 6](https://covarrnet.ca/our-team
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
+**NOTE: Due to the amount of visualizations provided in this notebook, this page may take up to 30 seconds to load completely. We apologize for the inconvenience.**
 
 # SARS-CoV-2 In Canada
 
@@ -243,28 +244,20 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 # Current situation
 
-**[NOTE: The order of some analyses below has changed. Frequency barplots now include a default tab showing the last 120 days.]**
+**[NOTE: Added a disclaimer above that the page below may take up to 30 seconds to load. Also, fixed the values for the selection coefficients to not be given on a percent basis.]**
 
-XBB.1.5, combined with its subvariants and other variants with the mutation S:F486P (like XBF, and XBB.1.9.1 which may have a further fitness advantage), are still collectively growing in all regions of Canada. Some other select subvariants are also increasing in some regions of Canada, but not as significantly or with lower numbers. Differences between some provinces continue - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
+XBB.1.5 is dominant in all regions of Canada. Other variants with the mutation S:F486P, in particular XBB.1.9.1 and other select subvariants of XBB.1.9, or XBB.1.16, continue to grow and include some consistent growth advantages over XBB.1.5. Some other select subvariants of XBB.1.5, BQ.1 and BA.2.75 are also increasing in some regions of Canada, but not as significantly or with lower numbers. Some mutations of recent note are more challenging to track, since they are in overlapping ORFs with different levels of impact on each ORF (i.e. mutation ORF9b:I5T which causes a synonymous change in an overlapping ORF that tends to be more tracked). Differences between some provinces continue but are less pronounced now due to the recent prevalence of XBB.1.5 - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics are variants of interest added since the last update of this summary):
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics denote variants/mutations of interest added since the last update of this summary, but they do not necessarily represent the primary variants of interest):
 
-* BM.1.1.1
-* BM.2 (high predicted affinity for the human ACE2 receptor)
-* BN.1* subvariants due to high predicted immune evasion
-* BQ.1.8 with S:F486P and S:L452R (seen recently in Ontario and _now also in other provinces_)
-* BQ.1* select new descendants, particularly BQ.1.1.5 with S:Y453F
-* BW.1, BW.1.1, BW.1.1.2 (descendants of BA.5.6, with S:F486A)
-* CH.1.1 descendants (CH.1.1 is descendant of BM which is BA.2.75.3 with S:L452R) and sublineages
-* DN.1/DN.1.1 (BQ.1.1.5 descendants with S:K147N) - that also has S:Y453F (and so is actually DN.1.1.1 but this isn’t in databases yet)
-* DN.1.1.1 (highest predicted affinity for the human ACE2 receptor)
-* DS.1 (highest predicted immune evasion)
-* EF.1 (BQ.1.1.13 subvariant)
-* EG.1 (a XBB.1.9.1 subvariant)
-* EK variants (subvariants ofXBB.1.5.13)
-* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.9.1, _XBB.1.9.2_, XBB.1.10, XBB.1.12, _XBB.1.16_, XBB.6.1 and subvariants with S:F486P (or other mutations of note like S:Y453F)
+* BQ.1* select new descendants (see plots below)
+* CH.1.1 descendants (CH.1.1 is descendant of BM which is BA.2.75.3 with S:L452R)
+* _DV.1 (BA.2.75 descendant - but not growing everywhere)_
+* EF.1.1.1 (BQ.1.1.13 descendant)
+* EG.1 (an XBB.1.9.1 subvariant)
+* EK variants (subvariants of XBB.1.5.13)
+* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.1.15, XBB.1.9.1, XBB.1.9.2, XBB.1.10, XBB.1.12, XBB.1.16, XBB.6.1 and subvariants with S:F486P (and/or other mutations of note like S:Y453F and _S:Q613H_)
 * XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
-* XBL (has S:F486P and immune evasion like XBB.1.5)
 
 # Omicron sublineages in Canada 
 
