@@ -1,0 +1,187 @@
+// informed by http://emilydolson.github.io/D3-visualising-data/09-d3exit.html
+
+console = d3.window(div.node()).console;
+console.log(data);
+
+// parse dates
+var dateparser = d3.timeParse("%Y-%m-%d"),
+    tips = data.tips.map(
+      x => ({ ...x, display: true, coldate: dateparser(x.coldate) })),
+    dates = tips.map(d => d.coldate),
+    palette = data.palette;
+
+// append entry for "other"
+palette["other"] = ["#777777"];
+
+var ri_wide = 130,  // width of input column
+    rtt_input = div.append("div")
+                   .attr("id", "rtt-input")
+                   .style("width", ri_wide+"px")
+                   .style("height", height+"px")
+                   .style("vertical-align", "top")
+                   .style("text-align", "right")
+                   .style("display", "inline-block");
+
+var rttdiv = div.append("div")
+                .attr("id", "rtt-div")
+                .style("width", width-ri_wide+"px")
+                .style("height", height+"px")
+                //.style("margin-top", "-30px")
+                .style("display", "inline-block");
+
+// render checkbox inputs labelled by PANGO group
+rtt_input.selectAll("input")
+  .data(Object.entries(data.palette))
+  .enter()
+  .append("label")
+  .text(function(d) { return d[0]; })
+  .append("input")
+  .attr("type", "checkbox")
+  .attr("class", "rtt_cb")
+  .attr("value", function(d) { return d[0]; })
+  .style("accent-color", function(d) { return d[1][0]; })
+  .attr("checked", true)
+  .attr("id", function(d,i) { return i; })
+  .attr("for", function(d,i) { return i; });
+
+// render inputs on separate lines
+rtt_input.selectAll("label")
+  .append("br");
+
+
+// bind event listener to checkboxes
+rtt_input.selectAll(".rtt_cb")
+  .on("change", function() {
+    var pgroup = tips.filter(x => x.pango == this.value);
+    pgroup.map(x => x.display = this.checked);
+    
+    /*
+    if (this.checked) {
+      // restore group from original data
+      filtered_tips = filtered_tips.concat(pgroup);
+    } else {
+      // remove group from data
+      filtered_tips = filtered_tips.filter(x => x.pango != this.value);
+    }
+    */
+    
+    //console.log(filtered_tips);
+    //console.log(tips);
+    rtt_update();
+  })
+
+
+// prepare SVG for scatterplot
+var rttsvg = rttdiv.append("svg")
+                   .attr("id", "rtt-svg")
+                   .attr("width", (width-ri_wide)+"px")
+                   .attr("height", (height)+"px");
+
+// add margins
+var margin = {top: 10, right: 10, bottom: 60, left: 60},
+    // dimensions for the graph
+    gwidth = width - ri_wide - margin.left - margin.right,
+    gheight = height - margin.top - margin.bottom;
+  
+var rttg = rttsvg.append("g")
+                 .attr("height", gheight+"px")
+                 .attr("width", gwidth+"px")
+                 .attr("id", "rtt-group")
+                 .attr("transform", "translate(" + margin.left + ',' + 
+                       margin.top + ")");
+                       
+// set up plotting scales
+var ymax = d3.max(tips, d => +d.div),
+    ymin = d3.min(tips, d => +d.div);
+
+var yScale = d3.scaleLinear()
+               .domain([ymin, ymax])
+               .range([gheight, 0]);
+
+// map date range to graph region width
+var xScale = d3.scaleLinear()
+               .domain(d3.extent(dates))
+               .range([0, gwidth]);
+
+
+// draw x-axis (dates)
+var rtt_xaxis = d3.axisBottom(xScale)
+                  .tickFormat(function(date) {
+                    return d3.timeFormat('%b \'%y')(date);
+                  });
+                  
+rttg.append("g")
+    .attr("class", "xaxis")
+    .attr("transform", "translate(" + xScale(d3.min(dates)) + 
+          "," + gheight + ")")
+    .call(rtt_xaxis);
+
+rttsvg.append("text")
+      .attr("class", "xlabel")
+      .attr("text-anchor", "middle")
+      .attr("x", gwidth/2 + margin.left)
+      .attr("y", gheight + margin.top + margin.bottom - 10)
+      .text("Sampling date");
+
+// draw y-axis (divergence)
+var rtt_yaxis = d3.axisLeft(yScale);
+
+rttg.append("g")
+    .attr("class", "yaxis")
+    .call(rtt_yaxis);
+
+// https://gist.github.com/mbostock/4403522
+rttsvg.append("text")
+      .attr("class", "ylabel")
+      .attr("x", 0)
+      .attr("y", margin.left - 30)
+      .attr("transform", "translate(0,"+(gheight/2)+")rotate(-90)")
+      .attr("text-anchor", "middle")
+      .text("Divergence from root");
+
+// draw points
+rttg.selectAll("circle")
+    .data(tips)
+    .enter()
+    .append("circle")
+    //.filter(function(d) { return d.display; })
+    .attr("cx", function(d, i) { return xScale(dates[i]); })
+    .attr("cy", function(d) { return yScale(d.div); })
+    .attr("r", 3)
+    .style("fill", function(d) {
+     if (d.pango in palette) {
+       return palette[d.pango][0];
+     } else {
+       return "#777";
+     }
+    });
+
+
+function rtt_update() {
+  // recalculate plot region
+  var filtered = tips.filter(x => x.display);
+  
+  dates = filtered.map(x => x.coldate);
+  xScale.domain(d3.extent(dates));
+  
+  ymax = d3.max(filtered, d => +d.div),
+  ymin = d3.min(filtered, d => +d.div);
+  yScale.domain([ymin, ymax]);
+  
+  rttg.select(".xaxis")
+      .transition().duration(500)
+      .call(rtt_xaxis);
+      
+  rttg.select(".yaxis")
+      .transition().duration(500)
+      .call(rtt_yaxis);
+  
+  rttg.selectAll("circle")
+      .data(tips)
+      .transition().duration(500)
+      .attr("r", function(d) { return d.display ? 3 : 0; } )
+      .attr("cx", function(d) { return xScale(d.coldate); })
+      .attr("cy", function(d) { return yScale(d.div); });
+}
+
+
