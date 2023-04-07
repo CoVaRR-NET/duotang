@@ -261,15 +261,6 @@ XBB.1.5 is dominant in all regions of Canada. Other variants with the mutation S
 + ORF9b:I5T (note its a synonymous mutation in the overlapping N gene)
 + ORF9b:N55S (synonymous mutation in N)
 
-* BQ.1* select new descendants (see plots below)
-* CH.1.1 descendants (CH.1.1 is descendant of BM which is BA.2.75.3 with S:L452R)
-* _DV.1 (BA.2.75 descendant - but not growing everywhere)_
-* EF.1.1.1 (BQ.1.1.13 descendant)
-* EG.1 (an XBB.1.9.1 subvariant)
-* EK variants (subvariants of XBB.1.5.13)
-* XBB.1, XBB.1.5, XBB.1.5.13, XBB.1.1.15, XBB.1.9.1, XBB.1.9.2, XBB.1.10, XBB.1.12, XBB.1.16, XBB.6.1 and subvariants with S:F486P (and/or other mutations of note like S:Y453F and _S:Q613H_)
-* XBF subvariants (BA.5.2/CJ.1 recombinant; have S:F486P and immune evasion like XBB.1.5)
-
 # Omicron sublineages in Canada 
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
