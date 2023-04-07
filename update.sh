@@ -500,14 +500,14 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f archive/readme.md
 	git add -f downloads/*
 	git add -f duotang*html
-	git add -f duotangCurVer
+	#git add -f duotangCurVer
 	git add -f DuotangUpdateStatus.json
 	git commit -m "Update: $datestamp"
 	git push origin dev
 	sed  "s/{updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
 	gh pr create -B main -F ./whatsnew.send.md --title "Update: $datestamp"
 	#python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
-	python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
+	python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html #--file duotang-sandbox.html --file duotang-GSD.html
 	rm ./whatsnew.send.md
 	#git checkout dev
 fi
