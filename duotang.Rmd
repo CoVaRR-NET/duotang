@@ -255,11 +255,11 @@ XBB.1.5 is dominant in all regions of Canada. Other variants with the mutation S
 * EG.1 (an XBB.1.9.1 subvariant)
 * EK variants (subvariants of XBB.1.5.13)
 * XBB.1.5.7, XBB.1.5.13, XBB.1.1.15, XBB.1.16, XBB.1.9.1, XBB.1.9.2 and subvariants with mutations of note like: 
-+ S:F486P, S:Y453F, S:Q613H, S:E180V, S:T478R (aka S:K478R - the S:T478K mutation occurred first)
-+ ORF1a:L3829F (aka NSP6_L260F; but previously very prevalent)
-+ ORF1b:D1746Y (aka NSP14_D222Y)
-+ ORF9b:I5T (note its a synonymous mutation in the overlapping N gene)
-+ ORF9b:N55S (synonymous mutation in N)
+  + S:F486P, S:Y453F, S:Q613H, S:E180V, S:T478R (aka S:K478R - the S:T478K mutation occurred first)
+  + ORF1a:L3829F (aka NSP6_L260F; but previously very prevalent)
+  + ORF1b:D1746Y (aka NSP14_D222Y)
+  + ORF9b:I5T (note its a synonymous mutation in the overlapping N gene)
+  + ORF9b:N55S (synonymous mutation in N)
 
 # Omicron sublineages in Canada 
 
