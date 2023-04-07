@@ -244,11 +244,22 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 # Current situation
 
-**[NOTE: Added a disclaimer above that the page below may take up to 30 seconds to load. Also, fixed the values for the selection coefficients to not be given on a percent basis.]**
+**[NOTE: No data update this week but selection plots below are now versus XBB.1.5. and this current situation text has been updated.]**
 
-XBB.1.5 is dominant in all regions of Canada. Other variants with the mutation S:F486P, in particular XBB.1.9.1 and other select subvariants of XBB.1.9, or XBB.1.16, continue to grow and include some consistent growth advantages over XBB.1.5. Some other select subvariants of XBB.1.5, BQ.1 and BA.2.75 are also increasing in some regions of Canada, but not as significantly or with lower numbers. Some mutations of recent note are more challenging to track, since they are in overlapping ORFs with different levels of impact on each ORF (i.e. mutation ORF9b:I5T which causes a synonymous change in an overlapping ORF that tends to be more tracked). Differences between some provinces continue but are less pronounced now due to the recent prevalence of XBB.1.5 - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
+XBB.1.5 is dominant in all regions of Canada. Other variants with the mutation S:F486P, in particular XBB.1.9.1 and other select subvariants of XBB.1.9, or XBB.1.16, continue to grow and include some consistent growth advantages over XBB.1.5. Some other select subvariants of XBB.1.5, BQ.1 and BA.2.75 are also increasing in some regions of Canada, but not as significantly or with lower numbers. Some mutations of recent note are more challenging to track, since they are in overlapping ORFs with different levels of impact on each ORF (i.e. mutation ORF9b:I5T which causes a synonymous change in the N gene that tends to be more tracked by some). Differences between some provinces continue but are less pronounced now due to the recent prevalence of XBB.1.5. However, some differences exist regarding when some relatively new variants have recently appeared in provinces - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
-**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some of these are not yet detected in Canada. Italics denote variants/mutations of interest added since the last update of this summary, but they do not necessarily represent the primary variants of interest):
+**Variants of current interest**, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (note that some may not yet be detected in Canada). Italics denote those added since the last update of this summary, but they do not necessarily represent the primary variants of interest - the latter are usually highlighted in the text above):
+
+* DV.1 (BA.2.75 descendant - but not growing everywhere)
+* EF.1.1.1 (BQ.1.1.13 descendant)
+* EG.1 (an XBB.1.9.1 subvariant)
+* EK variants (subvariants of XBB.1.5.13)
+* XBB.1.5.7, XBB.1.5.13, XBB.1.1.15, XBB.1.16, XBB.1.9.1, XBB.1.9.2 and subvariants with mutations of note like: 
++ S:F486P, S:Y453F, S:Q613H, S:E180V, S:T478R (aka S:K478R - the S:T478K mutation occurred first)
++ ORF1a:L3829F (aka NSP6_L260F; but previously very prevalent)
++ ORF1b:D1746Y (aka NSP14_D222Y)
++ ORF9b:I5T (note its a synonymous mutation in the overlapping N gene)
++ ORF9b:N55S (synonymous mutation in N)
 
 * BQ.1* select new descendants (see plots below)
 * CH.1.1 descendants (CH.1.1 is descendant of BM which is BA.2.75.3 with S:L452R)
