@@ -244,7 +244,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 # Current situation
 
-**[NOTE: No data update this week but selection plots below are now versus XBB.1.5. and this current situation text has been updated.]**
+**[NOTE: No data update this week but selection plots are now versus XBB.1.5., an XBB diversity tree was added, the RTT plots are now interactive, and there is a new data source for Ontario case counts.]**
 
 XBB.1.5 is dominant in all regions of Canada. Other variants with the mutation S:F486P, in particular XBB.1.9.1 and other select subvariants of XBB.1.9, or XBB.1.16, continue to grow and include some consistent growth advantages over XBB.1.5. Some other select subvariants of XBB.1.5, BQ.1 and BA.2.75 are also increasing in some regions of Canada, but not as significantly or with lower numbers. Some mutations of recent note are more challenging to track, since they are in overlapping ORFs with different levels of impact on each ORF (i.e. mutation ORF9b:I5T which causes a synonymous change in the N gene that tends to be more tracked by some). Differences between some provinces continue but are less pronounced now due to the recent prevalence of XBB.1.5. However, some differences exist regarding when some relatively new variants have recently appeared in provinces - see the evolving plots below of “Fastest growing lineages in Canada”, and “case count trends by variant”, per province.
 
