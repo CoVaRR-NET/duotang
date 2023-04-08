@@ -2,31 +2,31 @@
 The slope of root-to-tip plots over time provide an estimate of the substitution rate.
 A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
-```{r, dpi=300}
-
-get.tipnames <- function(tip.label) {
-  sapply(tip.label, function(x) {
-    tokens <- strsplit(x, "_")[[1]]
-    ntok <- length(tokens)
-    paste(tokens[1:(ntok-2)], collapse='_')
-  })
-}
+```{r}
+require(MASS)
 
 source("scripts/fit-rtt.R")
-fit1 <- fit.rtt(paste0(params$datadir, "/aligned_allSeqs_sample1.rtt.nwk"), plot=TRUE)
+rtt1 <- fit.rtt(paste0(params$datadir, "/aligned_allSeqs_sample1.rtt.nwk"))
+fit1 <- rtt1$fits
 
+# generate interactive plot
+pal <- VOCVOI$color
+names(pal) <- VOCVOI$name
+
+r2d3(data=toJSON(list(tips=rtt1$tips, palette=as.list(pal))), 
+     script="js/rtt.js", container="div", elementId="rtt-element")
 ```
 
 
 ```{r}
-fit2 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample2.rtt.nwk"), plot=FALSE)
-fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"), plot=FALSE)
+fit2 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample2.rtt.nwk"))$fits
+fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"))$fits
 ```
 
 
-## Molecular clock estimates
+### Molecular clock estimates (based on three independent subsamples)
 
-Here we show the estimate of the substitution rate based on 3 independent subsamples of different variants of interest, with their 95% confidence interval.
+Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest, with their 95% confidence interval.
 
 ```{r}
 
@@ -55,3 +55,5 @@ if(!is.null(fit1)){
 }
 
 ```
+
+

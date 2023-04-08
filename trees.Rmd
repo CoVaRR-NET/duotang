@@ -9,6 +9,8 @@ source("scripts/tree.r")
 mltree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.rtt.nwk"))
 ttree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.timetree.nwk"))
 recombTTree <- read.tree(paste0(params$datadir,"/aligned_recombinant_XBBS_sample1.timetree.nwk"))
+recombMLree <- read.tree(paste0(params$datadir,"/aligned_recombinant_XBBS_sample1.rtt.nwk"))
+
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
 
@@ -24,9 +26,9 @@ fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "lineage", "pango_group","month","week", "GID", "isolate")
 # extract rows from metadata table that correspond to ttree 
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
-
 # sort rows to match tip labels in tree
 metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
+
 
 #omi tree metadata
 metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
@@ -38,6 +40,9 @@ mmetasub_recomb <- mmetasub_recomb[match(recombTTree$tip.label, mmetasub_recomb$
 #scale to number of mutations
 mltree$edge.length <- mltree$edge.length*29903
 mltree <- ladderize(mltree, FALSE)
+recombMLree$edge.length <- recombMLree$edge.length*29903
+recombMLree <- ladderize(recombMLree, FALSE)
+
 
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
@@ -75,6 +80,7 @@ recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree
 
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
+recombDiversityTreeJsonObj <- DrawTree(recombMLree, mmetasub_recomb, "recombmltree", presetColors, "lineage", fieldnames=fieldnames)
 
 ### omicron diversity tree
 MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
@@ -106,6 +112,13 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
     r2d3(data=OmicrondiversityTreeJsonObj, 
      script="js/tree.js", container="div", elementId="omimltree-element")
+```
+
+## XBB* Diversity tree
+```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
+    r2d3(data=recombDiversityTreeJsonObj, 
+     script="js/tree.js", container="div", elementId="recombmltree-element")
+
 ```
 
 ## {-}

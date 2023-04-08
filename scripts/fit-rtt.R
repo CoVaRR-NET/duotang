@@ -1,5 +1,8 @@
 # RTT code contributed by Art Poon
 
+source("scripts/tree.r")
+require(MASS)
+
 blobs <- function(x, y, col, cex=1) {
   points(x, y, pch=21, cex=cex)
   points(x, y, bg=col, col=rgb(0,0,0,0), pch=21, cex=cex)
@@ -10,66 +13,68 @@ dlines <- function(x, y, col) {
   lines(x, y, col=col)
 }
 
-fit.rtt <- function(path, plot=FALSE) {
+
+#' fit.rtt
+#' Fit root-to-tip regression to a rooted maximum likelihood tree, in which 
+#' branch lengths are measured in units of expected numbers of substitutions 
+#' per site.
+#' @param path:  path to file containing a Newick tree string
+fit.rtt <- function(path) {
   rooted <- read.tree(path)
-  rooted$tip.label <- get.tipnames(rooted$tip.label)
+  
+  # link to metadata
+  rooted$tip.label <- reduce.tipnames(rooted$tip.label)
+  
+  #scale to number of mutations
+  rooted$edge.length <- rooted$edge.length*29903
+  
+  # extract rows from metadata table that correspond to ttree 
   metadataRTT <- meta[meta$fasta_header_name %in% rooted$tip.label, ]
   index1 <- match(rooted$tip.label, metadataRTT$fasta_header_name)
   if(sum(is.na(index1))!=0){
     print("some samples in the tree do not have sampling dates inthe metadatas")
     return()
   }
-  date <- metadataRTT$sample_collection_date[index1]
-  pg <- metadataRTT$pango_group[index1]
-  #print(metadataRTT[metadataRTT$pango_group=="other",]$lineage)
-  date <- as.Date(date)
-  # total branch length from root to each tip
-  div <- node.depth.edgelength(rooted)[1:Ntip(rooted)]
   
-  fit0 <- rlm(div[pg=='other'] ~ date[pg=='other'])
+  # package information for JavaScript
+  tips <- data.frame(
+    label = rooted$tip.label,
+    pango = metadataRTT$pango_group[index1],
+    div = node.depth.edgelength(rooted)[1:Ntip(rooted)],
+    coldate = as.Date(metadataRTT$sample_collection_date[index1])
+  )
+  rownames(tips) <- NULL
+  
+  # fit regressions for each PANGO group
+  coldate <- as.Date(tips$coldate)
+  pg <- tips$pango
+  div <- tips$div
+  
+  fit0 <- rlm(div[pg=='other'] ~ coldate[pg=='other'])
   fits <- list(other=fit0)
-  
-  if (plot) {
-    par(mar=c(5,5,0,1))
-    plot(date, div, type='n', las=1, cex.axis=0.6, cex.lab=0.7, bty='n',
-         xaxt='n', xlab="Sample collection date", ylab="Divergence from root")
-    xx <- floor_date(seq(min(date), max(date), length.out=5), unit="months")
-    axis(side=1, at=xx, label=format(xx, "%b %Y"), cex.axis=0.6)  
-    blobs(date[pg=='other'], div[pg=='other'], col='grey', cex=1)
-    abline(fit0, col='gray50')
-  }
-  
   for (i in 1:nrow(VOCVOI)) {
     variant <- VOCVOI$name[i]
-    if (sum(pg==variant) < 3) {
+    if (sum(pg==variant, na.rm=T) < 3) {
       next
     }
-    x <- date[pg==variant]
+    x <- coldate[pg==variant]
     if (all(is.na(x))) next
     y <- div[pg==variant]
     
     suppressWarnings(fit <- rlm(y ~ x))
     fits[[variant]] <- fit
-    
-    if (plot) {
-      blobs(x, y, col=VOCVOI$color[i], cex=0.8)
-      if (variant == "Recombinants") {next}
-      dlines(fit$x[,2], predict(fit), col=VOCVOI$color[i])  
-    }
   }
   
-  if (plot) {
-    legend(x=min(date), y=max(div), legend=VOCVOI$name, pch=21,
-           pt.bg=VOCVOI$color, bty='n', cex=0.8)    
-  }
-  fits
+  list(fits=fits, tips=tips)
 }
 
+# deprecated?
 confint.rlm <- function(object, ...) {
   # https://stackoverflow.com/questions/49156932/getting-confidence-intervals-for-robust-regression-coefficient-massrlm
   object$df.residual <- MASS:::summary.rlm(object)$df[2]
   confint.lm(object, ...)
 }
+
 get.ci <- function(fits) {
   ci <- lapply(fits, confint.rlm)
   est <- data.frame(
