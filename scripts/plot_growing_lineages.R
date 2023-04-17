@@ -24,6 +24,9 @@ plot_growing_lineage <- function(r, makeplot=TRUE){
   d$low_CI=as.numeric(d$low_CI)
   d$high_CI=as.numeric(d$high_CI)
   d$size=as.numeric(d$size)
+  
+  d <- d%>%unique()
+  
   if(makeplot){
     bins=c(0,20,40,80,100,200,500,10000000)
     labelsstart <- head(gsub("(?<!^)(\\d{3})$", ",\\1", bins+1, perl=T),-1)
