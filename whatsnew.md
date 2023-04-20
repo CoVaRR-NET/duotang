@@ -2,7 +2,6 @@ Duotang update {updatedate}:
 
 Detailed changes:
 ## duotang.html:
-* The RTT plot is now interactive (Thank you @Art!)(Closes #134)
-* The reference variant for the subvariant selection plots is now XBB.1.5 (Closes #174)
-* Switch to new data source for Ontario's case count data. (Closes #172)
-* Added a XBB diversity tree. (Closes #176)
+* In the fastest growing lineages plot, the points for Canada plot are enlarged if a lineage is growing rapidly in multiple provinces. (Closes #186)
+* Increase the DPI of various plots (Closes #188)
+* Relabel selection plots title for BA.2 sublineages to BA.2 and XBB sublineages (Closes #183)

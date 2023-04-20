@@ -324,7 +324,7 @@ link = DisplayHTMLTableDownloadLink(dataDownload, "GrowingLineages")
 
 # Sublineages selection 
 
-## BA.2 sublineages {.tabset .tabset-fade}
+## BA.2 and XBB sublineages {.tabset .tabset-fade}
 
 Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
@@ -364,7 +364,7 @@ for (i in 1:length(all.regions$name)){
 
 ```
 
-```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=50}
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150}
 #prints the BA.2 plots
 apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
@@ -394,7 +394,7 @@ apply(all.regions,1,function(reg){
 
 Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
-```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=50}
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150}
 #prints the BA.5 Plots
 apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
