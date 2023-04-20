@@ -136,18 +136,18 @@ latelineage_pangotree <- makepangotree(unique(
 
 ## 2. LOAD epidemiological data (PHAC)
 
-#from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
+# #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
 epidataCANall <- read.csv(paste0(params$datadir, "/CanadianEpiData.csv"))
 epidataCANall$date <- as.Date(epidataCANall$date)
 epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
 epidate <- tail(epidataCANall,1)$date #download date
 
 epidataCANall$previousvalue <- 0
-#small loop to get the numtoday column from previous versions of this file from the cumulative cases
+# #small loop to get the numtoday column from previous versions of this file from the cumulative cases
 for(row in 1:nrow(epidataCANall)) {
   p <- epidataCANall[row, "prname"]
-  subdf <- epidataCANall[which( 
-    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p) 
+  subdf <- epidataCANall[which(
+    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p)
     ), ]
   if(nrow(subdf) != 0) {
     nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
