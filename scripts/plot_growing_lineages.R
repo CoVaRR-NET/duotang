@@ -1,6 +1,6 @@
 plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
-  r = paramselected[1:n]
-  coefficientTable = coefficientTable
+  #r = paramselected[1:n]
+  #coefficientTable = coefficientTable
   d = data.frame(lineage = character(),
                  sel_coeff = numeric(),
                  low_CI = numeric(),
