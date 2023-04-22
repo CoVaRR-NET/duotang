@@ -29,14 +29,15 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
   
   d <- d%>%unique()
 
-  if (unique(d$region) == "Canada" & class(coefficientTable) == "data.frame" ){
-    #generate the circle with borders if in more than 1 provinc for canada only plot
-    regionPresenceTable <- coefficientTable %>% dplyr::select(lineage, region) %>% filter (region != "Canada") %>% unique() %>% group_by(lineage) %>% summarise(NumRegions=n()) 
-    
-    d <- d %>% left_join(regionPresenceTable, by="lineage") %>% 
-      mutate (MultiRegion = ifelse(NumRegions > 1, 1, 0)) %>% dplyr::select(-NumRegions) %>% mutate(MultiRegion = replace_na(MultiRegion, 0))
-
+  if (class(coefficientTable) == "data.frame" ){
+    if (unique(d$region) == "Canada"){
+      #generate the circle with borders if in more than 1 provinc for canada only plot
+      regionPresenceTable <- coefficientTable %>% dplyr::select(lineage, region) %>% filter (region != "Canada") %>% unique() %>% group_by(lineage) %>% summarise(NumRegions=n()) 
+      
+      d <- d %>% left_join(regionPresenceTable, by="lineage") %>% 
+        mutate (MultiRegion = ifelse(NumRegions > 1, 1, 0)) %>% dplyr::select(-NumRegions) %>% mutate(MultiRegion = replace_na(MultiRegion, 0))
     }
+  }
 #iew(d)
   if(makeplot){
     bins=c(0,20,40,80,100,200,500,10000000)
@@ -52,12 +53,15 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     maxdate=max((meta %>%  filter(province %in% get.province.list(r[[1]]$region)))$sample_collection_date)
     title=paste("Most recent sequence date:",format(maxdate, "%B %d, %Y"))
     
-    if (unique(d$region) == "Canada" & class(coefficientTable) == "data.frame" ){
-      p <- ggplot(d, aes(x=lineage, y=sel_coeff,colour=sequence_count, stroke=MultiRegion)) +
-        geom_point(size = 5, shape=21)
-    } else{
+    if (class(coefficientTable) == "data.frame" ){
+      if (unique(d$region) == "Canada")
+      {
+        p <- ggplot(d, aes(x=lineage, y=sel_coeff,colour=sequence_count, stroke=MultiRegion)) +
+          geom_point(size = 5, shape=21)
+      } else{
       p <- ggplot(d, aes(x=lineage, y=sel_coeff,colour=sequence_count))+
         geom_point(size = 5)
+      }
     }
     
     p <- p +
