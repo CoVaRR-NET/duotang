@@ -28,9 +28,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
   d$size=as.numeric(d$size)
   
   d <- d%>%unique()
-  
-  unique(d$region)
-  !is.na(coefficientTable)
+
   if (unique(d$region) == "Canada" & class(coefficientTable) == "data.frame" ){
     #generate the circle with borders if in more than 1 provinc for canada only plot
     regionPresenceTable <- coefficientTable %>% dplyr::select(lineage, region) %>% filter (region != "Canada") %>% unique() %>% group_by(lineage) %>% summarise(NumRegions=n()) 

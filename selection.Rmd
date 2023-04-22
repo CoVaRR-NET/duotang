@@ -220,7 +220,7 @@ apply(all.regions,1,function(reg){
 
 Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants, like `r individualSelectionPlotReference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
-```{r, echo = F, warning=FALSE, message=FALSE}
+```{r getCoefficientTable, echo = F, warning=FALSE, message=FALSE}
 source("scripts/plot_growing_lineages.R")
 
 paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
@@ -238,7 +238,7 @@ coefficientTable <- plot_growing_lineage(paramselected,makeplot=FALSE)
 Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
 
 
-```{r, results='asis', echo = F, warning=FALSE, fig.height=7}
+```{r buildStrictoPlots, results='asis', echo = F, warning=FALSE, fig.height=7}
 
 
 selectparam <- function(p,reg){
@@ -277,7 +277,7 @@ This plot highlights the groups of related lineages that are growing fastest (e.
 Again, Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
 
 
-```{r tabs, results='asis', echo=FALSE, warning=FALSE, fig.height=7}
+```{r buildNonStrictoPlots, results='asis', echo=FALSE, warning=FALSE, fig.height=7}
 source("scripts/plot_growing_lineages.R")
 selectparam <- function(p,reg){
   if(!any(is.na(p$fit))){
