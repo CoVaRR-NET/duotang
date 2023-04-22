@@ -912,6 +912,7 @@ BN.1.2	Alias of B.1.1.529.2.75.5.1.2, Singapore/England, E:D72G
 BN.1.2.1	Alias of B.1.1.529.2.75.5.1.2.1, England/Portugal, S:T470N
 BN.1.2.2	Alias of B.1.1.529.2.75.5.1.2.2, C29546T
 BN.1.2.3	Alias of B.1.1.529.2.75.5.1.2.3, C1471T
+FR.1	Alias of B.1.1.529.2.75.5.1.2.3.1, found mainly in Japan, Taiwan and USA, from pango-designation issue #1814
 BN.1.2.4	Alias of B.1.1.529.2.75.5.1.2.4, ORF1b:D1746H
 BN.1.3	Alias of B.1.1.529.2.75.5.1.3, India, ORF3a:T229I
 BN.1.3.1	Alias of B.1.1.529.2.75.5.1.3.1, found mainly in Israel, England and Denmark, from pango-designation issue #1257
@@ -2695,6 +2696,7 @@ XBB.1.30	Defined by ORF1b:K2557R, South East Asia
 XBB.1.31	Defined by S:453F and S:478R, Indonesia/Singapore
 XBB.1.32	Defined by ORF1a:E148D, Philippines
 XBB.1.33	Defined by S:A376T, found mainly in Italy, from pango-designation issue #1879
+XBB.1.34	Defined by S:681R, found mainly in USA and UK, from pango-designation issue #1621
 XBB.2	Defined by S:D253G, from issue #1173
 XBB.2.1	Defined by S:N764R (C23853G), two step mutation on top of C23854A (S:N764K defining of all Omicrons)
 XBB.2.2	Defined by S:Q613H
@@ -2704,6 +2706,8 @@ XBB.2.3.2	Defined by S:G184V, ORF1a:R2159W, India, from #1776
 XBB.2.3.3	Defined by S:182N, India/USA
 XBB.2.3.4	Defined by S:478Q, India
 XBB.2.3.5	Defined by S:K478N, found mainly in USA and India, from pango-designation issue #1846
+XBB.2.3.6	Defined by N:T166I, mainly Singapore
+XBB.2.3.7	Defined by ORF1a:T4087I
 XBB.2.4	Defined by S:S486P, Spain/Denmark/Germany
 XBB.2.5	S:Q613H, from https://github.com/jmcbroome/auto-pango-designation/pull/193
 XBB.2.6	Mostly Peru, C5144T, T5731A
@@ -2760,6 +2764,9 @@ XBJ.4	S:G485D, Japan/Thailand
 XBK	Recombinant lineage of BA.5.2 and CJ.1, Denmark/Europe, from pango-designation issue #1418
 XBK.1	S:P1162S, from #1551 and https://github.com/jmcbroome/auto-pango-designation/pull/193
 XBL	Recombinant lineage of XBB.1 with S:F486P and BA.2.75, Malaysia, from issue #1532
+XBL.1	S:V635I, T2461C
+XBL.2	A1393G
+XBL.3	C11824T, G14400T
 XBM	Recombinant lineage of BA.2.76 and BF.3, India/USA/Canada, from issue #1441
 XBN	Recombinant lineage of BA.2.75 and XBB.3, mainly found in USA, from pango-designation issue #1296
 XBP	Recombinant lineage of BA.2.75* and BQ.1*, predominantly in England and Canada, from pango-designation issue #1393
