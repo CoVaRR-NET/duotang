@@ -1,6 +1,6 @@
-plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=NA){
-  #r = paramselected[1:n]
-  #coefficientTable = coefficientTable
+plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
+  r = paramselected[1:n]
+  coefficientTable = coefficientTable
   d = data.frame(lineage = character(),
                  sel_coeff = numeric(),
                  low_CI = numeric(),
@@ -29,8 +29,9 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=NA){
   
   d <- d%>%unique()
   
-  
-  if (unique(d$region) == "Canada" &  !is.na(coefficientTable)){
+  unique(d$region)
+  !is.na(coefficientTable)
+  if (unique(d$region) == "Canada" & class(coefficientTable) == "data.frame" ){
     #generate the circle with borders if in more than 1 provinc for canada only plot
     regionPresenceTable <- coefficientTable %>% dplyr::select(lineage, region) %>% filter (region != "Canada") %>% unique() %>% group_by(lineage) %>% summarise(NumRegions=n()) 
     
@@ -53,7 +54,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=NA){
     maxdate=max((meta %>%  filter(province %in% get.province.list(r[[1]]$region)))$sample_collection_date)
     title=paste("Most recent sequence date:",format(maxdate, "%B %d, %Y"))
     
-    if (unique(d$region) == "Canada" & !is.na(coefficientTable) ){
+    if (unique(d$region) == "Canada" & class(coefficientTable) == "data.frame" ){
       p <- ggplot(d, aes(x=lineage, y=sel_coeff,colour=sequence_count, stroke=MultiRegion)) +
         geom_point(size = 5, shape=21)
     } else{
