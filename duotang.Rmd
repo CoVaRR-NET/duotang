@@ -260,7 +260,11 @@ The proportion of cases that contain the mutation S:F486P continues to grow in C
 * XBB.1.9.1, XBB.1.9.2 **_(which have non-spike mutations of note and in particular those with S:Q613H)_**
 * XBB.2.3 (has mutation S:P521S that could increase human ACE2 receptor binding/infectivity, **_with an interest in those also with mutation 478R)_**
 * XBC.1.6 (a “Deltacron” variant - recombinant lineage of BA.2 and B.1.617.2)
-* and sublineages with additional combinations of the mutations below:
+
+...and sublineages with additional combinations of the mutations below.
+
+Mutations of interest include:
+
   + S:E180V **_(though this may have a detrimental effect to XBB.1.16)_**
   + S:Y453F **_(could increase binding to the human ACE2 receptor)_**
   + **_S:F456L (evidence of increased immune evasion versus recent variants and a mutation growing in prevalence in multiple regions)_**
