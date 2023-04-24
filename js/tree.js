@@ -213,11 +213,11 @@ function updateTree(drawNodes = false) {
                           let pos = d3.select(this).node().getBoundingClientRect();
                           //populate the popout box text with ALL metadata columns
                           var toolTipText = "<p>"  
-							for(var i = 0; i < metadataFields.length; i++){
-							  cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
-							  cleanName = cleanName.split('_').join(' ');
-							  toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
-							}
+            							for(var i = 0; i < metadataFields.length; i++){
+            							  cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
+            							  cleanName = cleanName.split('_').join(' ');
+            							  toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
+            							}
                           toolTipText = toolTipText + "</p>";
                           tooltip.html(toolTipText)
                               .style("visibility", "visible")
@@ -228,6 +228,7 @@ function updateTree(drawNodes = false) {
                   .on("mouseout", function(e, d) {
                     tooltip.style("visibility", "hidden");
                   })
+                  
   
   //render the tip node circles
   if (drawNodes){
@@ -258,6 +259,15 @@ function updateTree(drawNodes = false) {
     })
     .on("mouseout", function(e, d) {
       tooltip.style("visibility", "hidden");
+    })
+    .on("click", function(e,d) {
+      navigator.clipboard.writeText(d.isolate)    
+      .then(function() {
+        console.log("Copied to clipboard: " + d.isolate);
+      })
+      .catch(function(error) {
+        console.error("Error copying to clipboard: ", error);
+      });
     })
   }
   // draw x-axis labels
