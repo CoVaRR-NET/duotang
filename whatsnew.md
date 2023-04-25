@@ -2,7 +2,6 @@ Duotang update {updatedate}:
 
 Detailed changes:
 ## duotang.html:
-* In the fastest growing lineages plot, the points for Canada plot are enlarged if a lineage is growing rapidly in multiple provinces. (Closes #186)
-* Increase the DPI of various plots (Closes #188)
-* Relabel selection plots title for BA.2 sublineages to BA.2 and XBB sublineages (Closes #183)
-* Added OnClick event to trees so that when you click a node, the isolate ID is copied to clipboard, which then can be pasted using (ctrl|cmd)+v.
+* Change colour to improve lineage distinction in Omicron sublineages barplot.(Closes #192)
+* Wording clarifications/improvements. (Closes #193, Closes #196, Closes #197)
+* Clean up the list of useful tool section and add Mike Honey’s SARS-CoV-2 genomes DataViz Projects to the list (Closes #194, Closes #195)

@@ -70,7 +70,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     scale_y_continuous(breaks=seq(max((round(min(d$sel_coeff)/5))*5,-5),min(round(max(d$high_CI,11,na.rm = TRUE)/5)*5,15),5))+
     coord_flip()+ colScale+
     ggtitle(title)+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", individualSelectionPlotReference, " with 95% CI bars"))+
-      labs(caption = "*Thick point border indicates a lineage have\na positive selection in multiple provinces") +
+      labs(caption = "*Thick point border indicates a lineage with \na positive selection coefficient in multiple provinces") +
       theme(plot.caption = element_text(color = "green", face = "italic")) +
       theme_bw()
     #plot(p)
