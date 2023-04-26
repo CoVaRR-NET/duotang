@@ -585,22 +585,25 @@ https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 
 ## List of useful tools
 
-Collect a list of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
+A selection of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
 
-* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version: https://genome.ucsc.edu/cgi-bin/hgPhyloPlace, local-version: https://shusher.gi.ucsc.edu/]
-* List of (mostly) modelling tools by CANMOD: [https://canmod.net/tools], includes RECON, outbreak tools for both modelling and genomic epi [https://github.com/reconhub]
-* List of homoplaises in SARS-CoV-2: https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt
-* Erin Gill's COVID-19 dashboard [https://github.com/eringill/COVID_dashboard_reboot]
-* The Epi Graph Network: training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro. [https://thegraphnetwork.training/]
-* Nybbler tool for subsampling SARS-CoV-2 genome ensembles [https://github.com/nodrogluap/nybbler]
-* Pokay tool for checking and reporitng mismatches [https://github.com/nodrogluap/pokay]
-* IRIDA Canada's ID analysis platform for genomic epi [https://github.com/pvanheus/irida]
-* cov-lineages (summaries of Pango lineages) [https://cov-lineages.org/lineage_list.html]
-* CoVizu (analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time) [https://github.com/PoonLab/covizu/]
-* COVID-MVP (mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health, CIDGOH) [https://covidmvp.cidgoh.ca/]
-* Outbreak Info (SARS2 data explorer: lineage comparison, mutation tracker, etc) [https://outbreak.info/situation-reports]
+* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version](https://genome.ucsc.edu/cgi-bin/hgPhyloPlace), [local-version]( https://shusher.gi.ucsc.edu)
+* List of (mostly) [modelling tools by CANMOD](https://canmod.net/tools), includes [RECON](https://github.com/reconhub), an outbreak tools for both modelling and genomic epidemiology
+* List of [homoplaises in SARS-CoV-2](https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt)
+* Erin Gill's [COVID-19 dashboard](https://github.com/eringill/COVID_dashboard_reboot)
+* [The Epi Graph Network](https://thegraphnetwork.training/): training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro.
+* [Nybbler tool](https://github.com/nodrogluap/nybbler) for subsampling SARS-CoV-2 genome ensembles
+* [Pokay tool](https://github.com/nodrogluap/pokay) for checking and reporitng mismatches
+* [IRIDA Canada's ID analysis platform](https://github.com/pvanheus/irida) for genomic epidemiology
+* [cov-lineages](https://cov-lineages.org/lineage_list.html): summaries of Pango lineages
+* [CoVizu](https://github.com/PoonLab/covizu/): analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time
+* [COVID-MVP](https://covidmvp.cidgoh.ca/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
+* [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
+* Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
 
-## [Previous Versions](https://covarr-net.github.io/duotang/archive/)
+## Previous Versions
+
+[Here we store old versions of the Duotang notebook](https://covarr-net.github.io/duotang/archive/)
 
 <!-- ## [Duotang Sandbox!](https://covarr-net.github.io/duotang/duotang-sandbox.html) -->
 
