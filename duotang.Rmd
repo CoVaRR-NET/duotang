@@ -585,7 +585,7 @@ https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
 
 ## List of useful tools
 
-Collect a list of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
+A selection of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
 
 * UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version](https://genome.ucsc.edu/cgi-bin/hgPhyloPlace), [local-version]( https://shusher.gi.ucsc.edu)
 * List of (mostly) [modelling tools by CANMOD](https://canmod.net/tools), includes [RECON](https://github.com/reconhub), an outbreak tools for both modelling and genomic epidemiology
@@ -598,7 +598,7 @@ Collect a list of bioinformatics, phylogenetic, and modelling tools that are use
 * [cov-lineages](https://cov-lineages.org/lineage_list.html): summaries of Pango lineages
 * [CoVizu](https://github.com/PoonLab/covizu/): analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time
 * [COVID-MVP](https://covidmvp.cidgoh.ca/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
-* [Outbreak Info](https://outbreak.info/situation-reports): SARS2 data explorer: lineage comparison, mutation tracker, etc
+* [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
 * Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
 
 ## Previous Versions
