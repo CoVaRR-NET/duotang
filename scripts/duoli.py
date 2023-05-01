@@ -66,7 +66,7 @@ if __name__ == "__main__":
             for file in fileList:
                 upload=client.files_upload_v2(file=file,filename=file)
                 message_text=message_text+" <"+upload['file']['permalink']+"| > "
-            print(message_text)
+            #print(message_text)
             if (threadTS != None):
                 response = client.chat_postMessage(channel=channel_id,text=message_text, thread_ts=threadTS)
             else:

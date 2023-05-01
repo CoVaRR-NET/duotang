@@ -84,7 +84,8 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		echo $status
 		if [[ "$status" == "Update completed successfully" ]]; then
 			python scripts/duoli.py --message "Update complete, see dev branch https://github.com/CoVaRR-NET/duotang/tree/dev"
-			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.html`
+			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
+			echo "Threadts: $threadts" 
 			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			rm ./whatsnew.send.md
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
