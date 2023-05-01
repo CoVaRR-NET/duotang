@@ -108,6 +108,8 @@ restartedFromCheckpoint="false"
 if [[ "$DRYRUN" = "PASS" ]]; then 
 	cp tests/pass.log ./update.log
 	cp tests/pass.log ./rebuild.log
+	cp tests/whatsnew.md ./whatsnew.send.md
+
 	echo "dry run passed"
 	exit
 fi
@@ -115,7 +117,7 @@ fi
 if [[ "$DRYRUN" = "FAIL" ]]; then 
 	cp tests/fail.log ./update.log
 	cp tests/fail.log ./rebuild.log
-
+	cp tests/whatsnew.md ./whatsnew.send.md
 	echo "dry run failed"
 	exit
 fi
