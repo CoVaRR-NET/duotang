@@ -78,7 +78,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			fi
 		fi
 		#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
-		bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush --dryrunpass
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush --dryrunpass
 
 		status=$( tail -n 1 update.log )
 		echo $status

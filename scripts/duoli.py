@@ -60,7 +60,7 @@ if __name__ == "__main__":
     
     #filesJsonString=json.dumps(filesJson)
     #print(filesJsonString)
-    
+    ts = 0
     try:
         if (len(fileList) >0):
             for file in fileList:
@@ -78,7 +78,8 @@ if __name__ == "__main__":
             else:
                 response = client.chat_postMessage(channel=channel_id,text=message_text)
 
-        print(response)
+        ts = response['ts']
     except SlackApiError as e:
         print("Error sending message: {}".format(e))
 
+    print(ts)

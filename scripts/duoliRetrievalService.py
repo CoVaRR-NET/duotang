@@ -23,22 +23,22 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     
-    if not (os.path.exists("../.secret/duolioauthtoken") and os.path.exists("../.secret/duoliapptoken")):
+    if not (os.path.exists(".secret/duolioauthtoken") and os.path.exists(".secret/duoliapptoken")):
         print ("This script reqires the oauth token and app token for duoli to be placed in .secret/duolioauthtoken and .secret/duoliapptoken")
         print ("Please check that they exist and the tokens are valid.")
         print ("Remeber to not push them into git.")
         sys.exit("token not found.")
 
-    with open ("../.secret/duolioauthtoken", 'r') as fh:
+    with open (".secret/duolioauthtoken", 'r') as fh:
         authToken = fh.readline().strip()
-    with open ("../.secret/duoliapptoken", 'r') as fh:
+    with open (".secret/duoliapptoken", 'r') as fh:
         appToken = fh.readline().strip()
 
     app = App(token=authToken)
     client = WebClient(token=authToken)
     
     channelID = args.channel
-    ts = 1682762018.677789#args.ts
+    ts = args.ts
     rebuildCount = 0
     try:
         # Call the conversations.list method using the WebClient

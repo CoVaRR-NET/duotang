@@ -530,9 +530,9 @@ if [ "$GITPUSH" = "YES" ]; then
 	git commit -m "Update: $datestamp"
 	git push origin dev
 	sed  "s/{updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
-	#set +e #workaround so the rebuild doesnt crash here. probably better to use || but this works.
+	set +e #workaround so the rebuild doesnt crash here. probably better to use || but this works.
 	gh pr create -B main -F ./whatsnew.send.md --title "Update: $datestamp"
-	#set -e
+	set -e
 	#python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
 
 	#git checkout dev
