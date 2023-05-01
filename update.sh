@@ -109,7 +109,7 @@ if [[ "$DRYRUN" = "PASS" ]]; then
 	cp tests/pass.log ./update.log
 	cp tests/pass.log ./rebuild.log
 	cp tests/whatsnew.md ./whatsnew.send.md
-
+	echo "finish" > checkpoint
 	echo "dry run passed"
 	exit
 fi
@@ -118,6 +118,7 @@ if [[ "$DRYRUN" = "FAIL" ]]; then
 	cp tests/fail.log ./update.log
 	cp tests/fail.log ./rebuild.log
 	cp tests/whatsnew.md ./whatsnew.send.md
+	echo "error" > checkpoint
 	echo "dry run failed"
 	exit
 fi
