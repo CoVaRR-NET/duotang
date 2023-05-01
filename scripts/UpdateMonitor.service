@@ -20,7 +20,7 @@ lastRebuildCount=`python scripts/UpdateStatusManager.py --action get --key Rebui
 if (( $newRebuildCount > $lastRebuildCount )); then
 	git pull --recurse-submodules
 	dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
-	bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang > rebuild.log 2>&1
+	bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang --dryrunpass > rebuild.log 2>&1
 	python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
 	
 	status=$( tail -n 1 rebuild.log )
@@ -92,6 +92,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid
 			python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
+			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
 		else
 			lastError=`tail -n 5 update.log`
 			python scripts/duoli.py --message "There was an issue with the update. See logs attached. Last 5 lines of log: $lastError ." --file "update.log"
