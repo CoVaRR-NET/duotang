@@ -74,12 +74,12 @@ if (( $viralaiepoch > $duotangverepoch )); then
 				echo "Exceeded failed count allowance, slack notified already sent"
 			elif (( failedCounter > $maxFailCount )); then
 				echo "3rd error warning msg"
-				#python scripts/duoli.py --message "This update failed 3 times already, errors will no longer appear, @Justin Jia better look into it."
-				#python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
+				python scripts/duoli.py --message "This update failed 3 times already, errors will no longer appear, @Justin Jia better look into it."
+				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
 			else
 				echo "failed message"
-				#python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Last update attempted failed, attempting to restart the update process..."
-				#dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
+				python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Last update attempted failed, attempting to restart the update process..."
+				dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
 			fi
 		fi
 		exit
