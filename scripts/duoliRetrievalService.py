@@ -60,9 +60,9 @@ if __name__ == "__main__":
                                 i = i - 1
                         except:
                             pass
-
                     with open("currentsituation.md", "w+") as fh:
                         fh.write("\n".join(text))
+                    rebuildCount = rebuildCount + 1
     except SlackApiError as e:
         print(f"Error: {e}")
     
