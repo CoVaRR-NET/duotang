@@ -63,7 +63,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			rm checkpoint
 			python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Starting update process..."
 			dateToUse=`date --utc +%F`
-			python scripts/UpdateStatusManager.py --action set --key InProgressUpdateDate --value $curDate
+			python scripts/UpdateStatusManager.py --action set --key InProgressUpdateDate --value $dateToUse
 			python scripts/UpdateStatusManager.py --action set --key FailedCounter --value "0"
 		else
 			failedCounter=`python scripts/UpdateStatusManager.py --action get --key FailedCounter`
