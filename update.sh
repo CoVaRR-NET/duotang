@@ -79,6 +79,14 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
+	--dryrunpass)
+      DRYRUN="PASS"
+      shift # past argument
+      ;;
+	--dryrunfail)
+      DRYRUN="FAIL"
+      shift # past argument
+      ;;
 	--help)
       HELPFLAG="YES"
       shift # past argument
@@ -97,6 +105,20 @@ set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 checkPointFile=$PWD/checkpoint
 restartedFromCheckpoint="false"
+if [[ "$DRYRUN" = "PASS" ]]; then 
+	cp tests/pass.log ./update.log
+	cp tests/pass.log ./rebuild.log
+	echo "dry run passed"
+	exit
+fi
+
+if [[ "$DRYRUN" = "FAIL" ]]; then 
+	cp tests/fail.log ./update.log
+	cp tests/fail.log ./rebuild.log
+
+	echo "dry run failed"
+	exit
+fi
 
 if [ -z "$DATE" ]; then DATE=`date --utc +%F`; fi
 if [ -z "$SOURCE" ]; then SOURCE="viralai"; fi
@@ -424,6 +446,9 @@ for treefile in `ls $data_dir/aligned_*.treefile`; do
 	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
 	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
 done
+python scripts/UpdateStatusManager.py --action set --key LastTreeUpdate --value $datestamp
+
+
 echo "knitduotang" > $checkPointFile
 
 #knitduotang:
@@ -505,10 +530,11 @@ if [ "$GITPUSH" = "YES" ]; then
 	git commit -m "Update: $datestamp"
 	git push origin dev
 	sed  "s/{updatedate}/$datestamp/g" ./whatsnew.md > ./whatsnew.send.md
+	#set +e #workaround so the rebuild doesnt crash here. probably better to use || but this works.
 	gh pr create -B main -F ./whatsnew.send.md --title "Update: $datestamp"
+	#set -e
 	#python scripts/duoli.py --message "Here are the preview HTMLs for update $datestamp." --file duotang.html --file duotang-sandbox.html --file duotang-GSD.html
-	python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html #--file duotang-sandbox.html --file duotang-GSD.html
-	rm ./whatsnew.send.md
+
 	#git checkout dev
 fi
 

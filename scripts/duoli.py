@@ -23,6 +23,8 @@ if __name__ == "__main__":
                         help="The filepath for a text file to be sent as the message")
     parser.add_argument("--channel", type=str, default="C046T5JA48H",
                         help="Specify the channel that the message should be sent to, default: pillar6-duotang_github")
+    parser.add_argument("--thread", type=str, default=None,
+                        help="Specify the thread that the message should be sent to")
 
     args = parser.parse_args()
     
@@ -44,6 +46,7 @@ if __name__ == "__main__":
     channel_id = args.channel
     fileList = args.file
     message_filepath = args.messagefile
+    threadTS = args.thread
     
     if (message_filepath != None):
         with open (message_filepath, 'r') as fh:
@@ -64,10 +67,17 @@ if __name__ == "__main__":
                 upload=client.files_upload_v2(file=file,filename=file)
                 message_text=message_text+" <"+upload['file']['permalink']+"| > "
             print(message_text)
-            response = client.chat_postMessage(channel=channel_id,text=message_text)
+            if (threadTS != None):
+                response = client.chat_postMessage(channel=channel_id,text=message_text, thread_ts=threadTS)
+            else:
+                response = client.chat_postMessage(channel=channel_id,text=message_text)
             #response = client.files_upload_v2(channel=channel_id,initial_comment=message_text,file_uploads=filesJson)
         else:
-            response = client.chat_postMessage(channel=channel_id,text=message_text)
+            if (threadTS != None):
+                response = client.chat_postMessage(channel=channel_id,text=message_text, thread_ts=threadTS)
+            else:
+                response = client.chat_postMessage(channel=channel_id,text=message_text)
+
         print(response)
     except SlackApiError as e:
         print("Error sending message: {}".format(e))
