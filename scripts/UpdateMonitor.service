@@ -27,6 +27,7 @@ if (( $newRebuildCount > $lastRebuildCount )); then
 	echo $status
 	if [[ "$status" == "Update completed successfully" ]]; then
 		prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
+		sleep 5
 		previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
 		while [[ ! "$previewURL" =~ "http" ]]; do
 			sleep 10
@@ -95,6 +96,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		if [[ "$status" == "Update completed successfully" ]]; then
 			prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
 			python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
+			sleep 5
 			previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
 			while [[ ! "$previewURL" =~ "http" ]]; do
 				sleep 10
