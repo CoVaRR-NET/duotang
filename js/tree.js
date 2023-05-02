@@ -275,28 +275,7 @@ function updateTree(drawNodes = false) {
                   .attr("y1", function(d) { return yScale(d.y0); })
                   .attr("y2", function(d) { return yScale(d.y1); })
                   .attr("stroke-width", 1.0)
-                  .attr("stroke", function(d) { return d.colour; })
-                  .on("mouseover", function(e, d) {
-                      if (d.isTip) {
-                          coords = d3.pointer(e);
-                          let pos = d3.select(this).node().getBoundingClientRect();
-                          //populate the popout box text with ALL metadata columns
-                          var toolTipText = "<p>"  
-            							for(var i = 0; i < metadataFields.length; i++){
-            							  cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
-            							  cleanName = cleanName.split('_').join(' ');
-            							  toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
-            							}
-                          toolTipText = toolTipText + "</p>";
-                          tooltip.html(toolTipText)
-                              .style("visibility", "visible")
-                              .style("left", (coords[0] ) + "px")
-                              .style('top', `${(window.pageYOffset  + pos['y'] +15)}px`);
-                      }
-                  })
-                  .on("mouseout", function(e, d) {
-                    tooltip.style("visibility", "hidden");
-                  })
+                  .attr("stroke", function(d) { return d.colour; })            
                   
   
   //render the tip node circles
