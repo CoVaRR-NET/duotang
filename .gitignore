@@ -7,7 +7,6 @@ Rnotebook_demo_covarrnetpillar6_old.Rmd
 data_needed/*
 scripts/__pycache__
 # the HTML is the public facing document, to be reviewed before release
-index.html
 duotang.md
 .vs
 scripts/.vscode
