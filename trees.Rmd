@@ -31,7 +31,7 @@ metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 
 
 #omi tree metadata
-metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
+#metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
 
 #recomb tree metadata
 mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
@@ -83,9 +83,9 @@ diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, field
 recombDiversityTreeJsonObj <- DrawTree(recombMLree, mmetasub_recomb, "recombmltree", presetColors, "lineage", fieldnames=fieldnames)
 
 ### omicron diversity tree
-MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
+#MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
+#OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
 ```
 
 
@@ -108,11 +108,11 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
      script="js/tree.js", container="div", elementId="mltree-element")
 ```
 
-## Omicron Diversity Tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=OmicrondiversityTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="omimltree-element")
-```
+<!-- ## Omicron Diversity Tree -->
+<!-- ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6} -->
+<!--     r2d3(data=OmicrondiversityTreeJsonObj,  -->
+<!--      script="js/tree.js", container="div", elementId="omimltree-element") -->
+<!-- ``` -->
 
 ## XBB* Diversity tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}

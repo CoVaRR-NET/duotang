@@ -83,12 +83,20 @@ var tdiv = div.append("div") //div for the time axis label?
               .style("overflow-y", "scroll"),
     colorByDiv = div.append("div") //div for the options menu containing dropdown for metadata columns
               .style("width", "165px")
-              .style("height", 100+"px")
+              .style("height", 60+"px")
               .style("margin-left", "110px")
               .style("overflow-x", "hidden")
               .style("overflow-y", "hidden")
               .style("position", "relative")
               .text("Colour Scheme:"),
+	zoomSliderDiv = div.append("div") //div for the options menu containing dropdown for metadata columns
+              .style("width", "165px")
+              .style("height", 40+"px")
+              .style("margin-left", "110px")
+              .style("overflow-x", "hidden")
+              .style("overflow-y", "hidden")
+              .style("position", "relative")
+              .text("Zoom:"),
     optionDiv = div.append("div") //div for the options menu containing checkboxes for unique metadata values
               .style("width", (220) + "px")
               .style("height", 100+"px")
@@ -152,6 +160,7 @@ var lg = lsvg.append("g")
 var tg = topsvg.append("g")
                .attr("width", gwidth+"px")
                .attr("transform", "translate(" + margin.left + ",0)");
+
  
 // create scrolling rect in left panel
 var scrollbox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -187,7 +196,67 @@ var xmax = d3.max(data.edges, e => +e.x1),
     ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
     yoffset = absolutePosition(svg.node());
 
+function changeZoom(zoomValue){
+	console.log(zoomValue)
+	treeheight = zoomValue
+	rdiv.selectAll("*").remove();
+	svg = rdiv.append("svg") //interactive tree svg
+              .attr("id", "main-tree-svg")
+              .attr("width", (width-100)+"px")
+              .attr("height", treeheight+"px");
+
+// add margins
+	margin = {top: 10, right: 10, bottom: 10, left: 10};
+    gwidth = width - 100 - margin.left - margin.right;
+    gheight = treeheight - margin.top - margin.bottom;
+    lgheight = height - margin.top - margin.bottom;
+	
+	svg.selectAll("*").remove();
+	lsvg.selectAll("*").remove();
+	topsvg.selectAll("*").remove();
+	
+	g = svg.append("g")
+           .attr("height", gheight+"px")
+           .attr("width", gwidth+"px")
+           .attr("id", "treeplot-group")
+           .attr("transform", "translate(" + margin.left + "," + 
+                 margin.top + ")");
+
+	lg = lsvg.append("g")
+             .attr("height", lgheight+"px")
+             .attr("width", "100px")
+             .attr("id", "scroll-tree")
+             .attr("transform", "translate(" + margin.left + ',' + 
+                   margin.top + ")");
+
+	tg = topsvg.append("g")
+               .attr("width", gwidth+"px")
+               .attr("transform", "translate(" + margin.left + ",0)");
+   
+	scrollbox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+	scrollbox.setAttribute("width", "100px");
+	scrollbox.setAttribute("height", ((height-100)/treeheight * lgheight)+"px");
+	scrollbox.setAttribute("fill", "#00000055")
+	lsvg.node().append(scrollbox);
+	
+	rdiv.on("scroll", function(e) {
+    scrollbox.setAttribute("y", this.scrollTop/treeheight * height);
+	});
+	
+	xmax = d3.max(data.edges, e => +e.x1),
+    ntips = data.ntips,
+    xScale = d3.scaleLinear().domain([0, xmax]).range([0, (gwidth-100) ]),
+    yScale = d3.scaleLinear().domain([0, ntips]).range([gheight, 40]),
+    xlScale = d3.scaleLinear().domain([0, xmax]).range([0, 100 ]),
+    ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
+    yoffset = absolutePosition(svg.node());
+	updateTree(true)
+}
+
 /* #endregion */
+
+//zoom slider logic
+
 //function called when the div needs to be re-rendered due to an update
 //`drawNodes` is a flag for drawing circles at the tip of the branches. Defaults to false.
 function updateTree(drawNodes = false) {
@@ -520,6 +589,15 @@ var colorByDivData = colorByDiv
                   .text(function(d) {
                     return d;
                   })
+				  
+var zoomSlider = zoomSliderDiv
+	.append("input")
+	.on("change", function() { changeZoom(this.value);})
+   .attr("type", "range")
+   .attr("min", 3000)
+   .attr("max", 16000)
+   .attr("value", 4800)
+   .attr("class", "slider");
 
 //force default color scheme
 displayOptions (this, defaultColorBy) 
