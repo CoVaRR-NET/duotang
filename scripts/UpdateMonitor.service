@@ -104,11 +104,10 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			done
 			previewURL="$previewURL/duotang.html"
 			#python scripts/duoli.py --message "Update complete, see PR branch $prLink"
-			echo -e "\nSee preview: $previewURL \bManage the PR: $prLink" >> ./whatsnew.send.md
+			echo -e "\n\nSee preview: $previewURL \bManage the PR: $prLink" >> ./whatsnew.send.md
 			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
-			echo "Threadts: $threadts" 
-			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			rm ./whatsnew.send.md
+			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid
 			python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
