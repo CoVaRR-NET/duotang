@@ -87,10 +87,11 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		status=$( tail -n 1 update.log )
 		echo $status
 		if [[ "$status" == "Update completed successfully" ]]; then
-			python scripts/duoli.py --message "Update complete, see dev branch https://github.com/CoVaRR-NET/duotang/tree/dev"
-			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
-			echo "Threadts: $threadts" 
 			prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
+			#python scripts/duoli.py --message "Update complete, see PR branch $prLink"
+			echo -e "\nSee preview in pull request: $prLink" >> ./whatsnew.send.md
+			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
+			echo "Threadts: $threadts" 
 			python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
 			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			rm ./whatsnew.send.md
