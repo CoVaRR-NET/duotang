@@ -515,7 +515,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	#if [ "$BUILDMAIN" = "YES" ]; then 
 	#git remote prune origin
 	#git checkout -B UpdatePreview
-	bash scripts/getPastDuotangVersions.sh
+	#bash scripts/getPastDuotangVersions.sh
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
 	git add -f data_needed/*.nwk
