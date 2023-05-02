@@ -10,8 +10,7 @@ echo `date`
 #parameters
 maxFailCount="3"
 
-#logic for checking for "current situation" updates via slack. 
-Rebuild=`python scripts/UpdateStatusManager.py --action get --key Rebuild`
+#logic for checking for "current situation" updates or rebuild commands via slack. 
 threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
 newRebuildCount=`python scripts/duoliRetrievalService.py --ts $threadts`
 lastRebuildCount=`python scripts/UpdateStatusManager.py --action get --key Rebuild`
@@ -79,7 +78,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 				echo "Exceeded failed count allowance, slack notified already sent"
 			elif (( failedCounter >= $maxFailCount )); then
 				echo "3rd error warning msg"
-				python scripts/duoli.py --message "This update failed $maxFailCount times already, errors will no longer appear, @Justin Jia better look into it."
+				python scripts/duoli.py --message "This update failed $maxFailCount times already, errors will no longer appear, <@U03VC9B7PC3> better look into it."
 				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
 			else
 				echo "failed message"
@@ -123,7 +122,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key FailedCounter --value $failedCounter
 		fi
 	else
-		echo "Found update on ViralAI, but it's not the latest update found on virusseq" 
+		echo "Desync between ViralAI and VirusSeq releases, likely because one of them just updated but not the other. " 
 	fi
 else
 	echo "no update" 
