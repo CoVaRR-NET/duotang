@@ -86,7 +86,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 				dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
 			fi
 		fi
-		exit
+		
 		#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
 		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
 
