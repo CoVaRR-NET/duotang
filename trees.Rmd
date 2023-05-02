@@ -23,7 +23,7 @@ recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","month","week", "GID", "isolate")
+               "lineage", "pango_group","week", "GID")
 # extract rows from metadata table that correspond to ttree 
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
@@ -43,7 +43,7 @@ mltree <- ladderize(mltree, FALSE)
 recombMLree$edge.length <- recombMLree$edge.length*29903
 recombMLree <- ladderize(recombMLree, FALSE)
 
-
+#enforce a non zero branch length so lines can be drawn in javascript
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
 #ttree <- ladderize(ttree, FALSE)
@@ -81,7 +81,7 @@ recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
 recombDiversityTreeJsonObj <- DrawTree(recombMLree, mmetasub_recomb, "recombmltree", presetColors, "lineage", fieldnames=fieldnames)
-
+#write(recombDiversityTreeJsonObj, "downloads/test.json")
 ### omicron diversity tree
 #MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 

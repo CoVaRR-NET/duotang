@@ -17,6 +17,12 @@
 console = d3.window(div.node()).console;
 //console.log(data)
 
+
+
+//fetch('./downloads/recombDiversityTree.json')
+//    .then((response) => response.json())
+//    .then((json) => console.log(json));
+
 //set the default color scheme
 if (data.defaultColorBy == null){var defaultColorBy = "pango_group"}
 else{defaultColorBy = data.defaultColorBy[0]}
@@ -26,6 +32,33 @@ var presetColors = {}
 for(var i = 0; i < data.VOCVOI.length; i++){
   presetColors[data.VOCVOI[i].name] = data.VOCVOI[i].color
 } 
+
+//intial loop through the data.edges object to create optimization arrays used for faster plot rendering. 
+var metadataFields = [] //array of available metadata keys
+var tipOnlyEdgesIndexList = [] //array of index of data.edges containing only edges that are tips
+for(var i = 0; i < data.edges.length; i++){
+	if (data.edges[i].direction == "X"){
+		data.edges[i].x1 = String(+data.edges[i].x0 + +data.edges[i].delta)
+		data.edges[i].y1 = String(data.edges[i].y0)
+	}
+	else if (data.edges[i].direction == "Y"){
+		data.edges[i].y1 = String(+data.edges[i].y0 + +data.edges[i].delta)
+		data.edges[i].x1 = String(data.edges[i].x0)
+	}
+  if (data.edges[i].isTip == "TRUE"){
+	data.edges[i].isolate = data.edges[i].fasta_header_name
+	data.edges[i].month = data.edges[i].week.substr(0, 7);
+	tipOnlyEdgesIndexList.push(i)
+  } else{
+    data.edges[i].colour = "#D3D3D3" //set default colors to light grey.
+  }
+  for (key in data.edges[i]){
+    if (!metadataFields.includes(key)) {
+      metadataFields.push(key);
+    }
+  }
+}
+
 //sets scaling factors
 var scalingFactors = {
   "timetree": 1,
@@ -197,7 +230,7 @@ var xmax = d3.max(data.edges, e => +e.x1),
     yoffset = absolutePosition(svg.node());
 
 function changeZoom(zoomValue){
-	console.log(zoomValue)
+	//console.log(zoomValue)
 	treeheight = zoomValue
 	rdiv.selectAll("*").remove();
 	svg = rdiv.append("svg") //interactive tree svg
@@ -524,22 +557,11 @@ function displayOptions(d, value = ""){
 
 /* #region init */
 
-//intial loop through the data.edges object to create optimization arrays used for faster plot rendering. 
-var metadataFields = [] //array of available metadata keys
-var tipOnlyEdgesIndexList = [] //array of index of data.edges containing only edges that are tips
-for(var i = 0; i < data.edges.length; i++){
-  if (data.edges[i].isTip == "TRUE"){
-    tipOnlyEdgesIndexList.push(i)
-  } else{
-    data.edges[i].colour = "#D3D3D3" //set default colors to light grey.
-  }
-  for (key in data.edges[i]){
-    if (!metadataFields.includes(key)) {
-      metadataFields.push(key);
-    }
-  }
-}
-var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
+
+
+//var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
+var fieldsToRemove = ["isTip","x0", "y0", "x1", "y1", "colour", "delta", "direction", "fasta_header_name"] //list of keys that are not metadata
+
 var fieldsToNotIncludeInDropdown = ["GID", "isolate"]
 //remove the non-metadata keys.
 metadataFields = metadataFields.filter( function( el ) {

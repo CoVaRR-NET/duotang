@@ -5,7 +5,6 @@ Rnotebook_demo_covarrnetpillar6_old.Rmd
 .format_table_last
 .RData
 data_needed/*
-duotang_files/*
 scripts/__pycache__
 # the HTML is the public facing document, to be reviewed before release
 index.html

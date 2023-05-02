@@ -7,6 +7,7 @@ author: "Pillar 6 - CAMEO"
 output:
   html_document:
     keep_md: true
+    self_contained: false
     code_folding: hide
     theme: cerulean
     toc: true
@@ -402,6 +403,7 @@ This historical analysis is not being further updated, as we focus on more inter
 # Canadian trees {.tabset .tabset-fade}  
 
 ```{r trees, child="trees.Rmd"}
+#The trees make up about 20MB in the HTML file
 ```
 
 

@@ -9,6 +9,11 @@
 DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pango_group", fieldnames = c("fasta.header.name", "province", "host.gender", "host.age.bin", "sample.collection.date", 
                                                     "sample.collected.by", "purpose.of.sampling", "purpose.of.sequencing",
                                                     "lineage", "pango.group")){
+  #tree = mltree
+  #metadata=metasub1
+  #treeType = "mltree"
+  #VOCVOI = presetColors
+  #fieldnames=fieldnames
   suppressWarnings(tt.layout <- tree.layout(tree, type='r'))
   #assign default colour to init color variable in json
   
@@ -28,8 +33,17 @@ DrawTree <- function(tree, metadata, treeType, VOCVOI, defaultColorField = "pang
       colour=e[1,]$colour)
   }))
   
-  edges <- merge(tt.layout$edges, v.edges, all=TRUE)  # tips, internals
+  tt.layout$edges$direction = "X"
+  v.edges.t <- as.data.frame(v.edges)
+  v.edges.t$direction = "Y"
   
+  #lets simply this data
+  #isTip, direction, X, Y, Delta, metadata.
+  
+  edges <- merge(tt.layout$edges, v.edges.t, all=TRUE)  # tips, internals
+  edges <- edges %>% mutate(delta = ifelse(direction=="X",as.numeric(x1)-as.numeric(x0), as.numeric(y1)-as.numeric(y0)))
+  edges <- edges %>% dplyr::select(-colour, -parent, -child, -length, -x1, -y1)
+
   jsonObj <- toJSON(list(nodes=NA, edges=edges, treetype=treeType, ntips=nrow(subset(tt.layout$nodes, n.tips == 0)), defaultColorBy=defaultColorField, VOCVOI=VOCVOI))
   
   return(jsonObj)
