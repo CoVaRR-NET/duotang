@@ -26,7 +26,7 @@ if (( $newRebuildCount > $lastRebuildCount )); then
 	status=$( tail -n 1 rebuild.log )
 	echo $status
 	if [[ "$status" == "Update completed successfully" ]]; then
-		prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
+		prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
 		python scripts/duoli.py --message "Update complete, approve the publication by checking the preview and then merging the PR on github: $prLink" --file duotang.html --thread $threadts
 	else
 		python scripts/duoli.py --message "There was an issue with the update. See logs attached. Please fix any issues and use the /update command to try again." --file "rebuild.log" --thread $threadts
@@ -90,6 +90,8 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/duoli.py --message "Update complete, see dev branch https://github.com/CoVaRR-NET/duotang/tree/dev"
 			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
 			echo "Threadts: $threadts" 
+			prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
+			python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
 			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			rm ./whatsnew.send.md
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
