@@ -9,11 +9,19 @@ source("scripts/fit-rtt.R")
 rtt1 <- fit.rtt(paste0(params$datadir, "/aligned_allSeqs_sample1.rtt.nwk"))
 fit1 <- rtt1$fits
 
+# extract line segments
+get.segments <- function (fit) {
+  p <- predict(fit)
+  x <- fit$model$x
+  list(x0=min(x), x1=max(x), y0=min(p), y1=max(p))
+}
+
 # generate interactive plot
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 
-r2d3(data=toJSON(list(tips=rtt1$tips, palette=as.list(pal))), 
+r2d3(data=toJSON(list(tips=rtt1$tips, palette=as.list(pal),
+                      fits=lapply(fit1, get.segments)), auto_unbox=TRUE), 
      script="js/rtt.js", container="div", elementId="rtt-element")
 ```
 

@@ -39,7 +39,7 @@ rtt_input.selectAll("input")
   .attr("type", "checkbox")
   .attr("class", "rtt_cb")
   .attr("value", function(d) { return d[0]; })
-  .style("accent-color", function(d) { return d[1][0]; })
+  .style("accent-color", function(d) { return d[1]; })
   .attr("checked", true)
   .attr("id", function(d,i) { return i; })
   .attr("for", function(d,i) { return i; });
@@ -150,11 +150,16 @@ rttg.selectAll("circle")
     .attr("r", 3)
     .style("fill", function(d) {
      if (d.pango in palette) {
-       return palette[d.pango][0];
+       return palette[d.pango];
      } else {
        return "#777";
      }
     });
+
+// draw lines
+//rttg.selectAll("lines")
+//    .data(tips)
+    
 
 
 function rtt_update() {
