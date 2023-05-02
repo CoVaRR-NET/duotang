@@ -172,8 +172,8 @@ var xScale = d3.scaleTime()
     xtime,
     yoffset = absolutePosition(bpsvg.node());
 
-console.log(bpsvg);
-console.log(yoffset);
+//console.log(bpsvg);
+//console.log(yoffset);
 
 var color = d3.scaleOrdinal()
     .domain(variants)
@@ -210,7 +210,7 @@ bpsvg.selectAll(".layer")
     })
     .on("mousemove", function(event, datum) {
       coords = d3.pointer(event);
-      console.log(coords);
+      //console.log(coords);
       //xtime = xScale.invert(event.x);
       xtime = xScale.invert(coords[0]);
       week = d3.bisect(weeks, xtime);
