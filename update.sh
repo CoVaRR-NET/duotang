@@ -527,6 +527,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f archive/*.html
 	git add -f archive/readme.md
 	git add -f downloads/*
+	git add -f duotang_files/*
 	git add -f duotang*html
 	#git add -f duotangCurVer
 	git add -f DuotangUpdateStatus.json
