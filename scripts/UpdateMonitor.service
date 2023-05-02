@@ -9,8 +9,6 @@ echo `date`
 
 #parameters
 maxFailCount="3"
-echo $maxFailCount
-
 
 #logic for checking for "current situation" updates via slack. 
 Rebuild=`python scripts/UpdateStatusManager.py --action get --key Rebuild`
@@ -22,7 +20,7 @@ if (( $newRebuildCount > $lastRebuildCount )); then
 	echo "An update cmd is given in slack."
 	git pull --recurse-submodules
 	dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
-	bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang --dryrunpass > rebuild.log 2>&1
+	bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang > rebuild.log 2>&1
 	python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
 	
 	status=$( tail -n 1 rebuild.log )
@@ -70,11 +68,11 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		else
 			failedCounter=`python scripts/UpdateStatusManager.py --action get --key FailedCounter`
 			echo $failedCounter
-			if (( failedCounter > (($maxFailCount+1)) )); then
+			if (( failedCounter >= (($maxFailCount+1)) )); then
 				echo "Exceeded failed count allowance, slack notified already sent"
-			elif (( failedCounter > $maxFailCount )); then
+			elif (( failedCounter >= $maxFailCount )); then
 				echo "3rd error warning msg"
-				python scripts/duoli.py --message "This update failed 3 times already, errors will no longer appear, @Justin Jia better look into it."
+				python scripts/duoli.py --message "This update failed $maxFailCount times already, errors will no longer appear, @Justin Jia better look into it."
 				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
 			else
 				echo "failed message"
@@ -84,7 +82,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		fi
 		exit
 		#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush --dryrunfail
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
 
 		status=$( tail -n 1 update.log )
 		echo $status
@@ -99,6 +97,8 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
+			echo "Duotang update {updatedate}:  \n\nDetailed changes:\n" > whatsnew.md
+## duotang.html:
 		else
 			#lastError=`tail -n 5 update.log`
 			python scripts/duoli.py --message "There was an issue with the update. See logs attached." --file "update.log"
