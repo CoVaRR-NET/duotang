@@ -524,8 +524,8 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f data_needed/CanadianEpiData.csv
 	git add -f data_needed/lineageNotes.tsv
 	git add -f data_needed/virusseq.fasta.xz
-	git add -f archive/*.html
-	git add -f archive/readme.md
+	#git add -f archive/*.html
+	#git add -f archive/readme.md
 	git add -f downloads/*
 	git add -f duotang_files/*
 	git add -f duotang*html
