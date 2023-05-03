@@ -23,7 +23,7 @@ recombTTree$tip.label  <- reduce.tipnames(recombTTree$tip.label)
 
 fieldnames<- c("fasta_header_name", "province", "host_gender", "host_age_bin",
                "sample_collected_by", "purpose_of_sampling",
-               "lineage", "pango_group","month","week", "GID", "isolate")
+               "lineage", "pango_group","week", "GID")
 # extract rows from metadata table that correspond to ttree 
 metasub1 <- meta[meta$fasta_header_name%in% ttree$tip.label, fieldnames]
 # sort rows to match tip labels in tree
@@ -31,7 +31,7 @@ metasub1 <- metasub1[match(ttree$tip.label, metasub1$fasta_header_name), ]
 
 
 #omi tree metadata
-metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
+#metasub_omi <- metasub1[grepl("Omicron",metasub1$pango_group ), ]
 
 #recomb tree metadata
 mmetasub_recomb <- meta[meta$fasta_header_name%in% recombTTree$tip.label, fieldnames]
@@ -43,7 +43,7 @@ mltree <- ladderize(mltree, FALSE)
 recombMLree$edge.length <- recombMLree$edge.length*29903
 recombMLree <- ladderize(recombMLree, FALSE)
 
-
+#enforce a non zero branch length so lines can be drawn in javascript
 ###Time Tree
 ttree$edge.length[ttree$edge.length == 0] <- 1e-4
 #ttree <- ladderize(ttree, FALSE)
@@ -81,11 +81,11 @@ recombTimeTreeJsonObj <-  DrawTree(recombTTree, mmetasub_recomb, "recombtimetree
 #diversity ML tree
 diversityTreeJsonObj <- DrawTree(mltree, metasub1, "mltree", presetColors, fieldnames=fieldnames)
 recombDiversityTreeJsonObj <- DrawTree(recombMLree, mmetasub_recomb, "recombmltree", presetColors, "lineage", fieldnames=fieldnames)
-
+#write(recombDiversityTreeJsonObj, "downloads/test.json")
 ### omicron diversity tree
-MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
+#MLtree_omi<-keep.tip(mltree, metasub_omi$fasta_header_name)
 
-OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
+#OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", presetColors, fieldnames=fieldnames)
 ```
 
 
@@ -108,11 +108,11 @@ OmicrondiversityTreeJsonObj <- DrawTree(MLtree_omi, metasub_omi, "omimltree", pr
      script="js/tree.js", container="div", elementId="mltree-element")
 ```
 
-## Omicron Diversity Tree
-```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}
-    r2d3(data=OmicrondiversityTreeJsonObj, 
-     script="js/tree.js", container="div", elementId="omimltree-element")
-```
+<!-- ## Omicron Diversity Tree -->
+<!-- ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6} -->
+<!--     r2d3(data=OmicrondiversityTreeJsonObj,  -->
+<!--      script="js/tree.js", container="div", elementId="omimltree-element") -->
+<!-- ``` -->
 
 ## XBB* Diversity tree
 ```{r message=FALSE, echo = FALSE, fig.width=8, fig.height=6}

@@ -2,6 +2,7 @@ Duotang update {updatedate}:
 
 Detailed changes:
 ## duotang.html:
-* Change colour to improve lineage distinction in Omicron sublineages barplot.(Closes #192)
-* Wording clarifications/improvements. (Closes #193, Closes #196, Closes #197)
-* Clean up the list of useful tool section and add Mike Honey’s SARS-CoV-2 genomes DataViz Projects to the list (Closes #194, Closes #195)
+* The interactive trees now have a zoom slider. Omicron Diversity Tree tab had been removed because of this. (Closes #139)
+* To reduce clutter and 'undefined' values, only the nodes on the tree now shows the information box when howered over with mouse.
+* Optimized the json for the interactive trees to reduce the document size.
+* Background changes to improve the updating and data ingest processes. As a result of this, dev previews had transitions into using cloudflare pages.

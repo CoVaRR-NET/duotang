@@ -1,0 +1,3 @@
+Duotang update {updatedate}:  
+
+TESTING

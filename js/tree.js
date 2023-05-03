@@ -17,6 +17,12 @@
 console = d3.window(div.node()).console;
 //console.log(data)
 
+
+
+//fetch('./downloads/recombDiversityTree.json')
+//    .then((response) => response.json())
+//    .then((json) => console.log(json));
+
 //set the default color scheme
 if (data.defaultColorBy == null){var defaultColorBy = "pango_group"}
 else{defaultColorBy = data.defaultColorBy[0]}
@@ -26,6 +32,33 @@ var presetColors = {}
 for(var i = 0; i < data.VOCVOI.length; i++){
   presetColors[data.VOCVOI[i].name] = data.VOCVOI[i].color
 } 
+
+//intial loop through the data.edges object to create optimization arrays used for faster plot rendering. 
+var metadataFields = [] //array of available metadata keys
+var tipOnlyEdgesIndexList = [] //array of index of data.edges containing only edges that are tips
+for(var i = 0; i < data.edges.length; i++){
+	if (data.edges[i].direction == "X"){
+		data.edges[i].x1 = String(+data.edges[i].x0 + +data.edges[i].delta)
+		data.edges[i].y1 = String(data.edges[i].y0)
+	}
+	else if (data.edges[i].direction == "Y"){
+		data.edges[i].y1 = String(+data.edges[i].y0 + +data.edges[i].delta)
+		data.edges[i].x1 = String(data.edges[i].x0)
+	}
+  if (data.edges[i].isTip == "TRUE"){
+	data.edges[i].isolate = data.edges[i].fasta_header_name
+	data.edges[i].month = data.edges[i].week.substr(0, 7);
+	tipOnlyEdgesIndexList.push(i)
+  } else{
+    data.edges[i].colour = "#D3D3D3" //set default colors to light grey.
+  }
+  for (key in data.edges[i]){
+    if (!metadataFields.includes(key)) {
+      metadataFields.push(key);
+    }
+  }
+}
+
 //sets scaling factors
 var scalingFactors = {
   "timetree": 1,
@@ -83,12 +116,20 @@ var tdiv = div.append("div") //div for the time axis label?
               .style("overflow-y", "scroll"),
     colorByDiv = div.append("div") //div for the options menu containing dropdown for metadata columns
               .style("width", "165px")
-              .style("height", 100+"px")
+              .style("height", 60+"px")
               .style("margin-left", "110px")
               .style("overflow-x", "hidden")
               .style("overflow-y", "hidden")
               .style("position", "relative")
               .text("Colour Scheme:"),
+	zoomSliderDiv = div.append("div") //div for the options menu containing dropdown for metadata columns
+              .style("width", "165px")
+              .style("height", 40+"px")
+              .style("margin-left", "110px")
+              .style("overflow-x", "hidden")
+              .style("overflow-y", "hidden")
+              .style("position", "relative")
+              .text("Zoom:"),
     optionDiv = div.append("div") //div for the options menu containing checkboxes for unique metadata values
               .style("width", (220) + "px")
               .style("height", 100+"px")
@@ -152,6 +193,7 @@ var lg = lsvg.append("g")
 var tg = topsvg.append("g")
                .attr("width", gwidth+"px")
                .attr("transform", "translate(" + margin.left + ",0)");
+
  
 // create scrolling rect in left panel
 var scrollbox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -187,7 +229,67 @@ var xmax = d3.max(data.edges, e => +e.x1),
     ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
     yoffset = absolutePosition(svg.node());
 
+function changeZoom(zoomValue){
+	//console.log(zoomValue)
+	treeheight = zoomValue
+	rdiv.selectAll("*").remove();
+	svg = rdiv.append("svg") //interactive tree svg
+              .attr("id", "main-tree-svg")
+              .attr("width", (width-100)+"px")
+              .attr("height", treeheight+"px");
+
+// add margins
+	margin = {top: 10, right: 10, bottom: 10, left: 10};
+    gwidth = width - 100 - margin.left - margin.right;
+    gheight = treeheight - margin.top - margin.bottom;
+    lgheight = height - margin.top - margin.bottom;
+	
+	svg.selectAll("*").remove();
+	lsvg.selectAll("*").remove();
+	topsvg.selectAll("*").remove();
+	
+	g = svg.append("g")
+           .attr("height", gheight+"px")
+           .attr("width", gwidth+"px")
+           .attr("id", "treeplot-group")
+           .attr("transform", "translate(" + margin.left + "," + 
+                 margin.top + ")");
+
+	lg = lsvg.append("g")
+             .attr("height", lgheight+"px")
+             .attr("width", "100px")
+             .attr("id", "scroll-tree")
+             .attr("transform", "translate(" + margin.left + ',' + 
+                   margin.top + ")");
+
+	tg = topsvg.append("g")
+               .attr("width", gwidth+"px")
+               .attr("transform", "translate(" + margin.left + ",0)");
+   
+	scrollbox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+	scrollbox.setAttribute("width", "100px");
+	scrollbox.setAttribute("height", ((height-100)/treeheight * lgheight)+"px");
+	scrollbox.setAttribute("fill", "#00000055")
+	lsvg.node().append(scrollbox);
+	
+	rdiv.on("scroll", function(e) {
+    scrollbox.setAttribute("y", this.scrollTop/treeheight * height);
+	});
+	
+	xmax = d3.max(data.edges, e => +e.x1),
+    ntips = data.ntips,
+    xScale = d3.scaleLinear().domain([0, xmax]).range([0, (gwidth-100) ]),
+    yScale = d3.scaleLinear().domain([0, ntips]).range([gheight, 40]),
+    xlScale = d3.scaleLinear().domain([0, xmax]).range([0, 100 ]),
+    ylScale = d3.scaleLinear().domain([0, ntips]).range([lgheight, 0]),
+    yoffset = absolutePosition(svg.node());
+	updateTree(true)
+}
+
 /* #endregion */
+
+//zoom slider logic
+
 //function called when the div needs to be re-rendered due to an update
 //`drawNodes` is a flag for drawing circles at the tip of the branches. Defaults to false.
 function updateTree(drawNodes = false) {
@@ -206,28 +308,7 @@ function updateTree(drawNodes = false) {
                   .attr("y1", function(d) { return yScale(d.y0); })
                   .attr("y2", function(d) { return yScale(d.y1); })
                   .attr("stroke-width", 1.0)
-                  .attr("stroke", function(d) { return d.colour; })
-                  .on("mouseover", function(e, d) {
-                      if (d.isTip) {
-                          coords = d3.pointer(e);
-                          let pos = d3.select(this).node().getBoundingClientRect();
-                          //populate the popout box text with ALL metadata columns
-                          var toolTipText = "<p>"  
-            							for(var i = 0; i < metadataFields.length; i++){
-            							  cleanName = metadataFields[i].charAt(0).toUpperCase() + metadataFields[i].slice(1);
-            							  cleanName = cleanName.split('_').join(' ');
-            							  toolTipText = toolTipText + "<b>" + cleanName + `: </b>${d[metadataFields[i]]}<br/>` 
-            							}
-                          toolTipText = toolTipText + "</p>";
-                          tooltip.html(toolTipText)
-                              .style("visibility", "visible")
-                              .style("left", (coords[0] ) + "px")
-                              .style('top', `${(window.pageYOffset  + pos['y'] +15)}px`);
-                      }
-                  })
-                  .on("mouseout", function(e, d) {
-                    tooltip.style("visibility", "hidden");
-                  })
+                  .attr("stroke", function(d) { return d.colour; })            
                   
   
   //render the tip node circles
@@ -476,22 +557,11 @@ function displayOptions(d, value = ""){
 
 /* #region init */
 
-//intial loop through the data.edges object to create optimization arrays used for faster plot rendering. 
-var metadataFields = [] //array of available metadata keys
-var tipOnlyEdgesIndexList = [] //array of index of data.edges containing only edges that are tips
-for(var i = 0; i < data.edges.length; i++){
-  if (data.edges[i].isTip == "TRUE"){
-    tipOnlyEdgesIndexList.push(i)
-  } else{
-    data.edges[i].colour = "#D3D3D3" //set default colors to light grey.
-  }
-  for (key in data.edges[i]){
-    if (!metadataFields.includes(key)) {
-      metadataFields.push(key);
-    }
-  }
-}
-var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
+
+
+//var fieldsToRemove = ["parent", "child","colour", "length", "isTip","x0", "x1","y0","y1", "fasta_header_name"] //list of keys that are not metadata
+var fieldsToRemove = ["isTip","x0", "y0", "x1", "y1", "colour", "delta", "direction", "fasta_header_name"] //list of keys that are not metadata
+
 var fieldsToNotIncludeInDropdown = ["GID", "isolate"]
 //remove the non-metadata keys.
 metadataFields = metadataFields.filter( function( el ) {
@@ -520,6 +590,15 @@ var colorByDivData = colorByDiv
                   .text(function(d) {
                     return d;
                   })
+				  
+var zoomSlider = zoomSliderDiv
+	.append("input")
+	.on("change", function() { changeZoom(this.value);})
+   .attr("type", "range")
+   .attr("min", 3000)
+   .attr("max", 16000)
+   .attr("value", 4800)
+   .attr("class", "slider");
 
 //force default color scheme
 displayOptions (this, defaultColorBy) 
