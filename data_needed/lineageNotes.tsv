@@ -2617,6 +2617,7 @@ EK.1	Alias of XBB.1.5.13.1, S:K417S, Austria from #1638
 EK.2	Alias of XBB.1.5.13.2, S:T259I, USA
 EK.2.1	Alias of XBB.1.5.13.2.1, S:478R, USA/Canada/Scotland
 EK.3	Alias of XBB.1.5.13.3, S:P251S, Scotland/England/Ireland
+EK.4	Alias of XBB.1.5.13.4, S:Q675K, USA/France
 XBB.1.5.14	C2695T, Europe/US
 EL.1	Alias of XBB.1.5.14.1, S:Q675H, Europe, from #1631
 XBB.1.5.15	G15957T, USA
@@ -2669,6 +2670,7 @@ XBB.1.5.50	S:621S, N:T49I, USA/Canada
 XBB.1.5.51	ORF1a:D3009A, USA
 XBB.1.5.52	C3589T
 XBB.1.5.53	S:F140I, S:L582F, S:R403K, South Africa
+XBB.1.5.54	C14358T,C20016T,C29311T, Central/Eastern Europe
 XBB.1.6	USA, S:L216F, S:H146K, from issue #1428
 XBB.1.7	USA-NY, S:V608I
 XBB.1.8	Denmark, S:186insSGG, C3241T
@@ -2729,6 +2731,8 @@ XBB.1.26	Defined by T10663C on 28297C branch, Canada
 XBB.1.27	Defined by S:478R, S:A890V, Mexico/US/India
 XBB.1.28	Defined by S:403K, Europe
 XBB.1.28.1	Defined by S:356T, Indonesia, global
+FW.1	Alias of XBB.1.28.1.1, S:A701V, Indonesia, Europe
+FW.2	Alias of XBB.1.28.1.2, ORF1a:G2258C, France
 XBB.1.29	Defined by ORF1a:L3829F, S:A292S, Europe
 XBB.1.30	Defined by ORF1b:K2557R, South East Asia
 XBB.1.31	Defined by S:453F and S:478R, Indonesia/Singapore
@@ -2748,6 +2752,7 @@ XBB.2.3.4	Defined by S:478Q, India
 XBB.2.3.5	Defined by S:K478N, found mainly in USA and India, from pango-designation issue #1846
 XBB.2.3.6	Defined by N:T166I, mainly Singapore
 XBB.2.3.7	Defined by ORF1a:T4087I
+XBB.2.3.8	Defined by C2013T, T16389C, S:478R, Singapore/SouthKorea from #1866
 XBB.2.4	Defined by S:S486P, Spain/Denmark/Germany
 XBB.2.5	S:Q613H, from https://github.com/jmcbroome/auto-pango-designation/pull/193
 XBB.2.6	Mostly Peru, C5144T, T5731A
