@@ -69,12 +69,14 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 10% per day to mark doubling in < week
     scale_y_continuous(breaks=seq(max((round(min(d$sel_coeff)/5))*5,-5),min(round(max(d$high_CI,11,na.rm = TRUE)/5)*5,15),5))+
     coord_flip()+ colScale+
+      theme_bw()+
+    
+    theme(plot.caption.position = "plot", plot.caption = element_text(hjust=0)) +
+      
     ggtitle(title)+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", individualSelectionPlotReference, " with 95% CI bars"))+
-      labs(caption = "*Thick point border indicates a lineage with \na positive selection coefficient in multiple provinces") +
-      theme(plot.caption = element_text(color = "green", face = "italic")) +
-      theme_bw()
+      labs(caption = "*Circled dots indicate lineages with a positive selection coefficient in multiple provinces") 
     #plot(p)
-    p
+   # p
     return(p)
   }
   else{

@@ -235,7 +235,7 @@ coefficientTable <- plot_growing_lineage(paramselected,makeplot=FALSE)
 
 ## Plot (stricto) {.tabset .tabset-fade}
 
-Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
+Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary. For Canada-wide plot, a dot with a circle border indicates lineages with a positive selection coefficient in multiple provinces. 
 
 
 ```{r buildStrictoPlots, results='asis', echo = F, warning=FALSE, fig.height=7}
@@ -254,7 +254,11 @@ selectparam <- function(p,reg){
 
 for (i in 1:length(all.regions[["name"]])) {
   cat("###", all.regions[['shortname']][[i]], "\n")
-  cat("#### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
+  if (all.regions[['name']][[i]] == "Canada"){
+      cat("#### Plot single lineages in", all.regions[['name']][[i]],"*\n","\n")
+  }else{
+      cat("#### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
+  }
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,all.regions[['name']][[i]])})]
   n=min(25,length(paramselected))
   if(n!=0){
@@ -274,7 +278,7 @@ for (i in 1:length(all.regions[["name"]])) {
       
 This plot highlights the groups of related lineages that are growing fastest (e.g., BQ.1* is the monophyletic clade that includes BQ.1.1 and all other BQ.1 sublineages. 
 
-Again, Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary.
+Again, Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary. For Canada-wide plot, a dot with a circle border indicates lineages with a positive selection coefficient in multiple provinces. 
 
 
 ```{r buildNonStrictoPlots, results='asis', echo=FALSE, warning=FALSE, fig.height=7}
