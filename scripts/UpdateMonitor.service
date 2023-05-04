@@ -86,7 +86,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
-			echo "Duotang update {updatedate}:  \n\nDetailed changes:\n##Duotang.html\n" > whatsnew.md
+			echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n##Duotang.html\n" > whatsnew.md
 ## duotang.html:
 		else
 			#lastError=`tail -n 5 update.log`
