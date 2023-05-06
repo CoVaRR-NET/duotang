@@ -540,10 +540,10 @@ if [ "$GITPUSH" = "YES" ]; then
 fi
 
 
+echo "deactivate" > $checkPointFile
 if [ "$NOCONDA" = "NO" ]; then 
 	conda deactivate
 fi
-
 
 echo "Update completed successfully"
 echo "finish" > $checkPointFile

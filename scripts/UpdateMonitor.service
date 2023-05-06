@@ -64,8 +64,8 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		if [[ "$status" == "Update completed successfully" ]]; then
 			echo "sending messages via slack and setting keys"
 			prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
-			if [ -z "${VAR}" ]; then
-				echo "prLink missing, there was a problem creating a PR on github."
+			if [ -z "$prLink" ]; then
+				python scripts/duoli.py --message "Error: PR link is missing. "
 				exit 1
 			fi
 			python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
