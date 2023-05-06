@@ -80,6 +80,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			echo -e "\n\nSee preview: $previewURL " >> ./whatsnew.send.md
 			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
 			rm ./whatsnew.send.md
+			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
 			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid

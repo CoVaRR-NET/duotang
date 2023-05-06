@@ -504,9 +504,8 @@ if [ "$CLEAN" = "YES" ]; then
 	rm -rf ${data_dir}/$datestamp
 fi
 
-echo "recordversion" > $checkPointFile
+#echo "recordversion" > $checkPointFile
 #echo "$datestamp" > duotangCurVer
-python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $datestamp
 
 echo "gitpush" > $checkPointFile
 
