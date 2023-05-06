@@ -506,7 +506,6 @@ fi
 
 #echo "recordversion" > $checkPointFile
 #echo "$datestamp" > duotangCurVer
-cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 
 echo "gitpush" > $checkPointFile
 	
@@ -516,6 +515,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	#git remote prune origin
 	#git checkout -B UpdatePreview
 	#bash scripts/getPastDuotangVersions.sh
+	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
 	git add -f data_needed/*.nwk
 	git add -f data_needed/virusseq.metadata.csv.gz
