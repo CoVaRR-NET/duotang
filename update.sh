@@ -540,6 +540,7 @@ fi
 
 
 echo "deactivate" > $checkPointFile
+#deactivate:
 if [ "$NOCONDA" = "NO" ]; then 
 	conda deactivate
 fi
