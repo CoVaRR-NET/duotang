@@ -4,7 +4,7 @@ library(splines)
 #' Return a named list for each province with key=shortname and value=df
 #' @param maxDate:  the maximum date to cutoff the data. Default=NA
 #' @param datadir:  the data directory where the agecount data is stored. Default='data_needed'
-parseCaseData<- function(maxDate = Sys.Date(), datadir = "data_needed"){
+parseCaseData<- function(maxDate = Sys.Date(), datadir = "./data_needed"){
   #maxDate = maxdate
   BC<-read.csv(gzfile(paste0(datadir, "/AgeCaseCountBC.csv.gz")), header=T)%>% 
     filter(Age_Group %in% c("90+", "80-89","70-79")) %>% #keep only the 70+ case counts
@@ -22,8 +22,10 @@ parseCaseData<- function(maxDate = Sys.Date(), datadir = "data_needed"){
     mutate (`Date.reported` = as.Date(`Date.reported`)) %>% #format the column as dates
     rename(Reported_Date = `Date.reported`) %>% #relabel date column.
     drop_na() #drop row if any col is NA
-  
+  #view(QC)
+  #colnames(QC)
   QC <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T)%>% 
+    mutate(Date = .[,1]) %>% 
     filter(Date != "Date inconnue") %>%
     filter(Nom %in% c("70-79 ans","80-89 ans","90 ans et plus")) %>% #keep only the 70+ case counts
     group_by(Date) %>%#group data by reported date
