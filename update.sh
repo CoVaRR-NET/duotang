@@ -504,12 +504,11 @@ if [ "$CLEAN" = "YES" ]; then
 	rm -rf ${data_dir}/$datestamp
 fi
 
-echo "recordversion" > $checkPointFile
+#echo "recordversion" > $checkPointFile
 #echo "$datestamp" > duotangCurVer
-python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $datestamp
 
 echo "gitpush" > $checkPointFile
-
+	
 #gitpush:
 if [ "$GITPUSH" = "YES" ]; then 
 	#if [ "$BUILDMAIN" = "YES" ]; then 
@@ -540,10 +539,11 @@ if [ "$GITPUSH" = "YES" ]; then
 fi
 
 
+echo "deactivate" > $checkPointFile
+#deactivate:
 if [ "$NOCONDA" = "NO" ]; then 
 	conda deactivate
 fi
-
 
 echo "Update completed successfully"
 echo "finish" > $checkPointFile
