@@ -17,13 +17,15 @@ duotangver=`python scripts/UpdateStatusManager.py --action get --key LastUpdated
 duotangverepoch=`date --date="${duotangver}" +"%s"`
 
 #get the virusseq version from the latest viral ai update.
-dnastack collections list | python3 -c "import sys, json; a=(json.load(sys.stdin)); b=[child for child in a if child['slugName']=='virusseq']; c=b[0]['description']; d=c[c.find('Release:'):].split('('); releaseDate=d[0].replace('Release:','').replace('</strong>','').replace('&nbsp;',' ').strip(); hash=d[1].replace('identifier:','').replace(')</p>','').strip(); print (releaseDate); print (hash)" > viralaiver
+#dnastack collections list | python3 -c "import sys, json; a=(json.load(sys.stdin)); b=[child for child in a if child['slugName']=='virusseq']; c=b[0]['description']; d=c[c.find('Release:'):].split('('); releaseDate=d[0].replace('Release:','').replace('</strong>','').replace('&nbsp;',' ').strip(); hash=d[1].replace('identifier:','').replace(')</p>','').strip(); print (releaseDate); print (hash)" > viralaiver
+
+viralaiInfo=`python scripts/viralaiAPIParser.py`
 
 #convert the date to epoch
-viralaidate=`sed -n '1p' viralaiver`
+viralaidate=`echo $viralaiInfo | cut -d';' -f 1`
 viralaidate2=`date --date="${viralaidate}" +'%Y-%m-%d'`
 viralaiepoch=`date --date="${viralaidate2}" +"%s"`
-viralaiid=`sed -n '2p' viralaiver`
+viralaiid=`echo $viralaiInfo | cut -d';' -f 2`
 
 rm viralaiver
 
