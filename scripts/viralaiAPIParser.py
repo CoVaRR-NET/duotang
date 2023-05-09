@@ -13,7 +13,7 @@ if __name__ == "__main__":
     #find the virusseq slugName
     virusseq = [child for child in payload if child['slugName']=='virusseq']
     description = virusseq[0]['description']
-    information = re.split('<|>|;',description[description.find('Release:'):])
+    information = re.split('<|>|;|\(|\)|identifier:',description[description.find('Release:'):])
     
 
     def is_date(string, fuzzy=True):
@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
     date = None
     for item in information:
-        if (is_date(item)):
-            date = item
+        if (is_date(item.strip())):
+            date = item.strip()
 
 
     def is_valid_uuid(val):
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
     identifier = None
     for item in information:
-        if (is_valid_uuid(item)):
-            identifier = item
+        if (is_valid_uuid(item.strip())):
+            identifier = item.strip()
 
     print (date + ";" + identifier)
 
