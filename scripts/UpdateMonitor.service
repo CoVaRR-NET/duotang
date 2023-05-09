@@ -27,7 +27,7 @@ viralaidate2=`date --date="${viralaidate}" +'%Y-%m-%d'`
 viralaiepoch=`date --date="${viralaidate2}" +"%s"`
 viralaiid=`echo $viralaiInfo | cut -d';' -f 2`
 
-rm viralaiver
+#rm viralaiver
 
 if (( $viralaiepoch > $duotangverepoch )); then
 	#query the virusseq data portal for their latest update. 
