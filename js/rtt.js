@@ -99,10 +99,17 @@ var yScale = d3.scaleLinear()
                .domain([ymin, ymax])
                .range([gheight, 0]);
 
+var yMap = function(d) { return yScale(d.div); },
+    yMap1 = function(d) { return yScale(d.y1); },
+    yMap2 = function(d) { return yScale(d.y2); };
+
 // map date range to graph region width
 var xScale = d3.scaleLinear()
                .domain(d3.extent(dates))
                .range([0, gwidth]);
+var xMap = function(d) { return xScale(d.coldate); },
+    xMap1 = function(d) { return xScale(dateparser(d.x1)); },
+    xMap2 = function(d) { return xScale(dateparser(d.x2)); };
 
 
 // draw x-axis (dates)
@@ -146,8 +153,8 @@ rttg.selectAll("circle")
     .enter()
     .append("circle")
     //.filter(function(d) { return d.display; })
-    .attr("cx", function(d, i) { return xScale(dates[i]); })
-    .attr("cy", function(d) { return yScale(d.div); })
+    .attr("cx", xMap)
+    .attr("cy", yMap)
     .attr("r", 3)
     .style("fill", function(d) {
      if (d.pango in palette) {
@@ -163,10 +170,10 @@ rttg.selectAll("lines")
     .enter()
     .append("line")
     .attr("class", "lines")
-    .attr("x1", function(d) { return xScale(dateparser(d.x1)); })
-    .attr("y1", function(d) { return yScale(d.y1); })
-    .attr("x2", function(d) { return xScale(dateparser(d.x2)); })
-    .attr("y2", function(d) { return yScale(d.y2); })
+    .attr("x1", xMap1)
+    .attr("y1", yMap1)
+    .attr("x2", xMap2)
+    .attr("y2", yMap2)
     .attr("stroke-width", 2)
     .attr("stroke", function(d) { return palette[d.pango]; });
     
@@ -195,8 +202,16 @@ function rtt_update() {
       .data(tips)
       .transition().duration(500)
       .attr("r", function(d) { return d.display ? 3 : 0; } )
-      .attr("cx", function(d) { return xScale(d.coldate); })
-      .attr("cy", function(d) { return yScale(d.div); });
+      .attr("cx", xMap)
+      .attr("cy", yMap);
+    
+  rttg.selectAll("lines")
+      .data(fits)
+      .transition().duration(500)
+      .attr("x1", xMap1)
+      .attr("y1", yMap1)
+      .attr("x2", xMap2)
+      .attr("y2", yMap2);
 }
 
 
