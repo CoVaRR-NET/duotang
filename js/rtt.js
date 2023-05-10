@@ -5,6 +5,7 @@ console.log(data);
 
 // parse dates
 var dateparser = d3.timeParse("%Y-%m-%d"),
+    fits = data.fits,  // x0, x1, y0, y1
     tips = data.tips.map(
       x => ({ ...x, display: true, coldate: dateparser(x.coldate) })),
     dates = tips.map(d => d.coldate),
@@ -157,8 +158,17 @@ rttg.selectAll("circle")
     });
 
 // draw lines
-//rttg.selectAll("lines")
-//    .data(tips)
+rttg.selectAll("lines")
+    .data(fits)
+    .enter()
+    .append("line")
+    .attr("class", "lines")
+    .attr("x1", function(d) { return xScale(dateparser(d.x1)); })
+    .attr("y1", function(d) { return yScale(d.y1); })
+    .attr("x2", function(d) { return xScale(dateparser(d.x2)); })
+    .attr("y2", function(d) { return yScale(d.y2); })
+    .attr("stroke-width", 2)
+    .attr("stroke", function(d) { return palette[d.pango]; });
     
 
 
