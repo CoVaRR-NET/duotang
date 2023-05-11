@@ -530,6 +530,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotang*html
 	#git add -f duotangCurVer
 	git add -f DuotangUpdateStatus.json
+	git add -f currentsituation.md
 	git add -f whatsnew.md
 	git commit -m "Update: $datestamp"
 	git push origin dev
