@@ -23,6 +23,8 @@ params:
   label: "DataDir"
   input: text
   value: "data_needed/"
+editor_options:
+  chunk_output_type: console
 ---
 
 
@@ -126,6 +128,16 @@ meta$pango_group <- as.factor(meta$pango_group)
 
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
+#for the recombinant descendants that does not start with X, e.g. FD. append their full lineage path to the raw_lineage column
+meta1 <- meta %>% rowwise() %>%
+      mutate(raw_lineage = ifelse(grepl("^X", raw_lineage), 
+                                   str_replace_all(paste0(realtorawlineage(substr(raw_lineage, 1,str_locate(raw_lineage, "\\.")-1)),
+                                          ".",
+                                          substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , ""),
+                                   raw_lineage)) %>% as.data.frame()
+
+
+#view(meta2)
 
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
 
@@ -213,7 +225,7 @@ These analyses are subject to frequent change given new data and updated lineage
 
 **The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`**
 
-```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+```{r general fits for selection estimator, message = F, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
 individualSelectionPlotReference <- getStrictoSubLineages("XBB.1.5", meta)
@@ -224,12 +236,13 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
   lineagelist <- getStrictoSubLineages(l, meta)
   lapply(rev(all.regions$name), function(region) {
     if(length(intersect(individualSelectionPlotReference, lineagelist)) == 0) {
+      #message(paste0(lineagelist,";",region,"\n"))
       generateAllParams(region=region, startdate=startdate, reference=individualSelectionPlotReference, mutants=lineagelist, startpar=startpar2)
     } else {
       NA
     }
   })
-}, mc.cores=8)
+}, mc.cores=16)
 
 allparams <- do.call(c, allparams)  # same structure as below
 allparams <- allparams[!is.na(allparams)]
@@ -266,8 +279,9 @@ sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
                                mindate=c(as.character(startdate),"","","","",""),
                                maxdate=c("","","","","",""),
                                exclude_previously_plotted=c(F, FALSE,FALSE,FALSE,F,F),
-                               exclude_recombinants=c(F, T,T,T, T,F),
+                               nonRecombinantOnly=c(F, T,T,T, T,F),
                                recombinantsOnly=c(F, F,F,F, F,T))
+
 plotted=c()
 frequencyTable <- data.frame()
 for (i in 1:nrow(sublineagestoplot)) {
@@ -280,7 +294,7 @@ for (i in 1:nrow(sublineagestoplot)) {
     maxdate=as.Date(sublineagestoplot[[i,"maxdate"]])
   }
   set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta, 
-                            seperateRecombinant=sublineagestoplot[[i,"exclude_recombinants"]], 
+                            nonRecombinantOnly=sublineagestoplot[[i,"nonRecombinantOnly"]], 
                             recombinantsOnly = sublineagestoplot[[i,"recombinantsOnly"]])
   if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
     set=set[!set %in% plotted]

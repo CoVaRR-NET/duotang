@@ -9,6 +9,7 @@ startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
 setAll=getAllStrictoLineages(meta) 
 sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
+
 #sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% sublineages_XBB15] #XBB Other
 
@@ -55,7 +56,9 @@ selectionEstimateFits <- list() #named list to store estimates for different pro
 selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
 maxdate = selectionEstimateFits[["Canada"]]$date
 
-for (i in 1:length(all.regions$name)){
+for (i in 2:length(all.regions$name)){
+  print(i)
+  print(all.regions$shortname[[i]])
   selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]])
 }
 

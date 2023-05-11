@@ -85,8 +85,15 @@ getAllStrictoLineages <- function(meta) {
   unique(meta$lineage)
 }
 
-getStrictoSubLineages <- function(x, meta, seperateRecombinant=F, recombinantsOnly=F) {
-  #x <- "XBB.1.5*"
+#' test if a lineage is a descendant of a recombinant lineage.
+#' @param x: the lineage to be tested
+isRecombinant <- function (x){
+  x <- realtorawlineage(x)
+  return(grepl("(.*|^)X..", x))
+}
+
+getStrictoSubLineages <- function(x, meta, nonRecombinantOnly=F, recombinantsOnly=F) {
+
   raw <- realtorawlineage(x)
   if (!endsWith(x, "*")) {
     return(list(rawtoreallineage(raw)))
@@ -98,31 +105,28 @@ getStrictoSubLineages <- function(x, meta, seperateRecombinant=F, recombinantsOn
     togrep <- paste(raw, "$|", raw, ".", sep="")
     
     #further expand regex if its a sublineage as raw lineages start with XBB rather than the raw name of XBB
-    if (grepl("^X", x)){
-      togrep <- paste(raw, "$|", raw, ".|^", substr(x, 0, nchar(x)-1), ".", sep="")
-    }
+    #if (grepl("^X", x)){
+    #  togrep <- paste(raw, "$|", raw, ".|^", substr(x, 0, nchar(x)-1), ".", sep="")
+    #}
     
     togrep <- gsub("\\.", "\\\\.", togrep)  # handle escape chars
     
     l <- unique(meta$lineage[grepl(togrep, meta$raw_lineage)])
+
     if(length(l) > 1) {
       l <- append(rawtoreallineage(x), l)
     }
     
+    #Keep only the recombinant lineages
     if (recombinantsOnly){
-      idx <- grep("^X", l, value = FALSE)
-      if (!identical(idx, integer(0))) {
-        l <- l[idx] 
-      }
-      return(l)
+      idx <- unname(sapply(l, isRecombinant))
+      return(l[idx==T])
     }
     
-    if (seperateRecombinant){
-      idx <- grep("^X", l, value = FALSE)
-      if (!identical(idx, integer(0))) {
-        l <- l[-idx]
-      }
-      return(l)
+    #keep only the non-recombinant lineages
+    if (nonRecombinantOnly){
+      idx <- unname(sapply(l, isRecombinant))
+      return(l[idx!=T])
     }
     
     return(l)
@@ -153,6 +157,10 @@ isSubLineage <- function(parent,child){
   if (endsWith(parent, "*")) {
     raw_parent=realtorawlineage(substr(parent, 1, nchar(parent)-1))
   }
+  #if (grepl("^X..", raw_child)){
+  #  firstDotLoc <- str_locate(raw_child, "\\.")
+  #  raw_child = paste0(realtorawlineage(substr(raw_child, 1,firstDotLoc-1)),".",substr(raw_child, firstDotLoc+1, nchar(raw_child)))
+  #}
   np=nchar(raw_parent)
   nextchar=substr(raw_child, np+1, np+1)
   return(substr(raw_child, 1, np)==raw_parent && nextchar %in% c(".","*",""))
