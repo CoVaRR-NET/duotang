@@ -10,37 +10,6 @@ echo `date`
 #parameters
 maxFailCount="3"
 
-#logic for checking for "current situation" updates or rebuild commands via slack. 
-threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
-newRebuildCount=`python scripts/duoliRetrievalService.py --ts $threadts`
-lastRebuildCount=`python scripts/UpdateStatusManager.py --action get --key Rebuild`
-
-if (( $newRebuildCount > $lastRebuildCount )); then
-	echo "An update cmd is given in slack."
-	git pull --recurse-submodules
-	dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
-	bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang > rebuild.log 2>&1
-	python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
-	
-	status=$( tail -n 1 rebuild.log )
-	echo $status
-	if [[ "$status" == "Update completed successfully" ]]; then
-		prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
-		sleep 5
-		previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
-		while [[ ! "$previewURL" =~ "http" ]]; do
-			sleep 10
-			previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
-		done
-		previewURL="$previewURL/duotang.html"
-		python scripts/duoli.py --message "Update complete, approve the publication by checking the preview: $previewURL and then merging the PR on github: $prLink" --file duotang.html --thread $threadts
-	else
-		python scripts/duoli.py --message "There was an issue with the update. See logs attached. Please fix any issues and use the /update command to try again." --file "rebuild.log" --thread $threadts
-	fi
-else
-	echo "no rebuild command"
-fi
-
 #logic for checking for new updates
 #duotangver=`cat duotangCurVer`
 duotangver=`python scripts/UpdateStatusManager.py --action get --key LastUpdated`
@@ -48,15 +17,17 @@ duotangver=`python scripts/UpdateStatusManager.py --action get --key LastUpdated
 duotangverepoch=`date --date="${duotangver}" +"%s"`
 
 #get the virusseq version from the latest viral ai update.
-dnastack collections list | python3 -c "import sys, json; a=(json.load(sys.stdin)); b=[child for child in a if child['slugName']=='virusseq']; c=b[0]['description']; d=c[c.find('Release:'):].split('('); releaseDate=d[0].replace('Release:','').replace('</strong>','').replace('&nbsp;',' ').strip(); hash=d[1].replace('identifier:','').replace(')</p>','').strip(); print (releaseDate); print (hash)" > viralaiver
+#dnastack collections list | python3 -c "import sys, json; a=(json.load(sys.stdin)); b=[child for child in a if child['slugName']=='virusseq']; c=b[0]['description']; d=c[c.find('Release:'):].split('('); releaseDate=d[0].replace('Release:','').replace('</strong>','').replace('&nbsp;',' ').strip(); hash=d[1].replace('identifier:','').replace(')</p>','').strip(); print (releaseDate); print (hash)" > viralaiver
+
+viralaiInfo=`python scripts/viralaiAPIParser.py`
 
 #convert the date to epoch
-viralaidate=`sed -n '1p' viralaiver`
+viralaidate=`echo $viralaiInfo | cut -d';' -f 1`
 viralaidate2=`date --date="${viralaidate}" +'%Y-%m-%d'`
 viralaiepoch=`date --date="${viralaidate2}" +"%s"`
-viralaiid=`sed -n '2p' viralaiver`
+viralaiid=`echo $viralaiInfo | cut -d';' -f 2`
 
-rm viralaiver
+#rm viralaiver
 
 if (( $viralaiepoch > $duotangverepoch )); then
 	#query the virusseq data portal for their latest update. 
@@ -93,7 +64,12 @@ if (( $viralaiepoch > $duotangverepoch )); then
 		status=$( tail -n 1 update.log )
 		echo $status
 		if [[ "$status" == "Update completed successfully" ]]; then
+			echo "sending messages via slack and setting keys"
 			prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
+			if [ -z "$prLink" ]; then
+				python scripts/duoli.py --message "Error: PR link is missing. "
+				exit 1
+			fi
 			python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
 			sleep 5
 			previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
@@ -103,16 +79,17 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			done
 			previewURL="$previewURL/duotang.html"
 			#python scripts/duoli.py --message "Update complete, see PR branch $prLink"
-			echo -e "\n\nSee preview: $previewURL \bManage the PR: $prLink" >> ./whatsnew.send.md
+			echo -e "\n\nSee preview: $previewURL " >> ./whatsnew.send.md
 			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
 			rm ./whatsnew.send.md
+			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
 			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
 			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid
 			python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
-			echo "Duotang update {updatedate}:  \n\nDetailed changes:\n" > whatsnew.md
+			echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n##Duotang.html\n" > whatsnew.md
 ## duotang.html:
 		else
 			#lastError=`tail -n 5 update.log`
@@ -126,7 +103,39 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	fi
 else
 	echo "no update" 
+	#logic for checking for "current situation" updates or rebuild commands via slack. 
+	threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
+	newRebuildCount=`python scripts/duoliRetrievalService.py --ts $threadts`
+	lastRebuildCount=`python scripts/UpdateStatusManager.py --action get --key Rebuild`
+
+	if (( $newRebuildCount > $lastRebuildCount )); then
+		echo "An update cmd is given in slack."
+		git pull --recurse-submodules
+		dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang > rebuild.log 2>&1
+		python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
+		
+		status=$( tail -n 1 rebuild.log )
+		echo $status
+		if [[ "$status" == "Update completed successfully" ]]; then
+			prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
+			sleep 5
+			previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+			while [[ ! "$previewURL" =~ "http" ]]; do
+				sleep 10
+				previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+			done
+			previewURL="$previewURL/duotang.html"
+			python scripts/duoli.py --message "Update complete, here's the dev preview: $previewURL" --thread $threadts
+			python scripts/duoli.py --message "You can make additional changes via github and then use the /update and /currentsituation commands to generate another preview, or you can approve the publication of duotang by merging the pull request here: $prLink" --thread $threadts
+		else
+			python scripts/duoli.py --message "There was an issue with the update. See logs attached. Please fix any issues and use the /update command to try again." --file "rebuild.log" --thread $threadts
+		fi
+	else
+		echo "no rebuild command"
+	fi
 fi
+
 
 sleep 10s
 
