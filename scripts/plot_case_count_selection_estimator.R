@@ -168,8 +168,9 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, region=NA, sav
     theme_bw() +
     guides(`Case Count` = guide_legend(order = 0),
            Variants = guide_legend(order =2)) +
-    labs(caption = paste0("Last day of genomic data (Darker colours) is ", max((d %>% filter(type=="Actual"))$Reported_Date),
-                          "\n Last day of accurate case counts (lighter colours) is ", max((d %>% filter(report_type=="Accurate"))$Reported_Date))) +
+    labs(caption = paste0("Lighter shade represents per lineage case counts estimated using available genomics data",
+                          "\nLast day of genomic data is ", max((d %>% filter(type=="Actual"))$Reported_Date),
+                          "\n Last day of accurate case counts is ", max((d %>% filter(report_type=="Accurate"))$Reported_Date))) +
     theme(legend.text=element_text(size=12), text = element_text(size = 20)) 
   
     if (saveToFile){
