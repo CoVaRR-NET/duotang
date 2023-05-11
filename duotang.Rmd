@@ -510,7 +510,7 @@ Reported cases among people aged over 70 are obtained from the Ontario Data Cata
 
 Using the previously discussed methods for selection coefficients, a fitted model is produced for each lineage ($i$) that represents the estimated proportion (0-1) of a lineage over time ($p_i(t)$). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date. By multiplying the list from case counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases over 70 that is due to a specific lineage at each time point as $$n_i(t) = p_i(t)*n(t)$$
 
-Finally, once the inferred case counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i[t]$ and $n_i[t-1]$, from which the growth rate of that lineage is estimated as $$r_i = log10(\frac{n_i[t]}{n_i[t-1]})$$.
+Finally, once the inferred case counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i[t]$ and $n_i[t-1]$, from which the growth rate of that lineage ($r_i$) is estimated as $$r_i = log10(\frac{n_i[t]}{n_i[t-1]})$$.
 
 Since genomics data always lag the case count data, we extended the model for estimated proportions of a lineage over time ($p_i(t)$) to the dates where there are no genomics data but there is a case count data to estimate the number of cases due to a lineage for those dates. These estimated values are shaded in a lighter color within the plot.
 
