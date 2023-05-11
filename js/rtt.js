@@ -159,6 +159,19 @@ rttg.selectAll("circle")
     });
 
 // draw lines
+
+rttg.selectAll("lines")
+    .data(fits)
+    .enter()
+    .append("line")
+    .attr("class", "slopesOutline")
+    .attr("x1", xMap1)
+    .attr("y1", yMap1)
+    .attr("x2", xMap2)
+    .attr("y2", yMap2)
+    .attr("stroke-width", 6)
+    .attr("stroke", "white");
+	
 rttg.selectAll("lines")
     .data(fits)
     .enter()
@@ -168,10 +181,8 @@ rttg.selectAll("lines")
     .attr("y1", yMap1)
     .attr("x2", xMap2)
     .attr("y2", yMap2)
-    .attr("stroke-width", 2)
+    .attr("stroke-width", 3)
     .attr("stroke", function(d) { return palette[d.pango]; });
-    
-
 
 function rtt_update() {
   // recalculate plot region
@@ -198,13 +209,20 @@ function rtt_update() {
       .attr("cy", yMap);
   
   // update regression lines
+rttg.selectAll(".slopesOutline")
+      .transition().duration(500)
+      .attr("x1", xMap1)
+      .attr("y1", yMap1)
+      .attr("x2", xMap2)
+      .attr("y2", yMap2)
+      .attr("stroke-width", function(d) { return d.display ? 6 : 0; });
   rttg.selectAll(".slopes")
       .transition().duration(500)
       .attr("x1", xMap1)
       .attr("y1", yMap1)
       .attr("x2", xMap2)
       .attr("y2", yMap2)
-      .attr("stroke-width", function(d) { return d.display ? 2 : 0; });
+      .attr("stroke-width", function(d) { return d.display ? 3 : 0; });
 }
 
 
