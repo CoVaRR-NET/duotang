@@ -86,16 +86,24 @@ getAllStrictoLineages <- function(meta) {
 }
 
 getStrictoSubLineages <- function(x, meta, seperateRecombinant=F, recombinantsOnly=F) {
-  #x <- "BA.1*"
+  #x <- "XBB.1.5*"
   raw <- realtorawlineage(x)
   if (!endsWith(x, "*")) {
     return(list(rawtoreallineage(raw)))
   } 
   else {
     raw <- substr(raw, 0, nchar(raw)-1)  # remove star
+    
     # expand * to regular expression
     togrep <- paste(raw, "$|", raw, ".", sep="")
+    
+    #further expand regex if its a sublineage as raw lineages start with XBB rather than the raw name of XBB
+    if (grepl("^X", x)){
+      togrep <- paste(raw, "$|", raw, ".|^", substr(x, 0, nchar(x)-1), ".", sep="")
+    }
+    
     togrep <- gsub("\\.", "\\\\.", togrep)  # handle escape chars
+    
     l <- unique(meta$lineage[grepl(togrep, meta$raw_lineage)])
     if(length(l) > 1) {
       l <- append(rawtoreallineage(x), l)

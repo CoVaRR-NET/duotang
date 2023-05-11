@@ -219,7 +219,7 @@ alpha <- function(col, alpha) {
       return(list(fit=bbfit, confint=myconf, sample=df))
     },
     error=function(cond) {
-      return(list(fit=NA, confint=NA, sample=NA, modelerror=TRUE))
+      return(list(fit=NA, confint=NA, sample=cond, modelerror=TRUE))
     })
 }
 
@@ -238,7 +238,7 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
-  #region <- "Ontario"
+  #region <- "Canada"
   #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
   #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
   #mutants <- mutants
@@ -248,11 +248,13 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   #maxdate=NA
   #col=col
   
-  
+
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+  
   fit <- .fit.model(est, startpar, method=method)
+
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -285,9 +287,8 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     filter(variable != "n1") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
     mutate (p = 2*value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot) %>%
     rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]])) %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
-    mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
-  plotData$variable =  as.factor(plotData$variable)
-
+    mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) 
+  plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
     #plot the count data (circles)
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
@@ -302,18 +303,31 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   scurvesPlotData <- cbind(toplot[,"date", drop=F], scurves[,2:ncol(scurves)])
   colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
   scurvesPlotData=scurvesPlotData %>% melt(id="date")
-  
+
   #plot the VOC fits (line)
   p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
-  
   if (any(!is.na(fit$sample))) {  
     p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[1], alpha=0.5)
+    
+    #I'm sorry whoever maintain this next, this is disguting code to make sure the ribbon draws because I cant get it to work with a for loop
+    #Good luck trying to solve it or just continue the problem :)
+    #if additional mutants are added, increment the index in lo95, hi95 and col
     if(ncol(lo95) > 2) {
-      for (i in seq(3,ncol(lo95))){
-        p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,i], ymax=hi95[,i]), color = "black", fill=col[i-1], alpha=0.5)
-      }
+      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,3], ymax=hi95[,3]), color = "black", fill= col[2], alpha=0.5)
     }
+    if(ncol(lo95) > 3) {
+      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,4], ymax=hi95[,4]), color = "black", fill= col[3], alpha=0.5)
+    }
+    if(ncol(lo95) > 4) {
+      stop("ERROR: function does not currently support more than three mutant types!")
+    }
+    
+    #for some reason geom_ribbon dont like for loops. this only plots the last ribbon?
+    #if(ncol(lo95) > 2) {
+    #  for (i in seq(3,ncol(lo95))){ 
+    #    p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,i], ymax=hi95[,i]), color = "black", fill=col[i-1], alpha=0.5)
+    #  }
   }
   #define theme
   p<-p + theme_bw() +     
