@@ -129,7 +129,7 @@ meta$pango_group <- as.factor(meta$pango_group)
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
 #for the recombinant descendants that does not start with X, e.g. FD. append their full lineage path to the raw_lineage column
-meta1 <- meta %>% rowwise() %>%
+meta <- meta %>% rowwise() %>%
       mutate(raw_lineage = ifelse(grepl("^X", raw_lineage), 
                                    str_replace_all(paste0(realtorawlineage(substr(raw_lineage, 1,str_locate(raw_lineage, "\\.")-1)),
                                           ".",
@@ -231,7 +231,6 @@ startpar2 <- list(p=0.5, s=0.05)
 individualSelectionPlotReference <- getStrictoSubLineages("XBB.1.5", meta)
 
 #saveRDS(allparams, "newallparams.rds")
-
 allparams <- mclapply(latelineage_pangotree, function(l) {
   lineagelist <- getStrictoSubLineages(l, meta)
   lapply(rev(all.regions$name), function(region) {
@@ -267,7 +266,7 @@ cat(md_file, sep = "\n")
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset.)
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.)
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
@@ -505,6 +504,15 @@ These estimates of selection ignore heterogeneity within provinces and may be bi
 Sampling strategies that oversample clustered cases (*e.g.*, sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time.
 Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
 
+#### Case count trends by variant
+
+Reported cases among people aged over 70 are obtained from the Ontario Data Catalogue (Ontario), BC Center for Disease Control Health Info Database (British Columbia), COVID-19 info for Albertans (Alberta), Centre d'expertise et de référence en santé publique (Quebec), Canada Health InfoBase (Canada). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province. We then remove the last 2 datapoints for Canada and last 5 data points for provinces to remove under reported data. This normalized cases over time ($n$) is then log transformed and then fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of case counts ($n(t)$), where each element correspond to a count on a particular date, are then calculated using this fitting function by reversing the log transformation.
+
+Using the previously discussed methods for selection coefficients, a fitted model is produced for each lineage ($i$) that represents the estimated proportion (0-1) of a lineage over time ($p_i(t)$). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date. By multiplying the list from case counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases over 70 that is due to a specific lineage at each time point as $$n_i(t) = p_i(t)*n(t)$$
+
+Finally, once the inferred case counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i[t]$ and $n_i[t-1]$, from which the growth rate of that lineage is estimated as $$r_i = log10(\frac{n_i[t]}{n_i[t-1]})$$.
+
+Since genomics data always lag the case count data, we extended the model for estimated proportions of a lineage over time ($p_i(t)$) to the dates where there are no genomics data but there is a case count data to estimate the number of cases due to a lineage for those dates. These estimated values are shaded in a lighter color within the plot.
 
 #### Rates
 ##### Root-to-tip estimates of substitution rate
