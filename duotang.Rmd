@@ -3,7 +3,7 @@
 title: |
   ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
-author: "Pillar 6 - CAMEO"
+author: "Pillar 6 - CAMEO, CoVaRR-Net"
 output:
   html_document:
     keep_md: true
@@ -205,7 +205,7 @@ A complete list of lab authors is in this repository, and more details are below
 ## Introduction
 
 This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
-It is for discussion with pillar 6/CAMEO's team and for sharing with collaborators, e.g. public health labs.
+It is for discussion within the Coronavirus Variants Rapid Response Network (CoVaRR-Net)'s pillar 6 - CAMEO (Computational Analysis, Modelling and Evolutionary Outcomes Group) team and for sharing with collaborators, e.g. public health labs.
 These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
@@ -620,7 +620,7 @@ sessionInfo()
 
 # Acknowledgements
 
-We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
+We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
 
 We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the VirusSeq database, on which this research is based.
 
@@ -631,3 +631,4 @@ We wish to acknowledge the following organisations/laboratories for contributing
 
 * Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)
 
+* Coronavirus Variants Rapid Response Network (CoVaRR-Net;https://covarrnet.ca/)
