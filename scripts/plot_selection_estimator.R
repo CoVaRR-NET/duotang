@@ -42,6 +42,7 @@ alpha <- function(col, alpha) {
   prov <- get.province.list(region)
   #filter out the metadata rows that have the reference and mutant as lineage
   #view(mydata)
+  nrow(meta)
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
     province %in% prov,
@@ -491,6 +492,10 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 generateAllParams <- function(region, startdate, reference, mutants, startpar, method='BFGS') {
+  #region = "Ontario"
+  #reference=individualSelectionPlotReference
+  #mutants = lineagelist
+  #collapseMutants = T
   est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
   if(any(is.na(est))){
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))

@@ -1,9 +1,9 @@
 
 ---
 title: |
-  ![Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
+  ![CAMEO - Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
-author: "Pillar 6 - CAMEO"
+author: "Pillar 6 - CAMEO, CoVaRR-Net"
 output:
   html_document:
     keep_md: true
@@ -23,6 +23,8 @@ params:
   label: "DataDir"
   input: text
   value: "data_needed/"
+editor_options:
+  chunk_output_type: console
 ---
 
 
@@ -126,6 +128,16 @@ meta$pango_group <- as.factor(meta$pango_group)
 
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
+#for the recombinant descendants that does not start with X, e.g. FD. append their full lineage path to the raw_lineage column
+meta <- meta %>% rowwise() %>%
+      mutate(raw_lineage = ifelse(grepl("^X", raw_lineage), 
+                                   str_replace_all(paste0(realtorawlineage(substr(raw_lineage, 1,str_locate(raw_lineage, "\\.")-1)),
+                                          ".",
+                                          substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , ""),
+                                   raw_lineage)) %>% as.data.frame()
+
+
+#view(meta2)
 
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
 
@@ -192,9 +204,9 @@ A complete list of lab authors is in this repository, and more details are below
 
 ## Introduction
 
-This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
-It is for discussion with pillar 6/CAMEO's team and for sharing with collaborators, e.g. public health labs.
-These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
+This notebook was built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread. 
+It is developed by the CAMEO team (Computational Analysis, Modelling and Evolutionary Outcomes Group) associated with the Coronavirus Variants Rapid Response Network (CoVaRR-Net) for sharing with collaborators, including public health labs. 
+These analyses are freely available and open source, enabling code reuse by public health authorities and other researchers for their own use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
@@ -213,23 +225,23 @@ These analyses are subject to frequent change given new data and updated lineage
 
 **The last sample collection date is `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`**
 
-```{r general fits for selection estimator, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
+```{r general fits for selection estimator, message = F, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
 individualSelectionPlotReference <- getStrictoSubLineages("XBB.1.5", meta)
 
 #saveRDS(allparams, "newallparams.rds")
-
 allparams <- mclapply(latelineage_pangotree, function(l) {
   lineagelist <- getStrictoSubLineages(l, meta)
   lapply(rev(all.regions$name), function(region) {
     if(length(intersect(individualSelectionPlotReference, lineagelist)) == 0) {
+      #message(paste0(lineagelist,";",region,"\n"))
       generateAllParams(region=region, startdate=startdate, reference=individualSelectionPlotReference, mutants=lineagelist, startpar=startpar2)
     } else {
       NA
     }
   })
-}, mc.cores=8)
+}, mc.cores=16)
 
 allparams <- do.call(c, allparams)  # same structure as below
 allparams <- allparams[!is.na(allparams)]
@@ -254,7 +266,7 @@ cat(md_file, sep = "\n")
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset.)
+Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.)
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
@@ -266,8 +278,9 @@ sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
                                mindate=c(as.character(startdate),"","","","",""),
                                maxdate=c("","","","","",""),
                                exclude_previously_plotted=c(F, FALSE,FALSE,FALSE,F,F),
-                               exclude_recombinants=c(F, T,T,T, T,F),
+                               nonRecombinantOnly=c(F, T,T,T, T,F),
                                recombinantsOnly=c(F, F,F,F, F,T))
+
 plotted=c()
 frequencyTable <- data.frame()
 for (i in 1:nrow(sublineagestoplot)) {
@@ -280,7 +293,7 @@ for (i in 1:nrow(sublineagestoplot)) {
     maxdate=as.Date(sublineagestoplot[[i,"maxdate"]])
   }
   set=getStrictoSubLineages(sublineagestoplot[[i,"name"]],meta, 
-                            seperateRecombinant=sublineagestoplot[[i,"exclude_recombinants"]], 
+                            nonRecombinantOnly=sublineagestoplot[[i,"nonRecombinantOnly"]], 
                             recombinantsOnly = sublineagestoplot[[i,"recombinantsOnly"]])
   if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
     set=set[!set %in% plotted]
@@ -491,6 +504,15 @@ These estimates of selection ignore heterogeneity within provinces and may be bi
 Sampling strategies that oversample clustered cases (*e.g.*, sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time.
 Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
 
+#### Case count trends by variant
+
+Reported cases among people aged over 70 are obtained from the Ontario Data Catalogue (Ontario), BC Center for Disease Control Health Info Database (British Columbia), COVID-19 info for Albertans (Alberta), Centre d'expertise et de référence en santé publique (Quebec), Canada Health InfoBase (Canada). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province. We then remove the last 2 datapoints for Canada and last 5 data points for provinces to remove under reported data. This normalized cases over time ($n$) is then log transformed and then fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of case counts ($n(t)$), where each element correspond to a count on a particular date, are then calculated using this fitting function by reversing the log transformation.
+
+Using the previously discussed methods for selection coefficients, a fitted model is produced for each lineage ($i$) that represents the estimated proportion (0-1) of a lineage over time ($p_i(t)$). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date. By multiplying the list from case counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases over 70 that is due to a specific lineage at each time point as $$n_i(t) = p_i(t)*n(t)$$
+
+Finally, once the inferred case counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i[t]$ and $n_i[t-1]$, from which the growth rate of that lineage ($r_i$) is estimated as $$r_i = log10(\frac{n_i[t]}{n_i[t-1]})$$.
+
+Since genomics data always lag the case count data, we extended the model for estimated proportions of a lineage over time ($p_i(t)$) to the dates where there are no genomics data but there is a case count data to estimate the number of cases due to a lineage for those dates. These estimated values are shaded in a lighter color within the plot.
 
 #### Rates
 ##### Root-to-tip estimates of substitution rate
@@ -598,7 +620,7 @@ sessionInfo()
 
 # Acknowledgements
 
-We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available.  We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
+We thank all the authors, developers, and contributors to the VirusSeq database for making their SARS-CoV-2 sequences publicly available. We especially thank the Canadian Public Health Laboratory Network, academic sequencing partners, diagnostic hospital labs, and other sequencing partners for the provision of the Canadian sequence data used in this work. Genome sequencing in Canada was supported by a Genome Canada grant to the Canadian COVID-19 Genomic Network (CanCOGeN).
 
 We gratefully acknowledge all the Authors, the Originating laboratories responsible for obtaining the specimens, and the Submitting laboratories for generating the genetic sequence and metadata and sharing via the VirusSeq database, on which this research is based.
 
@@ -608,4 +630,6 @@ We wish to acknowledge the following organisations/laboratories for contributing
 * Public Health Agency of Canada (PHAC) / National Microbiology Laboratory (NML) - (https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html)
 
 * Various provincial public health websites (e.g. INSPQ https://www.inspq.qc.ca/covid-19/donnees/)
+
+* Canadian Institutes of Health Research (CIHR) - Coronavirus Variants Rapid Response Network (CoVaRR-Net;https://covarrnet.ca/)
 

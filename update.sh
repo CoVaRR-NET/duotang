@@ -429,7 +429,7 @@ echo "buildtree" > $checkPointFile
 #buildtree:
 for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 	echo $alignedFasta
-	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo; 
+	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
 done
 echo "cleantree" > $checkPointFile
 
@@ -530,6 +530,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f duotang*html
 	#git add -f duotangCurVer
 	git add -f DuotangUpdateStatus.json
+	git add -f currentsituation.md
 	git add -f whatsnew.md
 	git commit -m "Update: $datestamp"
 	git push origin dev

@@ -2,18 +2,27 @@
 The slope of root-to-tip plots over time provide an estimate of the substitution rate.
 A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
-```{r}
-require(MASS)
+```{r message=FALSE}
+require(MASS, quietly=T)
 
 source("scripts/fit-rtt.R")
 rtt1 <- fit.rtt(paste0(params$datadir, "/aligned_allSeqs_sample1.rtt.nwk"))
 fit1 <- rtt1$fits
 
+# extract line segments
+segments <- lapply(1:length(fit1), function(i) {
+  pango <- names(fit1)[i]
+  p <- predict(fit1[[i]])
+  x <- fit1[[i]]$model$x
+  list(pango=pango, x1=min(x), x2=max(x), y1=min(p), y2=max(p))
+})
+
 # generate interactive plot
 pal <- VOCVOI$color
 names(pal) <- VOCVOI$name
 
-r2d3(data=toJSON(list(tips=rtt1$tips, palette=as.list(pal))), 
+r2d3(data=toJSON(list(tips=rtt1$tips, palette=as.list(pal), fits=segments), 
+                 auto_unbox=TRUE), 
      script="js/rtt.js", container="div", elementId="rtt-element")
 ```
 

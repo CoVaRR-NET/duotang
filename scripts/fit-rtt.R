@@ -51,6 +51,7 @@ fit.rtt <- function(path) {
   div <- tips$div
   
   fit0 <- rlm(div[pg=='other'] ~ coldate[pg=='other'])
+  names(fit0$model) <- c('y', 'x')
   fits <- list(other=fit0)
   for (i in 1:nrow(VOCVOI)) {
     variant <- VOCVOI$name[i]

@@ -101,7 +101,7 @@ def apply_cigar(seq, rpos, cigar, reflen):
     return aligned
 
 
-def minimap2(stdin, refpath, path='minimap2', nthread=3, reflen=29903):
+def minimap2(stdin, refpath, path='minimap2', nthread=16, reflen=29903):
     """
     Wrapper function for minimap2.
 
