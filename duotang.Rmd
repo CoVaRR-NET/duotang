@@ -204,9 +204,9 @@ A complete list of lab authors is in this repository, and more details are below
 
 ## Introduction
 
-This notebook is built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread.
-It is for discussion within the Coronavirus Variants Rapid Response Network (CoVaRR-Net)'s pillar 6 - CAMEO (Computational Analysis, Modelling and Evolutionary Outcomes Group) team and for sharing with collaborators, e.g. public health labs.
-These analyses can spur further research within or across pillars, be used for reports (or data dashboards), support discussions with the science communication pillar for public dissemination, and enable code reuse by public health authorities/laboratories for their internal use.
+This notebook was built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread. 
+It is developed by the CAMEO team (Computational Analysis, Modelling and Evolutionary Outcomes Group) associated with the Coronavirus Variants Rapid Response Network (CoVaRR-Net) for sharing with collaborators, including public health labs. 
+These analyses are freely available and open source, enabling code reuse by public health authorities and other researchers for their own use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
 Only representations of aggregate data will be posted here.
