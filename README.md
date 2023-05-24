@@ -6,7 +6,7 @@ The compiled HTML document is hosted as a GitHub Page at:
 https://covarr-net.github.io/duotang/duotang.html
 
 As an alternative, the document can also be viewed at: 
-https://duotang.pages.dev/duotang
+https://main.duotang.pages.dev/duotang
 
 For information on how to contribute to this project, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) document.
 
