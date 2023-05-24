@@ -2,29 +2,30 @@
 source("scripts/plot_selection_estimator.R")
 
 #define starting parameters (p,s) for making the selection estimates
-startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-#startpar <- list(p=c(0.5, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
+#startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
+startpar <- list(p=c(0.1, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
   
 #filter samples with variants of interest
 setAll=getAllStrictoLineages(meta) 
-sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
+#sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
-#sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-#sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% sublineages_XBB15] #XBB Other
+sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
+sublineages_XBB116 <- getStrictoSubLineages("XBB.1.16*",meta)
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15,sublineages_XBB116)] #XBB Other
 
-setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-#setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB15, sublineages_XBBOther)] #the rest
+#setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
+setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
 #define the mutants
-mutants = list(sublineages_BQ, sublineages_XBB )
-mutantNames = list("BQ*", "XBB*", "the rest") #
-col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+#mutants = list(sublineages_BQ, sublineages_XBB )
+#mutantNames = list("BQ*", "XBB*", "the rest") #
+#col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-#mutants = list(sublineages_BQ, sublineages_XBB15, sublineages_XBBOther )
-#mutantNames = list("BQ*", "XBB.1.5*", "XBB.Other", "the rest") #
-#col <- c(pal["Omicron BQ"], "Other XBB"=pal["XBB"], "XBB.1.5*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
-
+mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
+mutantNames = list("XBB.1.5*", "XBB\U200B.1.16*", "XBB\U200B.Other", "the rest") #
+col <- c("XBB.1.5*"="#CC5500", "XBB\U200B.1.16*" = "#00eeff", "XBB\U200B.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+#im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
