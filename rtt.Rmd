@@ -2,7 +2,7 @@
 The slope of root-to-tip plots over time provide an estimate of the substitution rate.
 A lineage with a steeper positive slope than average for SARS-CoV-2 is accumulating mutations at a faster pace, while a lineage that exhibits a jump up (a shift in intercept but not slope) has accumulated more than expected numbers of mutations in a transient period of time (similar to what we saw with Alpha when it first appeared in the UK).
 
-```{r message=FALSE}
+```{r message=FALSE, echo=F, warning=F}
 require(MASS, quietly=T)
 
 source("scripts/fit-rtt.R")
@@ -27,7 +27,7 @@ r2d3(data=toJSON(list(tips=rtt1$tips, palette=as.list(pal), fits=segments),
 ```
 
 
-```{r}
+```{r message=FALSE, echo=F, warning=F}
 fit2 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample2.rtt.nwk"))$fits
 fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"))$fits
 ```
@@ -37,7 +37,7 @@ fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"))$fits
 
 Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest, with their 95% confidence interval.
 
-```{r}
+```{r message=FALSE, echo=F, warning=F}
 
 if(!is.null(fit1)){
   est1 <- get.ci(fit1); est1$rep <- 'Rep1'

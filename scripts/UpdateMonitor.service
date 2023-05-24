@@ -134,6 +134,29 @@ else
 	else
 		echo "no rebuild command"
 	fi
+	
+	#logic for checking if PR is closed and thus should run an archive update.
+	prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
+	prStatus=$(gh pr view $prLink | grep -i -E -w "state.*merged")
+	if [ -z "$prStatus" ]; then
+		  echo "PR still open"
+	else
+		approveStatus=`python scripts/UpdateStatusManager.py --action get --key Approved`
+		if [ "$approveStatus" = "False" ]; then
+			echo "PR Approved, updating archive"
+			git pull
+			git checkout main
+			git pull
+			bash ./scripts/getPastDuotangVersions.sh
+			git add archive/*
+			git commit -m "Archive update"
+			git push
+			git checkout dev
+			python scripts/UpdateStatusManager.py --action set --key Approved --value "True"
+		else
+			echo "PR approved and archive updated, nothing to do."
+		fi
+	fi
 fi
 
 
