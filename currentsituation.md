@@ -1,6 +1,6 @@
 
 
-XBB.1.5 is decreasing now, as multiple other XBB variants further compete. Variants growing include multiple current XBB.1.16**, XBB.1.9**, and XBB.2.3** variants, and other variants with immune evasive mutations like S:F456L. Different variants are predominating in different provinces depending on timing of their introduction (for example, FD.1.1 was introduced earlier in Quebec and New Brunswick, versus XBB.1.16 which was introduced earlier in Ontario and Alberta). All of these variants have mutations that would confer additional immune evasion and/or infectivity, with some recent subvariants of XBB.1.16 and XBB.1.9.2 having multiple mutations of particular interest.
+XBB.1.5 is decreasing now, as multiple other XBB variants further compete. Variants growing include multiple current XBB.1.16, XBB.1.9, and XBB.2.3 variants, and other variants with immune evasive mutations like S:F456L. Different variants are predominating in different provinces depending on timing of their introduction (for example, FD.1.1 was introduced earlier in Quebec and New Brunswick, versus XBB.1.16 which was introduced earlier in Ontario and Alberta). All of these variants have mutations that would confer additional immune evasion and/or infectivity, with some recent subvariants of XBB.1.16 and XBB.1.9.2 having multiple mutations of particular interest.
 
 
 
