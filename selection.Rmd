@@ -2,29 +2,29 @@
 source("scripts/plot_selection_estimator.R")
 
 #define starting parameters (p,s) for making the selection estimates
-startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-#startpar <- list(p=c(0.1, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
+#startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
+startpar <- list(p=c(0.1, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
   
 #filter samples with variants of interest
-setAll=getAllStrictoLineages(meta) 
-sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
+#setAll=getAllStrictoLineages(meta) 
+#sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
-#sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-#sublineages_XBB116 <- getStrictoSubLineages("XBB.1.16*",meta)
-#sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15,sublineages_XBB116)] #XBB Other
+sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
+sublineages_XBB116 <- getStrictoSubLineages("XBB.1.16*",meta)
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15,sublineages_XBB116)] #XBB Other
 
-setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-#setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_XBBOther)] #the rest
+#setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
+setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
 #define the mutants
-mutants = list(sublineages_BQ, sublineages_XBB )
-mutantNames = list("BQ*", "XBB*", "the rest") #
-col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+#mutants = list(sublineages_BQ, sublineages_XBB )
+#mutantNames = list("BQ*", "XBB*", "the rest") #
+#col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-#mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
-#mutantNames = list("XBB.1.5*", "XBB\U200B.1.16*", "XBB\U200B.Other", "the rest") #
-#col <- c("XBB.1.5*"="#CC5500", "XBB\U200B.1.16*" = "#00eeff", "XBB\U200B.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
+mutantNames = list("XBB.1.5*", "XBB\U200B.1.16*", "XBB\U200B.Other", "the rest") #
+col <- c("XBB.1.5*"="#CC5500", "XBB\U200B.1.16*" = "#00eeff", "XBB\U200B.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 #im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
@@ -70,13 +70,15 @@ for (i in 2:length(all.regions$name)){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage, s (and by how much), against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages rising in frequency are the XBB.\* group with BQ.\*,which descend from BA.5\*, nearing a peak. We first show this growth of XBB\* and other BQ.\*, relative to the remaining strains, which consist predominantly of BA.5\* (excluding BQ.\*). Left plot: y-axis is the proportion of sub-lineages BQ.\* and XBB.\* relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.\* or BQ\*)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Currently, the major group of Omicron lineages rising in frequency are the XBB.* group, dominated by the XBB.1.5* lineages which is near it's peak. There are also several other XBB lineages showing a selective advantage. The previous dominant lineage, BQ.*, is nearly at the bottom, however several of it's descendant are beginning to grow again. See Fastest Growing Lineages for details on lineages showing positive selection.
 
-For comparison, Alpha had a selective advantage of s \~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+We first show this growth of XBB.1.5\*, XBB.1.16\*, or XBB.Other, relative to the remaining strains, which consist predominantly of BQ.\*. Left plot: y-axis is the proportion of sub-lineages BQ., XBB.1.5\*, and XBB.Other relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.1.5\*, XBB.1.16\*, or XBB.Other)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
-**Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of XBB.\*, BQ.\*, and other lineages during this time frame are not displayed.
+For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+
+**Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of a lineage during this time frame are not displayed.
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis', echo=FALSE}
 #define provinces to show selection plots for.
