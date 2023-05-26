@@ -3,7 +3,7 @@ source("scripts/plot_selection_estimator.R")
 
 #define starting parameters (p,s) for making the selection estimates
 startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-#startpar <- list(p=c(0.5, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
+#startpar <- list(p=c(0.1, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
   
 #filter samples with variants of interest
 setAll=getAllStrictoLineages(meta) 
@@ -11,20 +11,21 @@ sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
 #sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-#sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% sublineages_XBB15] #XBB Other
+#sublineages_XBB116 <- getStrictoSubLineages("XBB.1.16*",meta)
+#sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15,sublineages_XBB116)] #XBB Other
 
 setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-#setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB15, sublineages_XBBOther)] #the rest
+#setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
 #define the mutants
 mutants = list(sublineages_BQ, sublineages_XBB )
 mutantNames = list("BQ*", "XBB*", "the rest") #
 col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-#mutants = list(sublineages_BQ, sublineages_XBB15, sublineages_XBBOther )
-#mutantNames = list("BQ*", "XBB.1.5*", "XBB.Other", "the rest") #
-#col <- c(pal["Omicron BQ"], "Other XBB"=pal["XBB"], "XBB.1.5*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
-
+#mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
+#mutantNames = list("XBB.1.5*", "XBB\U200B.1.16*", "XBB\U200B.Other", "the rest") #
+#col <- c("XBB.1.5*"="#CC5500", "XBB\U200B.1.16*" = "#00eeff", "XBB\U200B.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+#im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
 #Note that the startdate shouldn't be too much before both alleles become common
@@ -101,7 +102,7 @@ apply(all.regions,1,function(reg){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-These plots track the reported cases among people aged over 70 per 100,000 individuals (green dots). This age group is more reliably tested in Canada and is thus used to describe overall trends in COVID-19. A cubic spline is fit to the log of case counts (top curve), with the recent trends used to estimate the daily exponential growth rate r in COVID-19 cases on the last day of accurate case counts. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding exponential growth rate. The most recent case counts are generally underreported and are not used in the fits (dropping two weeks of data from Canada and five days of data from the provinces). The lambda value used for the spline fit is 0.001. For detailed methodology, please see the methods section in the [appendix](#Methodology).
+These plots follow reported cases among people aged over 70 per 100,000 individuals (green dots), ignoring the most recent case counts (hollow circles), which are generally underestimated as data continues to be gathered. Individuals over age 70 are more reliably tested in Canada and thus provide a more accurate picture of COVID-19 incidence over time. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of accurate case counts are then used to estimate the daily exponential growth rate $r$ in COVID-19 cases. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of accurate case counts. For detailed methodology, please see the methods section in the [appendix](#Methodology).
 
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
