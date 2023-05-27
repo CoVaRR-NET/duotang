@@ -6,7 +6,7 @@ source("scripts/plot_selection_estimator.R")
 startpar <- list(p=c(0.1, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
   
 #filter samples with variants of interest
-#setAll=getAllStrictoLineages(meta) 
+setAll=getAllStrictoLineages(meta) 
 #sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
