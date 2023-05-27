@@ -11,8 +11,8 @@ Variants of current interest, due to their current/potential growth advantage, m
 * FD.1.1 (subvariant of XBB.1.5.15 with S:F456L)
 * FE.1 (subvariant of XBB.1.18.1 with S:456L)
 * Multiple XBB.1.5 subvariants including those that have S:F456L
-* XBB.1.16 which has S:T478R
-* XBB.1.9.1, XBB.1.9.2 (which have non-spike mutations of note and in particular those with S:Q613H and/or S:F456L)
+* XBB.1.16 which has S:T478R (with a particular interest in those with S:F456L)
+* XBB.1.9.1, XBB.1.9.2 (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H - aka orf6:y49h)
 * XBB.2.3, XBB.2.3.2, XBB.2.3.3 (has mutation S:P521S, with an interest in those also with mutation 478R)
 
 …and sublineages with additional combinations of the mutations below.
