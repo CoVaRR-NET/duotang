@@ -51,6 +51,7 @@ if (( $viralaiepoch > $duotangverepoch )); then
 				echo "3rd error warning msg"
 				python scripts/duoli.py --message "This update failed $maxFailCount times already, errors will no longer appear, <@U03VC9B7PC3> better look into it."
 				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
+				exit
 			else
 				echo "failed message"
 				python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Last update attempted failed, attempting to restart the update process..."
