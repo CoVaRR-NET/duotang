@@ -239,15 +239,15 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
-  #region <- "Canada"
-  #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
-  #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
-  #mutants <- mutants
-  #names <- mutantNames
-  #startpar <- startpar
-  #method='BFGS'
-  #maxdate=NA
-  #col=col
+  region <- "Canada"
+  startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+  reference <- c(setAll)  # or c("BA.1", "BA.1.1")
+  mutants <- mutants
+  names <- mutantNames
+  startpar <- startpar
+  method='BFGS'
+  maxdate=NA
+  col=col
   
 
   est <- .make.estimator(region, startdate, reference, mutants)
@@ -350,14 +350,14 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     mutate (p = value/n1) %>% filter(p != Inf) %>% dplyr::select(-n1) %>%
     rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]]))  %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
     mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ",round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
-  plotData$variable =  as.factor(plotData$variable)
+  plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
   
   # plot the count data (circles)
   p2<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
     scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
     xlab("Sample collection date") +
-    ylab(paste0("Proportion in ", est$region, "(log)")) + 
+    ylab(paste0("Relative proportions in ", est$region, " (logit)")) + 
     scale_y_log10(limits=c(0.001,1000), breaks = c(0.001, 0.01, 0.1, 1, 10, 100, 1000), labels = c(0.001, 0.01, 0.1, 1, 10, 100, 1000)) +
     xlim(min(plotData$date), maxdate)
   
