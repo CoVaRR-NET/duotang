@@ -239,15 +239,15 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
-  region <- "Canada"
-  startdate <- as.Date(max(meta$sample_collection_date)-days(120))
-  reference <- c(setAll)  # or c("BA.1", "BA.1.1")
-  mutants <- mutants
-  names <- mutantNames
-  startpar <- startpar
-  method='BFGS'
-  maxdate=NA
-  col=col
+  #region <- "Canada"
+  #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+  #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
+  #mutants <- mutants
+  #names <- mutantNames
+  #startpar <- startpar
+  #method='BFGS'
+  #maxdate=NA
+  #col=col
   
 
   est <- .make.estimator(region, startdate, reference, mutants)
