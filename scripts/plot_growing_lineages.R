@@ -67,7 +67,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     p <- p +
     geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
     geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 10% per day to mark doubling in < week
-    scale_y_continuous(breaks=seq(0, max(round((d$high_CI + 2.5)/ 5.0) * 5.0),5))+
+    scale_y_continuous(breaks=seq(0, max(round((d$sel_coeff + 2.5)/ 5.0) * 5.0),5))+
     coord_flip()+ colScale+
       theme_bw()+
      
