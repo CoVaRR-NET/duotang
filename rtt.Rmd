@@ -56,10 +56,13 @@ if(!is.null(fit1)){
   sec.frame$est[sec.frame$est < 0] <- 0
   sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
   sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
+    sec.frame=sec.frame[sec.frame$Lineage != "other",]
+
   
   pal <- VOCVOI$color
   names(pal) <- VOCVOI$name
   pal["other"] <- "white"
+  
     
   ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
     geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
