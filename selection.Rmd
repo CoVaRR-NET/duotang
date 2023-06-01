@@ -58,8 +58,6 @@ selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
 maxdate = selectionEstimateFits[["Canada"]]$date
 
 for (i in 2:length(all.regions$name)){
-  print(i)
-  print(all.regions$shortname[[i]])
   selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]])
 }
 
