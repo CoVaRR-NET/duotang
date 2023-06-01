@@ -9,13 +9,22 @@ source("scripts/fit-rtt.R")
 rtt1 <- fit.rtt(paste0(params$datadir, "/aligned_allSeqs_sample1.rtt.nwk"))
 fit1 <- rtt1$fits
 
+#exclusion list for the RTT lines
+rttLineBlacklist <- c("other", "Recombinants")
+
 # extract line segments
 segments <- lapply(1:length(fit1), function(i) {
   pango <- names(fit1)[i]
-  p <- predict(fit1[[i]])
-  x <- fit1[[i]]$model$x
-  list(pango=pango, x1=min(x), x2=max(x), y1=min(p), y2=max(p))
+  if (!(pango %in% rttLineBlacklist)){
+
+      p <- predict(fit1[[i]])
+      x <- fit1[[i]]$model$x
+      list(pango=pango, x1=min(x), x2=max(x), y1=min(p), y2=max(p))
+  }
 })
+
+#remove null value from segment list
+segments <- segments[segments!="NULL"]
 
 # generate interactive plot
 pal <- VOCVOI$color
@@ -47,10 +56,13 @@ if(!is.null(fit1)){
   sec.frame$est[sec.frame$est < 0] <- 0
   sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
   sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
+    sec.frame=sec.frame[sec.frame$Lineage != "other",]
+
   
   pal <- VOCVOI$color
   names(pal) <- VOCVOI$name
   pal["other"] <- "white"
+  
     
   ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
     geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 

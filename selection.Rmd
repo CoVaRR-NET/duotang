@@ -23,8 +23,10 @@ setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_
 #col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
-mutantNames = list("XBB.1.5*", "XBB\U200B.1.16*", "XBB\U200B.Other", "the rest") #
-col <- c("XBB.1.5*"="#CC5500", "XBB\U200B.1.16*" = "#00eeff", "XBB\U200B.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+#this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
+#!!!"The Rest" should always be last.
+mutantNames = list("XBB.1.5*", "XBB.1.16*", "XBB.Other", "The Rest") #
+col <- c("XBB.1.5*"="#CC5500", "XBB.1.16*" = "#00eeff", "XBB.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 #im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
@@ -58,8 +60,6 @@ selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
 maxdate = selectionEstimateFits[["Canada"]]$date
 
 for (i in 2:length(all.regions$name)){
-  print(i)
-  print(all.regions$shortname[[i]])
   selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]])
 }
 
@@ -74,7 +74,7 @@ Here we examine the relative rate of spread of the different sublineages of Omic
 
 Currently, the major group of Omicron lineages rising in frequency are the XBB.* group, dominated by the XBB.1.5* lineages which is near it's peak. There are also several other XBB lineages showing a selective advantage. The previous dominant lineage, BQ.*, is nearly at the bottom, however several of it's descendant are beginning to grow again. See Fastest Growing Lineages for details on lineages showing positive selection.
 
-We first show this growth of XBB.1.5\*, XBB.1.16\*, or XBB.Other, relative to the remaining strains, which consist predominantly of BQ.\*. Left plot: y-axis is the proportion of sub-lineages BQ., XBB.1.5\*, and XBB.Other relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.1.5\*, XBB.1.16\*, or XBB.Other)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+We first show this growth of XBB.1.5\*, XBB.1.16\*, or XBB.Other, relative to the remaining strains, which consist predominantly of BQ.\*. Left plot: y-axis is the proportion of sub-lineages XBB.1.5\*, XBB.1.16\*, and XBB.Other relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.1.5\*, XBB.1.16\*, or XBB.Other)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
@@ -119,8 +119,8 @@ populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t',
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-  #caseCountData <- caseData$AB
-  #selectionEstimateObject<- selectionEstimateFits$AB
+  #caseCountData <- caseData$BC
+  #selectionEstimateObject<- selectionEstimateFits$BC
   #filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
@@ -199,13 +199,12 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   #gather the population data for /100000 individual normalization
   if (selectionEstimateObject$region == "Canada"){
     population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
-  } 
-  else {
+  } else {
     population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
   }
   
   #pass the lines into the plotting function
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, saveToFile=saveToFile)
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, order=mutantNames, saveToFile=saveToFile)
 }
 
 ```

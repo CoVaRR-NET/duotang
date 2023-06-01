@@ -64,13 +64,15 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
       }
     }
     
+    axisMax <- ifelse(is.finite(max(round((d$high_CI + 2.5)/ 5.0) * 5.0)), max(round((d$high_CI + 2.5)/ 5.0) * 5.0),max(max(round((d$sel_coeff + 2.5)/ 5.0) * 5.0)) )
+    
     p <- p +
     geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
     geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 10% per day to mark doubling in < week
-    scale_y_continuous(breaks=seq(max((round(min(d$sel_coeff)/5))*5,-5),min(round(max(d$high_CI,11,na.rm = TRUE)/5)*5,15),5))+
+    scale_y_continuous(breaks=seq(0, axisMax,5))+
     coord_flip()+ colScale+
       theme_bw()+
-    
+     
     theme(plot.caption.position = "plot", plot.caption = element_text(hjust=0)) +
       
     ggtitle(title)+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", individualSelectionPlotReference, " with 95% CI bars"))+
