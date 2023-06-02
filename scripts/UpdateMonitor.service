@@ -149,6 +149,8 @@ else
 		  echo "PR still open"
 	else
 		approveStatus=`python scripts/UpdateStatusManager.py --action get --key Approved`
+		threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
+
 		if [ "$approveStatus" = "False" ]; then
 			echo "PR Approved, updating archive"
 			git pull
@@ -163,6 +165,7 @@ else
 			git add DuotangUpdateStatus.json
 			git commit -m "update status json"
 			git push
+			python scripts/duoli.py --message "PR had been approved and the archive had been updated. See you next update :)" --thread $threadts
 		else
 			echo "PR approved and archive updated, nothing to do."
 		fi
