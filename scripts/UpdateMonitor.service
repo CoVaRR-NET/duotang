@@ -165,7 +165,7 @@ else
 			git add DuotangUpdateStatus.json
 			git commit -m "update status json"
 			git push
-			python scripts/duoli.py --message "PR had been approved and the archive had been updated. See you next update :)" --thread $threadts
+			python scripts/duoli.py --message "PR had been approved, the archive had been updated, and the update is published. See you next time :)" --thread $threadts
 		else
 			echo "PR approved and archive updated, nothing to do."
 		fi
