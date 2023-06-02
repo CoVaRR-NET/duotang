@@ -160,6 +160,9 @@ else
 			git push
 			git checkout dev
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "True"
+			git add DuotangUpdateStatus.json
+			git commit -m "update status json"
+			git push
 		else
 			echo "PR approved and archive updated, nothing to do."
 		fi
