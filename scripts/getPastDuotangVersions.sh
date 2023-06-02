@@ -64,7 +64,9 @@ for i in `cat commitHistory.txt | sed '1!G;h;$!d'`; do
 		fi
 		
 	else
+		echo "- [$date](./$commit/$commit.html)" >> archive/readme.md #echo the link into the read me because we cleared it.
 		echo "commit was before that latest archive date, delete the archive folder to rebuild."
+		
 	fi   
 
 done;

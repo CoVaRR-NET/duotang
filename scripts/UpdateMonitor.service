@@ -91,6 +91,9 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
 			echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n## Duotang.html\n" > whatsnew.md
+			git add DuotangUpdateStatus.json
+			git commit -m "update status json"
+			git push
 ## duotang.html:
 		else
 			#lastError=`tail -n 5 update.log`
@@ -129,6 +132,9 @@ else
 			previewURL="$previewURL/duotang.html"
 			python scripts/duoli.py --message "Update complete, here's the dev preview: $previewURL" --thread $threadts
 			python scripts/duoli.py --message "You can make additional changes via github and then use the /update and /currentsituation commands to generate another preview, or you can approve the publication of duotang by merging the pull request here: $prLink" --thread $threadts
+			git add DuotangUpdateStatus.json
+			git commit -m "update status json"
+			git push
 		else
 			python scripts/duoli.py --message "There was an issue with the update. See logs attached. Please fix any issues and use the /update command to try again." --file "rebuild.log" --thread $threadts
 		fi
@@ -143,6 +149,8 @@ else
 		  echo "PR still open"
 	else
 		approveStatus=`python scripts/UpdateStatusManager.py --action get --key Approved`
+		threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
+
 		if [ "$approveStatus" = "False" ]; then
 			echo "PR Approved, updating archive"
 			git pull
@@ -154,6 +162,10 @@ else
 			git push
 			git checkout dev
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "True"
+			git add DuotangUpdateStatus.json
+			git commit -m "update status json"
+			git push
+			python scripts/duoli.py --message "PR had been approved, the archive had been updated, and the update is published. See you next time :)" --thread $threadts
 		else
 			echo "PR approved and archive updated, nothing to do."
 		fi
