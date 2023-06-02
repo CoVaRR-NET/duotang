@@ -91,6 +91,9 @@ if (( $viralaiepoch > $duotangverepoch )); then
 			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
 			echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n## Duotang.html\n" > whatsnew.md
+			git add DuotangUpdateStatus.json
+			git commit -m "update status json"
+			git push
 ## duotang.html:
 		else
 			#lastError=`tail -n 5 update.log`
@@ -129,6 +132,9 @@ else
 			previewURL="$previewURL/duotang.html"
 			python scripts/duoli.py --message "Update complete, here's the dev preview: $previewURL" --thread $threadts
 			python scripts/duoli.py --message "You can make additional changes via github and then use the /update and /currentsituation commands to generate another preview, or you can approve the publication of duotang by merging the pull request here: $prLink" --thread $threadts
+			git add DuotangUpdateStatus.json
+			git commit -m "update status json"
+			git push
 		else
 			python scripts/duoli.py --message "There was an issue with the update. See logs attached. Please fix any issues and use the /update command to try again." --file "rebuild.log" --thread $threadts
 		fi
