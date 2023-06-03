@@ -31,6 +31,7 @@ tac commitHistory2.txt > commitHistory.txt
 lastestArchiveDate=$(ls archive/ | grep -v "readme.md" | tac | head -1)
 echo $lastestArchiveDate
 lastestArchiveDate=$(date -d $lastestArchiveDate +%s) || lastestArchiveDate=0
+lastDate=1
 
 mkdir -p archive
 echo "Here we store old versions of the duotang notebook:" > archive/readme.md
@@ -46,21 +47,34 @@ for i in `cat commitHistory.txt | sed '1!G;h;$!d'`; do
 	
 	#check that the commit was made on a date after the latest available archive file date so we dont pull past files every time.
 	if [ $lastestArchiveDate -lt $parsedDate ]; then
-		mkdir -p archive/$commit
-		#echo "$id:$name"
-		git show $id:$name > archive/$commit/$commit.html
-		if [ -s archive/$commit/$commit.html ]; then
-			# echo the hyperlink to the readme
-			echo "- [$date](./$commit/$commit.html)" >> archive/readme.md
-			for j in `git ls-tree --name-only -r $id | grep duotang_files`; do
-				path=`dirname $j`
-				#echo $j
-				mkdir -p archive/$commit/$path
-				git show $id:$j > archive/$commit/$j
-			done;
+		if [ $parsedDate -eq $lastDate ]; then
+			echo "Not the latest commit"
 		else
-			# The file is empty, sometimes the symlink for follow pulls up random files not related to duotang,html, just delete it.
-			rm -rf archive/$commit/$commit.html
+			mkdir -p archive/$commit
+			#echo "$id:$name"
+			git show $id:$name > archive/$commit/$commit.html
+			if [ -s archive/$commit/$commit.html ]; then
+				# echo the hyperlink to the readme
+				echo "- [$date](./$commit/$commit.html)" >> archive/readme.md
+				for j in `git ls-tree --name-only -r $id | grep duotang_files`; do #pull all the files in the duotang_files folder
+					path=`dirname $j`
+					#echo $j
+					mkdir -p archive/$commit/$path
+					git show $id:$j > archive/$commit/$j
+				done;
+				
+				mkdir -p archive/$commit/downloads
+				SAVEIFS=$IFS #our filenames have spaces in them, we so must ignore them for this for loop
+				IFS=$(echo -en "\n\b")
+				for j in `git ls-tree --name-only -r $id | grep downloads`; do #pull the files in download filder
+					#echo ${j}	
+					git show $id:"${j}" > archive/$commit/${j}
+				done;
+				IFS=$SAVEIFS #reset ifs
+			else
+				# The file is empty, sometimes the symlink for follow pulls up random files not related to duotang,html, just delete it.
+				rm -rf archive/$commit/$commit.html
+			fi
 		fi
 		
 	else
@@ -68,7 +82,7 @@ for i in `cat commitHistory.txt | sed '1!G;h;$!d'`; do
 		echo "commit was before that latest archive date, delete the archive folder to rebuild."
 		
 	fi   
-
+	lastDate=$parsedDate
 done;
 #cleanup
 uniq archive/readme.md > archive/readme2.md
