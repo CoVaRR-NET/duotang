@@ -2722,6 +2722,7 @@ XBB.1.5.67	C21691T, USA
 XBB.1.5.68	S:P521T, ORF3a:L71I, C18501T, USA
 XBB.1.5.69	ORF1a:V2943I,C22513T, USA
 XBB.1.5.70	S:L455F, S:F456L (T22928C), ORF1a:A4068S, Brazil, from #1982
+GK.1	Alias of XBB.1.5.70.1, S:S704L, Brazil, from #2025
 XBB.1.5.71	S:V511I, Spain
 XBB.1.5.72	S:F456L (T22928C), ORF1a:G445S, T9823C, T10204C, South America
 XBB.1.5.73	T28271C, USA/Peru
@@ -2743,6 +2744,8 @@ FL.1.1	Alias of XBB.1.9.1.1.1, ORF1b:Q2635P, USA/Australia
 FL.1.2	Alias of XBB.1.9.1.1.2, ORF1a:T4311I, South Korea/Italy/Spain
 FL.1.3	Alias of XBB.1.9.1.1.3, ORF1a:T1881I, ORF1b:M606I, South Korea
 FL.1.4	Alias of XBB.1.9.1.1.4, S:478R, S:Q1208H, Vietnam, from issue #1985
+FL.1.5	Alias of XBB.1.9.1.1.5, S:456L (T22928C), ORF1b:K2557R, from #1985 and #2036
+FL.1.5.1	Alias of XBB.1.9.1.1.5.1, S:478R, from #2036
 FL.2	Alias of XBB.1.9.1.2, T4579A
 FL.2.1	Alias of XBB.1.9.1.2.1, C10228T, Germany, global
 FL.2.2	Alias of XBB.1.9.1.2.2, S:T478R, Indonesia, from #1927
@@ -2853,7 +2856,9 @@ XBB.1.31	Defined by S:453F and S:478R, Indonesia/Singapore
 XBB.1.32	Defined by ORF1a:E148D, Philippines
 XBB.1.32.1	S:Y453F, ORF1a:L642F, ORF1b:L2497I, Philippines/Thailand, from #1908
 XBB.1.33	Defined by S:A376T, found mainly in Italy, from pango-designation issue #1879
-XBB.1.34	Defined by S:681R, found mainly in USA and UK, from pango-designation issue #1621
+XBB.1.34	S:486P,S:681R, N:A50V, Uganda/Sudan, from pango-designation issue #1621
+XBB.1.34.1	S:E554K, ORF1b:P970L
+XBB.1.34.2	S:K182I, ORF8:C90F, ORF1a:G989C
 XBB.1.35	ORF1a:V89A, Indonesia
 XBB.1.36	Defined by S:S490P, found mainly in Malaysia, Indonesia and Singapore, from pango-designation issue #1781
 XBB.1.37	Defined by A5371G, Indonesia/Russia
@@ -2887,7 +2892,7 @@ XBB.2.4	Defined by S:S486P, Spain/Denmark/Germany
 XBB.2.5	S:Q613H, from https://github.com/jmcbroome/auto-pango-designation/pull/193
 XBB.2.6	Mostly Peru, C5144T, T5731A
 XBB.2.6.1	S:P521S, Peru, from #1869
-GH.1	Alias of XBB.2.6.1, ORF9b:P51Q, T6895C, T9148C, A15192C, Peru, from #1869
+GH.1	Alias of XBB.2.6.1.1, ORF9b:P51Q, T6895C, T9148C, A15192C, Peru, from #1869
 XBB.2.6.2	S:T19L, Peru
 XBB.2.7	ORF1a:R3662H, parent of lineage proposed in #1725
 XBB.2.7.1	S:Y453F, S:K478Q, Singapore, #1725
@@ -2908,6 +2913,7 @@ XBB.6.1	Defined by S:F486P, USA, from #1459
 XBB.7	Defined by S:Q613H, Malaysia
 XBB.8	T14574C after ORF1a:D82G, India/Malaysia/Brunei
 XBB.8.1	S:486P, Malaysia
+XBB.8.2	S:486P, ORF1a:A2529V, Reunion/Mayotte/Mauritius, from #1995
 XBB.9	N:T49I after ORF1a:D82G, Philippines
 XBC	Recombinant lineage of BA.2 and B.1.617.2*, predominantly in Philippines, from pango-designation issue #1100
 XBC.1	Mostly Philippines, South Korea, US, Singapore, defined by S:L452M, from issue #1130
@@ -2969,6 +2975,7 @@ XBZ	Recombinant lineage of BA.5.2* and EF.1.3, predominantly in Denmark, Germany
 XCA	Recombinant lineage of BA.2.75* and BQ.1*, predominantly in UK, from pango-designation issue #1752
 XCB	Recombinant lineage of BF.31.1 and BQ.1.10*, predominantly in Chile, from pango-designation issue #1668
 XCC	Recombinant lineage of CH.1.1.1 and XBB.1.9.1, predominantly Pakistan, Australia, from #1876
+XCD	Recombinant lineage of XBB.1* and BQ.1.1.25*, with S:R214H, S:478I, Indonesia, from #2042
 *A.2.1	Withdrawn: Lineage with sequences predominantly from Panama
 *A.8	Withdrawn: Indian lineage merged with A.9
 *A.10	Withdrawn: Spanish lineage reassigned to A.5
