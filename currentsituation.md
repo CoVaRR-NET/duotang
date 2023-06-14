@@ -1,12 +1,10 @@
 
 
-XBB.1.5 is decreasing now, as multiple other XBB variants further compete. Variants growing include multiple current XBB.1.16, XBB.1.9, and XBB.2.3 variants, and other variants with immune evasive mutations like S:F456L. Different variants are predominating in different provinces depending on timing of their introduction (for example, FD.1.1 was introduced earlier in Quebec and New Brunswick, versus XBB.1.16 which was introduced earlier in Ontario and Alberta). All of these variants have mutations that would confer additional immune evasion and/or infectivity, with some recent subvariants of XBB.1.16 and XBB.1.9.2 having multiple mutations of particular interest.
+XBB.1.5 “stricto” is decreasing now, with XBB.1.5 with S:456L and other variants with this mutation growing, plus also XBB.1.16 which has both spike and non-spike mutations proposed to be advantageous. Different variants are predominating in some different provinces depending on timing of their introduction (for example, FD.1.1 was introduced earlier in Quebec). Some XBB.1.9, and XBB.2.3 variants are still growing, however XBB.1.16 variants are outcompeting these in most regions. All of these variants have mutations that would confer additional immune evasion and/or infectivity.
 
 
 
 Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries:
-
-
 
 * FD.1.1 (subvariant of XBB.1.5.15 with S:F456L)
 * FE.1 (subvariant of XBB.1.18.1 with S:456L)
@@ -21,8 +19,6 @@ Variants of current interest, due to their current/potential growth advantage, m
 
 Mutations of interest include:
 
-
-
 * S:F456L (evidence of increased immune evasion versus recent variants and a mutation growing in prevalence in multiple lineages in multiple regions)
 * S:T478R (aka S:K478R - the S:T478K mutation occurred first). Evidence of increased infectivity when introduced into XBB.1.5. Associated with XBB.1.16 (which has additional mutations like S:E180V that may counteract this mutations advantage) but now seen in additional variants like XBB.2.3.
 * S:P521S (evidence it could increase human ACE2 receptor binding/infectivity - associated with XBB.2.3 variants)
@@ -33,10 +29,7 @@ Mutations of interest include:
 
 Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
 
-
-
 * <https://jbloomlab.github.io/SARS2-RBD-escape-calc/>
 * Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
 * Cao et al, Nature, 614:521-529 (2023)
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
-
