@@ -1,6 +1,6 @@
 
 
-XBB.1.5 “stricto” is decreasing now, with XBB.1.5 with S:456L and other variants with this mutation growing, plus also XBB.1.16 which has both spike and non-spike mutations proposed to be advantageous. Different variants are predominating in some different provinces depending on timing of their introduction (for example, FD.1.1 was introduced earlier in Quebec). Some XBB.1.9, and XBB.2.3 variants are still growing, however XBB.1.16 variants are outcompeting these in most regions. All of these variants have mutations that would confer additional immune evasion and/or infectivity.
+XBB.1.5 “stricto” is decreasing now, with XBB.1.5 with S:456L and other variants with this mutation growing, plus also XBB.1.16 which has both spike and non-spike mutations proposed to be advantageous. Different variants are predominating in some different provinces depending on timing of their introduction (for example, FD.1.1 was introduced earlier in Quebec). Some XBB.1.9, and XBB.2.3 variants are still growing, however XBB.1.16 variants are outcompeting these in most regions. All of these variants have mutations that would confer additional immune evasion and/or infectivity. Any saltation variants (variants with sudden, large mutational changes) are being closely tracked.
 
 
 
@@ -10,10 +10,10 @@ Variants of current interest, due to their current/potential growth advantage, m
 * FE.1 (subvariant of XBB.1.18.1 with S:456L)
 * Multiple XBB.1.5 subvariants including those that have S:F456L
 * XBB.1.16 which has S:T478R (with a particular interest in those with S:F456L)
-* XBB.1.9.1, XBB.1.9.2 (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H - aka orf6:y49h)
+* XBB.1.9.1, XBB.1.9.2, FL.5 (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H - aka orf6:y49h)
 * XBB.2.3, XBB.2.3.2, XBB.2.3.3 (has mutation S:P521S, with an interest in those also with mutation 478R)
 
-…and sublineages with additional combinations of the mutations below.
+…plus any saltation variants and sublineages with additional combinations of the mutations below.
 
 
 
