@@ -190,6 +190,10 @@ htmltools::tagList(ggplotly(ggplot()))
 
 ##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
 
+### Survey request
+
+Doutang, VirusSeq Data portal, and Viral AI would like to improve your user experience. Please take a few minutes to respond to [this survey](https://forms.gle/F63za7dgQCrF2YMi7).
+
 ### Contributing authors:  
 
 Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Justin Jia, Zohaib Anwar and Erin Gill.
