@@ -358,13 +358,13 @@ echo "epidata" > $checkPointFile
 #wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True || rm AgeCaseCountON.csv
 #set -e #set the stop on error flag back.
 
-wget -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/dataset/f4112442-bdc8-45d2-be3c-12efae72fb27/resource/455fd63b-603d-4608-8216-7d8647f43350/download/conposcovidloc.csv || rm AgeCaseCountON
-wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv || rm AgeCaseCountON.csv
-wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-data.csv || rm AgeCaseCountAB.csv
-wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648 || rm AgeCaseCountQC.csv
+wget -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/dataset/f4112442-bdc8-45d2-be3c-12efae72fb27/resource/455fd63b-603d-4608-8216-7d8647f43350/download/conposcovidloc.csv || rm -f AgeCaseCountON
+wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv || rm -f AgeCaseCountON.csv
+wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-data.csv || rm -f AgeCaseCountAB.csv
+wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648 || rm -f AgeCaseCountQC.csv
 #wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/cases/4565.csv || rm AgeCaseCountON.csv
-wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm CanadianEpiData.csv
-wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv || rm AgeCaseCountCAN.csv
+wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f CanadianEpiData.csv
+wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv || rm -f AgeCaseCountCAN.csv
 gzip -f ${data_dir}/AgeCaseCount*.csv
 
 echo "gsdmetadata" > $checkPointFile
