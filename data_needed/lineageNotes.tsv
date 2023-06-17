@@ -2805,6 +2805,9 @@ FL.13.1	Alias of XBB.1.9.1.13.1, S:A411S, ORF1a:P80S, China, from #1996
 FL.14	Alias of XBB.1.9.1.14, S:V1122M, C29311T, C22978T, Russia/Finland
 FL.15	Alias of XBB.1.9.1.15, S:F456L (T22928C), ORF1a:E637K, Vietnam/China/South Korea, from #1994
 FL.16	Alias of XBB.1.9.1.16, S:D215V, C3511T, China, from #2001
+FL.17	Alias of XBB.1.9.1.17, T3898C, C28333T
+FL.17.1	Alias of XBB.1.9.1.17.1, S:N74H, South Korea
+FL.17.2	Alias of XBB.1.9.1.17.2, S:L452R, from sars-cov-2-variants/lineage-proposals#53
 XBB.1.9.2	S:F486P (after 27507C, 16878T), Indonesia/Singapore
 EG.1	Alias of XBB.1.9.2.1, S:Q613H on N:L219F branch, from #1664 and https://github.com/jmcbroome/auto-pango-designation/pull/193
 EG.1.1	Alias of XBB.1.9.2.1.1, S:V70F and ORF1a:T403I, Luxembourg/Belgium/France
@@ -2854,6 +2857,7 @@ XBB.1.16.7	S:T732I after T12214C, Singapore/Japan/SouthKorea
 XBB.1.16.8	S:T732I after C28531T, India/USA/China/Australia
 XBB.1.16.9	S:F456L (T22930G), ORF1a:S2500F, Canada/Sweden/SouthKorea/USA
 XBB.1.16.10	N:G25D, from #1984
+XBB.1.16.11	S:P521T, India
 XBB.1.17	Defined by T27995C and ORF1a:L469F, from issue #1712
 XBB.1.17.1	Defined by S:215H, S:S486P, from issue #1712
 GA.1	Alias of XBB.1.17.1.1, ORF1a:G728C
@@ -2992,8 +2996,10 @@ XBC.1.4	Australia, S:G184S, #1622
 XBC.1.5	Philippines/South Korea/Japan, ORF1a:T708I after A10042C, from #1671
 XBC.1.6	S:346S, S:M452R, found in Australia, from pango-designation issue #1755
 XBC.1.6.1	ORF8:P36L, Australia
+GT.1	Alias of XBC.1.6.1.1, S:I105V, C28333T, Australia
 XBC.1.6.2	ORF1a:D827N, Australia
 XBC.1.6.3	N:A173V, Australia
+XBC.1.6.4	ORF1a:V1117I, T20286C, Australia
 XBC.1.7	S:478R, S:444T, Philippines/Australia/Hong Kong
 XBC.2	Mostly Philippines, defined by S:K97R
 XBC.2.1	S:K444T, Australia, from #1538
