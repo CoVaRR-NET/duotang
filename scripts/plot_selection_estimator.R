@@ -238,7 +238,7 @@ alpha <- function(col, alpha) {
 #' @param col:  char, vector of colour specification strings
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
-                                    startpar, maxdate=NA, col=c('red', 'blue'), method='BFGS') {
+                                    startpar, maxdate, col=c('red', 'blue'), method='BFGS') {
   #region <- "Canada"
   #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
   #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
@@ -248,7 +248,6 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   #method='BFGS'
   #maxdate=NA
   #col=col
-  
 
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
@@ -332,7 +331,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   }
   #define theme
   p<-p + theme_bw() +     
-    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", maxdate)) + 
+    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", max(toplot$date))) + 
     theme(legend.position=c(0.4, 0.90), legend.title=element_blank(), 
           legend.text=element_text(size=18), 
           legend.background = element_blank(), 
