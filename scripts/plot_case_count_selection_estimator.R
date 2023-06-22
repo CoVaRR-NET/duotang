@@ -171,7 +171,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, 
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
 
-    ylim(0, 40) + 
+    ylim(0, 30) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
     ylab("Age 70+ cases per 100,000 individuals") +
