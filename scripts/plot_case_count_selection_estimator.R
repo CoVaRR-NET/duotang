@@ -95,6 +95,7 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
   }
   
   if (file.exists(paste0(datadir,"/AgeCaseCountAB.csv.gz"))){
+    print("AB")
     caseCounts[["AB"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountAB.csv.gz")), header=T)%>% 
       filter(`Date.reported.to.Alberta.Health` > (as.Date(maxDate)-days(120))) %>%#take the last 120 days of data
       mutate (`Date.reported.to.Alberta.Health` = as.Date(`Date.reported.to.Alberta.Health`)) %>% #format the column as dates
@@ -104,6 +105,7 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
   }
 
   if (file.exists(paste0(datadir,"/AgeCaseCountQC.csv.gz"))){
+    print("QC")
     caseCounts[["QC"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T)%>% 
       mutate(Date = .[,1]) %>% 
       filter(Date != "Date inconnue") %>%
@@ -116,6 +118,7 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
   }
   
   if (file.exists(paste0(datadir,"/AgeCaseCountON.csv.gz"))){
+    print("ON")
     caseCounts[["ON"]] <-read.csv(gzfile(paste0(datadir,"/AgeCaseCountON.csv.gz")), header=T)%>% 
       group_by(Case_Reported_Date) %>%#group data by reported date
       summarize(n = n())%>% #get total count of num cases per day
@@ -231,8 +234,9 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, 
     #scale_shape_manual(name = NULL, values=c(19)) +
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
-
-    ylim(0, max(d$n) * 2) + 
+    
+    
+    ylim(0, max(60, max(d$n) * 2)) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
     ylab("Cases per 100,000 individuals") +
