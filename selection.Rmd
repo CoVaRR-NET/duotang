@@ -34,6 +34,7 @@ col <- c("XBB.1.5*"="#CC5500", "XBB.1.16*" = "#00eeff", "XBB.Other"=pal["XBB"]) 
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
+maxdate<-params$datestamp
 
 #wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
 sub.plot.selection.estimate <- function(region,maxdate=NA){
@@ -56,11 +57,11 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
 
 #calculate estimates for each province
 selectionEstimateFits <- list() #named list to store estimates for different provinces
-selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada")
-maxdate = selectionEstimateFits[["Canada"]]$date
+selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada", maxdate)
+#maxdate = selectionEstimateFits[["Canada"]]$date
 
 for (i in 2:length(all.regions$name)){
-  selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]])
+  selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]], maxdate)
 }
 
 
@@ -204,7 +205,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   }
   
   #pass the lines into the plotting function
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, order=mutantNames, saveToFile=saveToFile)
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = maxdate, order=mutantNames, saveToFile=saveToFile)
 }
 
 ```

@@ -107,7 +107,7 @@ CubicSplSmooth2 <- function(data, lambda=10^3) {
 }
 
 #' plot the casecount by selection estimate. 
-plotCaseCountByDate2 <- function(countData, lineFits, population, order = NA, region=NA, saveToFile=F){
+plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, order = NA, region=NA, saveToFile=F){
   #countData <- caseCountData
   #lineFits <-rev(caseSelectionLines)
   #region = "Alberta"
@@ -171,7 +171,8 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order = NA, re
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
 
-    ylim(0, 60) + 
+    ylim(0, 30) + 
+    xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
     ylab("Age 70+ cases per 100,000 individuals") +
 
