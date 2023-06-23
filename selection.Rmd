@@ -111,25 +111,24 @@ These plots follow reported cases among people aged over 70 per 100,000 individu
 source("scripts/plot_case_count_selection_estimator.R")
 
 #loads in the case count data for each province into a named list.
-caseData <- parseCaseData(maxdate, params$datadir)
+caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
 #loads in population data for /100000invidivudal normalization
 populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
-
+#view(caseCountData)
 #' function used to generate data required case count selection plots.
 #' @param caseCountData The case counts for a specific province. i.e. one item in variable caseData
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
-plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-  #caseCountData <- caseData$BC
-  #selectionEstimateObject<- selectionEstimateFits$BC
+plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=T){
+  #caseCountData <- caseData$Canada
+  #selectionEstimateObject<- selectionEstimateFits$Canada
   #filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
-      caseCountData <- head(caseCountData, -1)
+      #caseCountData <- head(caseCountData, -1)
     } else { 
-      dayToCut = 5 
+      dayToCut = 1 
     } #define the number of days since most recent data date as "underreported"
-  
   #populate a column with reporting accuracy (Accurate | UnderReported])
   caseCountData$report_type <- "Accurate"
   caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
