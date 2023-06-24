@@ -95,7 +95,6 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
   }
   
   if (file.exists(paste0(datadir,"/AgeCaseCountAB.csv.gz"))){
-    print("AB")
     caseCounts[["AB"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountAB.csv.gz")), header=T)%>% 
       filter(`Date.reported.to.Alberta.Health` > (as.Date(maxDate)-days(120))) %>%#take the last 120 days of data
       mutate (`Date.reported.to.Alberta.Health` = as.Date(`Date.reported.to.Alberta.Health`)) %>% #format the column as dates
@@ -105,10 +104,11 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
   }
 
   if (file.exists(paste0(datadir,"/AgeCaseCountQC.csv.gz"))){
-    print("QC")
-    caseCounts[["QC"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T)%>% 
+    caseCounts[["QC"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T, encoding = "UTF-8")%>% 
       mutate(Date = .[,1]) %>% 
       filter(Date != "Date inconnue") %>%
+      filter(Regroupement == "Groupe d'âge") %>% 
+      filter(Nom == "Total") %>% 
       group_by(Date) %>%#group data by reported date
       summarize(n = sum(as.numeric(psi_quo_pos_n)))%>% #get total count of num cases per day
       filter(as.Date(Date) > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
@@ -116,9 +116,8 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
       rename(Reported_Date = Date) %>% #relabel date column.
       drop_na() #drop row if any col is NA
   }
-  
+  #view(caseCounts[["QC"]])
   if (file.exists(paste0(datadir,"/AgeCaseCountON.csv.gz"))){
-    print("ON")
     caseCounts[["ON"]] <-read.csv(gzfile(paste0(datadir,"/AgeCaseCountON.csv.gz")), header=T)%>% 
       group_by(Case_Reported_Date) %>%#group data by reported date
       summarize(n = n())%>% #get total count of num cases per day
