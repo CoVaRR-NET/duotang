@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
     date = None
     for item in information:
-        if (is_date(item.strip().replace("&nbsp","")):
-            date = item.strip()
+        if (is_date(item.strip())):
+            date = item.strip().replace("&nbsp","")
 
 
     def is_valid_uuid(val):
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
     identifier = None
     for item in information:
-        if (is_valid_uuid(item.strip().replace("&nbsp",""))):
-            identifier = item.strip()
+        if (is_valid_uuid(item.strip())):
+            identifier = item.strip().replace("&nbsp","")
 
     print (date + ";" + identifier)
 
