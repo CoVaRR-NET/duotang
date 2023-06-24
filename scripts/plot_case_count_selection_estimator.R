@@ -107,7 +107,7 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
     caseCounts[["QC"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T, encoding = "UTF-8")%>% 
       mutate(Date = .[,1]) %>% 
       filter(Date != "Date inconnue") %>%
-      filter(Regroupement == "Groupe d'âge") %>% 
+      filter(Regroupement == "Sexe") %>% #use the total count from the sexe category because Paphlagon dont like UTF-8
       filter(Nom == "Total") %>% 
       group_by(Date) %>%#group data by reported date
       summarize(n = sum(as.numeric(psi_quo_pos_n)))%>% #get total count of num cases per day
