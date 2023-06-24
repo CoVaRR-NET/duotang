@@ -120,8 +120,8 @@ populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t',
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-  caseCountData <- caseData$QC
-  selectionEstimateObject<- selectionEstimateFits$QC
+  #caseCountData <- caseData$QC
+  #selectionEstimateObject<- selectionEstimateFits$QC
   #filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
