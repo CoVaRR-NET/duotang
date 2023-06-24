@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     date = None
     for item in information:
-        if (is_date(item.strip())):
+        if (is_date(item.strip().replace("&nbsp","")):
             date = item.strip()
 
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     identifier = None
     for item in information:
-        if (is_valid_uuid(item.strip())):
+        if (is_valid_uuid(item.strip().replace("&nbsp",""))):
             identifier = item.strip()
 
     print (date + ";" + identifier)
