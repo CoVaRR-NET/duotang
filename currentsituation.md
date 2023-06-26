@@ -1,5 +1,9 @@
 
 
+[The case count trends by variant plots now uses all available case data instead of only aged 70+  due to multiple provinces stopped reporting age data.]
+
+
+
 More variants continue to evolve that contain the immune evasive mutation S:456L, but none are growing really substantially. EG.5.1 (an XBB.1.9.2 descendent with S:F456L and other mutations of interest) is an example of a recent variant growing in some regions of Canada that have recent data, plus growing internationally. Other variants continue to be of interest including subvariants of XBB.1.16, XBB.1.9, and XBB.2.3. All of these variants have mutations that would confer additional immune evasion and/or infectivity. Any saltation variants (variants with sudden, large mutational changes) are being closely tracked.
 
 
