@@ -105,31 +105,30 @@ apply(all.regions,1,function(reg){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-These plots follow reported cases among people aged over 70 per 100,000 individuals (green dots), ignoring the most recent case counts (hollow circles), which are generally underestimated as data continues to be gathered. Individuals over age 70 are more reliably tested in Canada and thus provide a more accurate picture of COVID-19 incidence over time. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of accurate case counts are then used to estimate the daily exponential growth rate $r$ in COVID-19 cases. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of accurate case counts. For detailed methodology, please see the methods section in the [appendix](#Methodology).
+These plots follow reported cases per 100,000 individuals (green dots), ignoring the most recent case counts (hollow circles), which are generally underestimated as data continues to be gathered. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of accurate case counts are then used to estimate the daily exponential growth rate $r$ in COVID-19 cases. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of accurate case counts. For detailed methodology, please see the methods section in the [appendix](#Methodology).
 
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
 
 #loads in the case count data for each province into a named list.
-caseData <- parseCaseData(maxdate, params$datadir)
+caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
 #loads in population data for /100000invidivudal normalization
 populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
-
+#view(caseCountData)
 #' function used to generate data required case count selection plots.
 #' @param caseCountData The case counts for a specific province. i.e. one item in variable caseData
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-  #caseCountData <- caseData$BC
-  #selectionEstimateObject<- selectionEstimateFits$BC
+  #caseCountData <- caseData$QC
+  #selectionEstimateObject<- selectionEstimateFits$QC
   #filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
-      caseCountData <- head(caseCountData, -1)
+      #caseCountData <- head(caseCountData, -1)
     } else { 
-      dayToCut = 5 
+      dayToCut = 1 
     } #define the number of days since most recent data date as "underreported"
-  
   #populate a column with reporting accuracy (Accurate | UnderReported])
   caseCountData$report_type <- "Accurate"
   caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
@@ -149,9 +148,8 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   selectionFit <- selectionEstimateObject$fit
   selectionScurves <- selectionEstimateObject$scurves
   selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
-  
   #since canada only have data once every 7 days, modify the estimate fit to reflect that.
-  if (selectionEstimateObject$region == "Canada"){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
       selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
       selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
   }
@@ -198,12 +196,11 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
   #gather the population data for /100000 individual normalization
-  if (selectionEstimateObject$region == "Canada"){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
     population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
   } else {
     population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
   }
-  
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = maxdate, order=mutantNames, saveToFile=saveToFile)
 }

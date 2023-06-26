@@ -4,7 +4,7 @@ library(splines)
 #' Return a named list for each province with key=shortname and value=df
 #' @param maxDate:  the maximum date to cutoff the data. Default=NA
 #' @param datadir:  the data directory where the agecount data is stored. Default='data_needed'
-parseCaseData<- function(maxDate = Sys.Date(), datadir = "./data_needed"){
+parseCaseDataByAge_deprecated<- function(maxDate = Sys.Date(), datadir = "./data_needed"){
   #maxDate = maxdate
   BC<-read.csv(gzfile(paste0(datadir, "/AgeCaseCountBC.csv.gz")), header=T)%>% 
     filter(Age_Group %in% c("90+", "80-89","70-79")) %>% #keep only the 70+ case counts
@@ -66,6 +66,69 @@ parseCaseData<- function(maxDate = Sys.Date(), datadir = "./data_needed"){
   #  filter(Reported_Date > (as.Date(maxDate)-days(120))) #keep everything within the last 120 days from latest virrusseq colleection date. 
     
   return (list("BC" = BC, "ON" = ON, "QC"=QC, "AB"=AB, "Canada"=Canada))#, "SK"=SK))
+}
+
+#' Reads in case count data from files in $data_dir for each province
+#' Return a named list for each province with key=shortname and value=df
+#' @param maxDate:  the maximum date to cutoff the data. Default=NA
+#' @param datadir:  the data directory where the agecount data is stored. Default='data_needed'
+parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, datadir = "./data_needed"){
+  #maxDate = Sys.Date()
+  
+  caseCounts <- list()
+  
+  for (i in 1:length(all.regions[["name"]])){
+    CC <-read.csv(gzfile(paste0(datadir, "/AgeCaseCountCAN.csv.gz")), header=T)%>% 
+      filter(prname == all.regions[["name"]][i]) %>% #keep only the 70+ case counts
+      filter(date > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
+      mutate (date = as.Date(date)) %>% #format the column as dates
+      dplyr::select(date, numtotal_last7) %>%
+      drop_na()  #drop row if any col is NA
+    
+    colnames(CC) <- c("Reported_Date","n")
+    
+    if (nrow(CC) > 1){
+      caseCounts[[all.regions[["shortname"]][[i]]]] <- CC
+    } else{
+      caseCounts[[all.regions[["shortname"]][[i]]]] <- NA
+    }
+  }
+  
+  if (file.exists(paste0(datadir,"/AgeCaseCountAB.csv.gz"))){
+    caseCounts[["AB"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountAB.csv.gz")), header=T)%>% 
+      filter(`Date.reported.to.Alberta.Health` > (as.Date(maxDate)-days(120))) %>%#take the last 120 days of data
+      mutate (`Date.reported.to.Alberta.Health` = as.Date(`Date.reported.to.Alberta.Health`)) %>% #format the column as dates
+      drop_na() %>% #drop row if any col is NA
+      dplyr::select(`Date.reported.to.Alberta.Health`, `Number.of.cases`)
+    colnames(caseCounts[["AB"]]) <- c("Reported_Date", "n")
+  }
+
+  if (file.exists(paste0(datadir,"/AgeCaseCountQC.csv.gz"))){
+    caseCounts[["QC"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T, encoding = "UTF-8")%>% 
+      mutate(Date = .[,1]) %>% 
+      filter(Date != "Date inconnue") %>%
+      filter(Regroupement == "Sexe") %>% #use the total count from the sexe category because Paphlagon dont like UTF-8
+      filter(Nom == "Total") %>% 
+      group_by(Date) %>%#group data by reported date
+      summarize(n = sum(as.numeric(psi_quo_pos_n)))%>% #get total count of num cases per day
+      filter(as.Date(Date) > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
+      mutate (Date = as.Date(Date)) %>% #format the column as dates
+      rename(Reported_Date = Date) %>% #relabel date column.
+      drop_na() #drop row if any col is NA
+  }
+  #view(caseCounts[["QC"]])
+  if (file.exists(paste0(datadir,"/AgeCaseCountON.csv.gz"))){
+    caseCounts[["ON"]] <-read.csv(gzfile(paste0(datadir,"/AgeCaseCountON.csv.gz")), header=T)%>% 
+      group_by(Case_Reported_Date) %>%#group data by reported date
+      summarize(n = n())%>% #get total count of num cases per day
+      filter(Case_Reported_Date > (as.Date(maxDate)-days(120))) %>%##keep everything within the last 120 days from latest virrusseq colleection date. 
+      mutate (Case_Reported_Date = as.Date(Case_Reported_Date)) %>% #format the column as dates
+      rename(Reported_Date = Case_Reported_Date) %>% #relabel date column.
+      drop_na() #drop row if any col is NA
+  }
+
+  
+  return (caseCounts)#, "SK"=SK))
 }
 
 #' get smooth fit of casecounts using knots
@@ -170,11 +233,12 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, 
     #scale_shape_manual(name = NULL, values=c(19)) +
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
-
-    ylim(0, 30) + 
+    
+    
+    ylim(0, 60) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
-    ylab("Age 70+ cases per 100,000 individuals") +
+    ylab("Cases per 100,000 individuals") +
 
     theme_bw() +
     guides(`Case Count` = guide_legend(order = 0),
