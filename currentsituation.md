@@ -4,7 +4,7 @@ More variants continue to evolve that contain the immune evasive mutation S:456L
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. Bold denotes changes since the last Duotang release):
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. **Bold** denotes changes since the last Duotang release):
 
 
 
@@ -33,8 +33,12 @@ Mutations of interest include:
 * ORF9b:I5T (note its a synonymous mutation in the overlapping N gene)
 * ORF9b:N55S (synonymous mutation in N)
 
-Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
+Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
 
 
 
-<https://jbloomlab.github.io/SARS2-RBD-escape-calc/>
+* <https://jbloomlab.github.io/SARS2-RBD-escape-calc/>
+* Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
+* Cao et al, Nature, 614:521-529 (2023)
+* Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
+
