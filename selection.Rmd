@@ -197,9 +197,9 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   
   #gather the population data for /100000 individual normalization
   if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
-    population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
+    population <- as.numeric(populationData[1,selectionEstimateObject$region]* 7)
   } else {
-    population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
+    population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
   }
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = maxdate, order=mutantNames, saveToFile=saveToFile)
