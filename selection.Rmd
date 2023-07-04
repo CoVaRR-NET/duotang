@@ -105,7 +105,7 @@ apply(all.regions,1,function(reg){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-These plots follow reported cases per 100,000 individuals (green dots), ignoring the most recent case counts (hollow circles), which are generally underestimated as data continues to be gathered. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of accurate case counts are then used to estimate the daily exponential growth rate $r$ in COVID-19 cases. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of accurate case counts. For detailed methodology, please see the methods section in the [appendix](#Methodology).
+These plots follow reported cases per 100,000 individuals (green dots), ignoring the most recent case counts (hollow circles), which are generally underestimated as data continues to be gathered. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of fitted case counts are then used to estimate the daily exponential growth rate $r$ in COVID-19 cases. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of fitted case counts. Note that only a small fraction of cases are currently being tested by PCR, so the y-axis height is underestimated by orders of magnitude (e.g., by 92-fold in BC mid-2022, Skowronski et al. 2022). Thus, graphs should only be used to describe growth trends and not absolute numbers. For detailed methodology, please see the methods section in the [appendix](#appendix).
 
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
@@ -197,9 +197,9 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   
   #gather the population data for /100000 individual normalization
   if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
-    population <- as.numeric(populationData[2,selectionEstimateObject$region]* 7)
+    population <- as.numeric(populationData[1,selectionEstimateObject$region]* 7)
   } else {
-    population <- (as.numeric(populationData[2,selectionEstimateObject$region]) )
+    population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
   }
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = maxdate, order=mutantNames, saveToFile=saveToFile)
