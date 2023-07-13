@@ -1,9 +1,5 @@
 
 
-[Case count plots were corrected to normalize using the entire population of the province.]
-
-
-
 Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are currently showing the most growth, but none show substantial growth advantage. All of these variants have mutations that would confer additional immune evasion and/or infectivity. Any saltation variants (variants with sudden, large mutational changes) are being closely tracked, along with variants showing recent growth in multiple new regions internationally.
 
 
@@ -19,11 +15,9 @@ Variants of current interest, due to their current/potential growth advantage, m
 * XBB.1.16 which has S:T478R (with a particular interest in those with S:F456L)
 * XBB.1.9.1, XBB.1.9.2, FL.5 (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H (aka orf6:y49h)
 * XBB.2.3, XBB.2.3.2, XBB.2.3.3 (has mutation S:P521S, with an interest in those also with mutation 478R)
-* **XBC.1.6 subvariants (XBC.1 is a "Deltacron" recombinant lineage of BA.2 and B.1.617.2** with S:L452M. XBC.1.6 contains also S:346S, S:M452R).**
+* XBC.1.6 subvariants (XBC.1 is a “Deltacron” recombinant lineage of BA.2 and B.1.617.2 with S:L452M. XBC.1.6 contains also S:346S, S:M452R).
 
 …plus any saltation variants and sublineages with additional combinations of the mutations below.
-
-
 
 Mutations of interest include:
 
