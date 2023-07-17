@@ -33,8 +33,10 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
   #view(d)
   d$lineage <- sapply(d$lineage, function(x){
     l <- getStrictoSubLineages(x, meta)[1]
+    l <- as.character(l)
     return(l)
   })
+
   
   if (class(coefficientTable) == "data.frame" ){
     if (unique(d$region) == "Canada"){
