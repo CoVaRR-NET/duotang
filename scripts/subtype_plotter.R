@@ -24,7 +24,7 @@ plot.subvariants <- function(region='Canada', sublineage,
   varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
-  max=15
+  max=30
   if(nrow(lineagecount)>max)
   { 
     lineagecount=as_data_frame(lineagecount)
@@ -40,7 +40,7 @@ plot.subvariants <- function(region='Canada', sublineage,
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
   
   if (is.na(col)) {
-    set.seed(320) #setted for 15 colors were close shades are not contiguous
+    set.seed(42069) #setted for 15 colors were close shades are not contiguous
     col <- sample(rainbow(length(levels(varmeta1$pango_group))))  # default colour palette
   }
   pal <- col
