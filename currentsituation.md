@@ -1,12 +1,10 @@
 
 
-Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are currently showing the most growth, but none show substantial growth advantage. All of these variants have mutations that would confer additional immune evasion and/or infectivity. Any saltation variants (variants with sudden, large mutational changes) are being closely tracked, along with variants showing recent growth in multiple new regions internationally.
+Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are currently showing the most growth, but none show substantial growth advantage. EG.5.1, somewhat of note internationally, is growing significantly in some provinces, but not in other provinces with different variant backgrounds. All of these variants have mutations that would confer additional immune evasion and/or infectivity. Sequences are being monitored closely to identify or track any saltation variants (variants with sudden, large mutational changes) that might arise.
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. **Bold** denotes changes since the last Duotang release):
-
-
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries:
 
 * EG.5.1 (XBB.1.9.2 with S:F456L plus S:Q52H plus some notable non-spike mutations)
 * FD.1.1 (subvariant of XBB.1.5.15 with S:F456L)
