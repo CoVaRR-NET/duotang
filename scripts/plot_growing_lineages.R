@@ -1,6 +1,6 @@
 plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
-  #r = paramselected[1:n]
-  #coefficientTable = coefficientTable
+  #r = paramselected[1:25]
+ # coefficientTable = coefficientTable
   d = data.frame(lineage = character(),
                  sel_coeff = numeric(),
                  low_CI = numeric(),
@@ -29,11 +29,21 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
   
   d <- d%>%unique()
 
+  #test.l <- getStrictoSubLineages(test, meta)[1]
+  #view(d)
+  d$lineage <- sapply(d$lineage, function(x){
+    l <- getStrictoSubLineages(x, meta)[1]
+    l <- as.character(l)
+    return(l)
+  })
+
+  
   if (class(coefficientTable) == "data.frame" ){
     if (unique(d$region) == "Canada"){
       #generate the circle with borders if in more than 1 provinc for canada only plot
       regionPresenceTable <- coefficientTable %>% dplyr::select(lineage, region) %>% filter (region != "Canada") %>% unique() %>% group_by(lineage) %>% summarise(NumRegions=n()) 
-      
+     # view(regionPresenceTable)
+      regionPresenceTable$lineage <- as.character(regionPresenceTable$lineage)
       d <- d %>% left_join(regionPresenceTable, by="lineage") %>% 
         mutate (MultiRegion = ifelse(NumRegions > 1, 1, 0)) %>% dplyr::select(-NumRegions) %>% mutate(MultiRegion = replace_na(MultiRegion, 0))
     }
