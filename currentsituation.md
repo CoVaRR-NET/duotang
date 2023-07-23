@@ -1,23 +1,28 @@
 
 
-Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are currently showing the most growth, but none show substantial growth advantage. EG.5.1, somewhat of note internationally, is growing significantly in some provinces, but not in other provinces with different variant backgrounds. All of these variants have mutations that would confer additional immune evasion and/or infectivity. Sequences are being monitored closely to identify or track any saltation variants (variants with sudden, large mutational changes) that might arise.
+Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are still currently showing the most growth, but none show substantial growth advantage. Multiple variants have now independently acquired both mutations S:456L and S:478R (mutations thought to increase immune evasion and infectivity, respectively), including FL.1.5.1 (an XBB.1.9.1 subvariant) and some XBB.1.16 subvariants. All are showing a growth advantage vs XBB.1.16.
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries:
+Sequences are still being monitored closely to identify or track any saltation variants (variants with sudden, large mutational changes) that might arise.
+
+
+
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (**bold** denotes changes since the last report:
+
+
 
 * EG.5.1 (XBB.1.9.2 with S:F456L plus S:Q52H plus some notable non-spike mutations)
 * FD.1.1 (subvariant of XBB.1.5.15 with S:F456L)
 * FE.1 (subvariant of XBB.1.18.1 with S:456L)
-* Multiple XBB.1.5 subvariants including those that have S:F456L
-* XBB.1.16 which has S:T478R (with a particular interest in those with S:F456L)
+* -Multiple XBB.1.5 subvariants including those that have S:F456L
+* **FL.1.5.1 (XBB.1.9.1 with S:701V, ORF1a:G993S, S:456L and S:478R)**
+* XBB.1.16 which has S:T478R (with a particular interest in those with S:F456L **like XBB.1.16.6**)
 * XBB.1.9.1, XBB.1.9.2, FL.5 (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H (aka orf6:y49h)
 * XBB.2.3, XBB.2.3.2, XBB.2.3.3 (has mutation S:P521S, with an interest in those also with mutation 478R)
 * XBC.1.6 subvariants (XBC.1 is a “Deltacron” recombinant lineage of BA.2 and B.1.617.2 with S:L452M. XBC.1.6 contains also S:346S, S:M452R).
 
 …plus any saltation variants and sublineages with additional combinations of the mutations below.
-
-Mutations of interest include:
 
 
 
