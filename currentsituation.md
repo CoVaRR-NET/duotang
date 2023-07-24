@@ -8,7 +8,7 @@ Sequences are still being monitored closely to identify or track any saltation v
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (**bold** denotes changes since the last report:
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (**bold** denotes changes since the last report):
 
 
 
