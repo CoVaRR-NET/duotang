@@ -1,7 +1,6 @@
 
 
-Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are still currently showing the most growth, but none show substantial growth advantage. Multiple variants have now independently acquired both mutations S:456L and S:478R (mutations thought to increase immune evasion and infectivity, respectively), including FL.1.5.1 (an XBB.1.9.1 subvariant) and some XBB.1.16 subvariants. All are showing a growth advantage vs XBB.1.16.
-
+Select subvariants of XBB.1.16, XBB.1.9, and XBB.2.3 are still currently showing the most growth, but none show substantial growth advantage. Multiple variants have now independently acquired both mutations S:456L and S:478R (mutations thought to increase immune evasion and infectivity, respectively), including FL.1.5.1 (an XBB.1.9.1 subvariant) and some XBB.1.16 subvariants. These variants, in addition to EG.5.1, are showing a growth advantage vs XBB.1.16.
 
 
 Sequences are still being monitored closely to identify or track any saltation variants (variants with sudden, large mutational changes) that might arise.
