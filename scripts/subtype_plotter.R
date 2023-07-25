@@ -115,7 +115,7 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
-  max=25
+  max=50
   if(nrow(lineagecount)>max){ 
     lineagecount=as_data_frame(lineagecount)
     rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-max) #filter(n<0.01*nrow(varmeta1))
