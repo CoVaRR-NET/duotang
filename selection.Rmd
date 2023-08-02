@@ -213,8 +213,6 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis', echo=FALSE}
 #plots the case count selection plots with each pronvince as a tab.
-caseData
-
 apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
   cat("####",reg[["name"]],"\n","\n")
