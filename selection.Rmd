@@ -112,6 +112,9 @@ source("scripts/plot_case_count_selection_estimator.R")
 
 #loads in the case count data for each province into a named list.
 caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
+
+#remove NB cuz it doesnt have enough data
+caseData[["NB"]] <- NULL
 #loads in population data for /100000invidivudal normalization
 populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
 #view(caseCountData)
