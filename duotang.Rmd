@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "1994-01-01"
+  value: "2023-08-11"
  datadir:
   label: "DataDir"
   input: text
@@ -170,7 +170,7 @@ for(row in 1:nrow(epidataCANall)) {
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 
 #load the pango_lineage notes file and extracts parental data using it's alias as a separate column
-lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F) %>% 
+lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F, comment.char = "", fill = T) %>% 
   mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>% 
   mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
   dplyr::select(Lineage, Parent, Description) 

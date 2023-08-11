@@ -11,22 +11,22 @@ setAll=getAllStrictoLineages(meta)
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
 sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-sublineages_XBB116 <- getStrictoSubLineages("XBB.1.16*",meta)
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15,sublineages_XBB116)] #XBB Other
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15)] #XBB Other
+sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
 
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_XBBOther)] #the rest
+setAll=setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
 #define the mutants
 #mutants = list(sublineages_BQ, sublineages_XBB )
 #mutantNames = list("BQ*", "XBB*", "the rest") #
 #col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
+mutants = list(sublineages_XBB15, sublineages_EG5, sublineages_XBBOther )
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!"The Rest" should always be last.
-mutantNames = list("XBB.1.5*", "XBB.1.16*", "XBB.Other", "The Rest") #
-col <- c("XBB.1.5*"="#CC5500", "XBB.1.16*" = "#00eeff", "XBB.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("XBB.1.5*", "EG.5*", "XBB.Other", "The Rest") #
+col <- c("XBB.1.5*"="#CC5500", "EG.5*" = "#00eeff", "XBB.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 #im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
