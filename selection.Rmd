@@ -22,11 +22,11 @@ setAll=setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBB
 #mutantNames = list("BQ*", "XBB*", "the rest") #
 #col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-mutants = list(sublineages_XBB15, sublineages_EG5, sublineages_XBBOther )
+mutants = list(sublineages_XBB15, sublineages_XBBOther, sublineages_EG5 )
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!"The Rest" should always be last.
-mutantNames = list("XBB.1.5*", "EG.5*", "XBB.Other", "The Rest") #
-col <- c("XBB.1.5*"="#CC5500", "EG.5*" = "#00eeff", "XBB.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("XBB.1.5*", "XBB.Other",  "EG.5*", "The Rest") #
+col <- c("XBB.1.5*"="#CC5500",  "XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 #im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
@@ -109,7 +109,6 @@ These plots follow reported cases per 100,000 individuals (green dots), ignoring
 
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
-
 #loads in the case count data for each province into a named list.
 caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
 
@@ -123,9 +122,11 @@ populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t',
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-  #caseCountData <- caseData$QC
-  #selectionEstimateObject<- selectionEstimateFits$QC
-  #filename=NA
+  # caseCountData <- caseData$BC
+  # selectionEstimateObject<- selectionEstimateFits$BC
+  # 
+  # view(caseCountData)
+  filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
       #caseCountData <- head(caseCountData, -1)
@@ -152,7 +153,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   selectionScurves <- selectionEstimateObject$scurves
   selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
   #since canada only have data once every 7 days, modify the estimate fit to reflect that.
-  if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Quebec")){
       selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
       selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
   }
@@ -199,7 +200,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
   #gather the population data for /100000 individual normalization
-  if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Quebec")){
     population <- as.numeric(populationData[1,selectionEstimateObject$region]* 7)
   } else {
     population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
