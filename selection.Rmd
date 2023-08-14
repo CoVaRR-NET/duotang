@@ -11,22 +11,22 @@ setAll=getAllStrictoLineages(meta)
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
 sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-sublineages_XBB116 <- getStrictoSubLineages("XBB.1.16*",meta)
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15,sublineages_XBB116)] #XBB Other
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15)] #XBB Other
+sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
 
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-setAll=setAll[!setAll %in% c(sublineages_XBB116, sublineages_XBB15, sublineages_XBBOther)] #the rest
+setAll=setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
 #define the mutants
 #mutants = list(sublineages_BQ, sublineages_XBB )
 #mutantNames = list("BQ*", "XBB*", "the rest") #
 #col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-mutants = list(sublineages_XBB15, sublineages_XBB116, sublineages_XBBOther )
+mutants = list(sublineages_XBB15, sublineages_XBBOther, sublineages_EG5 )
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!"The Rest" should always be last.
-mutantNames = list("XBB.1.5*", "XBB.1.16*", "XBB.Other", "The Rest") #
-col <- c("XBB.1.5*"="#CC5500", "XBB.1.16*" = "#00eeff", "XBB.Other"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("XBB.1.5*", "XBB.Other",  "EG.5*", "The Rest") #
+col <- c("XBB.1.5*"="#CC5500",  "XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 #im cheating, using zero width spaces to sort text. dont hate me.
 
 #Set a starting date
@@ -73,9 +73,9 @@ for (i in 2:length(all.regions$name)){
 
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a reference lineage previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages rising in frequency are the XBB.* group, dominated by the XBB.1.5* lineages which is near it's peak. There are also several other XBB lineages showing a selective advantage. The previous dominant lineage, BQ.*, is nearly at the bottom, however several of it's descendant are beginning to grow again. See Fastest Growing Lineages for details on lineages showing positive selection.
+Currently, the major group of Omicron lineages rising in frequency are the XBB.* group. This group was previously dominated by the XBB.1.5* lineages, which peaked in April 2023. A variety of other XBB* have been spreading since, and we now track the frequencies of XBB.1.5\*, EG.5\*,  and XBB.Other, as well as all remaining non-XXB lineages. See Fastest Growing Lineages for details on lineages showing positive selection.
 
-We first show this growth of XBB.1.5\*, XBB.1.16\*, or XBB.Other, relative to the remaining strains, which consist predominantly of BQ.\*. Left plot: y-axis is the proportion of sub-lineages XBB.1.5\*, XBB.1.16\*, and XBB.Other relative to the remaining strains; right plot: y-axis describes the logit function, log(freq(XBB.1.5\*, XBB.1.16\*, or XBB.Other)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Left plot: y-axis is the proportion of sub-lineages EG.5\*,  XBB.1.5\*, and XBB.Other, with the remainder being non-XBB. Right plot: y-axis describes the logit function, log(freq(XBB.1.5\*, XBB.1.16\*, or XBB.Other)/freq(the rest)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
@@ -109,7 +109,6 @@ These plots follow reported cases per 100,000 individuals (green dots), ignoring
 
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
-
 #loads in the case count data for each province into a named list.
 caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
 
@@ -123,9 +122,11 @@ populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t',
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-  #caseCountData <- caseData$QC
-  #selectionEstimateObject<- selectionEstimateFits$QC
-  #filename=NA
+  # caseCountData <- caseData$BC
+  # selectionEstimateObject<- selectionEstimateFits$BC
+  # 
+  # view(caseCountData)
+  filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
       #caseCountData <- head(caseCountData, -1)
@@ -152,7 +153,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   selectionScurves <- selectionEstimateObject$scurves
   selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
   #since canada only have data once every 7 days, modify the estimate fit to reflect that.
-  if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Quebec")){
       selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
       selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
   }
@@ -199,7 +200,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
   #gather the population data for /100000 individual normalization
-  if (!selectionEstimateObject$region %in% c("Alberta", "Ontario", "Quebec")){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Quebec")){
     population <- as.numeric(populationData[1,selectionEstimateObject$region]* 7)
   } else {
     population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )

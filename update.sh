@@ -358,7 +358,7 @@ echo "epidata" > $checkPointFile
 #wget --retry-connrefused --waitretry=1 --read-timeout=3600 --timeout=3600 -t 0 -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/datastore/dump/455fd63b-603d-4608-8216-7d8647f43350?bom=True || rm AgeCaseCountON.csv
 #set -e #set the stop on error flag back.
 
-wget -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/dataset/f4112442-bdc8-45d2-be3c-12efae72fb27/resource/455fd63b-603d-4608-8216-7d8647f43350/download/conposcovidloc.csv || rm -f AgeCaseCountON
+#wget -O ${data_dir}/AgeCaseCountON.csv https://data.ontario.ca/dataset/f4112442-bdc8-45d2-be3c-12efae72fb27/resource/455fd63b-603d-4608-8216-7d8647f43350/download/conposcovidloc.csv || rm -f AgeCaseCountON
 #wget -O ${data_dir}/AgeCaseCountBC.csv www.bccdc.ca/Health-Info-Site/Documents/BCCDC_COVID19_Dashboard_Case_Details.csv || rm -f AgeCaseCountON.csv
 #wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-data.csv || rm -f AgeCaseCountAB.csv
 wget -O ${data_dir}/AgeCaseCountAB.csv https://www.alberta.ca/data/stats/covid-19-alberta-statistics-summary-data.csv || rm -f AgeCaseCountAB.csv
