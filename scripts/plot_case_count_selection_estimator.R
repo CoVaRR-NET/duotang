@@ -98,10 +98,10 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
     caseCounts[["AB"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountAB.csv.gz")), header=T)%>% 
       filter(`Date.reported.to.Alberta.Health` > (as.Date(maxDate)-days(120))) %>%#take the last 120 days of data
       mutate (`Date.reported.to.Alberta.Health` = as.Date(`Date.reported.to.Alberta.Health`)) %>% #format the column as dates
-      drop_na() %>% #drop row if any col is NA
+     # drop_na() %>% #drop row if any col is NA
       dplyr::select(`Date.reported.to.Alberta.Health`, `Number.of.cases`)
     colnames(caseCounts[["AB"]]) <- c("Reported_Date", "n")
-  }
+      }
 
   if (file.exists(paste0(datadir,"/AgeCaseCountQC.csv.gz"))){
     caseCounts[["QC"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountQC.csv.gz")), header=T, encoding = "UTF-8")%>% 
