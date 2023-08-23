@@ -9,7 +9,7 @@ def openlineageNotes(file):
     return dic
 
 
-AllLineageNotes=openlineageNotes("/lustre06/project/6065672/shared/covid-19/CAMEO/duotang/data_needed/lineageNotes.tsv")
+AllLineageNotes=openlineageNotes("./data_needed/lineageNotes.tsv")
 UsedLineageNotes={}
 
 def AnnotateParagraph(text):
