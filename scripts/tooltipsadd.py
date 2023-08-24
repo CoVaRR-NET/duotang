@@ -35,10 +35,13 @@ def AddAllUsedTooltipElements():
     return s
 
 
-with open ("currentsituation.md", 'r') as f:
-    currentsituation=f.read()
+def AddToolTip():
+    with open ("currentsituation.md", 'r') as f:
+        currentsituation=f.read()
 
-newtext=AnnotateParagraph(currentsituation)
-newtext+=AddAllUsedTooltipElements()
+    newtext=AnnotateParagraph(currentsituation)
+    newtext+=AddAllUsedTooltipElements()
 
-print(newtext)
+    with open("currentsituation.md", "w") as fh:
+        fh.write(newtext)
+
