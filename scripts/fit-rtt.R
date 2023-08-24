@@ -80,9 +80,9 @@ get.ci <- function(fits) {
   ci <- lapply(fits, confint.rlm)
   est <- data.frame(
     n = sapply(fits, function(f) nrow(f$x)),                            
-    est = 29903*sapply(fits, function(f) f$coef[2]),
-    lower.95 = 29903*sapply(ci, function(f) f[2,1]),
-    upper.95 = 29903*sapply(ci, function(f) f[2,2])
+    est = sapply(fits, function(f) f$coef[2]),
+    lower.95 = sapply(ci, function(f) f[2,1]),
+    upper.95 = sapply(ci, function(f) f[2,2])
   )
   est$Lineage <- row.names(est)
   est
