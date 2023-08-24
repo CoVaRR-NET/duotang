@@ -115,7 +115,7 @@ caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
 #remove NB cuz it doesnt have enough data
 caseData[["NB"]] <- NULL
 #loads in population data for /100000invidivudal normalization
-populationData <- read.table("resources/2022Population.tsv", header=T, sep='\t', check.names = F)
+populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='\t', check.names = F)
 #view(caseCountData)
 #' function used to generate data required case count selection plots.
 #' @param caseCountData The case counts for a specific province. i.e. one item in variable caseData

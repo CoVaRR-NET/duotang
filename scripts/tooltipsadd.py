@@ -1,28 +1,33 @@
 
 
-def openlineageNotes(file):
-    dic={}
-    with open (file, 'r') as f:
-        f.readline()
-        for i in f:
-            dic[i.split('\t')[0]]=i.split('\t')[1].strip()
-    return dic
+AllLineageNotes={}
+with open ("./data_needed/lineageNotes.tsv", 'r') as f:
+    f.readline()
+    for i in f:
+        AllLineageNotes[i.split('\t')[0]]=i.split('\t')[1].strip()
 
 
-AllLineageNotes=openlineageNotes("./data_needed/lineageNotes.tsv")
 UsedLineageNotes={}
 
 def AnnotateParagraph(text):
-    for i in text.split(' '):
-        if i in AllLineageNotes:
-            text=text.replace(i,"<u id='"+i+"'>"+i+"</u>")
+    def subReplace(i,text):
+        if i not in UsedLineageNotes:
             UsedLineageNotes[i]=AllLineageNotes[i]
+            for c1 in [" ","(","\n"]:
+                for c2 in [" ",")","\n",",",". ",".\n"]:
+                    text=text.replace(c1+i+c2,c1+"<u id='"+i+"'>"+i+"</u>"+c2)
+        return(text)
+    for i in text.replace("\n"," ").replace("("," ").split(' '):
+        if i in AllLineageNotes:
+            text=subReplace(i,text)
+        if i!="" and (i[-1] in [".","*",".",")"]) and (i[:-1] in AllLineageNotes):
+            text=subReplace(i[:-1],text)
     return text
 
 
 
 def AddAllUsedTooltipElements():
-    s="```{r, echo=FALSE}\n"
+    s="\n\n\n\n```{r, echo=FALSE}\n"
     print()
     for i in UsedLineageNotes:
         s+="tippy::tippy_this(elementId = \""+i+"\", tooltip = \""+UsedLineageNotes[i]+"\")\n"
@@ -30,10 +35,10 @@ def AddAllUsedTooltipElements():
     return s
 
 
-text="la la la BA.2"
-text2="la la la BA.2.86 lala XBB"
-text=AnnotateParagraph(text)
-text2=AnnotateParagraph(text2)
-print(text)
-print(text2)
-print(AddAllUsedTooltipElements())
+with open ("currentsituation.md", 'r') as f:
+    currentsituation=f.read()
+
+newtext=AnnotateParagraph(currentsituation)
+newtext+=AddAllUsedTooltipElements()
+
+print(newtext)

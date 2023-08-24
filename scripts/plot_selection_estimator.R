@@ -348,7 +348,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     filter(variable != "tot") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
     mutate (p = value/n1) %>% filter(p != Inf) %>% dplyr::select(-n1) %>%
     rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]]))  %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
-    mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ",round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
+    mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ",round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}"))
   plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
   
   # plot the count data (circles)
@@ -422,7 +422,7 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
     filter(variable != "n1") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
     mutate (p = value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot) %>%
     rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]])) %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
-    mutate(variable = paste0(variantName, "(n=", n, "): ", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) #THIS LINE IS CLEARLY WRONG
+    mutate(variable = paste0(variantName, "(n=", n, "): ", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) 
   plotData$variable =  as.factor(plotData$variable)
 
   #plot the count data (circles)
