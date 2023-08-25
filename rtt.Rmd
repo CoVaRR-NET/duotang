@@ -55,15 +55,18 @@ if(!is.null(fit1)){
   sec.frame <- rbind(est1, est2, est3)
   sec.frame$est[sec.frame$est < 0] <- 0
   sec.frame$lower.95[sec.frame$lower.95 < 0] <- 0
-  sec.frame=sec.frame[sec.frame$Lineage != "Recombinants",]
-    sec.frame=sec.frame[sec.frame$Lineage != "other",]
-
+  
+  avgGlobalRate <- mean(sec.frame$est)
+  
+  sec.frame<-sec.frame[sec.frame$Lineage != "Recombinants",]
+  sec.frame<-sec.frame[sec.frame$Lineage != "other",]
+  
+  avgVOIRate <- mean(sec.frame$est)
   
   pal <- VOCVOI$color
   names(pal) <- VOCVOI$name
   pal["other"] <- "white"
   
-    
   ggplot(sec.frame, aes(x=Lineage, y=est, group=rep)) + 
     geom_bar(stat="identity", color="black", aes(fill=Lineage), position='dodge') + 
     scale_fill_manual(values=pal) + 
@@ -71,8 +74,13 @@ if(!is.null(fit1)){
           legend.position='none', panel.grid.major=element_line(colour="grey90")) + 
     geom_errorbar(aes(ymin=lower.95, ymax=upper.95), width=.7,
                   position=position_dodge(1)) +
+    geom_hline(aes(yintercept = avgGlobalRate), color = "#6F8FAF", linetype = "dashed", size =1) +
+    geom_hline(aes(yintercept = avgVOIRate), color = "#D2B04C", linetype = "twodash", size =1) +
+    annotate("text", x=13, y=avgGlobalRate*1.05, label = "Global rate", color = "#6F8FAF") +
+    annotate("text", x=12.9, y=avgVOIRate*0.95, label = "VOI rate", color = "#D2B04C") +
+
     labs(y="Substitutions / Genome / Day",
-         x="Lineage", fill="Subsample")
+         x="Lineage", fill="Subsample") 
 }
 
 ```
