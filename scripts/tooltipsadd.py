@@ -34,14 +34,20 @@ def AddAllUsedTooltipElements():
     s+="```\n"
     return s
 
+def CreateTooltipRMD():
+    with open("Tooltip.Rmd", "w") as fh:
+        fh.write(AddAllUsedTooltipElements())
 
 def AddToolTip():
     with open ("currentsituation.md", 'r') as f:
         currentsituation=f.read()
 
     newtext=AnnotateParagraph(currentsituation)
-    newtext+=AddAllUsedTooltipElements()
 
     with open("currentsituation.md", "w") as fh:
         fh.write(newtext)
+    CreateTooltipRMD()
 
+
+
+AddToolTip()
