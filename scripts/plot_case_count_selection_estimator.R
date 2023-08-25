@@ -176,9 +176,9 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
   # region = "Ontario"
   # order=mutantNames
   # filename = "test"
-  # colors = list()
-  # rValues = list()
-  
+   rColors = list()
+   rValues = list()
+  # 
   order[[4]] = paste0(order[[4]], " (Reference)")
   
   #format each of the fit lines for different variants
@@ -186,14 +186,14 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     fitData <- lineFits[[i]]$line
     colnames(fitData) <- c("Reported_Date", lineFits[[i]]$names, "type")
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T) #merge the X values
-    colors[lineFits[[i]]$names] = lineFits[[i]]$color #assign color to line
-    rValues[lineFits[[i]]$names] = round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
+    rColors[lineFits[[i]]$names] <- lineFits[[i]]$color #assign color to line
+    rValues[lineFits[[i]]$names] <- round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
     if (region == "Canada"){
-      rValues[lineFits[[i]]$names] = as.numeric(rValues[lineFits[[i]]$names]) / 7
+      rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7
     }
   }
   names(rValues)[names(rValues) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
-  names(colors)[names(colors) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
+  names(rColors)[names(rColors) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
   
   countData$type <- lineFits[[2]]$line$type
   
@@ -209,7 +209,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
   }
   
   legendValues <- d %>% dplyr::select(variable) %>% mutate(variable = as.character(variable)) %>% unique() %>% 
-    mutate(colorToUse = colors[variable]) %>% 
+    mutate(colorToUse = rColors[variable]) %>% 
     mutate(nameWithR = paste0(variable, "\n(r = ", round(as.numeric(rValues[variable]),0), "%)")) %>%
     arrange(factor(variable, levels = levels(d$variable))) #generate legend labels
 	
