@@ -170,14 +170,16 @@ CubicSplSmooth2 <- function(data, lambda=10^3) {
 }
 
 #' plot the casecount by selection estimate. 
-plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, order = NA, region=NA, saveToFile=F){
-  #countData <- caseCountData
-  #lineFits <-rev(caseSelectionLines)
-  #region = "Alberta"
-  #order=mutantNames
-  #filename = "test"
-  colors = list()
-  rValues = list()
+plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate = NA,region=NA, saveToFile=F){
+  # countData <- caseCountData
+  # lineFits <-rev(caseSelectionLines)
+  # region = "Ontario"
+  # order=mutantNames
+  # filename = "test"
+  # colors = list()
+  # rValues = list()
+  
+  order[[4]] = paste0(order[[4]], " (Reference)")
   
   #format each of the fit lines for different variants
   for (i in seq(1:length(lineFits))){
@@ -190,19 +192,21 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, 
       rValues[lineFits[[i]]$names] = as.numeric(rValues[lineFits[[i]]$names]) / 7
     }
   }
+  names(rValues)[names(rValues) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
+  names(colors)[names(colors) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
   
   countData$type <- lineFits[[2]]$line$type
   
   #melt the DF for plotting
-  d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) 
+  d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) %>% 
+    mutate(variable = str_replace(variable, "The Rest", paste0(mutantNames[[4]], " (Reference)")))
 
-  #sort the order of the mutants according to the order variable. If not defined, sort alphabetically.
+    #sort the order of the mutants according to the order variable. If not defined, sort alphabetically.
   if (length(order) > 0){
     d$variable <- factor(d$variable , levels=c(order[length(order)], order[1:length(order)-1] ))
   } else{
     d$variable <- factor(d$variable , levels=levels(fct_relevel((levels(d$variable)), "The Rest", after=0)))
   }
-  
   
   legendValues <- d %>% dplyr::select(variable) %>% mutate(variable = as.character(variable)) %>% unique() %>% 
     mutate(colorToUse = colors[variable]) %>% 

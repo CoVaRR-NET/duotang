@@ -238,16 +238,19 @@ alpha <- function(col, alpha) {
 #' @param col:  char, vector of colour specification strings
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
-                                    startpar, maxdate, col=c('red', 'blue'), method='BFGS') {
-  #region <- "Canada"
-  #startdate <- as.Date(max(meta$sample_collection_date)-days(120))
-  #reference <- c(setAll)  # or c("BA.1", "BA.1.1")
-  #mutants <- mutants
-  #names <- mutantNames
-  #startpar <- startpar
-  #method='BFGS'
-  #maxdate=NA
-  #col=col
+                                    startpar, maxdate, col=c('red', 'blue'), method='BFGS', includeReference=FALSE) {
+  # region <- "Canada"
+  # startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+  # reference <- c(reference)  # or c("BA.1", "BA.1.1")
+  # mutants <- mutants
+  # names <- mutantNames
+  # startpar <- startpar
+  # method='BFGS'
+  # maxdate=NA
+  # col=col
+  if (includeReference){
+     col = c("Reference" = "black", col)
+   }
 
   est <- .make.estimator(region, startdate, reference, mutants)
   toplot <- est$toplot
@@ -282,14 +285,47 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   if(is.na(maxdate)){
     maxdate=max(toplot$date)
   }
-  # format the count data (circles)
+
+    # format the count data (circles)
   plotData <- toplot %>% melt(id = c("date", "time", "tot")) %>% dplyr::select(date, variable, value, tot) %>% 
-    filter(variable != "n1") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
-    mutate (p = 2*value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot) %>%
-    rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]])) %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
-    mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) 
+    mutate (variable = str_extract(variable,"[^n]+$")) %>% 
+    mutate (p = 2*value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot)  %>% 
+    rowwise() %>% 
+    mutate (s = ifelse((as.numeric(variable)-1) == 0, 0,(fit$fit[[paste0("s", (as.numeric(variable)-1))]]))) %>% 
+    group_by(variable) %>% mutate(n = sum(value)) 
+    
+    
+    if (!includeReference){
+      scurveStartIndex = 2
+      colorStartIndex = 1
+      
+      plotData <- plotData %>% filter(variable != 1) %>%    
+        mutate(variable = paste0(names[as.numeric(variable)-1], 
+                                 "(n=", n, "): ", 
+                                 round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
+                                 " {", 
+                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), 
+                                 ", ", 
+                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), 
+                                 "}")) 
+    }  else{
+      scurveStartIndex = 1
+      colorStartIndex = 2
+      
+      plotData <- plotData %>%    
+        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[4]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
+                                 "(n=", n, "): ", 
+                                 round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
+                                 " {", 
+                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), 
+                                 ", ", 
+                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), 
+                                 "}"))) 
+    }
+  
   plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
-    #plot the count data (circles)
+  
+  #plot the count data (circles)
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
     scale_fill_manual(label =c(levels(plotData$variable)), values = unname(col)) +
@@ -298,9 +334,8 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     ylim(0,1) +
     xlim(min(plotData$date), maxdate) 
 
-  
   #format the fit (line)
-  scurvesPlotData <- cbind(toplot[,"date", drop=F], scurves[,2:ncol(scurves)])
+  scurvesPlotData <- cbind(toplot[,"date", drop=F], scurves[,scurveStartIndex:ncol(scurves)])
   colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
   scurvesPlotData=scurvesPlotData %>% melt(id="date")
 
@@ -308,16 +343,21 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
   if (any(!is.na(fit$sample))) {  
-    p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[1], alpha=0.5)
+    
+    if (includeReference){
+      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,1], ymax=hi95[,1]), color = "black", fill= col[1], alpha=0.5)
+    }
+    
+    p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[colorStartIndex], alpha=0.5)
     
     #I'm sorry whoever maintain this next, this is disguting code to make sure the ribbon draws because I cant get it to work with a for loop
     #Good luck trying to solve it or just continue the problem :)
     #if additional mutants are added, increment the index in lo95, hi95 and col
     if(ncol(lo95) > 2) {
-      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,3], ymax=hi95[,3]), color = "black", fill= col[2], alpha=0.5)
+      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,3], ymax=hi95[,3]), color = "black", fill= col[colorStartIndex+1], alpha=0.5)
     }
     if(ncol(lo95) > 3) {
-      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,4], ymax=hi95[,4]), color = "black", fill= col[3], alpha=0.5)
+      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,4], ymax=hi95[,4]), color = "black", fill= col[colorStartIndex+2], alpha=0.5)
     }
     if(ncol(lo95) > 4) {
       stop("ERROR: function does not currently support more than three mutant types!")
@@ -343,6 +383,9 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   # second plot - logit transform
   options(scipen=1000000)
 
+  if (includeReference){
+    col <- col[-1]
+  }
   # format the count data (circles)
   plotData <- toplot %>% melt(id = c("date", "time", "n1")) %>% dplyr::select(date, variable, value, n1) %>% 
     filter(variable != "tot") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
