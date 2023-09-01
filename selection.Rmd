@@ -80,7 +80,7 @@ Here we examine the relative rate of spread of the different sublineages of Omic
 
 Currently, the major group of Omicron lineages rising in frequency are the XBB.* group. This group was previously dominated by the XBB.1.5* lineages, which peaked in April 2023. A variety of other XBB* have been spreading since, and we now track the frequencies of XBB.1.5\*, EG.5\*,  and XBB.Other, as well as all remaining non-XXB lineages. See Fastest Growing Lineages for details on lineages showing positive selection.
 
-Left plot: y-axis is the proportion of sub-lineages EG.5\*,  XBB.1.5\*, XBB.Other, and non-XBB. Right plot: y-axis describes the logit function, log(freq(non-XBB\*, XBB.1.16\*, or XBB.Other)/freq(XBB.1.5)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(EG.5\*, XBB.Other, or non-XBB\*)/freq(XBB.1.5\*)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 
