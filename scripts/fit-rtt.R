@@ -67,8 +67,20 @@ fit.rtt <- function(path) {
     fits[[variant]] <- fit
   }
   
-  fit.global <- rlm(div ~ coldate)
-  names(fit.global$coefficients) <- c('y', 'x')
+  fit.global <- rlm(0 +div ~ coldate)
+  
+  # summary(fit.global)
+  # names(fit.global$coefficients) <- c('y', 'x')
+  # 
+  # data <- data.frame(coldate,div )
+  # 
+  # min(coldate)
+  # 
+  # ggplot(data, aes(coldate, div)) +
+  #   geom_point() +  # Scatter plot points
+  #   geom_abline(intercept = , slope = coef(fit.global), color = "red") +  # Regression line with intercept forced to 0
+  #   labs(x = "X", y = "Y") +  # Label axes
+  #   theme_minimal()  # Minimalist theme
   
   fits[["global"]] <- fit.global
   
