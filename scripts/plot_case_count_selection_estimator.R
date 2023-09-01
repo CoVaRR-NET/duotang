@@ -239,7 +239,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
     
     
-    ylim(0, 10) + 
+    ylim(0, 6) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
     ylab("PCR-verified cases per 100,000 individuals") +
