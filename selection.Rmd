@@ -66,6 +66,9 @@ for (i in 2:length(all.regions$name)){
   selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]], maxdate)
 }
 
+#temporarily remove the NS plots because there is just too little data and it mucks up everything
+selectionEstimateFits[["NS"]]$plot1 <- NULL
+selectionEstimateFits[["NS"]]$plot2 <- NULL
 
 ```
 
@@ -100,7 +103,7 @@ apply(all.regions,1,function(reg){
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
   }
   cat("\n\n")})
-  
+
 ```
 
 # Case count trends by variant
