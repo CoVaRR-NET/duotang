@@ -20,6 +20,7 @@ dlines <- function(x, y, col) {
 #' per site.
 #' @param path:  path to file containing a Newick tree string
 fit.rtt <- function(path) {
+  
   rooted <- read.tree(path)
   
   # link to metadata
@@ -51,7 +52,7 @@ fit.rtt <- function(path) {
   div <- tips$div
   
   fit0 <- rlm(div[pg=='other'] ~ coldate[pg=='other'])
-  names(fit0$model) <- c('y', 'x')
+  names(fit0$coefficients) <- c('y', 'x')
   fits <- list(other=fit0)
   for (i in 1:nrow(VOCVOI)) {
     variant <- VOCVOI$name[i]
@@ -65,6 +66,13 @@ fit.rtt <- function(path) {
     suppressWarnings(fit <- rlm(y ~ x))
     fits[[variant]] <- fit
   }
+  
+  fit.global <- rlm(div ~ coldate)
+  names(fit.global$coefficients) <- c('y', 'x')
+  
+  fits[["global"]] <- fit.global
+  
+  #fit.VOCVOI <- rlm(div[pg %in% VOCVOI$name] ~ coldate[pg %in% VOCVOI$name])
   
   list(fits=fits, tips=tips)
 }
