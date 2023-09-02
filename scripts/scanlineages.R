@@ -51,11 +51,21 @@ makepangotree <- function(raw_lineagelist){
 #alias to ancestor
 rawtoreallineage <- function(lineage) {
   # FIXME: dico should be passed as an argument, not an implicit global var
-  sub.dico <- dico[sapply(dico$fullname, function(x) { grepl(x, lineage) } ), ]
+  # 
+  # lineage<- "B.1.1.529.2.XBB.1.9.1.1.5.1" #FL1.5.1
+  # lineage <- "B.1.1.529.2.XBB.1.5.10" # XBB.1.5.10
+  # lineage <- "B.1.1.529.2.XBB.1.9.1" #XBB.1.9.1
+  # 
+  
+  #dico=makepangolindico() #need to update this dictionary after we append the root of XBB variants.
+  
+  sub.dico <- dico[sapply(dico$fullname, function(x) { grepl(x, lineage) } ), ] #dictionary of lineages and it's immediate parent
   if (nrow(sub.dico)>0) {
     #deduced <- str_replace(lineage,t[1,"fullname"], t[1,"surname"])
-    deduced <- gsub(sub.dico$fullname[1], sub.dico$surname[1], lineage)
-    observed <- meta[meta$raw_lineage==lineage, ][1, ]$lineage
+    deduced <- gsub(sub.dico$fullname[1], sub.dico$surname[1], lineage) #expected lineage based off of the dico?
+    #observed <- meta[grepl(paste0("(.*|^)",lineage,"$"), meta$raw_lineage),][1, ]$lineage
+    observed <- meta[meta$raw_lineage == lineage,][1, ]$lineage #sometimes dico returns more than 1 lineage. mostly in case of 1 lineage having another name. observed is the correct naming?
+    
     if(! is.na(observed) && deduced!=observed){
       return(observed)
     }
@@ -64,8 +74,11 @@ rawtoreallineage <- function(lineage) {
   return(lineage)
 }
 
+
+
 #ancestor to alias
 realtorawlineage <- function(lineage){
+  
   #Since * could be directly add to the first part : eg BA*
   if(substr(lineage, nchar(lineage), nchar(lineage))=="*"){
     star="*"
@@ -92,9 +105,23 @@ isRecombinant <- function (x){
   return(grepl("(.*|^)X..", x))
 }
 
+#getStrictoSubLineages("FL.1.5.1", meta)
+#getStrictoSubLineages("XBB.1.5.10*", meta)
+#getStrictoSubLineages("FL.10.1", meta)
+# 
+
 getStrictoSubLineages <- function(x, meta, nonRecombinantOnly=F, recombinantsOnly=F) {
 
+  # x <- "FL.1.5.1"
+  # x <- "XBB.1.5.10"
+  # x <- "XBB.1.9.1"
+  # realtorawlineage(x)
+  # rawtoreallineage(realtorawlineage(x))
+
+  
   raw <- realtorawlineage(x)
+  
+  
   if (!endsWith(x, "*")) {
     return(list(rawtoreallineage(raw)))
   } 

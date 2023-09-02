@@ -1,6 +1,6 @@
 plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
-  #r = paramselected[1:25]
- # coefficientTable = coefficientTable
+   # r = paramselected[1:n]
+   # coefficientTable = coefficientTable
   d = data.frame(lineage = character(),
                  sel_coeff = numeric(),
                  low_CI = numeric(),
@@ -37,7 +37,6 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     return(l)
   })
 
-  
   if (class(coefficientTable) == "data.frame" ){
     if (unique(d$region) == "Canada"){
       #generate the circle with borders if in more than 1 provinc for canada only plot
@@ -60,6 +59,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     names(couleur)=levels(d$sequence_count)
     colScale=scale_colour_manual(name="sequence_count",values=couleur)
     d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
+    
     maxdate=max((meta %>%  filter(province %in% get.province.list(r[[1]]$region)))$sample_collection_date)
     title=paste("Most recent sequence date:",format(maxdate, "%B %d, %Y"))
     

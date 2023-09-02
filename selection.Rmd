@@ -245,6 +245,8 @@ Here we show the selection estimates and their 95% confidence intervals for Pang
 ```{r getCoefficientTable, echo = F, warning=FALSE, message=FALSE}
 source("scripts/plot_growing_lineages.R")
 
+dico <- makepangolindico()
+
 paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
 x=p$mut[[1]];
 (p$fit)$fit[["s1"]]>0 & 
@@ -252,7 +254,6 @@ sum(p$toplot$n2)>10
 }else{FALSE}})]
 
 coefficientTable <- plot_growing_lineage(paramselected,makeplot=FALSE)
-
 ```
 
 ## Plot (stricto) {.tabset .tabset-fade}
@@ -275,6 +276,7 @@ selectparam <- function(p,reg){
 
 
 for (i in 1:length(all.regions[["name"]])) {
+  # i=2
   cat("###", all.regions[['shortname']][[i]], "\n")
   if (all.regions[['name']][[i]] == "Canada"){
       cat("#### Plot single lineages in", all.regions[['name']][[i]],"*\n","\n")
@@ -282,7 +284,8 @@ for (i in 1:length(all.regions[["name"]])) {
       cat("#### Plot single lineages in", all.regions[['name']][[i]],"\n","\n")
   }
   paramselected=allparams[sapply(allparams,function(x){selectparam(x,all.regions[['name']][[i]])})]
-  n=min(25,length(paramselected))
+  n=min(25,length(paramselected)) #top x lineage
+
   if(n!=0){
     #print(plot_growing_lineage(paramselected[1:n]))
     p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable) #A%>% as_widget()
@@ -355,7 +358,7 @@ link = DisplayHTMLTableDownloadLink(dataDownload, "GrowingLineages")
 Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
 ```{r general settings for selection estimator BA.2, warning=FALSE, echo=FALSE, message=FALSE}
-source("scripts/scanlineages.R")
+#source("scripts/scanlineages.R")
 source("scripts/plot_selection_estimator.R")
 
 #function to plot all the indivudal variant's selection plot
