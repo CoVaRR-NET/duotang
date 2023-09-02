@@ -245,8 +245,6 @@ Here we show the selection estimates and their 95% confidence intervals for Pang
 ```{r getCoefficientTable, echo = F, warning=FALSE, message=FALSE}
 source("scripts/plot_growing_lineages.R")
 
-dico <- makepangolindico()
-
 paramselected=allparams[sapply(allparams,function(p){if(!any(is.na(p$fit))){
 x=p$mut[[1]];
 (p$fit)$fit[["s1"]]>0 & 

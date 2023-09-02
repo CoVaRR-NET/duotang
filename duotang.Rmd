@@ -123,8 +123,7 @@ startdate <- max(meta$sample_collection_date) - days(120)
 
 ## parse PANGO lineages
 source("scripts/scanlineages.R")
-meta$pango_group <- create.pango.group(VOCVOI, meta)
-meta$pango_group <- as.factor(meta$pango_group)
+
 
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
@@ -136,8 +135,12 @@ meta <- meta %>% rowwise() %>%
                                           substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , ""),
                                    raw_lineage)) %>% as.data.frame()
 
+# view((meta2 %>% filter (grepl("FL", lineage))))
 
-#view(meta2)
+dico <- makepangolindico() #rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB
+
+meta$pango_group <- create.pango.group(VOCVOI, meta)
+meta$pango_group <- as.factor(meta$pango_group)
 
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
 
@@ -265,6 +268,11 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 md_file <- readLines("currentsituation.md")
 cat(md_file, sep = "\n")
 ```
+
+<!-- # Tooltips deinitions -->
+
+<!-- ```{r rtt, child="Tooltip.Rmd"} -->
+<!-- ```  -->
 
 # Omicron sublineages in Canada 
 
