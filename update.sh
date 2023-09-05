@@ -404,7 +404,7 @@ echo "filterseq" > $checkPointFile
 #removes the recombinants
 
 echo "separating out the recombinants from the data..."
-python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "^X\S*$" --keepregex "^XBB\S*$"
+python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "(^|.)X.." --keepregex "(^|.)X.."
 
 echo "alignseq" > $checkPointFile
 

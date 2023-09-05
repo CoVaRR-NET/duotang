@@ -22,15 +22,15 @@ if __name__ == "__main__":
     # command line interface
     parser = argparse.ArgumentParser("Down-sample genome data in xz-compressed file and output reference-aligned sequences.")
 
-    parser.add_argument("--infile", type=str, 
+    parser.add_argument("--infile", type=str, default="../data_needed/virusseq.fasta.xz",
                         help="input, xz-compressed FASTA file from virusseq.py")
-    parser.add_argument("--metadata", type=str,
+    parser.add_argument("--metadata", type=str,default="../data_needed/virusseq.metadata.csv.gz",
                         help="input, gz-compressed metadata file from pango2seq.py")
-    parser.add_argument("--outfile", type=str, 
+    parser.add_argument("--outfile", type=str, default="../data_needed",
                         help="output, path to write FASTA.XZ and metadata files")
-    parser.add_argument("--extractregex", type=str, default="^X\S*$",
+    parser.add_argument("--extractregex", type=str, default="(^|.)X..",
                         help="regex used to extract lineages from all data. i.e. blacklist")
-    parser.add_argument("--keepregex",action='extend', nargs="+",  default=[],
+    parser.add_argument("--keepregex",action='extend', nargs="+",  default=["(^|.)X.."],
                         help="regex used to keep lineages from extracted data. i.e. whitelist")
     parser.add_argument("--extractbyid", action=argparse.BooleanOptionalAction,
                         help="bool, specifies that the regex should be applied to ID rather than lineage")
@@ -54,9 +54,9 @@ if __name__ == "__main__":
         for line in fh:
             #if metadata belongs to the regex being searched
             if (args.extractbyid == True):
-                strToMatch = line.split('\t')[0]
+                strToMatch = line.split('\t')[0] #isolate column
             else:
-                strToMatch = line.split('\t')[1]
+                strToMatch = line.split('\t')[-1] #raw lineage column
 
             if (re.search(args.extractregex, strToMatch)):
                 idToRemove.append(line.split('\t')[23])
@@ -75,7 +75,7 @@ if __name__ == "__main__":
             if (args.extractbyid == True):
                 strToMatch = line.split('\t')[0]
             else:
-                strToMatch = line.split('\t')[1]
+                strToMatch = line.split('\t')[-1]
 
             if (re.search(regex, strToMatch)):
                 ids.append(line.split('\t')[23])
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         metadataWhitelist[''.join([i for i in regex if i.isalpha()])]= md
     
     for key in idToWhitelist.keys():
-        with gzip.open(args.outfile + "/SequenceMetadata_regex_" + key + ".tsv.gz", 'wt') as fh:
+        with gzip.open(args.outfile + "/SequenceMetadata_regex_" + key.replace("\\","") + ".tsv.gz", 'wt') as fh:
             for line in metadataWhitelist[key]:
                 fh.write(line)
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     print("outputting matched sequences...")
     for key in recordsMatched:
-        with lzma.open(args.outfile + "/Sequences_regex_" + key + ".fasta.xz", 'wt', encoding='utf-8') as wfh:
+        with lzma.open(args.outfile + "/Sequences_regex_" + key.replace("\\","") + ".fasta.xz", 'wt', encoding='utf-8') as wfh:
             for record in recordsMatched[key]:
                 wfh.write(">" + record.id + "\n" + str(record.seq) + "\n")
     

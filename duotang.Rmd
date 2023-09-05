@@ -123,8 +123,7 @@ startdate <- max(meta$sample_collection_date) - days(120)
 
 ## parse PANGO lineages
 source("scripts/scanlineages.R")
-meta$pango_group <- create.pango.group(VOCVOI, meta)
-meta$pango_group <- as.factor(meta$pango_group)
+
 
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
@@ -136,8 +135,10 @@ meta <- meta %>% rowwise() %>%
                                           substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , ""),
                                    raw_lineage)) %>% as.data.frame()
 
+dico <- makepangolindico() #rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB
 
-#view(meta2)
+meta$pango_group <- create.pango.group(VOCVOI, meta)
+meta$pango_group <- as.factor(meta$pango_group)
 
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
 
@@ -265,6 +266,11 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 md_file <- readLines("currentsituation.md")
 cat(md_file, sep = "\n")
 ```
+
+<!-- # Tooltips deinitions -->
+
+<!-- ```{r rtt, child="Tooltip.Rmd"} -->
+<!-- ```  -->
 
 # Omicron sublineages in Canada 
 
@@ -510,7 +516,7 @@ Provinces with sampling strategies that are variant specific are removed, unless
 
 #### Case count trends by variant 
 
-Reported cases are obtained from the Ontario Data Catalogue (Ontario), COVID-19 info for Albertans (Alberta), Centre d'expertise et de référence en santé publique (Quebec), Canada Health InfoBase (Canada, British Columbia, Nova Scotia, and Newfoundland and Labrador). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed case counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
+Reported cases are obtained from the COVID-19 info for Albertans (Alberta; [link](https://www.alberta.ca/data/stats/covid-19-alberta-statistics-summary-data.csv)), Centre d'expertise et de référence en santé publique (Quebec; [link](https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648)), Canada Health InfoBase (Canada, British Columbia, Ontario, Nova Scotia, and Newfoundland and Labrador; [link](https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv)). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed case counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
 
 The previously discussed methods allow us to estimate the proportion of a lineage over time (see equation for $p_i(t)$ above). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date, $t$. By multiplying the list from case counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases that are due to a specific lineage at each time point as $$n_i(t) = p_i(t) \; n(t).$$
 
@@ -520,8 +526,7 @@ Because genomics data often lag case count data, the last date of reliable case 
 
 #### Rates
 ##### Root-to-tip estimates of substitution rate
-Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
-
+Substitution rates were obtained from the maximum likelihood tree made using [IQ-TREE](http://www.iqtree.org/) and a [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) conducted, without forcing the intercept to zero (similar results were seen when forcing the intercept). Up to 10000 samples for non-XBB lineages and all samples for XBB lineages are used to construct this tree. For the estimation of each VOI's substitution rates over time, all sequences of that VOI present in the tree are used. While this ignores pseudo-replication among the samples due to relatedness, the estimated slope is robust given the large sample sizes. Furthermore, we calculated SE bars from three different independent samples to reduce the influence of closely related viral samples. The global rate estimate was obtained by a regression over time of all the sequences present in the tree, as illustrated in the root-to-tip plot, ignoring variants classification.
 
 
 ## Data notes by province {.tabset .tabset-fade}

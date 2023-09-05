@@ -20,6 +20,7 @@ dlines <- function(x, y, col) {
 #' per site.
 #' @param path:  path to file containing a Newick tree string
 fit.rtt <- function(path) {
+  
   rooted <- read.tree(path)
   
   # link to metadata
@@ -51,7 +52,7 @@ fit.rtt <- function(path) {
   div <- tips$div
   
   fit0 <- rlm(div[pg=='other'] ~ coldate[pg=='other'])
-  names(fit0$model) <- c('y', 'x')
+  names(fit0$coefficients) <- c('y', 'x')
   fits <- list(other=fit0)
   for (i in 1:nrow(VOCVOI)) {
     variant <- VOCVOI$name[i]
@@ -65,6 +66,25 @@ fit.rtt <- function(path) {
     suppressWarnings(fit <- rlm(y ~ x))
     fits[[variant]] <- fit
   }
+  
+  fit.global <- rlm(0 +div ~ coldate)
+  
+  # summary(fit.global)
+  # names(fit.global$coefficients) <- c('y', 'x')
+  # 
+  # data <- data.frame(coldate,div )
+  # 
+  # min(coldate)
+  # 
+  # ggplot(data, aes(coldate, div)) +
+  #   geom_point() +  # Scatter plot points
+  #   geom_abline(intercept = , slope = coef(fit.global), color = "red") +  # Regression line with intercept forced to 0
+  #   labs(x = "X", y = "Y") +  # Label axes
+  #   theme_minimal()  # Minimalist theme
+  
+  fits[["global"]] <- fit.global
+  
+  #fit.VOCVOI <- rlm(div[pg %in% VOCVOI$name] ~ coldate[pg %in% VOCVOI$name])
   
   list(fits=fits, tips=tips)
 }
@@ -80,9 +100,9 @@ get.ci <- function(fits) {
   ci <- lapply(fits, confint.rlm)
   est <- data.frame(
     n = sapply(fits, function(f) nrow(f$x)),                            
-    est = 29903*sapply(fits, function(f) f$coef[2]),
-    lower.95 = 29903*sapply(ci, function(f) f[2,1]),
-    upper.95 = 29903*sapply(ci, function(f) f[2,2])
+    est = sapply(fits, function(f) f$coef[2]),
+    lower.95 = sapply(ci, function(f) f[2,1]),
+    upper.95 = sapply(ci, function(f) f[2,2])
   )
   est$Lineage <- row.names(est)
   est

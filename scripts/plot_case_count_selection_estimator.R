@@ -170,42 +170,46 @@ CubicSplSmooth2 <- function(data, lambda=10^3) {
 }
 
 #' plot the casecount by selection estimate. 
-plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, order = NA, region=NA, saveToFile=F){
-  #countData <- caseCountData
-  #lineFits <-rev(caseSelectionLines)
-  #region = "Alberta"
-  #order=mutantNames
-  #filename = "test"
-  colors = list()
-  rValues = list()
+plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate = NA,region=NA, saveToFile=F){
+  # countData <- caseCountData
+  # lineFits <-rev(caseSelectionLines)
+  # region = "Ontario"
+  # order=mutantNames
+  # filename = "test"
+   rColors = list()
+   rValues = list()
+  # 
+  order[[4]] = paste0(order[[4]], " (Reference)")
   
   #format each of the fit lines for different variants
   for (i in seq(1:length(lineFits))){
     fitData <- lineFits[[i]]$line
     colnames(fitData) <- c("Reported_Date", lineFits[[i]]$names, "type")
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T) #merge the X values
-    colors[lineFits[[i]]$names] = lineFits[[i]]$color #assign color to line
-    rValues[lineFits[[i]]$names] = round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
+    rColors[lineFits[[i]]$names] <- lineFits[[i]]$color #assign color to line
+    rValues[lineFits[[i]]$names] <- round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
     if (region == "Canada"){
-      rValues[lineFits[[i]]$names] = as.numeric(rValues[lineFits[[i]]$names]) / 7
+      rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7
     }
   }
+  names(rValues)[names(rValues) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
+  names(rColors)[names(rColors) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
   
   countData$type <- lineFits[[2]]$line$type
   
   #melt the DF for plotting
-  d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) 
+  d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) %>% 
+    mutate(variable = str_replace(variable, "The Rest", paste0(mutantNames[[4]], " (Reference)")))
 
-  #sort the order of the mutants according to the order variable. If not defined, sort alphabetically.
+    #sort the order of the mutants according to the order variable. If not defined, sort alphabetically.
   if (length(order) > 0){
     d$variable <- factor(d$variable , levels=c(order[length(order)], order[1:length(order)-1] ))
   } else{
     d$variable <- factor(d$variable , levels=levels(fct_relevel((levels(d$variable)), "The Rest", after=0)))
   }
   
-  
   legendValues <- d %>% dplyr::select(variable) %>% mutate(variable = as.character(variable)) %>% unique() %>% 
-    mutate(colorToUse = colors[variable]) %>% 
+    mutate(colorToUse = rColors[variable]) %>% 
     mutate(nameWithR = paste0(variable, "\n(r = ", round(as.numeric(rValues[variable]),0), "%)")) %>%
     arrange(factor(variable, levels = levels(d$variable))) #generate legend labels
 	
@@ -235,7 +239,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, maxdate = NA, 
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
     
     
-    ylim(0, 10) + 
+    ylim(0, 6) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
     ylab("PCR-verified cases per 100,000 individuals") +

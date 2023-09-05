@@ -8,8 +8,8 @@ source("scripts/tree.r")
 # load trees from files
 mltree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.rtt.nwk"))
 ttree <- read.tree(paste0(params$datadir,"/aligned_nonrecombinant_sample1.timetree.nwk"))
-recombTTree <- read.tree(paste0(params$datadir,"/aligned_recombinant_XBBS_sample1.timetree.nwk"))
-recombMLree <- read.tree(paste0(params$datadir,"/aligned_recombinant_XBBS_sample1.rtt.nwk"))
+recombTTree <- read.tree(paste0(params$datadir,"/aligned_recombinant_X_sample1.timetree.nwk"))
+recombMLree <- read.tree(paste0(params$datadir,"/aligned_recombinant_X_sample1.rtt.nwk"))
 
 #stopifnot(all(sort(mltree$tip.label) == sort(ttree$tip.label)))
 dateseq <- seq(ymd('2019-12-01'), ymd('2022-12-01'), by='3 month')
