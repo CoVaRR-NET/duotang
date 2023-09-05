@@ -44,7 +44,7 @@ fit3 <- fit.rtt(paste0(params$datadir,"/aligned_allSeqs_sample3.rtt.nwk"))$fits
 
 ### Molecular clock estimates (based on three independent subsamples)
 
-Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest, with their 95% confidence interval.
+Here we show the estimate of the substitution rate for 3 independent subsamples of different variants of interest (VOI), with their 95% confidence interval. The average rate of substitution within VOI is given by a bamboo colored dashed line.  For comparison, the average rate of substitution across all samples is much higher (grey line), indicating that about half of the substitutions occur through normal routes of transmission while the other half occur with the appearance of new, highly divergent VOI, likely due to different evolutionary processes occurring within chronic infections (see [Neher 2022](https://academic.oup.com/ve/article/8/2/veac113/6887176) for details).
 
 ```{r message=FALSE, echo=F, warning=F}
 
@@ -80,7 +80,7 @@ if(!is.null(fit1)){
     geom_hline(aes(yintercept = avgGlobalRate), color = "#6F8FAF", linetype = "dashed", size =1) +
     geom_hline(aes(yintercept = avgVOIRate), color = "#D2B04C", linetype = "twodash", size =1) +
     annotate("text", x=12, y=avgGlobalRate*1.05, label = paste0("Global rate (", round(avgGlobalRate,2), ")"), color = "#6F8FAF") +
-    annotate("text", x=12, y=avgVOIRate*1.10, label = paste0("VOC rate (", round(avgVOIRate,2), ")"), color = "#D2B04C") +
+    annotate("text", x=12, y=avgVOIRate*1.10, label = paste0("VOI rate (", round(avgVOIRate,2), ")"), color = "#D2B04C") +
 
     labs(y="Substitutions / Genome / Day",
          x="Lineage", fill="Subsample") 

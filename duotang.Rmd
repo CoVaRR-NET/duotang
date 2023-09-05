@@ -135,8 +135,6 @@ meta <- meta %>% rowwise() %>%
                                           substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , ""),
                                    raw_lineage)) %>% as.data.frame()
 
-# view((meta2 %>% filter (grepl("FL", lineage))))
-
 dico <- makepangolindico() #rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB
 
 meta$pango_group <- create.pango.group(VOCVOI, meta)
@@ -528,8 +526,7 @@ Because genomics data often lag case count data, the last date of reliable case 
 
 #### Rates
 ##### Root-to-tip estimates of substitution rate
-Maximum likelihood tree ([IQ-TREE](http://www.iqtree.org/)) processed with [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) and plotting in R.
-
+Substitution rates were obtained from the maximum likelihood tree made using [IQ-TREE](http://www.iqtree.org/) and a [root-to-tip regression](https://search.r-project.org/CRAN/refmans/ape/html/rtt.html) conducted, without forcing the intercept to zero (similar results were seen when forcing the intercept). Up to 10000 samples for non-XBB lineages and all samples for XBB lineages are used to construct this tree. For the estimation of each VOI's substitution rates over time, all sequences of that VOI present in the tree are used. While this ignores pseudo-replication among the samples due to relatedness, the estimated slope is robust given the large sample sizes. Furthermore, we calculated SE bars from three different independent samples to reduce the influence of closely related viral samples. The global rate estimate was obtained by a regression over time of all the sequences present in the tree, as illustrated in the root-to-tip plot, ignoring variants classification.
 
 
 ## Data notes by province {.tabset .tabset-fade}
