@@ -50,18 +50,26 @@ rtt_input.selectAll("input")
 rtt_input.selectAll("label")
   .append("br");
 
-
 // bind event listener to checkboxes
 rtt_input.selectAll(".rtt_cb")
   .on("change", function() {
-    // mark points for masking
-    var pgroup = tips.filter(x => x.pango == this.value);
-    pgroup.map(x => x.display = this.checked);
-    
-    // mark slopes for masking
-    var slope = fits.filter(x => x.pango == this.value);
-    slope.map(x => x.display = this.checked);
-    rtt_update();
+    // check that at least one checkbox is active
+    var nchecks = rtt_input.selectAll(".rtt_cb").filter(":checked").size();
+    if (nchecks == 0) {
+      console.log("Cannot have zero variants checked!")
+      console.log(this);
+      this.checked = true;
+    }
+    else {
+      // mark points for masking
+      var pgroup = tips.filter(x => x.pango == this.value);
+      pgroup.map(x => x.display = this.checked);
+      
+      // mark slopes for masking
+      var slope = fits.filter(x => x.pango == this.value);
+      slope.map(x => x.display = this.checked);
+      rtt_update();      
+    }
   })
 
 
