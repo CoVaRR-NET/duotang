@@ -57,7 +57,6 @@ rtt_input.selectAll(".rtt_cb")
     var nchecks = rtt_input.selectAll(".rtt_cb").filter(":checked").size();
     if (nchecks == 0) {
       console.log("Cannot have zero variants checked!")
-      console.log(this);
       this.checked = true;
     }
     else {
