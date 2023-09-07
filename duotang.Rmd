@@ -74,7 +74,7 @@ opts_knit$set(root.dir = getwd())
 source("scripts/utils.R")
 #Date of the VirusSeq release, load from params passed in during CLI command
 VirusSeq_release=format(as.Date(params$datestamp),"%B %d, %Y")
-Variants_Canada_over_time_Start_Date=as.Date('2021-01-01')
+Variants_Canada_over_time_Start_Date=as.Date('2020-01-01')
 
 pangoversion="4.2 (Viral AI)" #this should probably be passed in via params
 
@@ -144,7 +144,7 @@ fullpangotree <- makepangotree(unique(meta$raw_lineage))
 
 latelineage_pangotree <- makepangotree(unique(
   meta$raw_lineage[
-    meta$sample_collection_date > max(meta$sample_collection_date) - days(60) 
+    meta$sample_collection_date > startdate
     ]
   ))
 
@@ -170,12 +170,18 @@ for(row in 1:nrow(epidataCANall)) {
 }
 epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 
+uniqueNamedLineageLast120Days <- unique(
+  meta$lineage[
+    meta$sample_collection_date > startdate
+    ]
+  )
+
 #load the pango_lineage notes file and extracts parental data using it's alias as a separate column
 lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F, comment.char = "", fill = T) %>% 
   mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>% 
   mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
-  dplyr::select(Lineage, Parent, Description) 
-colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description")
+  dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, "YES", ""))
+colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "In Canada Last 3Mo")
 
 ```
 
@@ -261,6 +267,8 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 <hr style="border:1px solid gray">
 
 # Current situation
+
+There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for details of lineages present.
 
 ```{r, currensituation, echo=FALSE,  warning=FALSE, message=FALSE, results="asis"}
 md_file <- readLines("currentsituation.md")
@@ -440,9 +448,9 @@ This historical analysis is not being further updated, as we focus on more inter
 
 <hr style="border:1px solid gray">
 
-# Pango lineage table
+# Lineages
 
-Here we present a searchable table that provides a short description of each lineage as well information on the ancestor of that lineage.
+Here we present a searchable table that provides a short description of each PANGO lineage, it's the ancestor, a short description, and whether or not it's present in Canada in the last 120days.
 
 ```{r function for displaying lineage informaiton, echo=FALSE, warning=FALSE, message=FALSE}
 #show the table as paged and column searchable.
