@@ -180,9 +180,8 @@ uniqueNamedLineageLast120Days <- unique(
 lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F, comment.char = "", fill = T) %>% 
   mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>% 
   mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
-  dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, "YES", ""))
-colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "In Canada Last 3Mo")
-
+  dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage]), 0))
+colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "# In Canada Last 3Mo")
 ```
 
 ```{r, include=FALSE}
@@ -268,7 +267,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 # Current situation
 
-There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for details of lineages present.
+There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for number of sequences per lineage present.
 
 ```{r, currensituation, echo=FALSE,  warning=FALSE, message=FALSE, results="asis"}
 md_file <- readLines("currentsituation.md")
