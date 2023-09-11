@@ -268,7 +268,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 
 # Current situation
 
-There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for number of sequences per lineage present.
+<!-- There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for number of sequences per lineage present. -->
 
 ```{r, currensituation, echo=FALSE,  warning=FALSE, message=FALSE, results="asis"}
 md_file <- readLines("currentsituation.md")
