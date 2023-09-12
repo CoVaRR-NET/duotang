@@ -273,8 +273,6 @@ md_file <- readLines("currentsituation.md")
 cat(md_file, sep = "\n")
 ```
 
-<!-- # Tooltips deinitions -->
-
 <!-- ```{r rtt, child="Tooltip.Rmd"} -->
 <!-- ```  -->
 
