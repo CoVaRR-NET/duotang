@@ -278,10 +278,9 @@ cat(md_file, sep = "\n")
 
 # Omicron sublineages in Canada 
 
-## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
-
-
 There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for number of sequences per lineage present.
+
+## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
 Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.)
 
