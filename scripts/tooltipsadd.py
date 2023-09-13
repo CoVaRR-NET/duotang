@@ -19,7 +19,7 @@ def AnnotateParagraph(text):
                 for c2 in [" ",")","\n",",",". ",".\n"]:
                     text=text.replace(c1+i+c2,c1+"<u id='"+inodot+"'>"+i+"</u>"+c2)
         return(text)
-    for i in text.replace("\n"," ").replace("("," ").split(' '):
+    for i in text.replace("\n"," ").replace("("," ").replace(","," ").split(' '):
         if i in AllLineageNotes:
             text=subReplace(i,text)
         if i!="" and (i[-1] in [".","*",".",")"]) and (i[:-1] in AllLineageNotes):
