@@ -273,8 +273,8 @@ md_file <- readLines("currentsituation.md")
 cat(md_file, sep = "\n")
 ```
 
-<!-- ```{r rtt, child="Tooltip.Rmd"} -->
-<!-- ```  -->
+<!-- # ```{r rtt, child="Tooltip.Rmd"} -->
+<!-- # ``` -->
 
 # Omicron sublineages in Canada 
 
