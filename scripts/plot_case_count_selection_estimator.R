@@ -74,29 +74,29 @@ parseCaseDataByAge_deprecated<- function(maxDate = Sys.Date(), datadir = "./data
 #' @param datadir:  the data directory where the agecount data is stored. Default='data_needed'
 parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, datadir = "./data_needed"){
   #maxDate = Sys.Date()
-  
+  #datadir = "./data_needed"
   caseCounts <- list()
   
   for (i in 1:length(all.regions[["name"]])){
     CC <-read.csv(gzfile(paste0(datadir, "/AgeCaseCountCAN.csv.gz")), header=T)%>% 
       filter(prname == all.regions[["name"]][i]) %>% #keep only the 70+ case counts
-      filter(date > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
+      filter(date > startdate) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
       mutate (date = as.Date(date)) %>% #format the column as dates
       dplyr::select(date, numtotal_last7) %>%
       drop_na()  #drop row if any col is NA
     
     colnames(CC) <- c("Reported_Date","n")
     
-    if (nrow(CC) > 1){
+    if (nrow(CC) > 4){
       caseCounts[[all.regions[["shortname"]][[i]]]] <- CC
     } else{
-      caseCounts[[all.regions[["shortname"]][[i]]]] <- NA
+      #caseCounts[[all.regions[["shortname"]][[i]]]] <- NA
     }
   }
   
   if (file.exists(paste0(datadir,"/AgeCaseCountAB.csv.gz"))){
     caseCounts[["AB"]] <- read.csv(gzfile(paste0(datadir,"/AgeCaseCountAB.csv.gz")), header=T)%>% 
-      filter(`Date.reported.to.Alberta.Health` > (as.Date(maxDate)-days(120))) %>%#take the last 120 days of data
+      filter(`Date.reported.to.Alberta.Health` > startdate) %>%#take the last 120 days of data
       mutate (`Date.reported.to.Alberta.Health` = as.Date(`Date.reported.to.Alberta.Health`)) %>% #format the column as dates
      # drop_na() %>% #drop row if any col is NA
       dplyr::select(`Date.reported.to.Alberta.Health`, `Number.of.cases`)
@@ -111,7 +111,7 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
       filter(Nom == "Total") %>% 
       group_by(Date) %>%#group data by reported date
       summarize(n = sum(as.numeric(psi_quo_pos_n)))%>% #get total count of num cases per day
-      filter(as.Date(Date) > (as.Date(maxDate)-days(120))) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
+      filter(as.Date(Date) > startdate) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
       mutate (Date = as.Date(Date)) %>% #format the column as dates
       rename(Reported_Date = Date) %>% #relabel date column.
       drop_na() #drop row if any col is NA
@@ -121,7 +121,7 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
     caseCounts[["ON"]] <-read.csv(gzfile(paste0(datadir,"/AgeCaseCountON.csv.gz")), header=T)%>% 
       group_by(Case_Reported_Date) %>%#group data by reported date
       summarize(n = n())%>% #get total count of num cases per day
-      filter(Case_Reported_Date > (as.Date(maxDate)-days(120))) %>%##keep everything within the last 120 days from latest virrusseq colleection date. 
+      filter(Case_Reported_Date > startdate) %>%##keep everything within the last 120 days from latest virrusseq colleection date. 
       mutate (Case_Reported_Date = as.Date(Case_Reported_Date)) %>% #format the column as dates
       rename(Reported_Date = Case_Reported_Date) %>% #relabel date column.
       drop_na() #drop row if any col is NA
@@ -173,11 +173,13 @@ CubicSplSmooth2 <- function(data, lambda=10^3) {
 plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate = NA,region=NA, saveToFile=F){
   # countData <- caseCountData
   # lineFits <-rev(caseSelectionLines)
-  # region = "Ontario"
+  # region = "Alberta"
   # order=mutantNames
   # filename = "test"
    rColors = list()
    rValues = list()
+  #  
+  #  view(lineFits)
   # 
   order[[4]] = paste0(order[[4]], " (Reference)")
   
@@ -238,7 +240,6 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
     
-    
     ylim(0, 6) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
@@ -247,7 +248,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     theme_bw() +
     guides(`Case Count` = guide_legend(order = 0),
            Variants = guide_legend(order =2)) +
-    labs(caption = paste0("Lighter shade represents per lineage case counts estimated using available genomics data",
+    labs(caption = paste0("Lighter shade: per lineage case counts estimated using available genomics data",
                           "\nLast day of genomic data is ", max((d %>% filter(type=="Actual"))$Reported_Date),
                           "\n Last day of accurate case counts is ", max((d %>% filter(report_type=="Accurate"))$Reported_Date))) +
     theme(legend.text=element_text(size=12), text = element_text(size = 20)) 

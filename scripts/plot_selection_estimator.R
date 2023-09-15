@@ -239,8 +239,8 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate, col=c('red', 'blue'), method='BFGS', includeReference=FALSE) {
-  # region <- "Canada"
-  # startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+  # region <- "New Brunswick"
+  # startdate <- startdate
   # reference <- c(reference)  # or c("BA.1", "BA.1.1")
   # mutants <- mutants
   # names <- mutantNames
@@ -248,6 +248,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   # method='BFGS'
   # maxdate=NA
   # col=col
+  # includeReference=T
   if (includeReference){
      col = c("Reference" = "black", col)
    }
@@ -324,7 +325,6 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }
   
   plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
-  
   #plot the count data (circles)
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
@@ -339,6 +339,9 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
   scurvesPlotData=scurvesPlotData %>% melt(id="date")
 
+  lo95[lo95<0] <- 0
+  hi95 [hi95>1] <- 1
+  
   #plot the VOC fits (line)
   p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
@@ -467,7 +470,9 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
     rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]])) %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
     mutate(variable = paste0(variantName, "(n=", n, "): ", round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}")) 
   plotData$variable =  as.factor(plotData$variable)
-
+  
+  lo95 [lo95<0] <- 0
+  hi95 [hi95>1] <- 1
   #plot the count data (circles)
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
