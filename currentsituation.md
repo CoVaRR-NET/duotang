@@ -1,10 +1,10 @@
 
 
-There is a substantial diversity of SARS-CoV-2 in Canada, with EG.5.1 subvariants, including EG.5.1.1 the most prevalent in many regions, along with XBB.1.16.6, EG.6.1, FL.1.5.1, and a mix of some some other XBB subvariants all with growing immune evasive mutations. The immune evasive S:F456L mutation is in the vast majority of samples (now over 70%) and continues to steadily increase in prevalence. The mutation S:478R is occurring in multiple variants showing growth. Multiple subvariants of XBB.1.16, XBB.1.9, XBB.1.5 and CH.1.1, have independently obtained the two mutations S:F456L and S:L455F (of interest due to their potential to provide additional immune evasion - and referred to as "FLIP" mutations due to their "exchange of L and F) and are now growing significantly in multiple regions, including the CH.1.1 subvariant DV.7.1. However, such collective variants with these "FLIP" mutations are still in low numbers (up to 10% of cases) so they will not be having an impact yet.
+There is a substantial diversity of SARS-CoV-2 in Canada, with <u id='EG_5_1'>EG.5.1</u> subvariants, including <u id='EG_5_1_1'>EG.5.1.1</u> the most prevalent in many regions, along with <u id='XBB_1_16_6'>XBB.1.16.6</u>, <u id='EG_6_1'>EG.6.1</u>, <u id='FL_1_5_1'>FL.1.5.1</u>, and a mix of some some other <u id='XBB'>XBB</u> subvariants all with growing immune evasive mutations. The immune evasive S:F456L mutation is in the vast majority of samples (now over 70%) and continues to steadily increase in prevalence. The mutation S:478R is occurring in multiple variants showing growth. Multiple subvariants of <u id='XBB_1_16'>XBB.1.16</u>, <u id='XBB_1_9'>XBB.1.9</u>, <u id='XBB_1_5'>XBB.1.5</u> and <u id='CH_1_1'>CH.1.1</u>, have independently obtained the two mutations S:F456L and S:L455F (of interest due to their potential to provide additional immune evasion - and referred to as "FLIP" mutations due to their "exchange of L and F) and are now growing significantly in multiple regions, including the <u id='CH_1_1'>CH.1.1</u> subvariant <u id='DV_7_1'>DV.7.1</u>. However, such collective variants with these "FLIP" mutations are still in low numbers (up to 10% of cases) so they will not be having an impact yet.
 
 
 
-Sequences are also still being monitored closely to identify or track any highly divergent variants (variants with sudden, large mutational changes. This includes the recently identified variant BA.2.86, tracking additional mutations of concern that are arising in it.
+Sequences are also still being monitored closely to identify or track any highly divergent variants (variants with sudden, large mutational changes. This includes the recently identified variant <u id='BA_2_86'>BA.2.86</u>, tracking additional mutations of concern that are arising in it.
 
 
 
@@ -12,27 +12,27 @@ Variants of current interest, due to their current/potential growth advantage, m
 
 
 
-* EG.5.1 (XBB.1.9.2 with S:F456L plus S:Q52H plus some notable non-spike mutations)
-* EG.5.1.1 (EG.5.1 subvariant that has been growing significantly versus other current variants).
-* EG.5.1.3 (Another EG.5.1 subvariant growing notably)
-* Multiple XBB.1.5 subvariants and others that have S:F456L and S:L455F, in particular EG.5.1 and XBB.1.16.6 subvariants that have both these mutations and are growing well, **as well as DV.7.1 (a CH.1.1 subvariant)**
-* FL.1.5.1 (XBB.1.9.1 with S:701V, ORF1a:G993S, S:456L and S:478R, with an interest in those with S:L455F) and other possible FL.1 subvariants with S:478R)
-* XBB.1.16 which has S:T478R (with a particular interest in those with S:F456L like XBB.1.16.6 and also S:L455F)
-* XBB.1.9.1, XBB.1.9.2, FL.5 (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H (aka orf6:y49h)
-* XBB.2.3, XBB.2.3.2, XBB.2.3.3 (has mutation S:P521S, with an interest in those also with mutation 478R)
+* <u id='EG_5_1'>EG.5.1</u> (<u id='XBB_1_9_2'>XBB.1.9.2</u> with S:F456L plus S:Q52H plus some notable non-spike mutations)
+* <u id='EG_5_1_1'>EG.5.1.1</u> (<u id='EG_5_1'>EG.5.1</u> subvariant that has been growing significantly versus other current variants).
+* <u id='EG_5_1_3'>EG.5.1.3</u> (Another <u id='EG_5_1'>EG.5.1</u> subvariant growing notably)
+* Multiple <u id='XBB_1_5'>XBB.1.5</u> subvariants and others that have S:F456L and S:L455F, in particular <u id='EG_5_1'>EG.5.1</u> and <u id='XBB_1_16_6'>XBB.1.16.6</u> subvariants that have both these mutations and are growing well, **as well as <u id='DV_7_1'>DV.7.1</u> (a <u id='CH_1_1'>CH.1.1</u> subvariant)**
+* <u id='FL_1_5_1'>FL.1.5.1</u> (<u id='XBB_1_9_1'>XBB.1.9.1</u> with S:701V, ORF1a:G993S, S:456L and S:478R, with an interest in those with S:L455F) and other possible <u id='FL_1'>FL.1</u> subvariants with S:478R)
+* <u id='XBB_1_16'>XBB.1.16</u> which has S:T478R (with a particular interest in those with S:F456L like <u id='XBB_1_16_6'>XBB.1.16.6</u> and also S:L455F)
+* <u id='XBB_1_9_1'>XBB.1.9.1</u>, <u id='XBB_1_9_2'>XBB.1.9.2</u>, <u id='FL_5'>FL.5</u> (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H (aka orf6:y49h)
+* <u id='XBB_2_3'>XBB.2.3</u>, <u id='XBB_2_3_2'>XBB.2.3.2</u>, <u id='XBB_2_3_3'>XBB.2.3.3</u> (has mutation S:P521S, with an interest in those also with mutation 478R)
 
-…plus any highly divergent variants (like most recently BA.2.86) and sublineages with additional combinations of the mutations below.
+…plus any highly divergent variants (like most recently <u id='BA_2_86'>BA.2.86</u>) and sublineages with additional combinations of the mutations below.
 
 
 
-* S:Q:52H (due to association with EG.5.1)
+* S:Q:52H (due to association with <u id='EG_5_1'>EG.5.1</u>)
 * S:L455F (in particular if present with S:F456L)
 * S:F456L (evidence of increased immune evasion versus recent variants and a mutation growing in prevalence in multiple lineages in multiple regions)
-* S:T478R (aka S:K478R - the S:T478K mutation occurred first). Evidence of increased infectivity when introduced into XBB.1.5. Associated with XBB.1.16 (which has additional mutations like S:E180V that may counteract this mutations advantage) but now seen in additional variants like XBB.2.3.
-* S:P521S (evidence it could increase human ACE2 receptor binding/infectivity - associated with XBB.2.3 variants)
-* S:Q613H (growing and seen in XBB.1.5, CH.1.1 and XBB.1.9.1)
-* ORF1b:D1746Y (aka NSP14_D222Y - in XBB.1.16 variants)
-* **Orf1b:G662S aka NSP12_671 (in the context of a BA.2.86 subvariant) which has been found previously in other variant backgrounds to boosts viral replication at lower temperatures <https://doi.org/10.1016/j.celrep.2023.113077>**
+* S:T478R (aka S:K478R - the S:T478K mutation occurred first). Evidence of increased infectivity when introduced into <u id='XBB_1_5'>XBB.1.5</u>. Associated with <u id='XBB_1_16'>XBB.1.16</u> (which has additional mutations like S:E180V that may counteract this mutations advantage) but now seen in additional variants like <u id='XBB_2_3'>XBB.2.3</u>.
+* S:P521S (evidence it could increase human ACE2 receptor binding/infectivity - associated with <u id='XBB_2_3'>XBB.2.3</u> variants)
+* S:Q613H (growing and seen in <u id='XBB_1_5'>XBB.1.5</u>, <u id='CH_1_1'>CH.1.1</u> and <u id='XBB_1_9_1'>XBB.1.9.1</u>)
+* ORF1b:D1746Y (aka NSP14_D222Y - in <u id='XBB_1_16'>XBB.1.16</u> variants)
+* **Orf1b:G662S aka NSP12_671 (in the context of a <u id='BA_2_86'>BA.2.86</u> subvariant) which has been found previously in other variant backgrounds to boosts viral replication at lower temperatures <https://doi.org/10.1016/j.celrep.2023.113077>**
 * ORF9b:I5T (note its a synonymous mutation in the overlapping N gene)
 * ORF9b:N55S (synonymous mutation in N)
 
@@ -46,3 +46,6 @@ Plus other mutations identified through deep mutation scanning and the SARS-CoV-
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
 
 With thanks to the global team of variant hunters which play a key role in identifying new variants of note.
+
+
+<!-- edited -->
