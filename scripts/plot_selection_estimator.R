@@ -119,7 +119,7 @@ alpha <- function(col, alpha) {
   p.vecs <- matrix(NA, nrow=length(ts), ncol=1+length(p))
   p.vecs[,1] <- rep(1-sum(p), length(ts))  # s=0 for reference, exp(0*t) = 1 for all t
   for (j in 1:length(p)) {
-    p.vecs[,j+1] <- p[j] * exp(s[j] * ts)
+    p.vecs[,j+1] <- p[j] * exp(s[j] * ts) #does this every give you a negative p[j]?
   }
   p.vecs / apply(p.vecs, 1, sum)  # normalize to probabilities
 }
@@ -180,6 +180,7 @@ alpha <- function(col, alpha) {
 .fit.model <- function(est, startpar, method="BFGS") {
   refdata <- est$refdata
   mutdata <- est$mutdata
+  
   tryCatch(
     {
       if (length(startpar$s) == 1) {
@@ -213,8 +214,16 @@ alpha <- function(col, alpha) {
         df <- NA
       } else {
         # draw random parameter values from Hessian to determine variation in {p, s}
+        # this draw should never be negative
         df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
                                       method="Hessian", replicates=1000, silent=T)$random  
+        # view(df)
+        # hist(df[, 1], main="mean")
+        # hist(df[, 2], main="sd")
+        # plot(df[, 1], df[, 2], xlab="mean", ylab="sd", las=1, bty="n")
+        # lines(1:100, df$quantiles["50%", ])
+        
+        
       }
       
       return(list(fit=bbfit, confint=myconf, sample=df))
@@ -239,7 +248,7 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate, col=c('red', 'blue'), method='BFGS', includeReference=FALSE) {
-  # region <- "New Brunswick"
+  # region <- "Canada"
   # startdate <- startdate
   # reference <- c(reference)  # or c("BA.1", "BA.1.1")
   # mutants <- mutants
@@ -258,7 +267,6 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
   fit <- .fit.model(est, startpar, method=method)
-
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -312,9 +320,8 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }  else{
       scurveStartIndex = 1
       colorStartIndex = 2
-      
       plotData <- plotData %>%    
-        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[4]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
+        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
                                  "(n=", n, "): ", 
                                  round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
                                  " {", 

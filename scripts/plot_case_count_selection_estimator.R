@@ -181,7 +181,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
   #  
   #  view(lineFits)
   # 
-  order[[4]] = paste0(order[[4]], " (Reference)")
+  order[[length(order)]] = paste0(order[[length(order)]], " (Reference)")
   
   #format each of the fit lines for different variants
   for (i in seq(1:length(lineFits))){
@@ -194,14 +194,14 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
       rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7
     }
   }
-  names(rValues)[names(rValues) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
-  names(rColors)[names(rColors) == "The Rest"] <- paste0(mutantNames[[4]], " (Reference)")
+  names(rValues)[names(rValues) == "The Rest"] <- paste0(mutantNames[[length(mutantNames)]], " (Reference)")
+  names(rColors)[names(rColors) == "The Rest"] <- paste0(mutantNames[[length(mutantNames)]], " (Reference)")
   
   countData$type <- lineFits[[2]]$line$type
   
   #melt the DF for plotting
   d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) %>% 
-    mutate(variable = str_replace(variable, "The Rest", paste0(mutantNames[[4]], " (Reference)")))
+    mutate(variable = str_replace(variable, "The Rest", paste0(mutantNames[[length(mutantNames)]], " (Reference)")))
 
     #sort the order of the mutants according to the order variable. If not defined, sort alphabetically.
   if (length(order) > 0){
