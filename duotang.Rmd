@@ -123,7 +123,7 @@ meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'mont
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
 startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
-maxdate<-params$datestamp
+enddate<-params$datestamp
 
 
 ## parse PANGO lineages
