@@ -218,6 +218,9 @@ alpha <- function(col, alpha) {
         # this draw should never be negative
         df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
                                       method="Hessian", replicates=1000, silent=T)$random  
+        # negative draws for the allele frequency are prohibited and replaced with small positive values
+        df[seq.int(1,length(startpar$s))][df[seq.int(1,length(startpar$p))] < 0] <- 0.0001
+        # may want to also insert a check that the sum is <1 and divide by (sum/0.9999) if not
         # view(df)
         # hist(df[, 1], main="mean")
         # hist(df[, 2], main="sd")
