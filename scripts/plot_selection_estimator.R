@@ -276,7 +276,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
   fit <- .fit.model(est, startpar, method=method)
-  while (is.na(fit$sample)){
+  while (length(fit$sample)<1){
     newRefDate <- est$refdate - 10
     if (newRefDate < 10){
       break
