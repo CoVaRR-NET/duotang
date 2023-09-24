@@ -295,8 +295,9 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=c(toplot$time))#, seq(38,99)))
   scurves.extended<- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=c(toplot$time, seq(max(toplot$time)+1,(max(toplot$time)+100))))#, ))
+
+  
   if (any(!is.na(fit$sample))) {  
-    # calculate 95% confidence intervals from sampled parameters
     s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
       row <- as.numeric(x)
       s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
@@ -309,188 +310,10 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     } 
     lo95 <- qcurve(0.025)
     hi95 <- qcurve(0.975)  
+    par(mfrow=c(1,1), mar=c(5,5,1,1))
   }
-  
-  par(mar=c(5,5,1,1))
-  if(is.na(maxdate)){
-    maxdate=max(toplot$date)
-  }
-
-    # format the count data (circles)
-  plotData <- toplot %>% melt(id = c("date", "time", "tot")) %>% dplyr::select(date, variable, value, tot) %>% 
-    mutate (variable = str_extract(variable,"[^n]+$")) %>% 
-    mutate (p = 2*value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot)  %>% 
-    rowwise() %>% 
-    mutate (s = ifelse((as.numeric(variable)-1) == 0, 0,(fit$fit[[paste0("s", (as.numeric(variable)-1))]]))) %>% 
-    group_by(variable) %>% mutate(n = sum(value)) 
-    
-    
-    if (!includeReference){
-      scurveStartIndex = 2
-      colorStartIndex = 1
-      
-      plotData <- plotData %>% filter(variable != 1) %>%    
-        mutate(variable = paste0(names[as.numeric(variable)-1], 
-                                 "(n=", n, "): ", 
-                                 round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
-                                 " {", 
-                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), 
-                                 ", ", 
-                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), 
-                                 "}")) 
-    }  else{
-      scurveStartIndex = 1
-      colorStartIndex = 2
-      plotData <- plotData %>%    
-        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
-                                 "(n=", n, "): ", 
-                                 round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
-                                 " {", 
-                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), 
-                                 ", ", 
-                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), 
-                                 "}"))) 
-    }
-  
-  plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
-  #plot the count data (circles)
-  p<- ggplot() +
-    geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
-    scale_fill_manual(label =c(levels(plotData$variable)), values = unname(col)) +
-    xlab("Sample collection date") +
-    ylab(paste0("Proportion in ", est$region)) + 
-    ylim(0,1) +
-    xlim(min(plotData$date), maxdate) 
-
-  #format the fit (line)
-  scurvesPlotData <- cbind(toplot[,"date", drop=F], scurves[,scurveStartIndex:ncol(scurves)])
-  colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
-  scurvesPlotData=scurvesPlotData %>% melt(id="date")
-
-  
-  #plot the VOC fits (line)
-  p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
-    scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
-  if (any(!is.na(fit$sample))) {  
-    
-    lo95[lo95<0] <- 0
-    hi95 [hi95>1] <- 1
-    
-    if (includeReference){
-      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,1], ymax=hi95[,1]), color = "black", fill= col[1], alpha=0.5)
-    }
-    
-    p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[colorStartIndex], alpha=0.5)
-    
-    #I'm sorry whoever maintain this next, this is disguting code to make sure the ribbon draws because I cant get it to work with a for loop
-    #Good luck trying to solve it or just continue the problem :)
-    #if additional mutants are added, increment the index in lo95, hi95 and col
-    if(ncol(lo95) > 2) {
-      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,3], ymax=hi95[,3]), color = "black", fill= col[colorStartIndex+1], alpha=0.5)
-    }
-    if(ncol(lo95) > 3) {
-      p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,4], ymax=hi95[,4]), color = "black", fill= col[colorStartIndex+2], alpha=0.5)
-    }
-    if(ncol(lo95) > 4) {
-      stop("ERROR: function does not currently support more than three mutant types!")
-    }
-    
-    #for some reason geom_ribbon dont like for loops. this only plots the last ribbon?
-    #if(ncol(lo95) > 2) {
-    #  for (i in seq(3,ncol(lo95))){ 
-    #    p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,i], ymax=hi95[,i]), color = "black", fill=col[i-1], alpha=0.5)
-    #  }
-  }
-  #define theme
-  p<-p + theme_bw() +     
-    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", max(toplot$date))) + 
-    theme(legend.position=c(0.4, 0.90), legend.title=element_blank(), 
-          legend.text=element_text(size=18), 
-          legend.background = element_blank(), 
-          legend.key=element_blank(),
-          legend.spacing.y = unit(0.5, "cm"),
-          legend.key.size = unit(0.75, "cm"),
-          text = element_text(size = 20)) +
-    guides(color = guide_legend(override.aes = list(size = 4, shape = 22, linetype=NA)))  
-  # second plot - logit transform
-  options(scipen=1000000)
-
-  if (includeReference){
-    col <- col[-1]
-  }
-  # format the count data (circles)
-  plotData <- toplot %>% melt(id = c("date", "time", "n1")) %>% dplyr::select(date, variable, value, n1) %>% 
-    filter(variable != "tot") %>% mutate (variable = str_extract(variable,"[^n]+$")) %>% 
-    mutate (p = value/n1) %>% filter(p != Inf) %>% dplyr::select(-n1) %>%
-    rowwise() %>% mutate (s = (fit$fit[[paste0("s", (as.numeric(variable)-1))]]))  %>% group_by(variable) %>% mutate(n = sum(value)) %>% 
-    mutate(variable = paste0(names[as.numeric(variable)-1], "(n=", n, "): ",round(fit$fit[paste0("s", as.numeric(variable)-1)],2), " {", round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), ", ", round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), "}"))
-  plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
-  
-  # plot the count data (circles)
-  p2<- ggplot() +
-    geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
-    scale_fill_manual(label = c(levels(plotData$variable)), values = unname(col)) +
-    xlab("Sample collection date") +
-    ylab(paste0("Relative proportions in ", est$region, " (logit)")) + 
-    scale_y_log10(limits=c(0.001,1000), breaks = c(0.001, 0.01, 0.1, 1, 10, 100, 1000), labels = c(0.001, 0.01, 0.1, 1, 10, 100, 1000)) +
-    xlim(min(plotData$date), maxdate)
-  
-  # format the fits (lines)
-  scurvesPlotData <- cbind(toplot[,"date", drop=F], (scurves[,2:ncol(scurves)]/scurves[,1]))
-  colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
-  scurvesPlotData=scurvesPlotData %>% melt(id=c("date"))
-  # plot the fits (lines)
-  p2 <- p2 + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
-    scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
-  
-  #define plot theme
-  p2<-p2 + theme_bw() + 
-    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", max(toplot$date))) + 
-    theme(legend.position=c(0.4, 0.90), legend.title=element_blank(), 
-          legend.text=element_text(size=18), 
-          legend.background = element_blank(), 
-          legend.key=element_blank(),
-          legend.spacing.y = unit(0.5, "cm"),
-          legend.key.size = unit(0.75, "cm"),
-          text = element_text(size = 20)) +
-    guides(color = guide_legend(override.aes = list(size = 4, shape = 22, linetype=NA)))  
-
-  #returns all the necessary information as a named list. 
-  return(list("date"=max(toplot$date), "fit"=fit, "scurves" = scurves, "scurvesExtended" = scurves.extended, "names" = names, "color"=col, "region"=region, "plot1"=p, "plot2"=p2))
-  # Bends suggest a changing selection over time (e.g., due to the impact of 
-  # vaccinations differentially impacting the variants). Sharper turns are more 
-  # often due to NPI measures. 
-}
-
-
-#' This function is a refactor of plot.selection() to make use of ggplot2 and returns the plot object rather than just plotting it for better error handling.
-#' Return a ggplot2 plot.
-#' @param plotparam:  The selection estimate object. e.g 1 entry in allparam
-#' @param maxdate:  the right limit date that should be used for the plots. 
-plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red', 'blue')) {
-  toplot=plotparam$toplot
-  fit=plotparam$fit
-  
-  
-  # Once we get the set of {p,s} values, we can run them through the s-shaped 
-  # curve of selection
-  nvar <- length(fit$fit)/2
-  # generate sigmoidal (S-shaped) curves of selection
-  scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
   # calculate 95% confidence intervals from sampled parameters
-  s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
-    row <- as.numeric(x)
-    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
-  })
-  qcurve <- function(q) {
-    sapply(1:ncol(scurves), function(i) {
-      apply(sapply(s95, function(x) x[,i]), 1, 
-            function(y) quantile(y, q)) 
-    })
-  } 
-  lo95 <- qcurve(0.025)
-  hi95 <- qcurve(0.975)  
-  par(mfrow=c(1,1), mar=c(5,5,1,1))
+
   
   #format the count 
   variantName <- plotparam$mut[[1]]
@@ -579,17 +402,17 @@ generateAllParams <- function(region, startdate, reference, mutants, startpar, m
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
   }
   fit <- .fit.model(est, startpar, method=method)
-
-  while (is.null(fit$sample[1])){
-    newRefDate <- est$refdate - 10
-    if (newRefDate[1] < 10){
-      break
-    }
-    est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
-    if(any(is.na(est))){
-      return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
-    }
-    fit <- .fit.model(est, startpar, method=method, refDate=newRefDate)
-  }
+# 
+#   while (any(is.na(fit))){
+#     newRefDate <- est$refdate - 10
+#     if (newRefDate[1] < 10){
+#       break
+#     }
+#     est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
+#     if(any(is.na(est))){
+#       return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
+#     }
+#     fit <- .fit.model(est, startpar, method=method, refDate=newRefDate)
+#   }
   return(list(toplot=est$toplot,fit=fit,mut=mutants,ref=reference, region=region))
 }
