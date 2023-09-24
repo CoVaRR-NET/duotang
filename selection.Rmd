@@ -158,7 +158,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   selectionScurves <- selectionEstimateObject$scurves
   selectionScurvesExtended <- selectionEstimateObject$scurvesExtended
   #since canada only have data once every 7 days, modify the estimate fit to reflect that.
-  if (!selectionEstimateObject$region %in% c("Quebec")){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Quebec")){
       selectionScurves <- selectionEstimateObject$scurves[seq(1, nrow(selectionEstimateObject$scurves), 7), ]
       selectionScurvesExtended <- selectionEstimateObject$scurvesExtended[seq(1, nrow(selectionEstimateObject$scurvesExtended), 7), ]
   }
@@ -205,7 +205,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
   #gather the population data for /100000 individual normalization
-  if (!selectionEstimateObject$region %in% c("Quebec")){
+  if (!selectionEstimateObject$region %in% c("Alberta", "Quebec")){
     population <- as.numeric(populationData[1,selectionEstimateObject$region])* 7
   } else {
     population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
