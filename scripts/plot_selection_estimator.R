@@ -278,7 +278,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   fit <- .fit.model(est, startpar, method=method)
   
   #this loop deals with the "couldnt invert hessian" error by running .make.estimator that runs through refdates from 120 to 0 in series of 10 until the code does not fail.  
-  while (is.null(fit$sample)){
+  while (is.null(fit$sample[1])){
     newRefDate <- est$refdate - 10
     if (newRefDate[1] < 10){
       break
@@ -579,8 +579,8 @@ generateAllParams <- function(region, startdate, reference, mutants, startpar, m
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
   }
   fit <- .fit.model(est, startpar, method=method)
-  
-  while (is.null(fit$sample)){
+
+  while (is.null(fit$sample[1])){
     newRefDate <- est$refdate - 10
     if (newRefDate[1] < 10){
       break
