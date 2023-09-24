@@ -470,6 +470,8 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
 plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red', 'blue')) {
   toplot=plotparam$toplot
   fit=plotparam$fit
+  
+  
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -577,5 +579,17 @@ generateAllParams <- function(region, startdate, reference, mutants, startpar, m
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
   }
   fit <- .fit.model(est, startpar, method=method)
+  
+  while (is.null(fit$sample)){
+    newRefDate <- est$refdate - 10
+    if (newRefDate[1] < 10){
+      break
+    }
+    est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
+    if(any(is.na(est))){
+      return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
+    }
+    fit <- .fit.model(est, startpar, method=method, refDate=newRefDate)
+  }
   return(list(toplot=est$toplot,fit=fit,mut=mutants,ref=reference, region=region))
 }
