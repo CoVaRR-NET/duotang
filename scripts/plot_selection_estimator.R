@@ -215,7 +215,7 @@ alpha <- function(col, alpha) {
       dimnames(bbhessian) <- list(names(bbfit), names(bbfit))
       
       if (any(is.nan(bbhessian))) {
-        df <- NA
+        df <- NULL
         
       } else {
         # draw random parameter values from Hessian to determine variation in {p, s}
@@ -276,9 +276,11 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
   fit <- .fit.model(est, startpar, method=method)
-  while (is.na(fit$sample[1])){
+  
+  #this loop deals with the "couldnt invert hessian" error by running .make.estimator that runs through refdates from 120 to 0 in series of 10 until the code does not fail.  
+  while (is.null(fit$sample)){
     newRefDate <- est$refdate - 10
-    if (newRefDate < 10){
+    if (newRefDate[1] < 10){
       break
     }
     est <- .make.estimator(region, startdate, reference, mutants, refDate = newRefDate)
