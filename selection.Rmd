@@ -91,8 +91,11 @@ apply(all.regions,1,function(reg){
   if(reg[["name"]]=="Canada"){n_min=50}
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
-  {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
-    print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
+    #uncomment these to pring the error msg instead of some generic error
+  # {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
+  #   print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
+  {print(getEmptyErrorPlotWithMessage("Not enough data available."))
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))}
   else {
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
