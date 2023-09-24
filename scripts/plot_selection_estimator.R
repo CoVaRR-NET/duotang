@@ -38,7 +38,7 @@ alpha <- function(col, alpha) {
 #' @param mutants:  list, one or more character vectors of PANGO lineage names 
 #'                 to estimate selection advantages for.
 #' @param collapseMutants:  bool. specify to true if you are using this for the generateAllParam() function
-.make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F, refdate=NA) {
+.make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F, refDate=NA) {
   prov <- get.province.list(region)
   #filter out the metadata rows that have the reference and mutant as lineage
   #view(mydata)
@@ -94,7 +94,7 @@ alpha <- function(col, alpha) {
   if (is.na(refdate)){
     refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
   } else{
-    refdate <-refdate
+    refdate <-refDate
   }
   
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
@@ -281,7 +281,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     if (newRefDate < 10){
       break
     }
-    est <- .make.estimator(region, startdate, reference, mutants, refdate = newRefDate)
+    est <- .make.estimator(region, startdate, reference, mutants, refDate = newRefDate)
     toplot <- est$toplot
     toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
     fit <- .fit.model(est, startpar, method=method)
