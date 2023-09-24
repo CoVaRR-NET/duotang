@@ -11,8 +11,9 @@ setAll=getAllStrictoLineages(meta)
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
 sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15)] #XBB Other
 sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15, sublineages_EG5)] #XBB Other
+
 
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBBOther)] #the rest
