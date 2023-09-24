@@ -38,7 +38,7 @@ alpha <- function(col, alpha) {
 #' @param mutants:  list, one or more character vectors of PANGO lineage names 
 #'                 to estimate selection advantages for.
 #' @param collapseMutants:  bool. specify to true if you are using this for the generateAllParam() function
-.make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F) {
+.make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F, refdate=NA) {
   prov <- get.province.list(region)
   #filter out the metadata rows that have the reference and mutant as lineage
   #view(mydata)
@@ -91,8 +91,12 @@ alpha <- function(col, alpha) {
     ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0)
   })
   
-  refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
-
+  if (is.na(refdate)){
+    refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
+  } else{
+    refdate <-refdate
+  }
+  
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
   timeend <- -(timestart+refdate)
   timestart <- -refdate
@@ -109,7 +113,7 @@ alpha <- function(col, alpha) {
   dateconverter <- data.frame(time=toplot$time, date=as.Date(dateseq))
   toplot$date <- dateconverter$date
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
-  list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot)
+  list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot, refdate=refdate)
 }
 
 
@@ -265,12 +269,23 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   if (includeReference){
      col = c("Reference" = "black", col)
    }
-
+  
   est <- .make.estimator(region, startdate, reference, mutants)
+
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
   fit <- .fit.model(est, startpar, method=method)
+  while (is.na(fit$sample)){
+    newRefDate <- est$refdate - 10
+    if (newRefDate < 10){
+      break
+    }
+    est <- .make.estimator(region, startdate, reference, mutants, refdate = newRefDate)
+    toplot <- est$toplot
+    toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+    fit <- .fit.model(est, startpar, method=method)
+  }
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
