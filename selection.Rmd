@@ -32,7 +32,10 @@ mutantNames = list("XBB.Other",  "EG.5*", "Non-XBB", "XBB.1.5*") #
 col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
-#nrow(setAll)-nrow(reference)-nrow(Reduce(union,mutants))
+#this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
+if(length(setAll)-length(reference)-length(Reduce(union,mutants)) + length(mutants) != 0){
+  stop("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
+}
 
 #wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
 sub.plot.selection.estimate <- function(region,maxdate=NA){
