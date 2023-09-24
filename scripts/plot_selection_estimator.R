@@ -91,7 +91,7 @@ alpha <- function(col, alpha) {
     ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0)
   })
   
-  if (is.na(refdate)){
+  if (is.na(refDate)){
     refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
   } else{
     refdate <-refDate
