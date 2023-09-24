@@ -31,6 +31,8 @@ mutants = list(sublineages_XBBOther, sublineages_EG5,sublineages_NonXBB  )
 mutantNames = list("XBB.Other",  "EG.5*", "Non-XBB", "XBB.1.5*") #
 col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
+#SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
+#nrow(setAll)-nrow(reference)-nrow(Reduce(union,mutants))
 
 #wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
 sub.plot.selection.estimate <- function(region,maxdate=NA){
