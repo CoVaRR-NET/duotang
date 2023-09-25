@@ -3,7 +3,7 @@ source("scripts/plot_selection_estimator.R")
 
 #define starting parameters (p,s) for making the selection estimates
 #startpar <- list(p=c(0.2, 0.05), s=c(0.05, 0.1))
-startpar <- list(p=c(0.1, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
+startpar <- list(p=c(0.2, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
   
 #filter samples with variants of interest
 setAll=getAllStrictoLineages(meta) 
@@ -11,31 +11,31 @@ setAll=getAllStrictoLineages(meta)
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
 sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15)] #XBB Other
 sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15, sublineages_EG5)] #XBB Other
+
 
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
 reference <- sublineages_XBB15
-#define the mutants
-#mutants = list(sublineages_BQ, sublineages_XBB )
-#mutantNames = list("BQ*", "XBB*", "the rest") #
-#col <- c(pal["Omicron BQ"], "XBB*"=pal["XBB"]) #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
-mutants = list(sublineages_XBBOther, sublineages_EG5,sublineages_NonXBB  )
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
+# mutants = list(sublineages_XBBOther, sublineages_EG5  )
+# mutantNames = list("XBB.Other",  "EG.5*", "XBB.1.5*") #
+# col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
+
+# 
+mutants = list(sublineages_XBBOther, sublineages_EG5,sublineages_NonXBB  )
 mutantNames = list("XBB.Other",  "EG.5*", "Non-XBB", "XBB.1.5*") #
 col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
-#im cheating, using zero width spaces to sort text. dont hate me.
 
-#Set a starting date
-#Note that the startdate shouldn't be too much before both alleles become common
-#or rare migration events that die off could throw off the estimation procedure 
-#(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
-maxdate<-params$datestamp
+#SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
+#this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
+if(length(setAll)-length(reference)-length(Reduce(union,mutants)) + length(mutants) != 0){
+  stop("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
+}
 
 #wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
 sub.plot.selection.estimate <- function(region,maxdate=NA){
@@ -57,20 +57,20 @@ sub.plot.selection.estimate <- function(region,maxdate=NA){
   return(obj)
 }
 
-#calculate estimates for each province
-selectionEstimateFits <- list() #named list to store estimates for different provinces
-selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada", maxdate)
-#maxdate = selectionEstimateFits[["Canada"]]$date
+# #calculate estimates for each province
+ selectionEstimateFits <- list() #named list to store estimates for different provinces
+# selectionEstimateFits[["Canada"]] = sub.plot.selection.estimate(region="Canada", maxdate)
+# #maxdate = selectionEstimateFits[["Canada"]]$date
 
-for (i in 2:length(all.regions$name)){
-  selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]], maxdate)
+for (i in 1:length(all.regions$name)){
+  selectionEstimateFits[[all.regions$shortname[[i]]]] = sub.plot.selection.estimate(region=all.regions$name[[i]], enddate)
 }
 
 #temporarily remove the NS plots because there is just too little data and it mucks up everything
-selectionEstimateFits[["NS"]]$plot1 <- NULL
-selectionEstimateFits[["NS"]]$plot2 <- NULL
-selectionEstimateFits[["NL"]]$plot1 <- NULL
-selectionEstimateFits[["NL"]]$plot2 <- NULL
+# selectionEstimateFits[["NS"]]$plot1 <- NULL
+# selectionEstimateFits[["NS"]]$plot2 <- NULL
+# selectionEstimateFits[["NL"]]$plot1 <- NULL
+# selectionEstimateFits[["NL"]]$plot2 <- NULL
 
 ```
 
@@ -89,8 +89,6 @@ For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preex
 **Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of a lineage during this time frame are not displayed.
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width5, warning=FALSE, out.width="50%", results='asis', echo=FALSE}
-#define provinces to show selection plots for.
-dataAvailable.regions <- all.regions %>% filter(shortname %in% c("Canada", "BC", "AB", "SK", "MA", "ON", "QC", "East"))
 #display all selection plots with each province as a tab.
 apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], " {.unlisted .unnumbered}\n")
@@ -98,8 +96,11 @@ apply(all.regions,1,function(reg){
   if(reg[["name"]]=="Canada"){n_min=50}
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
-  {print(getEmptyErrorPlotWithMessage("Not enough Data Available"))
-    print(getEmptyErrorPlotWithMessage("Not enough Data Available"))}
+    #uncomment these to pring the error msg instead of some generic error
+  # {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
+  #   print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
+  {print(getEmptyErrorPlotWithMessage("Not enough data available."))
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))}
   else {
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
@@ -120,8 +121,8 @@ source("scripts/plot_case_count_selection_estimator.R")
 caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
 
 #remove NB cuz it doesnt have enough data
-caseData[["NB"]] <- NULL
-caseData[["NB"]] <- NULL
+# caseData[["NB"]] <- NULL
+# caseData[["NB"]] <- NULL
 #loads in population data for /100000invidivudal normalization
 populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='\t', check.names = F)
 #view(caseCountData)
@@ -130,10 +131,9 @@ populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-   # caseCountData <- caseData$ON
-   # selectionEstimateObject<- selectionEstimateFits$ON
-  # 
-  # view(caseCountData)
+     # caseCountData <- caseData$NS
+     # selectionEstimateObject<- selectionEstimateFits$NS
+  # # 
   filename=NA
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
@@ -155,7 +155,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   colnames(caseCountFitLine) <- c("Reported_Date", "n", "type")
   #replaces UnderReported with Projected in the "type" column
   caseCountFitLine <- caseCountFitLine %>% mutate(type = ifelse(type=="UnderReported", "Projected", "Actual"))
-
+  
   #get the selection estimate fits, scurves and extended scurves from the selection estimate object
   selectionFit <- selectionEstimateObject$fit
   selectionScurves <- selectionEstimateObject$scurves
@@ -213,8 +213,9 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   } else {
     population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
   }
+  
   #pass the lines into the plotting function
-  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = maxdate, order=mutantNames, saveToFile=saveToFile)
+  plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = enddate, order=mutantNames, saveToFile=saveToFile)
 }
 
 ```
@@ -375,7 +376,7 @@ plotIndividualSublineageSelection <- function(region, minimumSampleCount, parent
       if((allparams[[i]]$fit)$fit[["s1"]]>0 && sum(allparams[[i]]$toplot$n2)>minimumSampleCount){ #the numebr of samples are greater than the minimum we want.
           plotCounter <- plotCounter + 1
           #plot all the variants and save them to a named list
-          allSublineagePlots[[plotCounter]] <- list("variant" = allparams[[i]]$mut[[1]], "plot" = plotIndividualSelectionPlots.ggplot(plotparam=allparams[[i]], maxdate = maxdate))
+          allSublineagePlots[[plotCounter]] <- list("variant" = allparams[[i]]$mut[[1]], "plot" = plotIndividualSelectionPlots.ggplot(plotparam=allparams[[i]], maxdate = enddate))
       }
     }
   }
@@ -387,8 +388,8 @@ individualSublineageSelectionPlots.BA2 <- list()
 individualSublineageSelectionPlots.BA5 <- list() 
 for (i in 1:length(all.regions$name)){
   minCount = ifelse(all.regions$shortname[[i]] == "Canada", 50, 20)
-  individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", maxdate)
-  individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", maxdate)
+  individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", enddate)
+  individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", enddate)
 }
 
 

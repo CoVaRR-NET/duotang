@@ -38,7 +38,7 @@ alpha <- function(col, alpha) {
 #' @param mutants:  list, one or more character vectors of PANGO lineage names 
 #'                 to estimate selection advantages for.
 #' @param collapseMutants:  bool. specify to true if you are using this for the generateAllParam() function
-.make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F) {
+.make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F, refDate=NA) {
   prov <- get.province.list(region)
   #filter out the metadata rows that have the reference and mutant as lineage
   #view(mydata)
@@ -91,8 +91,12 @@ alpha <- function(col, alpha) {
     ifelse(sum(ns)>10, prod(ns) / sum(ns)^length(ns), 0)
   })
   
-  refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
-
+  if (is.na(refDate)){
+    refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
+  } else{
+    refdate <-refDate
+  }
+  
   #refdate <- which(v==max(v, na.rm=TRUE))[1]
   timeend <- -(timestart+refdate)
   timestart <- -refdate
@@ -109,7 +113,7 @@ alpha <- function(col, alpha) {
   dateconverter <- data.frame(time=toplot$time, date=as.Date(dateseq))
   toplot$date <- dateconverter$date
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
-  list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot)
+  list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot, refdate=refdate)
 }
 
 
@@ -119,7 +123,7 @@ alpha <- function(col, alpha) {
   p.vecs <- matrix(NA, nrow=length(ts), ncol=1+length(p))
   p.vecs[,1] <- rep(1-sum(p), length(ts))  # s=0 for reference, exp(0*t) = 1 for all t
   for (j in 1:length(p)) {
-    p.vecs[,j+1] <- p[j] * exp(s[j] * ts)
+    p.vecs[,j+1] <- p[j] * exp(s[j] * ts) #does this every give you a negative p[j]?
   }
   p.vecs / apply(p.vecs, 1, sum)  # normalize to probabilities
 }
@@ -180,6 +184,7 @@ alpha <- function(col, alpha) {
 .fit.model <- function(est, startpar, method="BFGS") {
   refdata <- est$refdata
   mutdata <- est$mutdata
+  
   tryCatch(
     {
       if (length(startpar$s) == 1) {
@@ -210,11 +215,23 @@ alpha <- function(col, alpha) {
       dimnames(bbhessian) <- list(names(bbfit), names(bbfit))
       
       if (any(is.nan(bbhessian))) {
-        df <- NA
+        df <- NULL
+        
       } else {
         # draw random parameter values from Hessian to determine variation in {p, s}
+        # this draw should never be negative
         df <- RandomFromHessianOrMCMC(Hessian=bbhessian, fitted.parameters=bbfit, 
                                       method="Hessian", replicates=1000, silent=T)$random  
+        # negative draws for the allele frequency are prohibited and replaced with small positive values
+        df[seq.int(1,length(startpar$s))][df[seq.int(1,length(startpar$p))] < 0] <- 0.0001
+        # may want to also insert a check that the sum is <1 and divide by (sum/0.9999) if not
+        # view(df)
+        # hist(df[, 1], main="mean")
+        # hist(df[, 2], main="sd")
+        # plot(df[, 1], df[, 2], xlab="mean", ylab="sd", las=1, bty="n")
+        # lines(1:100, df$quantiles["50%", ])
+        
+        
       }
       
       return(list(fit=bbfit, confint=myconf, sample=df))
@@ -240,24 +257,37 @@ alpha <- function(col, alpha) {
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate, col=c('red', 'blue'), method='BFGS', includeReference=FALSE) {
   # region <- "Canada"
-  # startdate <- as.Date(max(meta$sample_collection_date)-days(120))
+  # startdate <- startdate
   # reference <- c(reference)  # or c("BA.1", "BA.1.1")
   # mutants <- mutants
   # names <- mutantNames
   # startpar <- startpar
   # method='BFGS'
-  # maxdate=NA
+  # maxdate=params$datestamp
   # col=col
+  # includeReference=T
   if (includeReference){
      col = c("Reference" = "black", col)
    }
-
+  
   est <- .make.estimator(region, startdate, reference, mutants)
+
   toplot <- est$toplot
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
   fit <- .fit.model(est, startpar, method=method)
-
+  
+  #this loop deals with the "couldnt invert hessian" error by running .make.estimator that runs through refdates from 120 to 0 in series of 10 until the code does not fail.  
+  while (is.null(fit$sample[1])){
+    newRefDate <- est$refdate - 10
+    if (newRefDate[1] < 10){
+      break
+    }
+    est <- .make.estimator(region, startdate, reference, mutants, refDate = newRefDate)
+    toplot <- est$toplot
+    toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+    fit <- .fit.model(est, startpar, method=method)
+  }
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
@@ -311,9 +341,8 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }  else{
       scurveStartIndex = 1
       colorStartIndex = 2
-      
       plotData <- plotData %>%    
-        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[4]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
+        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
                                  "(n=", n, "): ", 
                                  round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
                                  " {", 
@@ -324,7 +353,6 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }
   
   plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
-  
   #plot the count data (circles)
   p<- ggplot() +
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
@@ -339,10 +367,14 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
   scurvesPlotData=scurvesPlotData %>% melt(id="date")
 
+  
   #plot the VOC fits (line)
   p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 
   if (any(!is.na(fit$sample))) {  
+    
+    lo95[lo95<0] <- 0
+    hi95 [hi95>1] <- 1
     
     if (includeReference){
       p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,1], ymax=hi95[,1]), color = "black", fill= col[1], alpha=0.5)
@@ -438,24 +470,29 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
 plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red', 'blue')) {
   toplot=plotparam$toplot
   fit=plotparam$fit
+  
+  
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
   # curve of selection
   nvar <- length(fit$fit)/2
   # generate sigmoidal (S-shaped) curves of selection
   scurves <- .scurves(p=fit$fit[1:nvar], s=fit$fit[-c(1:nvar)], ts=toplot$time)
-  # calculate 95% confidence intervals from sampled parameters
-  s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
-    row <- as.numeric(x)
-    s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
-  })
-  qcurve <- function(q) {
-    sapply(1:ncol(scurves), function(i) {
-      apply(sapply(s95, function(x) x[,i]), 1, 
-            function(y) quantile(y, q)) 
+  if (any(!is.na(fit$sample))) {  
+    
+    # calculate 95% confidence intervals from sampled parameters
+    s95 <- lapply(split(fit$sample, 1:nrow(fit$sample)), function(x) {
+      row <- as.numeric(x)
+      s <- .scurves(p=row[1:nvar], s=row[-c(1:nvar)], ts=toplot$time)
     })
-  } 
-  lo95 <- qcurve(0.025)
-  hi95 <- qcurve(0.975)  
+    qcurve <- function(q) {
+      sapply(1:ncol(scurves), function(i) {
+        apply(sapply(s95, function(x) x[,i]), 1, 
+              function(y) quantile(y, q)) 
+      })
+    } 
+    lo95 <- qcurve(0.025)
+    hi95 <- qcurve(0.975)  
+  }
   par(mfrow=c(1,1), mar=c(5,5,1,1))
   
   #format the count 
@@ -487,6 +524,8 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
 #    scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = c("red")) 
   
   if (any(!is.na(fit$sample))) {  
+    lo95 [lo95<0] <- 0
+    hi95 [hi95>1] <- 1
     p <- p + geom_ribbon(data = toplot, mapping = aes(x=date, ymin=lo95[,2], ymax=hi95[,2]), color = "black", fill= col[1], alpha=0.5)
     if(ncol(lo95) > 2) {
       for (i in seq(3,ncol(lo95))){
@@ -543,5 +582,17 @@ generateAllParams <- function(region, startdate, reference, mutants, startpar, m
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
   }
   fit <- .fit.model(est, startpar, method=method)
+# 
+#   while (any(is.na(fit))){
+#     newRefDate <- est$refdate - 10
+#     if (newRefDate[1] < 10){
+#       break
+#     }
+#     est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
+#     if(any(is.na(est))){
+#       return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
+#     }
+#     fit <- .fit.model(est, startpar, method=method, refDate=newRefDate)
+#   }
   return(list(toplot=est$toplot,fit=fit,mut=mutants,ref=reference, region=region))
 }

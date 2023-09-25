@@ -454,6 +454,7 @@ for treefile in `ls $data_dir/aligned_*.treefile`; do
 done
 python scripts/UpdateStatusManager.py --action set --key LastTreeUpdate --value $datestamp
 
+#python scripts/tooltipsadd.py 
 
 echo "knitduotang" > $checkPointFile
 
@@ -534,6 +535,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	#git add -f duotangCurVer
 	git add -f DuotangUpdateStatus.json
 	git add -f currentsituation.md
+	git add -f Tooltip.Rmd
 	git add -f whatsnew.md
 	git commit -m "Update: $datestamp"
 	git push origin dev

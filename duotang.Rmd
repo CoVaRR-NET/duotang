@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2023-08-11"
+  value: "2023-09-15"
  datadir:
   label: "DataDir"
   input: text
@@ -38,7 +38,7 @@ if(length(new.packages)>0) {
   devtools::install_github("ArtPoon/ggfree")
 }
 
-list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines", 'HelpersMG', "bbmle")
+list.of.packages <- c("tidyr", "knitr", "lubridate", "parallel", "ggplot2", "r2d3", "jsonlite", "tidyverse", "reshape2", "DT", "plotly", "splines", 'HelpersMG', "bbmle", "tippy")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) {
   install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -118,7 +118,12 @@ meta$sample_collection_date <- as.Date(meta$sample_collection_date)
 meta$week <- cut(meta$sample_collection_date, 'week')
 meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'month')))
 
-startdate <- max(meta$sample_collection_date) - days(120)
+#Set a starting date
+#Note that the startdate shouldn't be too much before both alleles become common
+#or rare migration events that die off could throw off the estimation procedure 
+#(so that the parameter estimates account for the presence of those alleles long in the past).
+startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
+enddate<-params$datestamp
 
 
 ## parse PANGO lineages
@@ -182,6 +187,10 @@ lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep
   mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
   dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage & meta$sample_collection_date > startdate]), 0))
 colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "# In Canada Last 3Mo")
+
+#this is used to build the tooltips in current situation.
+write_tsv(lineageDescriptions, "downloads/lineagesNotesAnnotated.tsv")
+system("python scripts/tooltipsadd.py")
 
 ```
 
@@ -273,8 +282,8 @@ md_file <- readLines("currentsituation.md")
 cat(md_file, sep = "\n")
 ```
 
-<!-- # ```{r rtt, child="Tooltip.Rmd"} -->
-<!-- # ``` -->
+```{r rtt, child="Tooltip.Rmd"}
+```
 
 # Omicron sublineages in Canada 
 
