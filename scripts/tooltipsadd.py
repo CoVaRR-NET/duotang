@@ -1,11 +1,16 @@
 
 
 AllLineageNotes={}
-with open ("./data_needed/lineageNotes.tsv", 'r') as f:
+with open ("downloads/lineagesNotesAnnotated.tsv", 'r') as f:
     f.readline()
     for i in f:
         if len(i)>3:
-            AllLineageNotes[i.split('\t')[0]]=i.split('\t')[1].strip()
+            row = i.split('\t')
+            lineage = row[0]
+            parent="Ancestor:" + row[1] if row[1] != "NA" else ""
+            description = row[2].strip()
+            n120days = row[3].strip() + " samples in last 120 days."
+            AllLineageNotes[i.split('\t')[0]]="//".join([parent, n120days, description]) if parent != "" else "//".join([n120days, description])
 
 
 UsedLineageNotes={}
@@ -47,12 +52,16 @@ def CreateTooltipRMD():
 def AddToolTip():
     with open ("currentsituation.md", 'r') as f:
         currentsituation=f.read()
+    if (currentsituation.find("<!-- edited -->") == -1):
+        newtext=AnnotateParagraph(currentsituation)
+        newtext = newtext + "\n\n\n<!-- edited -->"
+        CreateTooltipRMD()
+        with open("currentsituation.md", "w") as fh:
+            fh.write(newtext)
+    else:
+        print("current situation already edited.")
 
-    newtext=AnnotateParagraph(currentsituation)
 
-    with open("currentsituation.md", "w") as fh:
-        fh.write(newtext)
-    CreateTooltipRMD()
 
 
 
