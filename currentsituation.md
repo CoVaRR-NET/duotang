@@ -12,12 +12,12 @@ Variants of current interest, due to their current/potential growth advantage, m
 
 
 
-* **DV.7.1 (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F)**
+* **<u id='DV_7_1'>DV.7.1</u> (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F)**
 * <u id='EG_5_1'>EG.5.1</u> (<u id='XBB_1_9_2'>XBB.1.9.2</u> with S:F456L plus S:Q52H plus some notable non-spike mutations)
 * <u id='EG_5_1_1'>EG.5.1.1</u> (<u id='EG_5_1'>EG.5.1</u> subvariant that has been growing significantly versus other current variants).
 * <u id='EG_5_1_3'>EG.5.1.3</u> (Another <u id='EG_5_1'>EG.5.1</u> subvariant growing notably)
-* **HK.3 (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)**
-* **JJ.1 (<u id='EG_5_1_4'>EG.5.1.4</u> with S:F456L and S:L455F - still being reported often as <u id='EG_5_1_4'>EG.5.1.4</u>)**
+* **<u id='HK_3'>HK.3</u> (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)**
+* **<u id='JJ_1'>JJ.1</u> (<u id='EG_5_1_4'>EG.5.1.4</u> with S:F456L and S:L455F - still being reported often as <u id='EG_5_1_4'>EG.5.1.4</u>)**
 * <u id='FL_1_5_1'>FL.1.5.1</u> (<u id='XBB_1_9_1'>XBB.1.9.1</u> with S:701V, ORF1a:G993S, S:456L and S:478R, with an interest in those with S:L455F) and other possible <u id='FL_1'>FL.1</u> subvariants with S:478R)
 * <u id='XBB_1_16'>XBB.1.16</u> which has S:T478R (with a particular interest in those with S:F456L like <u id='XBB_1_16_6'>XBB.1.16.6</u> and also S:L455F)
 * <u id='XBB_1_9_1'>XBB.1.9.1</u>, <u id='XBB_1_9_2'>XBB.1.9.2</u>, <u id='FL_5'>FL.5</u> (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H (aka orf6:y49h)
@@ -47,6 +47,3 @@ Plus other mutations identified through deep mutation scanning and the SARS-CoV-
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
 
 With thanks to the global team of variant hunters which play a key role in identifying new variants of note.
-
-
-<!-- edited -->
