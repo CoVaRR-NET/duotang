@@ -3,4 +3,25 @@
 
 
 ```{r, echo=FALSE}
+tippy::tippy_this(elementId = "EG_5_1", tooltip = "Alias of XBB.1.9.2.5.1, S:Q52H")
+tippy::tippy_this(elementId = "EG_5_1_1", tooltip = "Alias of XBB.1.9.2.5.1.1, China, from pango-designation issue #2020")
+tippy::tippy_this(elementId = "XBB_1_16_6", tooltip = "S:F456L (T22930A), A12397G, USA/Canada/China")
+tippy::tippy_this(elementId = "EG_6_1", tooltip = "Alias of XBB.1.9.2.6.1, S:456L (T22928C), Israel/Japan/Canada From #1950")
+tippy::tippy_this(elementId = "FL_1_5_1", tooltip = "Alias of XBB.1.9.1.1.5.1, S:478R, from #2036")
+tippy::tippy_this(elementId = "XBB", tooltip = "Recombinant lineage of BJ.1 and BM.1.1.1 with breakpoint in S1, found in USA and Singapore, from issue #1058")
+tippy::tippy_this(elementId = "XBB_1_16", tooltip = "Defined by S:E180V, S:478R, found in India, USA, Singapore, and Europe, from pango-designation issue #1723")
+tippy::tippy_this(elementId = "XBB_1_9", tooltip = "ORF1a:G1819S, ORF1a:T4175I")
+tippy::tippy_this(elementId = "XBB_1_5", tooltip = "USA, S:F486P")
+tippy::tippy_this(elementId = "CH_1_1", tooltip = "Alias of B.1.1.529.2.75.3.4.1.1.1.1, defined by S:L452R, issue #1113")
+tippy::tippy_this(elementId = "HK_3", tooltip = "Alias of XBB.1.9.2.5.1.1.3, S:L455F, China from https://github.com/sars-cov-2-variants/lineage-proposals/issues/414")
+tippy::tippy_this(elementId = "DV_7_1", tooltip = "Alias of B.1.1.529.2.75.3.4.1.1.1.1.1.7.1, S:L455F, S:F456L(T22928C), Spain/Austria, from sars-cov-2-variants/lineage-proposals#135")
+tippy::tippy_this(elementId = "BA_2_86", tooltip = "Alias of B.1.1.529.2.86, from pango-designation issue #2183")
+tippy::tippy_this(elementId = "XBB_1_9_2", tooltip = "S:F486P (after 27507C, 16878T), Indonesia/Singapore，from #1602")
+tippy::tippy_this(elementId = "EG_5_1_3", tooltip = "Alias of XBB.1.9.2.5.1.3, ORF1a:R542C, C22570T from https://github.com/sars-cov-2-variants/lineage-proposals/issues/222")
+tippy::tippy_this(elementId = "JJ_1", tooltip = "Alias of XBB.1.9.2.5.1.4.1, S:L455F, ORF3a:I47V, China/Japan From #2208")
+tippy::tippy_this(elementId = "EG_5_1_4", tooltip = "Alias of XBB.1.9.2.5.1.4, ORF1b:K2557R, from #2117")
+tippy::tippy_this(elementId = "XBB_1_9_1", tooltip = "S:F486P (after C11956T), Indonesia/Singapore/Malaysia/England")
+tippy::tippy_this(elementId = "FL_1", tooltip = "Alias of XBB.1.9.1.1, S:701V, ORF1a:G993S, from #1808")
+tippy::tippy_this(elementId = "FL_5", tooltip = "Alias of XBB.1.9.1.5, N:T362I")
+tippy::tippy_this(elementId = "XBB_2_3", tooltip = "Defined by S:P521S and S:S486P, India/Indonesia/Singapore/USA，from #1603 and #1535")
 ```
