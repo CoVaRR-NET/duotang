@@ -1,6 +1,6 @@
 
 
-There continues to be a substantial diversity of SARS-CoV-2 in Canada, with <u id='EG_5_1'>EG.5.1</u> subvariants, including <u id='EG_5_1_1'>EG.5.1.1</u> the most prevalent in many regions, along with <u id='XBB_1_16_6'>XBB.1.16.6</u>, <u id='EG_6_1'>EG.6.1</u>, <u id='FL_1_5_1'>FL.1.5.1</u>, and a mix of some some other <u id='XBB'>XBB</u> subvariants all with growing immune evasive mutations. The immune evasive S:F456L mutation is in the vast majority of samples (now over 75%) and continues to steadily increase in prevalence. The mutation S:478R is occurring in multiple variants showing growth. Multiple subvariants of <u id='XBB_1_16'>XBB.1.16</u>, <u id='XBB_1_9'>XBB.1.9</u>, <u id='XBB_1_5'>XBB.1.5</u> and <u id='CH_1_1'>CH.1.1</u>, have independently obtained the two mutations S:F456L and S:L455F (of interest due to their potential to provide additional immune evasion - and referred to as “FLIP” mutations due to their “exchange of L and F) and are now growing significantly in multiple regions, including the <u id='EG_5_1_1'>EG.5.1.1</u> subvariant <u id='HK_3'>HK.3</u> and the <u id='CH_1_1'>CH.1.1</u> subvariant <u id='DV_7_1'>DV.7.1</u>. However, such collective variants with these”FLIP” mutations are still in low numbers (up to 15% of cases, except in NL and NB where they are up to 40%) so they will not be having an impact yet.
+There continues to be a substantial diversity of SARS-CoV-2 in Canada, with <u id='EG_5_1'>EG.5.1</u> subvariants, including <u id='EG_5_1_1'>EG.5.1.1</u> the most prevalent in many regions, along with <u id='XBB_1_16_6'>XBB.1.16.6</u>, <u id='EG_6_1'>EG.6.1</u>, <u id='FL_1_5_1'>FL.1.5.1</u>, and a mix of some some other <u id='XBB'>XBB</u> subvariants all with growing immune evasive mutations. The immune evasive S:F456L mutation is in the vast majority of samples (now over 75%) and continues to steadily increase in prevalence. The mutation S:478R is occurring in multiple variants showing growth. Multiple subvariants of <u id='XBB_1_16'>XBB.1.16</u>, <u id='XBB_1_9'>XBB.1.9</u>, <u id='XBB_1_5'>XBB.1.5</u> and <u id='CH_1_1'>CH.1.1</u>, have independently obtained the two mutations S:F456L and S:L455F (of interest due to their potential to provide additional immune evasion - and referred to as "FLIP" mutations due to their “exchange of L and F) and are now growing significantly in multiple regions, including the <u id='EG_5_1_1'>EG.5.1.1</u> subvariant <u id='HK_3'>HK.3</u> and the <u id='CH_1_1'>CH.1.1</u> subvariant <u id='DV_7_1'>DV.7.1</u>. However, such collective variants with these "FLIP" mutations are still in low numbers (up to 15% of cases, except in NL and NB where they are up to 40%) so they will not be having an impact yet.
 
 
 
@@ -12,12 +12,12 @@ Variants of current interest, due to their current/potential growth advantage, m
 
 
 
-* **DV.7.1 (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F)**
+* **<u id='DV_7_1'>DV.7.1</u> (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F)**
 * <u id='EG_5_1'>EG.5.1</u> (<u id='XBB_1_9_2'>XBB.1.9.2</u> with S:F456L plus S:Q52H plus some notable non-spike mutations)
 * <u id='EG_5_1_1'>EG.5.1.1</u> (<u id='EG_5_1'>EG.5.1</u> subvariant that has been growing significantly versus other current variants).
 * <u id='EG_5_1_3'>EG.5.1.3</u> (Another <u id='EG_5_1'>EG.5.1</u> subvariant growing notably)
-* **HK.3 (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)**
-* **JJ.1 (<u id='EG_5_1_4'>EG.5.1.4</u> with S:F456L and S:L455F - still being reported often as <u id='EG_5_1_4'>EG.5.1.4</u>)**
+* **<u id='HK_3'>HK.3</u> (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)**
+* **<u id='JJ_1'>JJ.1</u> (<u id='EG_5_1_4'>EG.5.1.4</u> with S:F456L and S:L455F - still being reported often as <u id='EG_5_1_4'>EG.5.1.4</u>)**
 * <u id='FL_1_5_1'>FL.1.5.1</u> (<u id='XBB_1_9_1'>XBB.1.9.1</u> with S:701V, ORF1a:G993S, S:456L and S:478R, with an interest in those with S:L455F) and other possible <u id='FL_1'>FL.1</u> subvariants with S:478R)
 * <u id='XBB_1_16'>XBB.1.16</u> which has S:T478R (with a particular interest in those with S:F456L like <u id='XBB_1_16_6'>XBB.1.16.6</u> and also S:L455F)
 * <u id='XBB_1_9_1'>XBB.1.9.1</u>, <u id='XBB_1_9_2'>XBB.1.9.2</u>, <u id='FL_5'>FL.5</u> (which have non-spike mutations of note, with a particular interest in those with S:Q613H OR with S:F456L plus NS6:Y49H (aka orf6:y49h)

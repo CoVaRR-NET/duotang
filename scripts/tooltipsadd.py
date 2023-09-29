@@ -15,20 +15,24 @@ with open ("downloads/lineagesNotesAnnotated.tsv", 'r') as f:
 
 UsedLineageNotes={}
 
+possible_string_before_lineage=[" ", "(", "\n", "**"]
+possible_string_after_lineage=[" ", ")", "\n", ",", ". ", ".\n", "**"]
+
 def AnnotateParagraph(text):
     def subReplace(i,text):
         if i not in UsedLineageNotes:
             UsedLineageNotes[i]=AllLineageNotes[i]
             inodot=i.replace(".","_")
-            for c1 in [" ","(","\n"]:
-                for c2 in [" ",")","\n",",",". ",".\n"]:
-                    text=text.replace(c1+i+c2,c1+"<u id='"+inodot+"'>"+i+"</u>"+c2)
+            for c_b in possible_string_before_lineage:
+                for c_a in possible_string_after_lineage:
+                    text=text.replace(c_b+i+c_a,c_b+"<u id='"+inodot+"'>"+i+"</u>"+c_a)
         return(text)
-    for i in text.replace("\n"," ").replace("("," ").replace(","," ").split(' '):
+    textnopunct=text
+    for i in set(possible_string_before_lineage+possible_string_after_lineage):
+      textnopunct=textnopunct.replace(i,' ')
+    for i in textnopunct.split(' '):
         if i in AllLineageNotes:
             text=subReplace(i,text)
-        if i!="" and (i[-1] in [".","*",".",")"]) and (i[:-1] in AllLineageNotes):
-            text=subReplace(i[:-1],text)
     return text
 
 
