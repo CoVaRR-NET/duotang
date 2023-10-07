@@ -1,5 +1,5 @@
 Duotang update {updatedate}:  
 
 Detailed changes:
-## Duotang.html
+* Update to VirusSeq Release 
 
