@@ -26,9 +26,10 @@ Variants of current interest, due to their current/potential growth advantage, m
 
 Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
 
-* 
+
+
 * <https://jbloomlab.github.io/SARS2-RBD-escape-calc/>
-* Greaney, Starr, & Bloom, Virus Evolution, 8:veac021 (2022)
+* Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
 * Cao et al, Nature, 614:521-529 (2023)
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
 
