@@ -383,13 +383,11 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 <hr style="border:1px solid gray">
 
-# Mutational composition of Omicron
+# COVID-MVP: Mutational composition of Omicron
 
-Tabulation of the most predominant mutational changes in Omicron, with adjacent rows comparing the composition of Canadian sublineages to that sublineage globally.
+<iframe src="https://virusmvp.org/covid-mvp/" height="500" width="100%" align="left" style="border:none;" title="covidmvp-iframe"></iframe> 
 
-![](raphgraph.png)
-
-Mutational profile of Omicron and its sublineages in Canada and globally for the most prevalent (>75%) point mutations in each category (based on the `r nrow(meta)` genomes available on VirusSeq on `r VirusSeq_release`).
+An preview of the mutational profile of actively circulating strains and its sublineages in Canada are shown above. This preview is from https://virusmvp.org/covid-mvp.
 
 <hr style="border:1px solid gray">
 
