@@ -190,7 +190,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T) #merge the X values
     rColors[lineFits[[i]]$names] <- lineFits[[i]]$color #assign color to line
     rValues[lineFits[[i]]$names] <- round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
-    if (!region %in% c("Alberta", "Quebec")){
+    if (region != "Alberta" & region != "Quebec")){
       rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7
     }
   }
