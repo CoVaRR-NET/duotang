@@ -35,73 +35,80 @@ if (( $viralaiepoch > $duotangverepoch )); then
 	if [ "$viralaiid" = "$virusseqid" ]; then
 		echo "Update found. Release $viralaidate2, ID: $virusseqid"
 
-		git pull --recurse-submodules
-		if read -r first_line < "checkpoint" && [[ "$first_line" == "finish" ]]; then
-			rm checkpoint
-			python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Starting update process..."
-			dateToUse=`date --utc +%F`
-			python scripts/UpdateStatusManager.py --action set --key InProgressUpdateDate --value $dateToUse
-			python scripts/UpdateStatusManager.py --action set --key FailedCounter --value "0"
+		approveStatus=`python scripts/UpdateStatusManager.py --action get --key Approved`
+		threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
+		if [ "$approveStatus" = "False" ]; then
+			echo "There is a new update released, but the last update has not finished. Waiting..."
 		else
-			failedCounter=`python scripts/UpdateStatusManager.py --action get --key FailedCounter`
-			echo $failedCounter
-			if (( failedCounter >= (($maxFailCount+1)) )); then
-				echo "Exceeded failed count allowance, slack notified already sent"
-				exit 1
-			elif (( failedCounter >= $maxFailCount )); then
-				echo "3rd error warning msg"
-				python scripts/duoli.py --message "This update failed $maxFailCount times already, errors will no longer appear, <@U03VC9B7PC3> better look into it."
-				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
-				exit 1
+			echo "Updating..."
+			git pull --recurse-submodules
+			if read -r first_line < "checkpoint" && [[ "$first_line" == "finish" ]]; then
+				rm checkpoint
+				python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Starting update process..."
+				dateToUse=`date --utc +%F`
+				python scripts/UpdateStatusManager.py --action set --key InProgressUpdateDate --value $dateToUse
+				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value "0"
 			else
-				echo "failed message"
-				python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Last update attempted failed, attempting to restart the update process..."
-				dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
+				failedCounter=`python scripts/UpdateStatusManager.py --action get --key FailedCounter`
+				echo $failedCounter
+				if (( failedCounter >= (($maxFailCount+1)) )); then
+					echo "Exceeded failed count allowance, slack notified already sent"
+					exit 1
+				elif (( failedCounter >= $maxFailCount )); then
+					echo "3rd error warning msg"
+					python scripts/duoli.py --message "This update failed $maxFailCount times already, errors will no longer appear, <@U03VC9B7PC3> better look into it."
+					python scripts/UpdateStatusManager.py --action set --key FailedCounter --value 999
+					exit 1
+				else
+					echo "failed message"
+					python scripts/duoli.py --message "ViralAI updated with release date $viralaidate2, id: $viralaiid. Last update attempted failed, attempting to restart the update process..."
+					dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
+				fi
 			fi
-		fi
-		
-		#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
+			
+			#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
+			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
 
-		status=$( tail -n 1 update.log )
-		echo $status
-		if [[ "$status" == "Update completed successfully" ]]; then
-			echo "sending messages via slack and setting keys"
-			prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
-			if [ -z "$prLink" ]; then
-				python scripts/duoli.py --message "Error: PR link is missing. "
-				exit 1
-			fi
-			python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
-			sleep 5
-			previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
-			while [[ ! "$previewURL" =~ "http" ]]; do
-				sleep 10
+			status=$( tail -n 1 update.log )
+			echo $status
+			if [[ "$status" == "Update completed successfully" ]]; then
+				echo "sending messages via slack and setting keys"
+				prLink=`cat update.log | grep "https://github.com/CoVaRR-NET/duotang/pull"`
+				if [ -z "$prLink" ]; then
+					python scripts/duoli.py --message "Error: PR link is missing. "
+					exit 1
+				fi
+				python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
+				sleep 5
 				previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
-			done
-			previewURL="$previewURL/duotang.html"
-			#python scripts/duoli.py --message "Update complete, see PR branch $prLink"
-			echo -e "\n\nSee preview: $previewURL " >> ./whatsnew.send.md
-			threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
-			rm ./whatsnew.send.md
-			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
-			python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
-			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
-			python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid
-			python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
-			python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
-			python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
-			echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n* Update to VirusSeq Release $datestamp\n" > whatsnew.md
-			git add DuotangUpdateStatus.json
-			git commit -m "update status json"
-			git push
-## duotang.html:
-		else
-			#lastError=`tail -n 5 update.log`
-			python scripts/duoli.py --message "There was an issue with the update. See logs attached." --file "update.log"
-			failedCounter=`python scripts/UpdateStatusManager.py --action get --key FailedCounter`
-			((failedCounter=failedCounter+1))
-			python scripts/UpdateStatusManager.py --action set --key FailedCounter --value $failedCounter
+				while [[ ! "$previewURL" =~ "http" ]]; do
+					sleep 10
+					previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+				done
+				previewURL="$previewURL/duotang.html"
+				#python scripts/duoli.py --message "Update complete, see PR branch $prLink"
+				echo -e "\n\nSee preview: $previewURL " >> ./whatsnew.send.md
+				threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
+				rm ./whatsnew.send.md
+				python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
+				python scripts/UpdateStatusManager.py --action set --key LastNotifMessage --value $threadts
+				python scripts/UpdateStatusManager.py --action set --key LastVirusSeqRelease --value $viralaidate2
+				python scripts/UpdateStatusManager.py --action set --key LastVirusSeqReleaseID --value $virusseqid
+				python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
+				python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
+				python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
+				echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n* Update to VirusSeq Release $datestamp\n" > whatsnew.md
+				git add DuotangUpdateStatus.json
+				git commit -m "update status json"
+				git push
+	## duotang.html:
+			else
+				#lastError=`tail -n 5 update.log`
+				python scripts/duoli.py --message "There was an issue with the update. See logs attached." --file "update.log"
+				failedCounter=`python scripts/UpdateStatusManager.py --action get --key FailedCounter`
+				((failedCounter=failedCounter+1))
+				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value $failedCounter
+			fi
 		fi
 	else
 		echo "Desync between ViralAI and VirusSeq releases, likely because one of them just updated but not the other. " 
