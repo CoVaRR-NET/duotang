@@ -42,7 +42,6 @@ alpha <- function(col, alpha) {
   prov <- get.province.list(region)
   #filter out the metadata rows that have the reference and mutant as lineage
   #view(mydata)
-  nrow(meta)
   mydata <- meta %>% filter(
     lineage %in% c(reference, unlist(mutants)), 
     province %in% prov,
@@ -55,6 +54,12 @@ alpha <- function(col, alpha) {
     mutants = "n2"
     if (nrow(mydata) == 0 | length(unique(mydata$lineage)) != 2){return(list(region=region, prov=prov, refdata=NA, mutdata=NA, toplot=NA))}
   }
+  
+  #>4 samples are needed for smooth.spline() function. Add a check to ensure it's true. otherwise return NA because the model will be useless anyways.
+  if (nrow(mydata) < 5){
+    return(list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=NA, refdate=NA))
+  }
+  
   # set final date
   lastdate <- max(mydata$sample_collection_date)
   
@@ -113,7 +118,7 @@ alpha <- function(col, alpha) {
   dateconverter <- data.frame(time=toplot$time, date=as.Date(dateseq))
   toplot$date <- dateconverter$date
   toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
-  list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot, refdate=refdate)
+  return(list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=toplot, refdate=refdate))
 }
 
 
@@ -573,10 +578,11 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 generateAllParams <- function(region, startdate, reference, mutants, startpar, method='BFGS') {
-  #region = "Ontario"
-  #reference=individualSelectionPlotReference
-  #mutants = lineagelist
-  #collapseMutants = T
+  # region = "Manitoba"
+  # reference=individualSelectionPlotReference
+  # mutants = lineagelist
+  # collapseMutants = T
+
   est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
   if(any(is.na(est))){
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
