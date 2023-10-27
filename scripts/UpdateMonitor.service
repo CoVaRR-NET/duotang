@@ -96,7 +96,7 @@ if [ "$approveStatus" = "True" ]; then
 				python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
 				python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 				python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
-				echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n* Update to VirusSeq Release $datestamp\n" > whatsnew.md
+				echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n* Update to VirusSeq Release $datestamp \n" > whatsnew.md
 				git add DuotangUpdateStatus.json
 				git commit -m "update status json"
 				git push
