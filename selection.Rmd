@@ -18,7 +18,7 @@ sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB1
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBBOther)] #the rest
 
-reference <- sublineages_XBB15
+reference <- sublineages_EG5
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
@@ -27,9 +27,9 @@ reference <- sublineages_XBB15
 # col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
 
 # 
-mutants = list(sublineages_XBBOther, sublineages_EG5,sublineages_NonXBB  )
-mutantNames = list("XBB.Other", "Non-XBB", "XBB.1.5*", "EG.5*") #
-col <- c("XBB.Other"=pal["XBB"],"XBB.1.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineages_XBBOther, sublineages_XBB15 ,sublineages_NonXBB)
+mutantNames = list("XBB.Other", "XBB.1.5*","Non-XBB",  "EG.5*") #
+col <- c("XBB.Other"=pal["XBB"], "XBB.1.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
@@ -364,7 +364,7 @@ Here we show the trends of the various BA.2.\* sublineages over time, relative t
 source("scripts/plot_selection_estimator.R")
 
 #function to plot all the indivudal variant's selection plot
-plotIndividualSublineageSelection <- function(region, minimumSampleCount, parentalNodes, maxdate){
+plotIndividualSublineageSelection <- function(region, minimumSampleCount, parentalNodes, maxdate, excludeRecomb = F){
   allSublineagePlots <- list()
   plotCounter <- 0
   #loop through all params and find...
