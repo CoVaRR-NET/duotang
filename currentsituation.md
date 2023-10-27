@@ -12,21 +12,21 @@ Sequences are also still being monitored closely to identify or track any highly
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (**Bold** only denotes changes since the last Duotang release - not necessarily those of greatest interest):
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries:
 
 
 
 * <u id='DV_7_1'>DV.7.1</u> (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F, with an interest in those with also S:452R)
 * <u id='HK_3'>HK.3</u> (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)
-* **<u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with also S:452R - a mutation which may confer a transmission advantage)**
+* <u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with also S:452R - a mutation which may confer a transmission advantage)
 
 …plus any highly divergent variants (like most recently <u id='BA_2_86'>BA.2.86</u>) and sublineages with additional combinations of the mutations below.
 
 
 
-* **S:L452R (in variant <u id='HV_1'>HV.1</u> which is growing. It potentially conferred a transmission advantage in past variants)**
+* S:L452R (in variant <u id='HV_1'>HV.1</u> which is growing. It potentially conferred a transmission advantage in past variants)
 * S:L455F (in particular if present with S:F456L)
-* **S:475V (growing, including in lineages currently just classified as <u id='XBB_1_5'>XBB.1.5</u>, plus FL.15.1.1/FL.15, <u id='GK_3_1'>GK.3.1</u> <u id='JD_1_1'>JD.1.1</u> - though none of these individual variants show as much growth vs those listed above).**
+* S:475V (growing, including in lineages currently just classified as <u id='XBB_1_5'>XBB.1.5</u>, plus FL.15.1.1/FL.15, <u id='GK_3_1'>GK.3.1</u> <u id='JD_1_1'>JD.1.1</u> - though none of these individual variants show as much growth vs those listed above).
 
 Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
 
