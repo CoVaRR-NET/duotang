@@ -29,17 +29,16 @@ viralaiid=`echo $viralaiInfo | cut -d';' -f 2`
 
 #rm viralaiver
 
-if (( $viralaiepoch > $duotangverepoch )); then
-	#query the virusseq data portal for their latest update. 
-	virusseqid=`curl -s -X GET "https://singularity.virusseq-dataportal.ca/archives?createdAfterEpochSec=$duotangverepoch&sortDirection=DESC" -H  "accept: application/json" | python3 -c "import sys, json; a=(json.load(sys.stdin)); print(a['content'][0]['id'].strip());"`
-	if [ "$viralaiid" = "$virusseqid" ]; then
-		echo "Update found. Release $viralaidate2, ID: $virusseqid"
 
-		approveStatus=`python scripts/UpdateStatusManager.py --action get --key Approved`
-		threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
-		if [ "$approveStatus" = "False" ]; then
-			echo "There is a new update released, but the last update has not finished. Waiting..."
-		else
+approveStatus=`python scripts/UpdateStatusManager.py --action get --key Approved`
+threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
+if [ "$approveStatus" = "True" ]; then
+	if (( $viralaiepoch > $duotangverepoch )); then
+		#query the virusseq data portal for their latest update. 
+		virusseqid=`curl -s -X GET "https://singularity.virusseq-dataportal.ca/archives?createdAfterEpochSec=$duotangverepoch&sortDirection=DESC" -H  "accept: application/json" | python3 -c "import sys, json; a=(json.load(sys.stdin)); print(a['content'][0]['id'].strip());"`
+		if [ "$viralaiid" = "$virusseqid" ]; then
+			echo "Update found. Release $viralaidate2, ID: $virusseqid"
+
 			echo "Updating..."
 			git pull --recurse-submodules
 			if read -r first_line < "checkpoint" && [[ "$first_line" == "finish" ]]; then
@@ -109,12 +108,14 @@ if (( $viralaiepoch > $duotangverepoch )); then
 				((failedCounter=failedCounter+1))
 				python scripts/UpdateStatusManager.py --action set --key FailedCounter --value $failedCounter
 			fi
+		else
+			echo "Desync between ViralAI and VirusSeq releases, likely because one of them just updated but not the other. " 
 		fi
 	else
-		echo "Desync between ViralAI and VirusSeq releases, likely because one of them just updated but not the other. " 
+		echo "no update"
 	fi
 else
-	echo "no update" 
+	echo "Last update still in progress..." 
 	#logic for checking for "current situation" updates or rebuild commands via slack. 
 	threadts=`python scripts/UpdateStatusManager.py --action get --key LastNotifMessage`
 	newRebuildCount=`python scripts/duoliRetrievalService.py --ts $threadts`
