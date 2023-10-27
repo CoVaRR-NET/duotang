@@ -28,8 +28,8 @@ reference <- sublineages_XBB15
 
 # 
 mutants = list(sublineages_XBBOther, sublineages_EG5,sublineages_NonXBB  )
-mutantNames = list("XBB.Other",  "EG.5*", "Non-XBB", "XBB.1.5*") #
-col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("XBB.Other", "Non-XBB", "XBB.1.5*", "EG.5*") #
+col <- c("XBB.Other"=pal["XBB"],"XBB.1.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
@@ -80,9 +80,9 @@ for (i in 1:length(all.regions$name)){
 
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a reference lineage (`r individualSelectionPlotReference[[1]]`) previously common in Canada (see the methods for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages rising in frequency are the XBB.* group. This group was previously dominated by the XBB.1.5* lineages, which peaked in April 2023. A variety of other XBB* have been spreading since, and we now track the frequencies of XBB.1.5\*, EG.5\*,  and XBB.Other, as well as all remaining non-XXB lineages. See Fastest Growing Lineages for details on lineages showing positive selection.
+Currently, the major group of Omicron lineages rising in frequency are the XBB.* group. This group was previously dominated by the XBB.1.5* lineages, which peaked in April 2023. A variety of other XBB* have been spreading since, and we now track the frequencies of `r print(mutantNames[-length(mutantNames)])`. See Fastest Growing Lineages for details on lineages showing positive selection.
 
-Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(EG.5\*, XBB.Other, or non-XBB\*)/freq(XBB.1.5\*)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r print(mutantNames[-length(mutantNames)])`)/freq(`r print(mutantNames[length(mutantNames)])`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 

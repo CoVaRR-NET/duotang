@@ -248,7 +248,7 @@ These analyses are subject to frequent change given new data and updated lineage
 ```{r general fits for selection estimator, message = F, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
-individualSelectionPlotReference <- getStrictoSubLineages("XBB.1.5", meta)
+individualSelectionPlotReference <- getStrictoSubLineages("EG.5.1", meta)
 
 #saveRDS(allparams, "newallparams.rds")
 allparams <- mclapply(latelineage_pangotree, function(l) {
@@ -268,7 +268,15 @@ allparams <- allparams[!is.na(allparams)]
 #print(Sys.time() - t0)
 
 allparams <- allparams[order(sapply(allparams, function(p) { 
-  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+    if (is.atomic(p))
+    {
+      NA
+    } else if (any(is.na(p$fit))){
+      NA
+    } else{
+      (p$fit)$fit[["s1"]]
+    }
+    # ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
   }), decreasing = TRUE)]
 
 ```
