@@ -1,10 +1,10 @@
 
 
-<u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with S:452R), is estimated to be most prevalent variant now, and is significantly growing in most regions at a level that it would be having an impact soon. One exception is Quebec which had its <u id='EG_5_1_1'>EG.5.1.1</u> wave earlier than others.
+HV.1 (EG.5.1.6 with S:452R), is estimated to be most prevalent variant now, and is significantly growing in most regions at a level that it would be having an impact soon. One exception is Quebec which had its EG.5.1.1 wave earlier than others.
 
 
 
-Multiple variant lineages have independently obtained the two mutations S:F456L and S:L455F (“FLip” mutations) that may confer more immune evasion), but at this time <u id='HV_1'>HV.1</u> is dominating overall.
+Multiple variant lineages have independently obtained the two mutations S:F456L and S:L455F (“FLip” mutations) that may confer more immune evasion), but at this time HV.1 is dominating overall.
 
 
 
@@ -16,17 +16,17 @@ Variants of current interest, due to their current/potential growth advantage, m
 
 
 
-* <u id='DV_7_1'>DV.7.1</u> (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F, with an interest in those with also S:452R)
-* <u id='HK_3'>HK.3</u> (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)
-* <u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with also S:452R - a mutation which may confer a transmission advantage)
+* DV.7.1 (CH.1.1 subvariant with S:F456L and S:L455F, with an interest in those with also S:452R)
+* HK.3 (EG.5.1.1 with with S:F456L and S:L455F)
+* HV.1 (EG.5.1.6 with also S:452R - a mutation which may confer a transmission advantage)
 
-…plus any highly divergent variants (like most recently <u id='BA_2_86'>BA.2.86</u>) and sublineages with additional combinations of the mutations below.
+…plus any highly divergent variants (like most recently BA.2.86) and sublineages with additional combinations of the mutations below.
 
 
 
-* S:L452R (in variant <u id='HV_1'>HV.1</u> which is growing. It potentially conferred a transmission advantage in past variants)
+* S:L452R (in variant HV.1 which is growing. It potentially conferred a transmission advantage in past variants)
 * S:L455F (in particular if present with S:F456L)
-* S:475V (growing, including in lineages currently just classified as <u id='XBB_1_5'>XBB.1.5</u>, plus FL.15.1.1/FL.15, <u id='GK_3_1'>GK.3.1</u> <u id='JD_1_1'>JD.1.1</u> - though none of these individual variants show as much growth vs those listed above).
+* S:475V (growing, including in lineages currently just classified as XBB.1.5, plus FL.15.1.1/FL.15, GK.3.1 JD.1.1 - though none of these individual variants show as much growth vs those listed above).
 
 Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
 
@@ -38,6 +38,3 @@ Plus other mutations identified through deep mutation scanning and the SARS-CoV-
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
 
 With thanks to the global team of variant hunters which play a key role in identifying new variants of note.
-
-
-<!-- edited -->
