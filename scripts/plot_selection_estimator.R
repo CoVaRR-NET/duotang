@@ -57,7 +57,7 @@ alpha <- function(col, alpha) {
   
   #>4 samples are needed for smooth.spline() function. Add a check to ensure it's true. otherwise return NA because the model will be useless anyways.
   if (nrow(mydata) < 5){
-    return(list(region=region, prov=prov, refdata=refdata, mutdata=mutdata, toplot=NA, refdate=NA))
+    return(list(region=region, prov=prov, refdata=NA, mutdata=NA, toplot=NA, refdate=NA))
   }
   
   # set final date
