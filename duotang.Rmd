@@ -268,7 +268,15 @@ allparams <- allparams[!is.na(allparams)]
 #print(Sys.time() - t0)
 
 allparams <- allparams[order(sapply(allparams, function(p) { 
-  ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
+    if (is.atomic(p))
+    {
+      NA
+    } else if (any(is.na(p$fit))){
+      NA
+    } else{
+      (p$fit)$fit[["s1"]]
+    }
+    # ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
   }), decreasing = TRUE)]
 
 ```
