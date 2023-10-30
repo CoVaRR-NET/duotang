@@ -16,7 +16,7 @@ Sequences are also still being monitored closely to identify or track any highly
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries:
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (**Bold** only denotes changes since the last Duotang release - not necessarily those of greatest interest)::
 
 
 
