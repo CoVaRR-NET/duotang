@@ -15,8 +15,8 @@ with open ("downloads/lineagesNotesAnnotated.tsv", 'r') as f:
 
 UsedLineageNotes={}
 
-possible_string_before_lineage=[" ", "(", "\n", "**"]
-possible_string_after_lineage=[" ", ")", "\n", ",", ". ", ".\n", "**"]
+possible_string_before_lineage=[" ", "(", "/", "\n", "**"]
+possible_string_after_lineage=[" ", ")", "\n", ",", "/", ". ", ".\n", "**"]
 
 def AnnotateParagraph(text):
     def subReplace(i,text):
