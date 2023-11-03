@@ -321,6 +321,13 @@ sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
                                exclude_previously_plotted=c(F, FALSE,FALSE,FALSE,F,F),
                                nonRecombinantOnly=c(F, T,T,T, T,F),
                                recombinantsOnly=c(F, F,F,F, F,T))
+sublineagestoplot = data.frame(name=c("B*"),
+                               tabname=c("Last 120 days"),
+                               mindate=c(as.character(startdate)),
+                               maxdate=c(""),
+                               exclude_previously_plotted=c(F),
+                               nonRecombinantOnly=c(F),
+                               recombinantsOnly=c(F))
 
 plotted=c()
 frequencyTable <- data.frame()
