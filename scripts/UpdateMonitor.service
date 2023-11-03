@@ -66,6 +66,7 @@ if [ "$approveStatus" = "True" ]; then
 			fi
 			
 			#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
+			lastTreeDate=`python scripts/UpdateStatusManager.py --action get --key LastTreeUpdate`
 			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
 
 			status=$( tail -n 1 update.log )

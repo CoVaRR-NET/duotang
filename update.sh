@@ -87,6 +87,10 @@ while [[ $# -gt 0 ]]; do
       DRYRUN="FAIL"
       shift # past argument
       ;;
+	--skiptrees)
+      SKIPTREE="YES"
+      shift # past argument
+      ;;
 	--help)
       HELPFLAG="YES"
       shift # past argument
@@ -133,6 +137,8 @@ if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$INCLUDEGSD" = "YES" ]; then INCLUDEGSD="YES"; else INCLUDEGSD="NO"; fi
 if [ "$GITPUSH" = "YES" ]; then GITPUSH="YES"; else GITPUSH="NO"; fi
+if [ "$SKIPTREE" = "YES" ]; then SKIPTREE="YES"; else SKIPTREE="NO"; fi
+
 if [ "$LISTSTEPS" = "YES" ]; then 
 	echo "Available checkpoint steps are: "
 	echo $(cat update.sh | grep '^#.*:$' | sed 's/#//' | sed 's/://')
@@ -403,61 +409,66 @@ if [ "$DOWNLOADONLY" = "YES" ]; then
 	exit 0
 fi
 
-echo "filterseq" > $checkPointFile
 
-#filterseq:
-#removes the recombinants
+if [ "$SKIPTREE" = "NO" ]; then 
+	echo "filterseq" > $checkPointFile
 
-echo "separating out the recombinants from the data..."
-python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "(^|.)X.." --keepregex "(^|.)X.."
+	#filterseq:
+	#removes the recombinants
 
-echo "alignseq" > $checkPointFile
+	echo "separating out the recombinants from the data..."
+	python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "(^|.)X.." --keepregex "(^|.)X.."
 
-#alignseq:
-echo "aligning sequences..."
+	echo "alignseq" > $checkPointFile
 
-#All Sequences
-python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
+	#alignseq:
+	echo "aligning sequences..."
 
-#selected recombinants
-for variant in `ls $data_dir/*regex*.fasta.xz`; do
-	name=${variant##*/}; 
-	name=${name%.*};
-	name=${name%.*};
-	name=`echo $name|cut -d '_' -f3-`;
-	echo $variant
-	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
-done
+	#All Sequences
+	python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
 
-#non-recombinants
-python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 1  --reffile resources/NC_045512.fa; 
+	#selected recombinants
+	for variant in `ls $data_dir/*regex*.fasta.xz`; do
+		name=${variant##*/}; 
+		name=${name%.*};
+		name=${name%.*};
+		name=`echo $name|cut -d '_' -f3-`;
+		echo $variant
+		python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+	done
 
-echo "buildtree" > $checkPointFile
+	#non-recombinants
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 1  --reffile resources/NC_045512.fa; 
 
-#buildtree:
-for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
-	echo $alignedFasta
-	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
-done
-echo "cleantree" > $checkPointFile
+	echo "buildtree" > $checkPointFile
 
-#cleantree:
-echo "cleaning trees..."
+	#buildtree:
+	for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
+		echo $alignedFasta
+		iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
+	done
+	echo "cleantree" > $checkPointFile
 
-for treefile in `ls $data_dir/aligned_*.treefile`; do
-	name=${treefile%.*};
-	name=${name%.*};
-	recombString="recombinant"
-	keeproot="--keep-root"
-	if [[ "$name" == *"$recombString"* ]];then
-		keeproot=""
-	fi
-	echo $name
-	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
-	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
-	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
-done
-python scripts/UpdateStatusManager.py --action set --key LastTreeUpdate --value $datestamp
+	#cleantree:
+	echo "cleaning trees..."
+
+	for treefile in `ls $data_dir/aligned_*.treefile`; do
+		name=${treefile%.*};
+		name=${name%.*};
+		recombString="recombinant"
+		keeproot="--keep-root"
+		if [[ "$name" == *"$recombString"* ]];then
+			keeproot=""
+		fi
+		echo $name
+		Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
+		treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
+		python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
+	done
+	python scripts/UpdateStatusManager.py --action set --key LastTreeUpdate --value $datestamp
+else
+	echo "Trees skipped"
+fi
 
 #python scripts/tooltipsadd.py 
 
