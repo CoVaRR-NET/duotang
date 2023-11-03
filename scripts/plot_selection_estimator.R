@@ -195,8 +195,7 @@ alpha <- function(col, alpha) {
       if (length(startpar$s) == 1) {
         bbml <- mle2(.ll.binom, start=list(p1=startpar$p[1], s1=startpar$s[1]), 
                      data=list(refdata=refdata, mutdata=mutdata[1]), method=method)  
-      } 
-      else if (length(startpar$s) == 2) {
+      }else if (length(startpar$s) == 2) {
         bbml <- mle2(.ll.trinom, 
                      start=list(p1=startpar$p[1], p2=startpar$p[2], 
                                 s1=startpar$s[1], s2=startpar$s[2]), 
@@ -578,27 +577,29 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
 #' mutants <- list("BA.1.1", "BA.2")
 #' startpar <- list(p=c(0.4, 0.1), s=c(0.05, 0.05))
 generateAllParams <- function(region, startdate, reference, mutants, startpar, method='BFGS') {
-  # region = "Manitoba"
+  # region = "Canada"
   # reference=individualSelectionPlotReference
-  # mutants = lineagelist
+  # mutants = "HV.1"
   # collapseMutants = T
+  # startpar = startpar2
+  # method='BFGS'
 
   est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
   if(any(is.na(est))){
     return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
   }
   fit <- .fit.model(est, startpar, method=method)
-# 
-#   while (any(is.na(fit))){
-#     newRefDate <- est$refdate - 10
-#     if (newRefDate[1] < 10){
-#       break
-#     }
-#     est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
-#     if(any(is.na(est))){
-#       return(list(toplot=NA,fit=NA,mut=mutants,ref=reference, region=region))
-#     }
-#     fit <- .fit.model(est, startpar, method=method, refDate=newRefDate)
-#   }
+  
+  while ((is.null(fit$sample))){
+    newRefDate <- est$refdate - 10
+
+    if (newRefDate < 10){
+      break
+    }
+    est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T, refDate = newRefDate)
+    fit <- .fit.model(est, startpar, method=method)
+  }
   return(list(toplot=est$toplot,fit=fit,mut=mutants,ref=reference, region=region))
 }
+
+t<-generateAllParams("a",startdate,"a","a","a","a")
