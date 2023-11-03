@@ -647,6 +647,9 @@ The version numbers of all packages in the current environment as well as inform
 sessionInfo()
 ```
 
+# [Duotang-GSD](https://covarr-net.github.io/duotang/duotangGSD.html)
+
+[Link to Duotang-GSD](https://covarr-net.github.io/duotang/duotangGSD.html)
 
 # Acknowledgements
 
