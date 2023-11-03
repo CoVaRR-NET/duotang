@@ -472,6 +472,12 @@ fi
 
 #python scripts/tooltipsadd.py 
 
+echo "knitgsd" > $checkPointFile
+
+#knitgsd:
+Rscript -e "rmarkdown::render('duotangGSD.Rmd',params=list(datestamp="\"$datestamp\""))"
+echo "encrypt" > $checkPointFile
+
 echo "knitduotang" > $checkPointFile
 
 #knitduotang:
@@ -481,11 +487,7 @@ echo "knitsandbox" > $checkPointFile
 
 #knitsandbox:
 #Rscript -e "rmarkdown::render('duotang-sandbox.Rmd',params=list(datestamp="\"$datestamp\""))"
-echo "knitgsd" > $checkPointFile
 
-#knitgsd:
-#Rscript -e "rmarkdown::render('duotang-GSD.Rmd',params=list(datestamp="\"$datestamp\""))"
-echo "encrypt" > $checkPointFile
 
 #encrypt:
 if [ -f ".secret/sandbox" ]; then
