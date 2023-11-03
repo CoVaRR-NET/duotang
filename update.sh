@@ -390,6 +390,11 @@ if [ "$INCLUDEGSD" = "YES" ]; then
 	cat ${data_dir}/pango_designation_alias_key.tsv ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv | awk 'NF==2{t[$1]=$2}NF!=2{rem=$7;split($7,p,".");if(p[1] in t){gsub(p[1] , t[p[1]], $7)}$7=rem" "$7;print}' | sed 's/lineage lineage/lineage raw_lineage/' | tr ' ' '\t' | sort -k2,2 > ${data_dir}/temp_metadatagisaid_beforecorrection.tsv
 
 	join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' |  gzip > ${data_dir}/GSDMetadataCleaned.tsv.gz
+	
+	echo -e "fasta_header_name\tsample_collection_date\tprovince\thost_age_bin\thost_gender\tlineage\traw_lineage\tsample_collected_by\tpurpose_of_sampling\tpurpose_of_sequencing" > gsd.metadata.tsv
+	zcat GSDMetadataCleaned.tsv.gz | grep -v "fasta_header_name" >> gsd.metadata.tsv
+	gzip -f gsd.metadata.tsv
+	
 fi
 
 if [ "$DOWNLOADONLY" = "YES" ]; then
@@ -472,24 +477,24 @@ echo "knitgsd" > $checkPointFile
 echo "encrypt" > $checkPointFile
 
 #encrypt:
-#if [ -f ".secret/sandbox" ]; then
-#    secret=`cat .secret/sandbox`
-#	python3 scripts/encrypt.py duotang-sandbox.html $secret
-#	python3 scripts/encrypt.py duotang-GSD.html $secret
+if [ -f ".secret/sandbox" ]; then
+   secret=`cat .secret/sandbox`
+	#python3 scripts/encrypt.py duotang-sandbox.html $secret
+	python3 scripts/encrypt.py duotangGSD.html $secret
 
-#	mv duotang-sandbox-protected.html duotang-sandbox.html
-#	mv duotang-GSD-protected.html duotang-GSD.html
+	# mv duotang-sandbox-protected.html duotang-sandbox.html
+	mv duotangGSD-protected.html duotangGSD.html
 
-#else
-#	echo ".secret file not found, unable to encrypt."
-#	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
-#	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
-#	echo "DO NOT ADD THIS FILE TO GIT."
-#	rm -f duotang-sandbox.html
-#	rm -f duotang-GSD.html
-#	echo "duotangbuilt" > $checkPointFile
-#	exit 1
-#fi
+else
+	echo ".secret file not found, unable to encrypt."
+	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
+	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
+	echo "DO NOT ADD THIS FILE TO GIT."
+	# rm -f duotang-sandbox.html
+	rm -f duotangGSD.html
+	echo "duotangbuilt" > $checkPointFile
+	exit 1
+fi
 
 echo "cleanup" > $checkPointFile
 
@@ -503,7 +508,7 @@ if [ "$CLEAN" = "YES" ]; then
 	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/$datestamp
-	cp ${data_dir}/GSDMetadataCleaned.tsv.gz ${data_dir}/$datestamp
+	cp ${data_dir}/gsd.metadata.tsv.gz ${data_dir}/$datestamp
 	tar -cvf - ${data_dir}/$datestamp | xz -9 - > update.$datestamp.tar.xz
 	rm -rf ${data_dir}/$datestamp
 fi

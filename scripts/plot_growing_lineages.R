@@ -60,7 +60,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
     colScale=scale_colour_manual(name="sequence_count",values=couleur)
     d$lineage = factor(d$lineage, levels=d[order(d$sel_coeff),]$lineage)
     
-    maxdate=max((meta %>%  filter(province %in% get.province.list(r[[1]]$region)))$sample_collection_date)
+    maxdate=max((meta %>%  filter(province %in% get.province.list(r[[1]]$region)))$sample_collection_date, na.rm=T)
     title=paste("Most recent sequence date:",format(maxdate, "%B %d, %Y"))
     
     if (class(coefficientTable) == "data.frame" ){

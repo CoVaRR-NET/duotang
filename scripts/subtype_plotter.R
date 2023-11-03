@@ -99,14 +99,14 @@ plot.subvariants <- function(region='Canada', sublineage,
 #' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants.ggplot <- function(region='Canada', sublineage, 
                              scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
-  #sublineage <- set
-  #region = 'Canada'
-  #scaled=FALSE
-  #col=NA
-  #mindate=mindate
-  #maxdate=maxdate
+  # sublineage <- set
+  # region = 'Canada'
+  # scaled=FALSE
+  # col=NA
+  # mindate=mindate
+  # maxdate=maxdate
   if(is.na(maxdate)){
-    maxdate=max(meta$sample_collection_date)
+    maxdate=max(meta$sample_collection_date, na.rm = T)
   }
   if(is.na(mindate)){
     mindate=as.Date("2021-01-01")  
