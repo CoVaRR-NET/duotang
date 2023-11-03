@@ -24,6 +24,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
   }
   d$sel_coeff=as.numeric(d$sel_coeff)
   d$low_CI=as.numeric(d$low_CI)
+  d$low_CI[d$low_CI < 0] <- 0
   d$high_CI=as.numeric(d$high_CI)
   d$size=as.numeric(d$size)
   
