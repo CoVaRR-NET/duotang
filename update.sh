@@ -87,6 +87,10 @@ while [[ $# -gt 0 ]]; do
       DRYRUN="FAIL"
       shift # past argument
       ;;
+	--skiptrees)
+      SKIPTREE="YES"
+      shift # past argument
+      ;;
 	--help)
       HELPFLAG="YES"
       shift # past argument
@@ -133,6 +137,8 @@ if [ "$CLEAN" = "YES" ]; then CLEAN="YES"; else CLEAN="NO"; fi
 if [ "$DOWNLOADONLY" = "YES" ]; then DOWNLOADONLY="YES"; else DOWNLOADONLY="NO"; fi
 if [ "$INCLUDEGSD" = "YES" ]; then INCLUDEGSD="YES"; else INCLUDEGSD="NO"; fi
 if [ "$GITPUSH" = "YES" ]; then GITPUSH="YES"; else GITPUSH="NO"; fi
+if [ "$SKIPTREE" = "YES" ]; then SKIPTREE="YES"; else SKIPTREE="NO"; fi
+
 if [ "$LISTSTEPS" = "YES" ]; then 
 	echo "Available checkpoint steps are: "
 	echo $(cat update.sh | grep '^#.*:$' | sed 's/#//' | sed 's/://')
@@ -390,6 +396,11 @@ if [ "$INCLUDEGSD" = "YES" ]; then
 	cat ${data_dir}/pango_designation_alias_key.tsv ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv | awk 'NF==2{t[$1]=$2}NF!=2{rem=$7;split($7,p,".");if(p[1] in t){gsub(p[1] , t[p[1]], $7)}$7=rem" "$7;print}' | sed 's/lineage lineage/lineage raw_lineage/' | tr ' ' '\t' | sort -k2,2 > ${data_dir}/temp_metadatagisaid_beforecorrection.tsv
 
 	join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' |  gzip > ${data_dir}/GSDMetadataCleaned.tsv.gz
+	
+	echo -e "fasta_header_name\tsample_collection_date\tprovince\thost_age_bin\thost_gender\tlineage\traw_lineage\tsample_collected_by\tpurpose_of_sampling\tpurpose_of_sequencing" > gsd.metadata.tsv
+	zcat GSDMetadataCleaned.tsv.gz | grep -v "fasta_header_name" >> gsd.metadata.tsv
+	gzip -f gsd.metadata.tsv
+	
 fi
 
 if [ "$DOWNLOADONLY" = "YES" ]; then
@@ -398,61 +409,66 @@ if [ "$DOWNLOADONLY" = "YES" ]; then
 	exit 0
 fi
 
-echo "filterseq" > $checkPointFile
 
-#filterseq:
-#removes the recombinants
+if [ "$SKIPTREE" = "NO" ]; then 
+	echo "filterseq" > $checkPointFile
 
-echo "separating out the recombinants from the data..."
-python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "(^|.)X.." --keepregex "(^|.)X.."
+	#filterseq:
+	#removes the recombinants
 
-echo "alignseq" > $checkPointFile
+	echo "separating out the recombinants from the data..."
+	python3 ${scripts_dir}/extractSequences.py --infile ${data_dir}/virusseq.$datestamp.fasta.xz --metadata ${data_dir}/virusseq.metadata.csv.gz --outfile ${data_dir}/ --extractregex "(^|.)X.." --keepregex "(^|.)X.."
 
-#alignseq:
-echo "aligning sequences..."
+	echo "alignseq" > $checkPointFile
 
-#All Sequences
-python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
+	#alignseq:
+	echo "aligning sequences..."
 
-#selected recombinants
-for variant in `ls $data_dir/*regex*.fasta.xz`; do
-	name=${variant##*/}; 
-	name=${name%.*};
-	name=${name%.*};
-	name=`echo $name|cut -d '_' -f3-`;
-	echo $variant
-	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
-done
+	#All Sequences
+	python3 ${scripts_dir}/alignment.py ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/aligned_allSeqs --samplenum 3 --reffile resources/NC_045512.fa; 
 
-#non-recombinants
-python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 1  --reffile resources/NC_045512.fa; 
+	#selected recombinants
+	for variant in `ls $data_dir/*regex*.fasta.xz`; do
+		name=${variant##*/}; 
+		name=${name%.*};
+		name=${name%.*};
+		name=`echo $name|cut -d '_' -f3-`;
+		echo $variant
+		python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+	done
 
-echo "buildtree" > $checkPointFile
+	#non-recombinants
+	python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_remainder.fasta.xz ${data_dir}/SequenceMetadata_remainder.tsv.gz ${data_dir}/aligned_nonrecombinant --samplenum 1  --reffile resources/NC_045512.fa; 
 
-#buildtree:
-for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
-	echo $alignedFasta
-	iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
-done
-echo "cleantree" > $checkPointFile
+	echo "buildtree" > $checkPointFile
 
-#cleantree:
-echo "cleaning trees..."
+	#buildtree:
+	for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
+		echo $alignedFasta
+		iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
+	done
+	echo "cleantree" > $checkPointFile
 
-for treefile in `ls $data_dir/aligned_*.treefile`; do
-	name=${treefile%.*};
-	name=${name%.*};
-	recombString="recombinant"
-	keeproot="--keep-root"
-	if [[ "$name" == *"$recombString"* ]];then
-		keeproot=""
-	fi
-	echo $name
-	Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
-	treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
-	python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
-done
-python scripts/UpdateStatusManager.py --action set --key LastTreeUpdate --value $datestamp
+	#cleantree:
+	echo "cleaning trees..."
+
+	for treefile in `ls $data_dir/aligned_*.treefile`; do
+		name=${treefile%.*};
+		name=${name%.*};
+		recombString="recombinant"
+		keeproot="--keep-root"
+		if [[ "$name" == *"$recombString"* ]];then
+			keeproot=""
+		fi
+		echo $name
+		Rscript ${scripts_dir}/root2tip.R ${name}.fasta.treefile ${name}.rtt.nwk ${name}.dates.tsv; 
+		treetime --tree ${name}.rtt.nwk --dates ${name}.dates.tsv --clock-filter 0 --sequence-length 29903 $keeproot --outdir ${name}.treetime_dir;
+		python3 ${scripts_dir}/nex2nwk.py ${name}.treetime_dir/timetree.nexus ${name}.timetree.nwk;
+	done
+	python scripts/UpdateStatusManager.py --action set --key LastTreeUpdate --value $datestamp
+else
+	echo "Trees skipped"
+fi
 
 #python scripts/tooltipsadd.py 
 
@@ -472,24 +488,24 @@ echo "knitgsd" > $checkPointFile
 echo "encrypt" > $checkPointFile
 
 #encrypt:
-#if [ -f ".secret/sandbox" ]; then
-#    secret=`cat .secret/sandbox`
-#	python3 scripts/encrypt.py duotang-sandbox.html $secret
-#	python3 scripts/encrypt.py duotang-GSD.html $secret
+if [ -f ".secret/sandbox" ]; then
+   secret=`cat .secret/sandbox`
+	#python3 scripts/encrypt.py duotang-sandbox.html $secret
+	python3 scripts/encrypt.py duotangGSD.html $secret
 
-#	mv duotang-sandbox-protected.html duotang-sandbox.html
-#	mv duotang-GSD-protected.html duotang-GSD.html
+	# mv duotang-sandbox-protected.html duotang-sandbox.html
+	mv duotangGSD-protected.html duotangGSD.html
 
-#else
-#	echo ".secret file not found, unable to encrypt."
-#	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
-#	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
-#	echo "DO NOT ADD THIS FILE TO GIT."
-#	rm -f duotang-sandbox.html
-#	rm -f duotang-GSD.html
-#	echo "duotangbuilt" > $checkPointFile
-#	exit 1
-#fi
+else
+	echo ".secret file not found, unable to encrypt."
+	echo "Make a 'sandbox' text file in the .secret directory, put a password in it. "
+	echo "For example e.g. echo 'Hunter2' > .secret/sandbox"
+	echo "DO NOT ADD THIS FILE TO GIT."
+	# rm -f duotang-sandbox.html
+	rm -f duotangGSD.html
+	echo "duotangbuilt" > $checkPointFile
+	exit 1
+fi
 
 echo "cleanup" > $checkPointFile
 
@@ -503,7 +519,7 @@ if [ "$CLEAN" = "YES" ]; then
 	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/$datestamp
-	cp ${data_dir}/GSDMetadataCleaned.tsv.gz ${data_dir}/$datestamp
+	cp ${data_dir}/gsd.metadata.tsv.gz ${data_dir}/$datestamp
 	tar -cvf - ${data_dir}/$datestamp | xz -9 - > update.$datestamp.tar.xz
 	rm -rf ${data_dir}/$datestamp
 fi

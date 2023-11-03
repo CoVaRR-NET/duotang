@@ -66,6 +66,7 @@ if [ "$approveStatus" = "True" ]; then
 			fi
 			
 			#bash ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
+			lastTreeDate=`python scripts/UpdateStatusManager.py --action get --key LastTreeUpdate`
 			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush > update.log 2>&1
 
 			status=$( tail -n 1 update.log )
@@ -84,9 +85,11 @@ if [ "$approveStatus" = "True" ]; then
 					sleep 10
 					previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
 				done
-				previewURL="$previewURL/duotang.html"
+				previewURLBase="$previewURL/duotang.html"
+				previewURLGSD="$previewURL/duotangGSD.html"
 				#python scripts/duoli.py --message "Update complete, see PR branch $prLink"
-				echo -e "\n\nSee preview: $previewURL " >> ./whatsnew.send.md
+				echo -e "\n\nSee preview with VirusSeq data: $previewURLBase " >> ./whatsnew.send.md
+				echo -e "\n\nSee preview with GSD data: $previewURLGSD " >> ./whatsnew.send.md
 				threadts=`python scripts/duoli.py --messagefile ./whatsnew.send.md` # --file duotang.html` #--file duotang-sandbox.html --file duotang-GSD.htm
 				rm ./whatsnew.send.md
 				python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
@@ -96,7 +99,7 @@ if [ "$approveStatus" = "True" ]; then
 				python scripts/UpdateStatusManager.py --action set --key Rebuild --value 0
 				python scripts/UpdateStatusManager.py --action set --key Approved --value "False"
 				python scripts/UpdateStatusManager.py --action set --key LastUpdated --value $dateToUse
-				echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n* Update to VirusSeq Release $datestamp \n" > whatsnew.md
+				echo -e "Duotang update {updatedate}:  \n\nDetailed changes:\n* Update to VirusSeq Release $viralaidate2 \n" > whatsnew.md
 				git add DuotangUpdateStatus.json
 				git commit -m "update status json"
 				git push

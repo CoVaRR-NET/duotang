@@ -7,7 +7,10 @@ makepangolindico <- function(){
     raw=x[1]
     lin=x[2]
     fullname=sapply(list(strsplit(raw, "\\.")[[1]][1:(length(strsplit(raw, "\\.")[[1]])-length(strsplit(lin, "\\.")[[1]])+1)]), paste, collapse = ".")
-    c(surname=strsplit(lin, "\\.")[[1]][1],fullname=fullname)
+    p <- c(surname=strsplit(lin, "\\.")[[1]][1],fullname=fullname)
+    if (is.na(p["surname"]))
+    {print (x)}
+    return (p)
   }
   dico=as.data.frame(unique(t(sapply(as.data.frame(t(unique(meta[meta$raw_lineage!=meta$lineage,c("raw_lineage", "lineage")]))),getdef))))
   dico=dico[order(sapply(dico$fullname,nchar),decreasing=TRUE),]
