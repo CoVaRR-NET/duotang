@@ -7,7 +7,7 @@ author: "Pillar 6 - CAMEO, CoVaRR-Net"
 output:
   html_document:
     keep_md: true
-    self_contained: true
+    self_contained: false
     code_folding: hide
     theme: cerulean
     toc: true
