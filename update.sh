@@ -395,10 +395,10 @@ if [ "$INCLUDEGSD" = "YES" ]; then
 
 	cat ${data_dir}/pango_designation_alias_key.tsv ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv | awk 'NF==2{t[$1]=$2}NF!=2{rem=$7;split($7,p,".");if(p[1] in t){gsub(p[1] , t[p[1]], $7)}$7=rem" "$7;print}' | sed 's/lineage lineage/lineage raw_lineage/' | tr ' ' '\t' | sort -k2,2 > ${data_dir}/temp_metadatagisaid_beforecorrection.tsv
 
-	join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' |  gzip > ${data_dir}/GSDMetadataCleaned.tsv.gz
+	join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' > ${data_dir}/GSDMetadataCleaned.tsv
 	
 	echo -e "fasta_header_name\tsample_collection_date\tprovince\thost_age_bin\thost_gender\tlineage\traw_lineage\tsample_collected_by\tpurpose_of_sampling\tpurpose_of_sequencing" > gsd.metadata.tsv
-	zcat GSDMetadataCleaned.tsv.gz | grep -v "fasta_header_name" >> gsd.metadata.tsv
+	cat GSDMetadataCleaned.tsv.gz | grep -v "fasta_header_name" >> gsd.metadata.tsv
 	gzip -f gsd.metadata.tsv
 	
 fi
