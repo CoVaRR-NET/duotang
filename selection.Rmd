@@ -10,15 +10,14 @@ setAll=getAllStrictoLineages(meta)
 #sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 
-sublineages_XBB15  <- getStrictoSubLineages("XBB.1.5*",meta) #XBB1.5 variants
 sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_XBB15, sublineages_EG5)] #XBB Other
-
+sublineage_hv1 <- getStrictoSubLineages("HV.1*",meta)
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_EG5, sublineages_XBB15, sublineages_XBBOther)] #the rest
+sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_EG5, sublineage_hv1, sublineages_XBBOther)] #the rest
 
-reference <- sublineages_XBB15
+reference <- sublineages_EG5
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
@@ -27,9 +26,9 @@ reference <- sublineages_XBB15
 # col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
 
 # 
-mutants = list(sublineages_XBBOther, sublineages_EG5 ,sublineages_NonXBB)
-mutantNames = list("XBB.Other", "EG.5*","Non-XBB",  "XBB.1.5*") #
-col <- c("XBB.Other"=pal["XBB"], "EG.5*" = "#00eeff","Non-XBB*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineages_XBBOther, sublineage_hv1 ,sublineages_NonXBB)
+mutantNames = list("XBB.Other", "HV.1*","BA.2*",  "EG.5*") #
+col <- c("XBB.Other"=pal["XBB"], "HV.1*" = "#00eeff","BA.2*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
@@ -355,10 +354,6 @@ link = DisplayHTMLTableDownloadLink(dataDownload, "GrowingLineages")
 
 # Sublineages selection 
 
-## BA.2 and XBB sublineages {.tabset .tabset-fade}
-
-Here we show the trends of the various BA.2.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
-
 ```{r general settings for selection estimator BA.2, warning=FALSE, echo=FALSE, message=FALSE}
 #source("scripts/scanlineages.R")
 source("scripts/plot_selection_estimator.R")
@@ -372,7 +367,7 @@ plotIndividualSublineageSelection <- function(region, minimumSampleCount, parent
     if(!any(is.na(allparams[[i]]$fit)) && # fit not NA
        allparams[[i]]$region==region &&  #region is the same as what we want
        substr(allparams[[i]]$mut[[1]], nchar(allparams[[i]]$mut[[1]]), nchar(allparams[[i]]$mut[[1]]))!="*" && #is the same lineage
-       isSubLineage(parentalNodes,allparams[[i]]$mut[[1]])){ #is child lineage of parentalNodes 
+       isSubLineage(parentalNodes,allparams[[i]]$mut[[1]], excludeRecomb)){ #is child lineage of parentalNodes 
       if((allparams[[i]]$fit)$fit[["s1"]]>0 && sum(allparams[[i]]$toplot$n2)>minimumSampleCount){ #the numebr of samples are greater than the minimum we want.
           plotCounter <- plotCounter + 1
           #plot all the variants and save them to a named list
@@ -384,16 +379,53 @@ plotIndividualSublineageSelection <- function(region, minimumSampleCount, parent
 }
 
 #generate  selection variant plots for BA2 and BA5 variants for each province
+individualSublineageSelectionPlots.XBB <- list() 
 individualSublineageSelectionPlots.BA2 <- list() 
 individualSublineageSelectionPlots.BA5 <- list() 
+
 for (i in 1:length(all.regions$name)){
   minCount = ifelse(all.regions$shortname[[i]] == "Canada", 50, 20)
-  individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", enddate)
-  individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", enddate)
+  individualSublineageSelectionPlots.BA2[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.2*", enddate, excludeRecomb = T)
+  individualSublineageSelectionPlots.XBB[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "XBB*", enddate, excludeRecomb = F)
+  individualSublineageSelectionPlots.BA5[[all.regions$shortname[[i]]]] = plotIndividualSublineageSelection(region=all.regions$name[[i]], minCount, "BA.5*", enddate, excludeRecomb = T)
 }
 
 
 ```
+
+## XBB sublineages {.tabset .tabset-fade}
+
+Here we show the trends of the various XBB.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
+
+```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150}
+#prints the BA.2 plots
+apply(all.regions,1,function(reg){
+  cat("###", reg[["shortname"]], "\n")
+  n_min=20
+  if(reg[["name"]]=="Canada"){n_min=50}
+  cat("####",reg[["name"]],"\n","\n")
+  if (length(individualSublineageSelectionPlots.XBB[[reg[["shortname"]]]])>0){
+      i = 0
+      for (plot in individualSublineageSelectionPlots.XBB[[reg[["shortname"]]]]){
+        i = i + 1
+        if (i==4){
+          cat ("<P>")
+          cat("<details>")
+          cat ("<summary><b>Only the three most strongly selected variants are displayed. Click here to see the rest.</b></summary>")
+        }
+        print(plot$plot)
+      }
+      if (i>3){cat("</details>")}
+  }else{
+    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
+  }
+  cat("\n\n")})
+
+```
+
+## BA.2 sublineages {.tabset .tabset-fade}
+
+Here we show the trends of the various BA.2.\* sublineages over time, excluding any recombinants, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
 
 ```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150}
 #prints the BA.2 plots
