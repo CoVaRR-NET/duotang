@@ -77,9 +77,9 @@ for (i in 1:length(all.regions$name)){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a reference lineage (`r individualSelectionPlotReference[[1]]`) previously common in Canada (see the methods for more details about selection and how it is estimated).
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale: `r mutantNames[-length(mutantNames)]`; fine scale: `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages rising in frequency are the XBB.* group. This group was previously dominated by the XBB.1.5* lineages, which peaked in April 2023. A variety of other XBB* have been spreading since, and we now track the frequencies of `r mutantNames[-length(mutantNames)]`. See Fastest Growing Lineages for details on lineages showing positive selection.
+Currently, the major group of Omicron lineages circulating are XBB.\* variants, including EG.5* and HV.1\*, as well as BA.2\* variants, particularly BA.2.86 and descendants. At the broad scale, we now track the frequencies of EG.5.\* (excluding HV.1\*), HV.1\*, XBB.Other, and BA.2\*. At the fine scale, we look at each named lineage against the reference variant EG.5.1.1 in the Fastest Growing Lineages section.
 
 Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
@@ -243,7 +243,7 @@ apply(all.regions,1,function(reg){
 
 # Fastest growing lineages {.tabset .tabset-fade}
 
-Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants, like `r individualSelectionPlotReference[[1]]`.1). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
 
 ```{r getCoefficientTable, echo = F, warning=FALSE, message=FALSE}
 source("scripts/plot_growing_lineages.R")
