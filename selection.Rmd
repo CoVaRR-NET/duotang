@@ -77,9 +77,9 @@ for (i in 1:length(all.regions$name)){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale: `r mutantNames[-length(mutantNames)]`; fine scale: `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
+Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale: `r mutantNames[length(mutantNames)]`; and in the Fastest Growing Lineages section, at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages circulating are XBB.\* variants, including EG.5* and HV.1\*, as well as BA.2\* variants, particularly BA.2.86 and descendants. At the broad scale, we now track the frequencies of EG.5.\* (excluding HV.1\*), HV.1\*, XBB.Other, and BA.2\*. At the fine scale, we look at each named lineage against the reference variant EG.5.1.1 in the Fastest Growing Lineages section.
+Currently, the major group of Omicron lineages circulating are XBB.\* variants, including EG.5* and HV.1\*, as well as BA.2\* variants, particularly BA.2.86 and descendants. At the broad scale, we now track the frequencies of EG.5.\* (excluding HV.1\*), HV.1\*, XBB.Other, and BA.2\*. 
 
 Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
