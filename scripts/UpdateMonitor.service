@@ -166,7 +166,7 @@ else
 	
 	#logic for checking if PR is closed and thus should run an archive update.
 	prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
-	prStatus=$(gh pr view $prLink | grep -i -E -w "state.*merged")
+	prStatus=$(gh pr view $prLink | grep -i -E -w "(state.*merged|state.*losed)")
 	if [ -z "$prStatus" ]; then
 		  echo "PR still open"
 	else
