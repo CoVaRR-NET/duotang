@@ -1053,7 +1053,10 @@ JN.6	Alias of B.1.1.529.2.86.1.6, S:V193L
 JN.7	Alias of B.1.1.529.2.86.1.7, S:G594S, Denmark
 JN.8	Alias of B.1.1.529.2.86.1.8, S:T299I, Sweden/Denmark
 JN.9	Alias of B.1.1.529.2.86.1.9, S:M1229I, Netherlands
+<<<<<<< Updated upstream
 JN.10	Alias of B.1.1.529.2.86.1.10, S:A475V, on T3565C branch with JN.1, Spain/France
+=======
+>>>>>>> Stashed changes
 BA.2.86.2	Alias of B.1.1.529.2.86.2, ORF7a:E22D, South Africa/Botswana，from sars-cov-2-variants/lineage-proposals/issues/756
 BA.2.86.3	Alias of B.1.1.529.2.86.3, C222T, C1960T, T12775C, South Africa
 JQ.1	Alias of B.1.1.529.2.86.3.1, S:T95I, Denmark/France/South Africa, from sars-cov-2-variants/lineage-proposals#906
@@ -3608,7 +3611,10 @@ XDA	Recombinant lineage of XBB.1.16, HN.5 (breakpoint 22102-22927), from sars-co
 XDB	Recombinant lineage of XBB.1.16.19, non-XBB.1.16/EG.5/XBB.2.3 XBB (breakpoint ~28000, depending on donor), Indonesia, from sars-cov-2-variants/lineage-proposals#969
 XDC	Recombinant lineage of HK.3, XBB.1.16 (breakpoint 22996-27506), China/Singapore, from sars-cov-2-variants/lineage-proposals#902
 XDD	Recombinant lineage of EG.5.1.1, JN.1, EG.5.1.1 (breakpoints at 6541-7842 and 25416-26270), USA/France/Spain, from sars-cov-2-variants/lineage-proposals#1024
+<<<<<<< Updated upstream
 XDE	Recombinant lineage of GW.5.1 and FL.13.4 (breakpoint at 24034-24046), Pakistan, from #2352
+=======
+>>>>>>> Stashed changes
 *A.2.1	Withdrawn: Lineage with sequences predominantly from Panama
 *A.8	Withdrawn: Indian lineage merged with A.9
 *A.10	Withdrawn: Spanish lineage reassigned to A.5
