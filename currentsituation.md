@@ -1,10 +1,14 @@
 
 
-<u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with S:452R) is estimated to be the most prevalent variant now in all regions of Canada, <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) is showing notable growth internationally with a slight selection advantage compared to <u id='HV_1'>HV.1</u> but is currently at low numbers in Canada.
+<u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with S:452R) is estimated to be the most prevalent variant now in most regions of Canada.
 
 
 
-Multiple variant lineages have independently obtained the two mutations S:F456L and S:L455F (“FLip” mutations) that may confer more immune evasion), but are not showing as much growth at this time as <u id='HV_1'>HV.1</u>.
+Multiple variant lineages have independently obtained the two mutations S:F456L and S:L455F (“FLip” mutations) that may confer more immune evasion, such as <u id='EG_5_1'>EG.5.1</u> descendants <u id='HK_3'>HK.3</u> and <u id='JG_3'>JG.3</u>. They are not the fastest growing variants, but collectively they make up over approximately a third of recent samples.
+
+
+
+<u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) is showing notable growth internationally with a selection advantage compared to <u id='HV_1'>HV.1</u>. It is still currently at low numbers in Canada but is now showing notable growth nationally.
 
 
 
