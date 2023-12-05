@@ -514,7 +514,7 @@ plotIndividualSelectionPlots.ggplot <- function(plotparam, maxdate, col=c('red',
     geom_point(data = plotData, mapping = aes(x = date, y=p,  fill = variable), pch=21, color = "black", alpha=0.7, size = sqrt(plotData$value)/4) +
     #scale_fill_manual(label = c(levels(plotData$variable)), c(col))  +
     xlab("Sample collection date") +
-    ylab(paste0("growth advantage (s% per day) \nrelative to", variantRef, " (stricto) in ", plotparam$region)) + 
+    ylab(paste0("growth advantage (s% per day) \nrelative to ", variantRef, " (stricto) in ", plotparam$region)) + 
     ylim(0,1) +
     xlim(min(plotData$date), maxdate)
   
