@@ -32,3 +32,7 @@ duotang-GSD_files
 updatemonitor.log
 duotang*.md
 rebuild.log
+gsd.metadata.tsv
+gsd.metadata.tsv.gz
+updatemonitor.log.gz
+whatsnew.send.md
