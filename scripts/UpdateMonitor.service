@@ -91,9 +91,15 @@ if [ "$approveStatus" = "True" ]; then
 				python scripts/UpdateStatusManager.py --action set --key PRLink --value $prLink
 				sleep 5
 				previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+				waitAttempt=0
 				while [[ ! "$previewURL" =~ "http" ]]; do
 					sleep 10
 					previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+					((waitAttempt++))
+					if [ "$waitAttempt" -eq 20 ]; then
+						previewURL="Unable to fetch preview URL, Cloudflare deployment likely failed. Check Github."
+						break
+					fi
 				done
 				previewURLBase="$previewURL/duotang.html"
 				previewURLGSD="$previewURL/duotangGSD.html"
@@ -139,7 +145,7 @@ else
 		git pull --recurse-submodules
 		dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
 		#python scripts/tooltipsadd.py
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang > rebuild.log 2>&1
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitgsd > rebuild.log 2>&1
 		python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
 		status=$( tail -n 1 rebuild.log )
 		echo $status
@@ -147,9 +153,15 @@ else
 			prLink=`python scripts/UpdateStatusManager.py --action get --key PRLink`
 			sleep 5
 			previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+			waitAttempt=0
 			while [[ ! "$previewURL" =~ "http" ]]; do
 				sleep 10
 				previewURL=`wget -O - -o /dev/null $prLink | grep "Preview URL" -A 1 | tail -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1`
+				((waitAttempt++))
+				if [ "$waitAttempt" -eq 20 ]; then
+					previewURL="Unable to fetch preview URL, Cloudflare deployment likely failed. Check Github."
+					break
+				fi
 			done
 			previewURL="$previewURL/duotang.html"
 			python scripts/duoli.py --message "Update complete, here's the dev preview: $previewURL" --thread $threadts
