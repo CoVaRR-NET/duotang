@@ -215,7 +215,7 @@ htmltools::tagList(ggplotly(ggplot()))
 
 ### Survey request
 
-Doutang, VirusSeq Data portal, and Viral AI would like to improve your user experience. Please take a few minutes to respond to [this survey](https://forms.gle/F63za7dgQCrF2YMi7).
+Duotang, VirusSeq Data portal, and Viral AI would like to improve your user experience. Please take a few minutes to respond to [this survey](https://forms.gle/F63za7dgQCrF2YMi7).
 
 ### Contributing authors:  
 
