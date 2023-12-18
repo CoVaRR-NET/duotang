@@ -17,6 +17,7 @@ else
 	exit
 fi
 
+gh pr list --state closed --limit 1000 | grep "Update:" | grep "MERGED" | cut -f5 | cut -d' ' -f1 > prHistoryDates.txt
 #pull all commits with changes to duotang.html
 git log --pretty=%ad,%H --date=short --name-only -- duotang.html | tr ':' '_'> commitHistory.txt
 #remove empty lines
@@ -28,13 +29,27 @@ sed -i '/data_needed/d' commitHistory2.txt
 
 tac commitHistory2.txt > commitHistory.txt
 
+mapfile -t dates < prHistoryDates.txt
+
+while IFS=, read -r date hash name || [ -n "$date" ]; do
+    # Check if the date is in the array from the second file
+    if [[ " ${dates[*]} " == *" $date "* ]]; then
+        # Print or process the matching line from the first file
+        echo "$date,$hash,$name"
+    fi
+done < commitHistory.txt > commitHistory2.txt
+
+tac commitHistory2.txt | sort -t',' -k1,1 -u | tac > commitHistory.txt
+
+#awk -F',' '!seen[$1]++' "commitHistory.txt" > commitHistory.txt
+
 lastestArchiveDate=$(ls archive/ | grep -v "readme.md" | tac | head -1)
 echo $lastestArchiveDate
 lastestArchiveDate=$(date -d $lastestArchiveDate +%s) || lastestArchiveDate=0
 lastDate=1
 
 mkdir -p archive
-echo "Here we store old versions of the duotang notebook:" > archive/readme.md
+#echo "Here we store old versions of the duotang notebook:" > archive/readme.md
 #recreate the duotang.html file from each commit and save it
 for i in `cat commitHistory.txt | sed '1!G;h;$!d'`; do
 	echo $i;
@@ -55,7 +70,8 @@ for i in `cat commitHistory.txt | sed '1!G;h;$!d'`; do
 			git show $id:$name > archive/$commit/$commit.html
 			if [ -s archive/$commit/$commit.html ]; then
 				# echo the hyperlink to the readme
-				echo "- [$date](./$commit/$commit.html)" >> archive/readme.md
+				#echo "- [$date](./$commit/$commit.html)" >> archive/readme.md
+				sed -i "2i- [$date](./$commit/$commit.html)" archive/readme.md
 				for j in `git ls-tree --name-only -r $id | grep duotang_files`; do #pull all the files in the duotang_files folder
 					path=`dirname $j`
 					#echo $j
@@ -78,7 +94,7 @@ for i in `cat commitHistory.txt | sed '1!G;h;$!d'`; do
 		fi
 		
 	else
-		echo "- [$date](./$commit/$commit.html)" >> archive/readme.md #echo the link into the read me because we cleared it.
+		#echo "- [$date](./$commit/$commit.html)" >> archive/readme.md #echo the link into the read me because we cleared it.
 		echo "commit was before that latest archive date, delete the archive folder to rebuild."
 		
 	fi   
@@ -89,3 +105,4 @@ uniq archive/readme.md > archive/readme2.md
 mv archive/readme2.md archive/readme.md
 rm commitHistory.txt
 rm commitHistory2.txt
+rm prHistoryDates.txt
