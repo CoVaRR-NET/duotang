@@ -145,14 +145,13 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   epi <- epidataCANall[epidataCANall$prname==region, ] %>% dplyr::select(date, numtotal_last7) %>% mutate(date=floor_date(as.Date(date), "weeks", week_start = 1))
   tab <- tab %>% left_join(epi, by=c("Date"="date")) 
   #coefficient used to scale the total case so that it fits into the same graph. 
-  coeff <- max(tab$numtotal_last7) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
-  tab <- tab %>% mutate(numtotal_last7 = round(numtotal_last7/coeff,0)) 
-  totalCaseColName <- paste0("TotalCases(x",round(coeff,0),")")
-  colnames(tab) <- c("Lineage", "Date", "Frequency", "Color", totalCaseColName)
+  #coeff <- max(tab$numtotal_last7) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
+  #tab <- tab %>% mutate(numtotal_last7 = round(numtotal_last7/coeff,0)) 
+  #totalCaseColName <- paste0("TotalCases(x",round(coeff,0),")")
+  #colnames(tab) <- c("Lineage", "Date", "Frequency", "Color", totalCaseColName)
   #secondary y axis scaling coefficient
-  coeff <- max(tab$TotalCases) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
+  #coeff <- max(tab$TotalCases) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
   tab <- tab %>% left_join((tab %>% group_by(Date) %>% summarize(total = sum(Frequency))), by="Date") %>%  mutate(`% Frequency` = paste0(round((100* Frequency/ total),0),"%"))
-  #view(tab)
   
   #sort the legend by sum of total value in desc order
   Legend_Order <- tab %>% group_by(Lineage) %>% summarise(n=sum(Frequency)) %>% arrange(desc(n)) %>% dplyr::select(Lineage) %>% unlist() %>% as.vector()
@@ -174,7 +173,7 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
 absolute<- ggplot() + 
     geom_bar(data=tab, mapping = aes(x = Date, y=Frequency,  fill = Lineage), position="stack", stat="identity") + 
     scale_fill_manual(name = "Lineages", values = cols) +
-    geom_line(data=tab, mapping=aes(x=Date, y=.data[[totalCaseColName]]), color="grey") + 
+    #geom_line(data=tab, mapping=aes(x=Date, y=.data[[totalCaseColName]]), color="grey") + 
     scale_x_date(date_breaks = "1 month", label=scales::date_format("%b %Y"), limits = c(min(tab$Date), max = max(tab$Date)))+
     scale_y_continuous(name = "Sequenced cases per week", sec.axis = sec_axis(~., name="Total cases per week", breaks = scales::pretty_breaks(n=6))) +
     #ylab("Sequences cases per week \n(fraction)") +
