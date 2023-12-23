@@ -339,7 +339,7 @@ for (i in 1:length(all.regions[["name"]])) {
 ```
 
 ```{r overview of the selection estimator table, echo=FALSE}
-dataDownload <- coefficientTable %>% mutate(sel_coeff = sel_coeff / 100)  %>% mutate(low_CI = low_CI / 100)  %>% mutate(high_CI = high_CI / 100)  %>% mutate(reference=ifelse(grepl("\\*", lineage), individualSelectionPlotReference[[1]], mutantNames[length(mutantNames)]))
+dataDownload <- coefficientTable %>% mutate(sel_coeff = sel_coeff / 100)  %>% mutate(low_CI = low_CI / 100)  %>% mutate(high_CI = high_CI / 100)  %>% mutate(reference=ifelse(grepl("\\*", lineage), individualSelectionPlotReference[[1]], mutantNames[[length(mutantNames)]]))
 
 link = DisplayHTMLTableDownloadLink(dataDownload, "GrowingLineages")
 #DisplayHTMLTable(plot_growing_lineage(paramselected,makeplot=FALSE))
