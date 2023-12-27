@@ -1,8 +1,10 @@
-HV.1, and other variants with additional immune evasive mutations like <u id='HK_3'>HK.3</u> and <u id='JG_3'>JG.3</u> are still quite prevalent, however <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) is showing by far the most rapid growth. It is expected to start having more of an impact this month. <u id='JN_1'>JN.1</u> subvariants with additional potential immune evasive mutations are among the variants being closely tracked.
+
+
+<u id='HV_1'>HV.1</u>, and other variants with additional immune evasive mutations like <u id='HK_3'>HK.3</u> and <u id='JG_3'>JG.3</u> are still quite prevalent, however <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) is still showing by far the most rapid growth. It is expected to start having more of an impact soon. <u id='JN_1'>JN.1</u> subvariants with additional potential immune evasive mutations are among the variants being closely tracked.
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (Bold only denotes changes since the last Duotang release - not necessarily those of greatest interest)::
+Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (Bold only denotes changes since the last Duotang release - not necessarily those of greatest interest):
 
 
 
@@ -24,14 +26,12 @@ Plus other mutations identified through deep mutation scanning and the SARS-CoV-
 
 
 
-* https://jbloomlab.github.io/SARS2-RBD-escape-calc/
-* Greaney, Starr, & Bloom, Virus Evolution, 8:veac021 (2022)
+* <https://jbloomlab.github.io/SARS2-RBD-escape-calc/>
+* Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
 * Cao et al, Nature, 614:521-529 (2023)
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
 
 With thanks to the global team of variant hunters which play a key role in identifying new variants of note.
-
-
 
 
 <!-- edited -->
