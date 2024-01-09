@@ -24,7 +24,7 @@ if __name__ == '__main__':
     data_connect_client = client.get_data_connect_client(collection_name)
 
     # Dowload fasta files information
-    query = "SELECT * FROM viralai.virusseq.files WHERE NAME LIKE '%multifasta_compressed%'"
+    query = "SELECT * FROM viralai.virusseq.files WHERE NAME LIKE 'CanCOGeN/multifasta_compressed/%'"
     seq_df = pd.DataFrame(data_connect_client.query(query))
     seq_df = seq_df.sort_values(by='created_time', ascending=False)
     seq_df.head(1).to_csv(args.seq, encoding='utf-8', index=False, sep='\t', header=False, columns=["drs_url"])
