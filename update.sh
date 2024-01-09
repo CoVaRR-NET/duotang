@@ -540,7 +540,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	cp data_needed/virusseq.$datestamp.fasta.xz data_needed/virusseq.fasta.xz
 	git status
 	git add -f data_needed/*.nwk
-	git add -f data_needed/virusseq.metadata.csv.gz
+	#git add -f data_needed/virusseq.metadata.csv.gz #removed because the file size is getting too big. 
 	git add -f data_needed/AgeCaseCount*
 	git add -f data_needed/CanadianEpiData.csv
 	git add -f data_needed/lineageNotes.tsv
