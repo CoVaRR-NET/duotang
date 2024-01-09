@@ -371,8 +371,8 @@ echo "epidata" > $checkPointFile
 wget -O ${data_dir}/AgeCaseCountQC.csv https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648 || rm -f AgeCaseCountQC.csv
 #wget -O ${data_dir}/AgeCaseCountSK.csv https://dashboard.saskatchewan.ca/export/cases/4565.csv || rm AgeCaseCountON.csv
 #wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-ageGender.csv || rm -f AgeCaseCountCAN.csv
-#wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f AgeCaseCountCAN.csv
-#wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f CanadianEpiData.csv
+wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f AgeCaseCountCAN.csv
+wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f CanadianEpiData.csv
 
 gzip -f ${data_dir}/AgeCaseCount*.csv
 
