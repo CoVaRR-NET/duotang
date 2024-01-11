@@ -602,4 +602,4 @@ generateAllParams <- function(region, startdate, reference, mutants, startpar, m
   return(list(toplot=est$toplot,fit=fit,mut=mutants,ref=reference, region=region))
 }
 
-t<-generateAllParams("a",startdate,"a","a","a","a")
+#t<-generateAllParams("a",startdate,"a","a","a","a")
