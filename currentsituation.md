@@ -18,9 +18,15 @@ JN.1 (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) has c
 * S:572I which is thought to increase ACE2 receptor enhance binding.
 * Other mutations identified through mutation scanning that are involved in binding or immune evasion (like S:346T). See:
 
---Greaney, Starr, & Bloom, Virus Evolution, 8:veac021 (2022)\n--Cao et al, Nature, 614:521-529 (2023)\n--Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)\n--Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)\n--Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
+--Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
 
+--Cao et al, Nature, 614:521-529 (2023)
 
+--Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
+
+--Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
+
+--Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
 
 With thanks to the global team of variant hunters, and other SARS-CoV-2 genome analysis tool providers (see List of Useful Tools below), which play a key role in identifying new variants of note.
 
