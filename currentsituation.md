@@ -1,4 +1,6 @@
-JN.1 (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) has continued to grow in proportion of variants and now is the most prevalent variant in most regions. <u id='JN_1'>JN.1</u> subvariants are being closely tracked, including <u id='JN_1_5'>JN.1.5</u> (which has NSP13:V348T and is showing potentially notable growth internationally) and others with additional proposed ACE2 receptor binding enhancing mutations like S:572I (obtained independently multiple times) and immune evasive mutations like S:346T.
+
+
+<u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) has continued to grow in proportion of variants and now is the most prevalent variant in most regions. <u id='JN_1'>JN.1</u> subvariants are being closely tracked, including <u id='JN_1_5'>JN.1.5</u> (which has NSP13:V348T and is showing potentially notable growth internationally) and others with additional proposed ACE2 receptor binding enhancing mutations like S:572I (obtained independently multiple times) and immune evasive mutations like S:346T.
 
 
 
@@ -18,15 +20,19 @@ JN.1 (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) has c
 * S:572I which is thought to increase ACE2 receptor enhance binding.
 * Other mutations identified through mutation scanning that are involved in binding or immune evasion (like S:346T). See:
 
---Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
+--Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)\
 
---Cao et al, Nature, 614:521-529 (2023)
+--Cao et al, Nature, 614:521-529 (2023)\
 
---Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
+--Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)\
 
---Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
+--Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)\
 
 --Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
+
+
+
+
 
 With thanks to the global team of variant hunters, and other SARS-CoV-2 genome analysis tool providers (see List of Useful Tools below), which play a key role in identifying new variants of note.
 
