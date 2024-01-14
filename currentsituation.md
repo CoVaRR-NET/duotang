@@ -21,7 +21,7 @@
 
 * NSP13:V348T (also known as ORF1b:V1273T - a rare two-nucleotide mutation that is TRS-related. See the excellent summary by Ryan Hisner at <https://twitter.com/LongDesertTrain/status/1745578135033110737>)
 * S:683W and other furin cleavage site mutations that may impact/reduce disease severity.
-* S:572I which is thought to increase ACE2 receptor enhance binding.
+* S:572I which is thought to increase ACE2 receptor binding.
 
 Plus other mutations identified through mutation scanning that are involved in binding or immune evasion (like S:346T). See:
 
