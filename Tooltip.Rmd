@@ -3,8 +3,8 @@
 
 
 ```{r, echo=FALSE}
-tippy::tippy_this(elementId = "JN_1", tooltip = "Ancestor:BA.2.86.1//503 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1, S:L455S, ORF1a:R3821K, ORF7b:F19L, Europe")
-tippy::tippy_this(elementId = "BA_2_86_1", tooltip = "Ancestor:BA.2.86//136 samples in last 120 days.//Alias of B.1.1.529.2.86.1, ORF1a:K1973R, mostly with C12815T, mainly Europe, from #2236")
+tippy::tippy_this(elementId = "JN_1", tooltip = "Ancestor:BA.2.86.1//594 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1, S:L455S, ORF1a:R3821K, ORF7b:F19L, Europe")
+tippy::tippy_this(elementId = "BA_2_86_1", tooltip = "Ancestor:BA.2.86//143 samples in last 120 days.//Alias of B.1.1.529.2.86.1, ORF1a:K1973R, mostly with C12815T, mainly Europe, from #2236")
 tippy::tippy_this(elementId = "JN_1_5", tooltip = "Ancestor:JN.1//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.5, ORF1b:V1271T, Singapore/Malaysia/Indonesia, from #2419")
 tippy::tippy_this(elementId = "JN_1_7", tooltip = "Ancestor:JN.1//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.7, S:T572I, S:E1150D, USA/France")
 tippy::tippy_this(elementId = "JN_1_6_1", tooltip = "Ancestor:JN.1.6//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.6.1, S:R346T, Sweden")
