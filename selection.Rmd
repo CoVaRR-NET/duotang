@@ -143,6 +143,10 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   #populate a column with reporting accuracy (Accurate | UnderReported])
   caseCountData$report_type <- "Accurate"
   caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
+  caseCountData$n <- ifelse((caseCountData$n)<1, 1, caseCountData$n) #populate empty cells with 1 because we have to log10 it later
+  caseCountData$n <- as.numeric(caseCountData$n) #convert the column to numeric type. For some reason, as of Jan 08, 2024, this column is parsed as character.
+
+  
   #construct a spline fit for the accurate case counts only
   caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))
   #extract the y-values for the fit

@@ -202,7 +202,6 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
   #melt the DF for plotting
   d <- countData %>% melt(id = c("Reported_Date", "n", "CaseCount", "report_type", "type")) %>% 
     mutate(variable = str_replace(variable, "The Rest", paste0(mutantNames[[length(mutantNames)]], " (Reference)")))
-
     #sort the order of the mutants according to the order variable. If not defined, sort alphabetically.
   if (length(order) > 0){
     d$variable <- factor(d$variable , levels=c(order[length(order)], order[1:length(order)-1] ))
@@ -223,6 +222,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
   lastDayAccurate <- d %>% filter(report_type == "Accurate") %>% filter(Reported_Date == max(Reported_Date)) %>% mutate(report_type="UnderReported")
   lastDayAccurate$value=NA
   d <- rbind(d, lastDayActual) %>% rbind(lastDayAccurate)
+  
   d$n <- (d$n*100000)/population
   d$value <- (d$value*100000)/population
   d$CaseCount <- (d$CaseCount*100000)/population

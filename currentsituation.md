@@ -1,37 +1,39 @@
 
 
-<u id='HV_1'>HV.1</u>, and other variants with additional immune evasive mutations like <u id='HK_3'>HK.3</u> and <u id='JG_3'>JG.3</u> are still quite prevalent, however <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) is still showing by far the most rapid growth. It is expected to start having more of an impact soon. <u id='JN_1'>JN.1</u> subvariants with additional potential immune evasive mutations are among the variants being closely tracked.
+<u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S) has continued to grow in proportion of variants and now is the most prevalent variant in most regions. <u id='JN_1'>JN.1</u> subvariants are being closely tracked, including <u id='JN_1_5'>JN.1.5</u> (which has NSP13:V348T and is showing potentially notable growth internationally) and others with additional proposed ACE2 receptor binding enhancing mutations like S:572I (obtained independently multiple times) and immune evasive mutations like S:346T.
 
 
 
-Variants of current interest, due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries (Bold only denotes changes since the last Duotang release - not necessarily those of greatest interest):
+**Variants of current interest:**
+
+(Due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries. Note this has been significantly revised from the last update, with few noted due to the current success of <u id='JN_1'>JN.1</u>)
 
 
 
-* <u id='DV_7_1'>DV.7.1</u> (<u id='CH_1_1'>CH.1.1</u> subvariant with S:F456L and S:L455F, with an interest in those with also S:452R)
-* <u id='HK_3'>HK.3</u> (<u id='EG_5_1_1'>EG.5.1.1</u> with with S:F456L and S:L455F)
-* <u id='HV_1'>HV.1</u> (<u id='EG_5_1_6'>EG.5.1.6</u> with also S:452R - a mutation which may confer a transmission advantage)
-* <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S)
+* <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S - still showing notable growth in Canada).
+* <u id='JN_1_5'>JN.1.5</u> (<u id='JN_1'>JN.1</u> with NSP13:V348T, also known as ORF1b:V1273T, with just a few cases in Canada to date, but notable growth in some regions internationally).
+* <u id='JN_1_7'>JN.1.7</u> (<u id='JN_1'>JN.1</u> with S:T572I and S:E1150D, or others with S:T572I)
+* <u id='JN_1_6_1'>JN.1.6.1</u> (<u id='JN_1_6'>JN.1.6</u> with S:R346T, and other variants with immune evasive mutations like S:R346T)
 
 …plus any highly divergent variants and sublineages with additional combinations of the mutations below.
 
 
 
-* S:L452R (in variant <u id='HV_1'>HV.1</u> which is growing. It potentially conferred a transmission advantage in past variants)
-* S:L455F (Immune evasive mutation of particular note if present with S:F456L)
-* S:L455S (Immune evasive mutation of particular note in <u id='BA_2_86_1'>BA.2.86.1</u> subvariants/<u id='JN_1'>JN.1</u>)
-* S:475V (including in lineages classified as <u id='XBB_1_5'>XBB.1.5</u>, plus <u id='FL_15_1_1'>FL.15.1.1</u>/<u id='FL_15'>FL.15</u>, <u id='GK_3_1'>GK.3.1</u>)
+* NSP13:V348T (also known as ORF1b:V1273T - a rare two-nucleotide mutation that is TRS-related. See the excellent summary by Ryan Hisner at <https://twitter.com/LongDesertTrain/status/1745578135033110737>)
+* S:683W and other furin cleavage site mutations that may impact/reduce disease severity.
+* S:572I which is thought to increase ACE2 receptor binding.
 
-Plus other mutations identified through deep mutation scanning and the SARS-CoV-2 RBD antibody escape calculator. See:
-
+Plus other mutations identified through mutation scanning that are involved in binding or immune evasion (like S:346T). See:
 
 
-* <https://jbloomlab.github.io/SARS2-RBD-escape-calc/>
+
 * Greaney, Starr, &amp; Bloom, Virus Evolution, 8:veac021 (2022)
 * Cao et al, Nature, 614:521-529 (2023)
 * Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
+* Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
+* Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
 
-With thanks to the global team of variant hunters which play a key role in identifying new variants of note.
+With thanks to the global team of variant hunters, and other SARS-CoV-2 genome analysis tool providers (see List of Useful Tools below), which play a key role in identifying new variants of note.
 
 
 <!-- edited -->
