@@ -27,7 +27,7 @@ reference = sublineage_hv1
 
 # 
 mutants = list(sublineages_XBBOther, sublineage_jn1 ,sublineages_NonXBB)
-mutantNames = list("XBB.Other", "JN.1*","BA.2.Other",  "HV.*") #
+mutantNames = list("XBB.Other", "JN.1*","BA.2.Other",  "HV.1*") #
 col <- c("XBB.Other"=pal["XBB"], "JN.1*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
@@ -105,10 +105,10 @@ apply(all.regions,1,function(reg){
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
     #uncomment these to pring the error msg instead of some generic error
-   {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
-     print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
-  # {print(getEmptyErrorPlotWithMessage("Not enough data available."))
-  #   print(getEmptyErrorPlotWithMessage("Not enough data available."))}
+   # {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
+   #   print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
+  {print(getEmptyErrorPlotWithMessage("Not enough data available."))
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))}
   else {
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
