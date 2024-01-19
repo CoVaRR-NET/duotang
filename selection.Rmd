@@ -288,7 +288,6 @@ selectparam <- function(p,reg){
 
 
 for (i in 1:length(all.regions[["name"]])) {
-   i=1
   cat("###", all.regions[['shortname']][[i]], "\n")
   if (all.regions[['name']][[i]] == "Canada"){
       cat("#### Plot single lineages in", all.regions[['name']][[i]],"*\n","\n")
