@@ -27,7 +27,7 @@ reference = sublineage_hv1
 
 # 
 mutants = list(sublineages_XBBOther, sublineage_jn1 ,sublineages_NonXBB)
-mutantNames = list("XBB.Other", "JN.1*","BA.2.Other",  "HV.1*") #
+mutantNames = list("XBB.Other", "JN.1*","BA.2.Other",  "HV.*") #
 col <- c("XBB.Other"=pal["XBB"], "JN.1*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
@@ -42,7 +42,7 @@ if(length(reference)+length(Reduce(union,mutants)) -1 != length(setAll)){
   dupsInList <- combinedList[duplicated(combinedList)]
   view(combinedList)
   view(setAll)
-  stop("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
+  #stop("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
 }
 
 #wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
@@ -88,7 +88,7 @@ for (i in 1:length(all.regions$name)){
 
 Here we examine the relative rate of spread of the different sublineages of Omicron currently in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale: `r mutantNames[length(mutantNames)]`; and in the Fastest Growing Lineages section, at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of Omicron lineages circulating are XBB.\* variants, including EG.5* and HV.1\*, as well as BA.2\* variants, particularly BA.2.86 and descendants. At the broad scale, we now track the frequencies of EG.5.\* (excluding HV.1\*), HV.1\*, XBB.Other, and BA.2\*. 
+Currently, the major group of Omicron lineages circulating are XBB.\* variants, including HV.1\*, as well as BA.2\* variants, particularly JN.1 and other BA.2.86 descendants. At the broad scale, we now track the frequencies of HV.1\*, XBB.Other, JN.1 and and BA.2.Other. 
 
 Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
