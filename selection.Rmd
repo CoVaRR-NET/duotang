@@ -9,15 +9,15 @@ startpar <- list(p=c(0.2, 0.05, 0.01), s=c(0.05, 0.05, 0.01))
 setAll=getAllStrictoLineages(meta) 
 #sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
-
-sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
+#sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
 sublineage_hv1 <- getStrictoSubLineages("HV.1*",meta)
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
-
+sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)] #XBB Other
+#sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_EG5, sublineage_hv1, sublineages_XBBOther)] #the rest
+sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
+sublineages_NonXBB<-setAll[!setAll %in% c(sublineage_hv1, sublineages_XBBOther, sublineage_jn1)] #the rest
 
-reference <- sublineages_EG5
+reference = sublineage_hv1
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
@@ -26,13 +26,22 @@ reference <- sublineages_EG5
 # col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
 
 # 
-mutants = list(sublineages_XBBOther, sublineage_hv1 ,sublineages_NonXBB)
-mutantNames = list("XBB.Other", "HV.1*","BA.2*",  "EG.5*") #
-col <- c("XBB.Other"=pal["XBB"], "HV.1*" = "#00eeff","BA.2*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineages_XBBOther, sublineage_jn1 ,sublineages_NonXBB)
+mutantNames = list("XBB.Other", "JN.1*","BA.2.Other",  "HV.1*") #
+col <- c("XBB.Other"=pal["XBB"], "JN.1*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
-if(length(setAll)-length(reference)-length(Reduce(union,mutants)) + length(mutants) != 0){
+#//TODO, we need to subtract the number of root lineage names without numbers but with * (e.g. XBB*, HV*) from the total count. This arises as an artefact of the getStrictoSublineages() function. Modifying the function to remove this breaks the entire selection coefficient calculation loop. This subtraction need to be done dynamically and is usually equal to length(mutants). However, it's not always the case.. 
+if(length(reference)+length(Reduce(union,mutants)) -1 != length(setAll)){
+  print(length(setAll))
+  print(length(reference))
+  print(length(Reduce(union,mutants)))
+  print(length(mutants))
+  combinedList <- Reduce(union,mutants)
+  dupsInList <- combinedList[duplicated(combinedList)]
+  view(combinedList)
+  view(setAll)
   stop("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
 }
 
@@ -96,10 +105,10 @@ apply(all.regions,1,function(reg){
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1))
     #uncomment these to pring the error msg instead of some generic error
-  # {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
-  #   print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
-  {print(getEmptyErrorPlotWithMessage("Not enough data available."))
-    print(getEmptyErrorPlotWithMessage("Not enough data available."))}
+   {print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
+     print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))}
+  # {print(getEmptyErrorPlotWithMessage("Not enough data available."))
+  #   print(getEmptyErrorPlotWithMessage("Not enough data available."))}
   else {
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot1)
     print(selectionEstimateFits[[reg[["shortname"]]]]$plot2)
@@ -130,10 +139,8 @@ populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
-     # caseCountData <- caseData$NS
-     # selectionEstimateObject<- selectionEstimateFits$NS
   # # 
-  filename=NA
+  saveToFile=F
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
       #caseCountData <- head(caseCountData, -1)
@@ -143,14 +150,15 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   #populate a column with reporting accuracy (Accurate | UnderReported])
   caseCountData$report_type <- "Accurate"
   caseCountData$report_type[(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)] <- "UnderReported"
-  caseCountData$n <- ifelse((caseCountData$n)<1, 1, caseCountData$n) #populate empty cells with 1 because we have to log10 it later
-  caseCountData$n <- as.numeric(caseCountData$n) #convert the column to numeric type. For some reason, as of Jan 08, 2024, this column is parsed as character.
 
+  caseCountData$n <- as.numeric(caseCountData$n) #convert the column to numeric type. For some reason, as of Jan 08, 2024, this column is parsed as character.
+  caseCountData <- caseCountData[!(caseCountData$report_type=="Accurate" & is.na(caseCountData$n)),]#populate empty cells with 1 because we have to log10 it later
   
   #construct a spline fit for the accurate case counts only
-  caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))
+  caseFitModel <- getCaseCountSmoothFitWithLambda(caseCountData %>% filter(report_type=="Accurate"))# %>% filter(!is.na(n)))
   #extract the y-values for the fit
   caseFitLineValues <- 10^(caseFitModel$y)
+
   #extend the previous fit for the "underreported dates" and extract the y values
   caseFitLinePredictedValues <- c((10^(predict(caseFitModel, data.frame(x=(nrow(caseCountData)-dayToCut+1):nrow(caseCountData)))[[2]]))$x)
   #merge the accurate and underreported case count fit lines and construct a DF with X, and metadata
@@ -158,7 +166,6 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   colnames(caseCountFitLine) <- c("Reported_Date", "n", "type")
   #replaces UnderReported with Projected in the "type" column
   caseCountFitLine <- caseCountFitLine %>% mutate(type = ifelse(type=="UnderReported", "Projected", "Actual"))
-  
   #get the selection estimate fits, scurves and extended scurves from the selection estimate object
   selectionFit <- selectionEstimateObject$fit
   selectionScurves <- selectionEstimateObject$scurves
@@ -230,7 +237,7 @@ apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1)){
-    print(getEmptyErrorPlotWithMessage("Not enough genomic data available."))
+    print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
   } else if (reg[["shortname"]] %in% names(caseData)){
       p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
       print(p)
@@ -281,7 +288,7 @@ selectparam <- function(p,reg){
 
 
 for (i in 1:length(all.regions[["name"]])) {
-  # i=2
+   i=1
   cat("###", all.regions[['shortname']][[i]], "\n")
   if (all.regions[['name']][[i]] == "Canada"){
       cat("#### Plot single lineages in", all.regions[['name']][[i]],"*\n","\n")
