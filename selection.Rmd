@@ -237,7 +237,9 @@ apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
   cat("####",reg[["name"]],"\n","\n")
   if (is.null(selectionEstimateFits[[reg[["shortname"]]]]$plot1)){
-    print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
+    print(getEmptyErrorPlotWithMessage("Not enough data available."))
+    #print(getEmptyErrorPlotWithMessage(selectionEstimateFits[[reg[["shortname"]]]]$plot2))
+
   } else if (reg[["shortname"]] %in% names(caseData)){
       p<-plotCaseCountSelection(caseData[[reg[["shortname"]]]], selectionEstimateFits[[reg[["shortname"]]]])#,reg[["shortname"]])
       print(p)
