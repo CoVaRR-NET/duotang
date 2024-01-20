@@ -260,7 +260,7 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate, col=c('red', 'blue'), method='BFGS', includeReference=FALSE) {
-  # region <- "Canada"
+  # region <- "Ontario"
   # startdate <- startdate
   # reference <- c(reference)  # or c("BA.1", "BA.1.1")
   # mutants <- mutants
@@ -282,8 +282,9 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   fit <- .fit.model(est, startpar, method=method)
   
   #this loop deals with the "couldnt invert hessian" error by running .make.estimator that runs through refdates from 120 to 0 in series of 10 until the code does not fail.  
-  while (is.null(fit$sample[1])){
+  while ("modelerror" %in% names(fit)){
     newRefDate <- est$refdate - 10
+    print(newRefDate)
     if (newRefDate[1] < 10){
       break
     }
