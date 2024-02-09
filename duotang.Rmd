@@ -293,7 +293,7 @@ cat(md_file, sep = "\n")
 ```{r rtt, child="Tooltip.Rmd"}
 ```
 
-# Omicron sublineages in Canada 
+# Sublineages in Canada 
 
 There are `r length(uniqueNamedLineageLast120Days)` unique named variants currently circulating in Canada since `r startdate` (last 120 days). Please see [Pango lineage table](#lineages) for number of sequences per lineage present.
 
