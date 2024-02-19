@@ -129,7 +129,7 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   varmeta1 <- varmeta1[as.Date(varmeta1$week) > mindate, ]
   
   if (is.na(col)) {
-    set.seed(42069) #setted for 15 colors were close shades are not contiguous
+    set.seed(25041) #setted for 15 colors were close shades are not contiguous
     col <- sample(rainbow(length(levels(varmeta1$pango_group))))  # default colour palette
   }
   pal <- col
