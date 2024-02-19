@@ -466,34 +466,4 @@ apply(all.regions,1,function(reg){
 
 ```
 
-## BA.5 sublineages {.tabset .tabset-fade}
-
-Here we show the trends of the various BA.5* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
-
-```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150}
-#prints the BA.5 Plots
-apply(all.regions,1,function(reg){
-  cat("###", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("####",reg[["name"]],"\n","\n")
-  if (length(individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]])>0){
-      i = 0
-      for (plot in individualSublineageSelectionPlots.BA5[[reg[["shortname"]]]]){
-        i = i + 1
-        if (i==4){
-          cat ("")
-          cat("<details>")
-          cat ("<summary><b>Only the variants with the 3 highest selection coefficients are displayed. Click here to see the rest.</b></summary>")
-        }
-        print(plot$plot)
-      }
-      if (i>3){cat("</details>")}
-  }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
-  }
-  cat("\n\n")})
-
-```
-
 ## {-}
