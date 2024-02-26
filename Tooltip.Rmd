@@ -3,11 +3,17 @@
 
 
 ```{r, echo=FALSE}
-tippy::tippy_this(elementId = "JN_1", tooltip = "Ancestor:BA.2.86.1//3087 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1, S:L455S, ORF1a:R3821K, ORF7b:F19L, Europe")
-tippy::tippy_this(elementId = "JN_1_4", tooltip = "Ancestor:JN.1//730 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.4, ORF1a:T170I, Denmark/Singapore, from #2381")
-tippy::tippy_this(elementId = "BA_2_86_1", tooltip = "Ancestor:BA.2.86//231 samples in last 120 days.//Alias of B.1.1.529.2.86.1, ORF1a:K1973R, mostly with C12815T, mainly Europe, from #2236")
-tippy::tippy_this(elementId = "JN_1_7", tooltip = "Ancestor:JN.1//18 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.7, S:T572I, S:E1150D, USA/France, from sars-cov-2-variants/lineage-proposals#1097")
-tippy::tippy_this(elementId = "JN_1_8_1", tooltip = "Ancestor:JN.1.8//40 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.8.1, S:T572I, USA/Denmark, from sars-cov-2-variants/lineage-proposals#1097")
+tippy::tippy_this(elementId = "JN_1", tooltip = "Ancestor:BA.2.86.1//4164 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1, S:L455S, ORF1a:R3821K, ORF7b:F19L, Europe")
+tippy::tippy_this(elementId = "JN_1_4_3", tooltip = "Ancestor:JN.1.4//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.4.3, S:T572I, USA, from #2487")
+tippy::tippy_this(elementId = "JN_1_7", tooltip = "Ancestor:JN.1//36 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.7, S:T572I, S:E1150D, USA/France, from sars-cov-2-variants/lineage-proposals#1097")
+tippy::tippy_this(elementId = "XDP", tooltip = "33 samples in last 120 days.//Recombinant lineage of JN.1.4 and FL.15 (breakpoint between 26834 and 27809), from #2451")
+tippy::tippy_this(elementId = "JN_1_4", tooltip = "Ancestor:JN.1//1127 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.4, ORF1a:T170I, Denmark/Singapore, from #2381")
+tippy::tippy_this(elementId = "FL_15", tooltip = "Ancestor:XBB.1.9.1//51 samples in last 120 days.//Alias of XBB.1.9.1.15, S:F456L (T22928C), ORF1a:E637K, Vietnam/China/South Korea, from #1994")
+tippy::tippy_this(elementId = "BA_2_86_1", tooltip = "Ancestor:BA.2.86//260 samples in last 120 days.//Alias of B.1.1.529.2.86.1, ORF1a:K1973R, mostly with C12815T, mainly Europe, from #2236")
+tippy::tippy_this(elementId = "JN_1_23", tooltip = "Ancestor:JN.1//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.23, S:K444R, S:Y453F, ORF1a:A307V, ORF1a:P2144L, Brazil, from #2488")
 tippy::tippy_this(elementId = "JN_1_6_1", tooltip = "Ancestor:JN.1.6//1 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.6.1, S:R346T, Sweden, from sars-cov-2-variants/lineage-proposals#1089")
-tippy::tippy_this(elementId = "JN_1_6", tooltip = "Ancestor:JN.1//12 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.6, G22627A")
+tippy::tippy_this(elementId = "JN_1_6", tooltip = "Ancestor:JN.1//32 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.6, G22627A")
+tippy::tippy_this(elementId = "JN_1_9_1", tooltip = "Ancestor:JN.1.9//1 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.9.1, S:T572I, ORF1a:A3143V")
+tippy::tippy_this(elementId = "JN_1_9", tooltip = "Ancestor:JN.1//114 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.9, S:Q183H, USA/UK/Canada, from #2410")
+tippy::tippy_this(elementId = "JN_1_8_1", tooltip = "Ancestor:JN.1.8//107 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.8.1, S:T572I, USA/Denmark, from sars-cov-2-variants/lineage-proposals#1097")
 ```
