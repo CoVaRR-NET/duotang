@@ -92,7 +92,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable="", mutantNa
     if (length(which(d$Highlight == 1)) != 0){
       matching_rows <- length(d$Highlight) - which(d$Highlight == 1) + 1
       p <- p + geom_rect(aes(ymin = -Inf, ymax = Inf, xmin = matching_rows - 0.5, xmax = matching_rows + 0.5), 
-                         fill = "lightblue", alpha = 0.01) 
+                         fill = "lightblue", alpha = 0.02, color = NA) 
     }
 
     
