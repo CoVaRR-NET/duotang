@@ -1,6 +1,8 @@
-plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
-   # r = paramselected[1:n]
-   # coefficientTable = coefficientTable
+plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable="", mutantNamesToHighlight = ""){
+  # r = paramselected[1:n]
+  # coefficientTable = coefficientTable
+  # mutantNamesToHighlight = mutantNames
+  # 
   d = data.frame(lineage = character(),
                  sel_coeff = numeric(),
                  low_CI = numeric(),
@@ -48,6 +50,11 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
         mutate (MultiRegion = ifelse(NumRegions > 1, 1, 0)) %>% dplyr::select(-NumRegions) %>% mutate(MultiRegion = replace_na(MultiRegion, 0))
     }
   }
+  
+  if (length(mutantNamesToHighlight) > 1){
+    mutantNamesToHighlight <- gsub("\\*", "", mutantNamesToHighlight)
+    d <- d %>% mutate(Highlight = ifelse(lineage %in% mutantNamesToHighlight, 1, 0))
+  }
 #iew(d)
   if(makeplot){
     bins=c(0,20,40,80,100,200,500,10000000)
@@ -74,22 +81,28 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable=""){
         geom_point(size = 5)
       }
     }
-    
     axisMax <- ifelse(is.finite(max(round((d$high_CI + 2.5)/ 5.0) * 5.0)), max(round((d$high_CI + 2.5)/ 5.0) * 5.0),max(max(round((d$sel_coeff + 2.5)/ 5.0) * 5.0)) )
-    
+    #annotate lines and CIs
     p <- p +
     geom_pointrange( aes(ymin=low_CI, ymax=high_CI))+
     geom_hline(yintercept=10, linetype="dashed", color = "grey")+ #dash line at 10% per day to mark doubling in < week
     scale_y_continuous(breaks=seq(0, axisMax,5))+
-    coord_flip()+ colScale+
-      theme_bw()+
-     
+    coord_flip()+ colScale
+    
+    if (length(which(d$Highlight == 1)) != 0){
+      matching_rows <- length(d$Highlight) - which(d$Highlight == 1) + 1
+      p <- p + geom_rect(aes(ymin = -Inf, ymax = Inf, xmin = matching_rows - 0.5, xmax = matching_rows + 0.5), 
+                         fill = "lightblue", alpha = 0.01) 
+    }
+
+    
+    #draw in the theme
+    p<- p + theme_bw()+
     theme(plot.caption.position = "plot", plot.caption = element_text(hjust=0)) +
-      
     ggtitle(title)+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", individualSelectionPlotReference, " with 95% CI bars"))+
       labs(caption = "*Circled dots indicate lineages with a positive selection coefficient in multiple provinces") 
     #plot(p)
-   # p
+    #p
     return(p)
   }
   else{
