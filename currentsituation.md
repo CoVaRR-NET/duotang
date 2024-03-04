@@ -1,6 +1,6 @@
 
 
-<u id='JN_1'>JN.1</u> and its subvariants continue to predominate, with <u id='JN_1'>JN.1</u> still being most prevalent overall. Sets of <u id='JN_1'>JN.1</u> subvariants with S:T572I (a proposed ACE2 receptor binding enhancing mutation) are now starting to show a very slight selection advantage at this time (in particular <u id='JN_1_4_3'>JN.1.4.3</u> and <u id='JN_1_7'>JN.1.7</u>, and possibly others). These are being tracked, along with those with <u id='XDP'>XDP</u> (a recombinant lineage of <u id='JN_1_4'>JN.1.4</u> and <u id='FL_15'>FL.15</u>) and other combinations of mutations that potentially change both receptor binding and immune evasion. However, currently there is no major evidence that a single <u id='JN_1'>JN.1</u> subvariant or recombinant is significantly outcompeting <u id='JN_1'>JN.1</u>. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
+<u id='JN_1'>JN.1</u> predominates, but that is expected to change. Sets of <u id='JN_1'>JN.1</u> subvariants with S:T572I (a proposed ACE2 receptor binding enhancing mutation) now have a clear selection advantage, in particular currently <u id='JN_1_7'>JN.1.7</u>. There is also a growth advantage for <u id='JN_1_11_1'>JN.1.11.1</u> which contains the immune evasive mutation S:F456L. These are being tracked, along with those like <u id='XDP'>XDP</u> (a recombinant lineage of <u id='JN_1_4'>JN.1.4</u> and <u id='FL_15'>FL.15</u>) and other combinations of mutations that potentially change both receptor binding and immune evasion. Collectively, these variants based on <u id='JN_1'>JN.1</u>, with their additional ACE2 binding or immune evasive mutations, will avoid cases becoming very low. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
 
 
 
@@ -8,14 +8,13 @@ Variants of current interest:
 
 (Due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries.)
 
-
-
 * <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S). Still the most common variant in Canada).
 * <u id='JN_1_23'>JN.1.23</u> (<u id='JN_1'>JN.1</u> with S:Y453F and S:K444R). No notable spread, but of interest due to its mutations that are predicted to notably increase ACE2 receptor binding and immune evasion.
-* <u id='JN_1_4_3'>JN.1.4.3</u> (<u id='JN_1_4'>JN.1.4</u> with S:T572I). S:T452I potentially increases ACE2 binding and this variant is showing notable growth, with subvariants of this with additional immune evasive mutations like S:R346T of interest). 
+* <u id='JN_1_4_3'>JN.1.4.3</u> (<u id='JN_1_4'>JN.1.4</u> with S:T572I). S:T452I potentially increases ACE2 binding and this variant is showing notable growth, with subvariants of this with additional immune evasive mutations like S:R346T of interest).
 * <u id='JN_1_6_1'>JN.1.6.1</u> (<u id='JN_1_6'>JN.1.6</u> with S:R346T and other new variants with immune evasive mutations like S:R346T).
 * <u id='JN_1_7'>JN.1.7</u> (<u id='JN_1'>JN.1</u> with S:T572I and S:E1150D). S:T452I potentially increases ACE2 binding and this variant is showing notable growth like <u id='JN_1_4_3'>JN.1.4.3</u>.
-* <u id='JN_1_9_1'>JN.1.9.1</u> (<u id='JN_1_9'>JN.1.9</u> with S:T452I and ORF1a:A3143V). S:T452I potentially increases ACE2 binding and this variant is showing early notable growth.   
+* <u id='JN_1_9_1'>JN.1.9.1</u> (<u id='JN_1_9'>JN.1.9</u> with S:T452I and ORF1a:A3143V). S:T452I potentially increases ACE2 binding and this variant is showing early notable growth.
+* <u id='JN_1_11_1'>JN.1.11.1</u> (<u id='JN_1_11'>JN.1.11</u> with S:F456L) and others with the immune evasive mutation S:F456L.
 * <u id='XDP'>XDP</u> (Recombinant lineage of <u id='JN_1_4'>JN.1.4</u> and <u id='FL_15'>FL.15</u>). Showing notable growth and a case was identified with S:T572I.
 * Plus others with S:T572I like <u id='JN_1_8_1'>JN.1.8.1</u> (though growth is not as significant) and any highly divergent variants (saltations). and sublineages with additional combinations of mutations identified through mutation scanning that are involved in binding or immune evasion. See:
 
