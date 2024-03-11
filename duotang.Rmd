@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2024-01-19"
+  value: "2024-03-04"
  datadir:
   label: "DataDir"
   input: text
@@ -393,9 +393,13 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 # COVID-MVP: Mutational composition of Omicron
 
-<iframe src="https://virusmvp.org/covid-mvp/" height="500" width="100%" align="left" style="border:none;" title="covidmvp-iframe"></iframe> 
+<!-- <iframe src="https://virusmvp.org/covid-mvp/" height="500" width="100%" align="left" style="border:none;" title="covidmvp-iframe"></iframe>  -->
+The image below shows a snapshot of the mutational profile of lineages actively circulating in Canada. To scan the entire genome and read more details, see https://virusmvp.org/covid-mvp.
 
-An preview of the mutational profile of actively circulating strains and its sublineages in Canada are shown above. This preview is from https://virusmvp.org/covid-mvp.
+<a href="https://virusmvp.org/covid-mvp">
+  <img src="img/covidmvp.png" alt="covid-mvp" width="100%" height="500"> 
+</a>
+
 
 <hr style="border:1px solid gray">
 

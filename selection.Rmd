@@ -301,7 +301,7 @@ for (i in 1:length(all.regions[["name"]])) {
 
   if(n!=0){
     #print(plot_growing_lineage(paramselected[1:n]))
-    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable) #A%>% as_widget()
+    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable, mutantNamesToHighlight = mutantNames) #A%>% as_widget()
     #print(htmltools::tagList(ggplotly(p, height = 700)))
     print(p)
   }else{
@@ -338,7 +338,7 @@ for (i in 1:length(all.regions[["name"]])) {
   n=min(25,length(paramselected))
   if(n!=0){
     #print(plot_growing_lineage(paramselected[1:n]))
-    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable) #A%>% as_widget()
+    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable, mutantNamesToHighlight = mutantNames) #A%>% as_widget()
     #print(htmltools::tagList(ggplotly(p, height = 700)))
     print(p)
   }else{
