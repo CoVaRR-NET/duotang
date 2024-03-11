@@ -10,9 +10,9 @@ Variants of current interest:
 
 * <u id='JN_1'>JN.1</u> (<u id='BA_2_86_1'>BA.2.86.1</u> with immune evasive mutation S:455S). Still the most common variant in Canada).
 * <u id='JN_1_23'>JN.1.23</u> (<u id='JN_1'>JN.1</u> with S:Y453F and S:K444R). No notable spread, but of interest due to its mutations that are predicted to notably increase ACE2 receptor binding and immune evasion.
-* <u id='JN_1_4_3'>JN.1.4.3</u> (<u id='JN_1_4'>JN.1.4</u> with S:T572I). S:T452I potentially increases ACE2 binding and this variant is showing notable growth, with subvariants of this with additional immune evasive mutations like S:R346T of interest).
+* <u id='JN_1_4_3'>JN.1.4.3</u> (<u id='JN_1_4'>JN.1.4</u> with S:T572I). S:T572I potentially increases ACE2 binding and this variant is showing notable growth, with subvariants of this with additional immune evasive mutations like S:R346T of interest).
 * <u id='JN_1_6_1'>JN.1.6.1</u> (<u id='JN_1_6'>JN.1.6</u> with S:R346T and other new variants with immune evasive mutations like S:R346T).
-* <u id='JN_1_7'>JN.1.7</u> (<u id='JN_1'>JN.1</u> with S:T572I and S:E1150D). S:T452I potentially increases ACE2 binding and this variant is showing notable growth like <u id='JN_1_4_3'>JN.1.4.3</u>.
+* <u id='JN_1_7'>JN.1.7</u> (<u id='JN_1'>JN.1</u> with S:T572I and S:E1150D). S:T572I potentially increases ACE2 binding and this variant is showing notable growth like <u id='JN_1_4_3'>JN.1.4.3</u>.
 * <u id='JN_1_9_1'>JN.1.9.1</u> (<u id='JN_1_9'>JN.1.9</u> with S:T452I and ORF1a:A3143V). S:T452I potentially increases ACE2 binding and this variant is showing early notable growth.
 * <u id='JN_1_11_1'>JN.1.11.1</u> (<u id='JN_1_11'>JN.1.11</u> with S:F456L) and others with the immune evasive mutation S:F456L.
 * <u id='XDP'>XDP</u> (Recombinant lineage of <u id='JN_1_4'>JN.1.4</u> and <u id='FL_15'>FL.15</u>). Showing notable growth and a case was identified with S:T572I.
