@@ -1,6 +1,6 @@
 
 
-<u id='JN_1'>JN.1</u> predominates, but that is expected to change. Sets of <u id='JN_1'>JN.1</u> subvariants with S:T572I (a proposed ACE2 receptor binding enhancing mutation) now have a clear selection advantage, in particular currently <u id='JN_1_7'>JN.1.7</u>. There is also a growth advantage for <u id='JN_1_11_1'>JN.1.11.1</u> which contains the immune evasive mutation S:F456L. These are being tracked, along with those like <u id='XDP'>XDP</u> (a recombinant lineage of <u id='JN_1_4'>JN.1.4</u> and <u id='FL_15'>FL.15</u>) and other combinations of mutations that potentially change both receptor binding and immune evasion. Collectively, these variants based on <u id='JN_1'>JN.1</u>, with their additional ACE2 binding or immune evasive mutations, will avoid cases becoming very low. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
+<u id='JN_1'>JN.1</u> predominates, with particular <u id='JN_1'>JN.1</u> subvariants showing some selection advantage, including <u id='JN_1_7'>JN.1.7</u>, and others with additional ACE2 binding or immune evasive mutations, plus <u id='XDP'>XDP</u> (a recombinant lineage of <u id='JN_1_4'>JN.1.4</u> and <u id='FL_15'>FL.15</u>). Collectively, these variants based on <u id='JN_1'>JN.1</u> will avoid cases becoming very low. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
 
 
 
@@ -27,8 +27,6 @@ Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
 Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
 
 Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
-
-
 
 With thanks to the global team of variant hunters, and other SARS-CoV-2 genome analysis tool providers (see List of Useful Tools below), which play a key role in identifying new variants of note.
 
