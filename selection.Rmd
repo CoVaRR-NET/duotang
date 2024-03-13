@@ -86,13 +86,13 @@ for (i in 1:length(all.regions$name)){
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we examine the relative rate of spread of the different sublineages of SARS-CoV-2 currently circulating in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale: `r mutantNames[length(mutantNames)]`; and in the Fastest Growing Lineages section, at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
+Here we examine the relative rate of spread of the different sublineages of SARS-CoV-2 currently circulating in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale (and in the Fastest Growing Lineages section): `r mutantNames[length(mutantNames)]` and at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of SARS-CoV-2 lineages circulating are XBB.\* variants, including HV.1\*, as well as BA.2\* variants, particularly JN.1 and other BA.2.86 descendants. At the broad scale, we now track the frequencies of HV.1\*, XBB.Other, JN.1 and and BA.2.Other. 
+Currently, the major group of SARS-CoV-2 lineages circulating are XBB.\* variants, including HV.1\*, as well as BA.2\* variants, particularly JN.1 and other BA.2.86 descendants. Thus, at the broad scale, we are currently track the frequencies of HV.1\*, Non-HV.1* XBB descendants (XBB.Other), JN.1* and Non-JN.1* BA.2 descendants. 
 
 Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
-For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
+For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha. [Can this be updated to a more recent lineage?]
 
 **Caveat:** These selection analyses must be interpreted with caution due to the potential for non-representative sampling, lags in reporting, and spatial heterogeneity in prevalence of different sublineages across Canada. Provinces that do not have at least 20 sequences of a lineage during this time frame are not displayed.
 
@@ -256,7 +256,10 @@ apply(all.regions,1,function(reg){
 
 # Fastest growing lineages {.tabset .tabset-fade}
 
-Here we show the selection estimates and their 95% confidence intervals for Pango lineages with more than 10 sequences in Canada since `r startdate` and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants). Plots showing the change in variant frequency over time in Canada are given below for lineages with more than 50 sequences.
+Here we show the selection estimates and their 95% confidence intervals for SARS-CoV-2 lineages with more than 10 sequences in present in a region since `r startdate`, and with enough data to estimate the confidence interval. Each selection estimate measures the growth rate relative to `r individualSelectionPlotReference[[1]]` stricto (i.e., sequences designated as `r individualSelectionPlotReference[[1]]` and not its descendants). Plots showing the change in variant frequency over time in Canada as a whole are given below for lineages with more than 50 sequences. For Canada-wide plot, a dot with a circle border indicates lineages with a positive selection coefficient in multiple provinces. The most prevelant lineage in the last two weeks is higlighted in grey. A table of the selection estimates is available for download below. 
+
+Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary. 
+
 
 ```{r getCoefficientTable, echo = F, warning=FALSE, message=FALSE}
 source("scripts/plot_growing_lineages.R")
@@ -272,8 +275,7 @@ coefficientTable <- plot_growing_lineage(paramselected,makeplot=FALSE)
 
 ## Plot (stricto) {.tabset .tabset-fade}
 
-Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary. For Canada-wide plot, a dot with a circle border indicates lineages with a positive selection coefficient in multiple provinces. 
-
+This plot highlights single lineages that are growing fastest (e.g., JN.1). 
 
 ```{r buildStrictoPlots, results='asis', echo = F, warning=FALSE, fig.height=7}
 
@@ -314,10 +316,7 @@ for (i in 1:length(all.regions[["name"]])) {
 
 ## Plot (non stricto)  {.tabset .tabset-fade}
       
-This plot highlights the groups of related lineages that are growing fastest (e.g., BQ.1* is the monophyletic clade that includes BQ.1.1 and all other BQ.1 sublineages. 
-
-Again, Growth advantage of 0-5% corresponds to doubling times of more than two weeks, with 5-10% reflecting one to two week doubling times and over 10% representing significant growth of less than one week doubling time. Note that estimating selection of sub-variants with low sequence counts (less than 100 dots) is prone to error, such as mistaking one-time super spreader events or pulses of sequence data from one region as selection. Estimates with lower sequence counts in one region should be considered as very preliminary. For Canada-wide plot, a dot with a circle border indicates lineages with a positive selection coefficient in multiple provinces. 
-
+This plot highlights the groups of related lineages that are growing fastest (e.g., JN.1* is the monophyletic clade that includes JN.1.7 and all other JN.1 sublineages, excluding recombinants. 
 
 ```{r buildNonStrictoPlots, results='asis', echo=FALSE, warning=FALSE, fig.height=7}
 source("scripts/plot_growing_lineages.R")
