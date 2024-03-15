@@ -228,12 +228,12 @@ Only representations of aggregate data will be posted here.
 
 ## Important limitations
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
-Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. [Is this still true]
+Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. 
 
 For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
 When possible, these differences in sampling strategies are mentioned but they are not always known.
 With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
-Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
+Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population [@sally, comments and potential citaitons?]. 
 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
@@ -295,7 +295,7 @@ There are `r length(uniqueNamedLineageLast120Days)` unique named variants curren
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Below is an interactive visualization showing frequencies of ciruclating lineages, sub-divided by major sub-lineages, currently circulating in Canada. A table of lineage frequencues can be downloaded by clicking on the (Frequency Table Download) button. 
+Below is an interactive visualization showing frequencies of ciruclating lineages, sub-divided by major sub-lineages, currently circulating in Canada. A table of lineage frequencies can be downloaded by clicking on the (Frequency Table Download) button. 
 
 Tips: Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.
 
@@ -389,13 +389,13 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 <hr style="border:1px solid gray">
 
-# COVID [VIRUS?] -MVP: Mutational composition of Omicron
+# VIRUS-MVP: Mutational composition of Omicron
 
 <!-- <iframe src="https://virusmvp.org/covid-mvp/" height="500" width="100%" align="left" style="border:none;" title="covidmvp-iframe"></iframe>  -->
-The image below shows a snapshot of the mutational profile of lineages actively circulating in Canada. To scan the entire genome and read more details, click on the image below or see https://virusmvp.org/covid-mvp.
+The image below is a screenshot from VIRUS-MVP. please click to examine mutations and their curated functional information. Shows a snapshot of the VIRUS-MVP tool of lineages actively circulating in Canada. To scan the entire genome and read more details, click on the image below or see https://virusmvp.org/covid-mvp.
 
-<a href="https://virusmvp.org/covid-mvp">
-  <img src="img/covidmvp.png" alt="covid-mvp" width="100%" height="500"> 
+<a href="https://virusmvp.org/covid-mvp" target="_blank">
+  <img src="img/covidmvp.png" alt="covid-mvp" width="100%" height="100%"> 
 </a>
 
 
@@ -430,19 +430,6 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
 rm(dat)
 rm(meta1)
 ```
-##### Historical notes [Is this section still necessary?]
-
-From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
-By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
-The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
-
-There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
-
-* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
-* B.1.2 - a USA lineage that spread well in Canada  
-* B.1.160 - an European lineages that spread well in Canada  
-
-This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
 <hr style="border:1px solid gray">
 
@@ -551,12 +538,45 @@ All analyses draw on the most recent publicly available viral sequence data on V
 ### BC
 #### British Columbia  
 Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized).
+Additional COVID-19 information for British Columbia can be found here: http://www.bccdc.ca/health-info/diseases-conditions/covid-19
+
+### AB
+#### Alberta
+Additional COVID-19 information for Alberta can be found here: https://www.alberta.ca/coronavirus-info-for-albertans
+
+
+### SK
+#### Saskatchewan
+Additional COVID-19 information for Saskatchewan can be found at: https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
+
+
+### MB
+#### Manitoba
+Additional COVID-19 information for Manitoba can be found at: https://www.gov.mb.ca/health/publichealth/surveillance/influenza/index.html
+
+
+### ON
+#### Ontario
+Additional COVID-19 information for Ontario can be found at: https://www.publichealthontario.ca/en/Data-and-Analysis/Infectious-Disease/Respiratory-Virus-Tool
 
 ### QC
 #### Quebec
 Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
-Additiona up-to-date COVID data for this province can be found here:  
-https://www.inspq.qc.ca/covid-19/donnees/variants
+Additions up-to-date COVID-19 data for Quebec can be found at: https://www.inspq.qc.ca/covid-19/donnees/variants
+
+### NS
+#### Nova Scotia
+Additional COVID-19 information for Nova Scotia can be found at: https://novascotia.ca/coronavirus/alerts-notices/#epidemiologic-summaries
+
+
+### NB
+#### New Brunswick
+Additional COVID-19 information for New Brunswick can be found at: https://www2.gnb.ca/content/gnb/en/corporate/promo/respiratory-watch.html
+
+
+### NL
+#### Newfoundland and Labrador
+Additional COVID-19 information for Newfoundland and Labrador can be found at: https://experience.arcgis.com/experience/b47262b1265f48ba95d7477c56835593
 
 
 ## List of useful tools
@@ -576,6 +596,20 @@ A selection of bioinformatics, phylogenetic, and modelling tools that are useful
 * [VIRUS-MVP](https://virusmvp.org/covid-mvp/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
 * [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
 * Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
+
+## Historical notes
+
+From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
+The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
+
+There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
+
+* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
+* B.1.2 - a USA lineage that spread well in Canada  
+* B.1.160 - an European lineages that spread well in Canada  
+
+This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
 ## Previous Versions
 
