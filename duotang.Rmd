@@ -228,12 +228,10 @@ Only representations of aggregate data will be posted here.
 
 ## Important limitations
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
-Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance. 
-
-For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
+Furthermore, sequencing volumes and priorities have changed during the pandemic, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
 When possible, these differences in sampling strategies are mentioned but they are not always known.
 With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
-Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population [@sally, comments and potential citaitons?]. 
+Currently, most jurisdictions are sequencing mainly hospitalized patients or outbreaks, with little population-level random sampling, underestimating case counts and viral diversity.
 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
