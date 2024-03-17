@@ -390,7 +390,7 @@ for (i in 1:nrow(sublineagestoplot)) {
 # VIRUS-MVP: Mutational composition of Omicron
 
 <!-- <iframe src="https://virusmvp.org/covid-mvp/" height="500" width="100%" align="left" style="border:none;" title="covidmvp-iframe"></iframe>  -->
-The image below is a screenshot from VIRUS-MVP. please click to examine mutations and their curated functional information. Shows a snapshot of the VIRUS-MVP tool of lineages actively circulating in Canada. To scan the entire genome and read more details, click on the image below or see https://virusmvp.org/covid-mvp.
+The image below is a screenshot from VIRUS-MVP showing a snapshot of the mutations from lineages actively circulating in Canada. Please click on the link to scan the entire genome and examine the functional impact of the mutations. More details, click on the image below or see https://virusmvp.org/covid-mvp.
 
 <a href="https://virusmvp.org/covid-mvp" target="_blank">
   <img src="img/covidmvp.png" alt="covid-mvp" width="100%" height="100%"> 
