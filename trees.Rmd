@@ -1,5 +1,8 @@
-Here we present a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada.
-The x-axis of the time tree represents the estimated number of years from today for which the root emerged. Due to the low number of XBB sequences, this estimate may not be accurate for the XBB* time tree. The x-axis of the diversity trees shows the number of mutations from the outgroup. Clicking on a node with the information tooltip shown will copy the isolate ID to your clipboard.
+Below is an interactive visualization of a subsampled phylogenetic snapshot of SARS-CoV-2 genomes from Canada. Please see methods for details.
+
+The x-axis of the time tree represents the estimated number of years from today for which the root emerged. The x-axis of the diversity trees shows the number of mutations from the outgroup.
+
+Hovering over a node will display a tool tip with sequence metadata, clicking on a node with the tooltip shown will copy the isolate ID to your clipboard.
 
 ```{r message=FALSE}
 ### metadata and trees

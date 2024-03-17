@@ -205,13 +205,9 @@ htmltools::tagList(ggplotly(ggplot()))
 
 ##### `r format(as.Date(params$datestamp), '%d %B, %Y')`
 
-### Survey request
-
-Duotang, VirusSeq Data portal, and Viral AI would like to improve your user experience. Please take a few minutes to respond to [this survey](https://forms.gle/F63za7dgQCrF2YMi7).
-
 ### Contributing authors:  
 
-Data analysis, code, and maintenance of this notebook: Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Justin Jia, Zohaib Anwar and Erin Gill.
+Data analysis, code, and maintenance of this notebook: Justin Jia (current), Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Zohaib Anwar, and Erin Gill.
 Input and direction by other members of [Pillar 6](https://covarrnet.ca/our-team/#pillar-6) and [CAMEO](https://covarrnet.ca/computational-analysis-modelling-and-evolutionary-outcomes-cameo), which include: Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and William Hsiao. 
 
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
@@ -232,12 +228,10 @@ Only representations of aggregate data will be posted here.
 
 ## Important limitations
 These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
-Sequencing volumes and priorities have changed during the pandemic, and the sequencing strategy is typically a combination of prioritizing outbreaks, travellers, public health investigations, and random sampling for genomic surveillance.
-
-For example, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
+Furthermore, sequencing volumes and priorities have changed during the pandemic, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
 When possible, these differences in sampling strategies are mentioned but they are not always known.
 With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
-Therefore, from this time onward, case counts are likely underestimated and the sequenced virus diversity is not necessarily representative of the virus circulating in the overall population. 
+Currently, most jurisdictions are sequencing mainly hospitalized patients or outbreaks, with little population-level random sampling, underestimating case counts and viral diversity.
 
 Thus, interpretation of these plots and comparisons between health regions should be made with caution, considering that the data may not be fully representative.
 These analyses are subject to frequent change given new data and updated lineage designations.
@@ -299,7 +293,9 @@ There are `r length(uniqueNamedLineageLast120Days)` unique named variants curren
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-Here we take a look, sub-dividing the major sub-lineages currently circulating in Canada. (Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.)
+Below is an interactive visualization showing frequencies of ciruclating lineages, sub-divided by major sub-lineages, currently circulating in Canada. A table of lineage frequencies can be downloaded by clicking on the (Frequency Table Download) button. 
+
+Tips: Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.
 
 ```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
 
@@ -391,13 +387,13 @@ for (i in 1:nrow(sublineagestoplot)) {
 
 <hr style="border:1px solid gray">
 
-# COVID-MVP: Mutational composition of Omicron
+# VIRUS-MVP: Mutational composition of Omicron
 
 <!-- <iframe src="https://virusmvp.org/covid-mvp/" height="500" width="100%" align="left" style="border:none;" title="covidmvp-iframe"></iframe>  -->
-The image below shows a snapshot of the mutational profile of lineages actively circulating in Canada. To scan the entire genome and read more details, see https://virusmvp.org/covid-mvp.
+The image below is a screenshot from VIRUS-MVP showing a snapshot of the mutations from lineages actively circulating in Canada. Please click on the link to scan the entire genome and examine the functional impact of the mutations. More details, click on the image below or see https://virusmvp.org/covid-mvp.
 
-<a href="https://virusmvp.org/covid-mvp">
-  <img src="img/covidmvp.png" alt="covid-mvp" width="100%" height="500"> 
+<a href="https://virusmvp.org/covid-mvp" target="_blank">
+  <img src="img/covidmvp.png" alt="covid-mvp" width="100%" height="100%"> 
 </a>
 
 
@@ -432,19 +428,6 @@ r2d3(data=toJSON(dat), script="js/barplot.js", container="div",
 rm(dat)
 rm(meta1)
 ```
-##### Historical notes
-
-From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
-By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
-The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
-
-There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
-
-* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
-* B.1.2 - a USA lineage that spread well in Canada  
-* B.1.160 - an European lineages that spread well in Canada  
-
-This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
 <hr style="border:1px solid gray">
 
@@ -467,7 +450,7 @@ This historical analysis is not being further updated, as we focus on more inter
 
 # Lineages
 
-Here we present a searchable table that provides a short description of each PANGO lineage, it's the ancestor, a short description, and whether or not it's present in Canada in the last 120days.
+Here we present a searchable table that provides a short description of each PANGO lineage, it's immediate ancestor, and the number of sequences in the last 120days.
 
 ```{r function for displaying lineage informaiton, echo=FALSE, warning=FALSE, message=FALSE}
 #show the table as paged and column searchable.
@@ -507,18 +490,10 @@ Outliers were identified in by root-to-tip regression using the R package [ape](
 [TreeTime](https://github.com/neherlab/treetime) was used to reconstruct a time-scaled tree under a strict molecular clock model.
 The resulting trees were converted into interactive plots with [ggfree](https://github.com/ArtPoon/ggfree) and [r2d3](https://rstudio.github.io/r2d3/).
 
-### Mutational composition
-#### Mutation composition graph
-We extracted mutation frequencies from unaligned genomes using a custom Python wrapper of [minimap2](https://github.com/lh3/minimap2) (version 2.17).
-These data were supplemented with genomic data and metadata from the [NCBI GenNank](https://www.ncbi.nlm.nih.gov/genbank/) database, curated by the [Nextstrain](https://nextstrain.org/ncov/open/global) development team.
-We used these outputs to generate mutational graphs reporting mutations seen in at least 75% of sequences in the respective variants of concern in Canada.
-Bars are colored by substitution type, and the corresponding amino acid changes are shown.
-Genomic position annotations were generated in Python using [SnpEFF](http://pcingola.github.io/SnpEff/).
-
 ### Selection
 #### Selection Coefficents
 To estimate selection, we used standard likelihood techniques.
-In brief, sublineages of interest were prespecified (e.g., BA.1, BA.1.1, BA.2) and counts by day tracked over time.
+In brief, sublineages of interest were prespecified (e.g., JN.1) and counts by day tracked over time.
 If selection were constant over time, the frequency of sub-type $i$ at time $t$ would be expected to rise according to $$p_i(t) = \frac{p_i(0) \exp(s_i t)}{\sum_j p_j(0) \exp(s_j t)},$$ where $s_i$ is the selection coefficient favouring sub-type $i$.
 A selection coefficient of $s_i=0.1$ implies that sub-type $i$ is expected to rise from 10% to 90% frequency in 44 days (in $4.4./s_i$ days for other values of $s_i$).
 
@@ -541,13 +516,13 @@ Provinces with sampling strategies that are variant specific are removed, unless
 
 #### Case count trends by variant 
 
-Reported cases are obtained from the COVID-19 info for Albertans (Alberta; [link](https://www.alberta.ca/data/stats/covid-19-alberta-statistics-summary-data.csv)), Centre d'expertise et de référence en santé publique (Quebec; [link](https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648)), Canada Health InfoBase (Canada, British Columbia, Ontario, Nova Scotia, and Newfoundland and Labrador; [link](https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv)). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed case counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
+Reported cases are obtained from the Centre d'expertise et de référence en santé publique (Quebec; [link](https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648)), Canada Health InfoBase (Canada, Alberta, British Columbia, Ontario, Nova Scotia, and Newfoundland and Labrador; [link](https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv)). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are likely underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed case counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
 
 The previously discussed methods allow us to estimate the proportion of a lineage over time (see equation for $p_i(t)$ above). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date, $t$. By multiplying the list from case counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases that are due to a specific lineage at each time point as $$n_i(t) = p_i(t) \; n(t).$$
 
 Finally, once the inferred case counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i(t)$ and $n_i(t-1)$, from which the growth rate of that lineage ($r_i$) is estimated as $$r_i = ln\left( \frac{n_i(t)}{n_i(t-1)} \right).$$
 
-Because genomics data often lag case count data, the last date of reliable case count data may be closer to the present than the last date of genomics data. In these cases, the evolutionary model for $p_i(t)$ is projected forward in time (shaded in a lighter color within the plot).
+Because genomics data often lag case count data, the last date of reliable case count data may be closer to the present than the last date of genomics data. In these cases, the evolutionary model for $p_i(t)$ is projected forward in time and shown as a ligher shaded area under the curve within the plot).
 
 #### Rates
 ##### Root-to-tip estimates of substitution rate
@@ -561,76 +536,78 @@ All analyses draw on the most recent publicly available viral sequence data on V
 ### BC
 #### British Columbia  
 Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized).
-Additional up-to-date covid data for this province can be found here:  
-http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data-trends  
-
+Additional COVID-19 information for British Columbia can be found here: http://www.bccdc.ca/health-info/diseases-conditions/covid-19
 
 ### AB
 #### Alberta
-Additional up-to-date COVID data for this province can be found here:  
-https://www.alberta.ca/stats/covid-19-alberta-statistics.htm#variants-of-concern
+Additional COVID-19 information for Alberta can be found here: https://www.alberta.ca/coronavirus-info-for-albertans
 
 
 ### SK
 #### Saskatchewan
-Additional up-to-date COVID data for this province can be found here:  
-https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
+Additional COVID-19 information for Saskatchewan can be found at: https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
 
 
 ### MB
 #### Manitoba
-Additional up-to-date COVID data for this province can be found here:  
-https://geoportal.gov.mb.ca/apps/manitoba-covid-19/explore
+Additional COVID-19 information for Manitoba can be found at: https://www.gov.mb.ca/health/publichealth/surveillance/influenza/index.html
 
 
 ### ON
 #### Ontario
-Additional up-to-date COVID data for this province can be found here:  
-https://www.publichealthontario.ca/en/diseases-and-conditions/infectious-diseases/respiratory-diseases/novel-coronavirus/variants
-
+Additional COVID-19 information for Ontario can be found at: https://www.publichealthontario.ca/en/Data-and-Analysis/Infectious-Disease/Respiratory-Virus-Tool
 
 ### QC
 #### Quebec
-Provincial random sequencing has been temporarily suspended as of Feb 8th, 2021. Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
-Additiona up-to-date COVID data for this province can be found here:  
-https://www.inspq.qc.ca/covid-19/donnees/variants
-
+Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
+Additions up-to-date COVID-19 data for Quebec can be found at: https://www.inspq.qc.ca/covid-19/donnees/variants
 
 ### NS
 #### Nova Scotia
-Additional up-to-date COVID data for this province can be found here:  
-https://experience.arcgis.com/experience/204d6ed723244dfbb763ca3f913c5cad
+Additional COVID-19 information for Nova Scotia can be found at: https://novascotia.ca/coronavirus/alerts-notices/#epidemiologic-summaries
 
 
 ### NB
 #### New Brunswick
-Additional up-to-date COVID data for this province can be found here:  
-https://experience.arcgis.com/experience/8eeb9a2052d641c996dba5de8f25a8aa (NB dashboard)
+Additional COVID-19 information for New Brunswick can be found at: https://www2.gnb.ca/content/gnb/en/corporate/promo/respiratory-watch.html
 
 
 ### NL
 #### Newfoundland and Labrador
-Additional up-to-date COVID data for this province can be found here:  
-https://covid-19-newfoundland-and-labrador-gnl.hub.arcgis.com/
+Additional COVID-19 information for Newfoundland and Labrador can be found at: https://experience.arcgis.com/experience/b47262b1265f48ba95d7477c56835593
 
 
 ## List of useful tools
 
 A selection of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
 
-* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version](https://genome.ucsc.edu/cgi-bin/hgPhyloPlace), [local-version]( https://shusher.gi.ucsc.edu)
+* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version](https://genome.ucsc.edu/cgi-bin/hgPhyloPlace), [local-version]( https://shusher.gi.ucsc.edu) [unavailable]
 * List of (mostly) [modelling tools by CANMOD](https://canmod.net/tools), includes [RECON](https://github.com/reconhub), an outbreak tools for both modelling and genomic epidemiology
-* List of [homoplaises in SARS-CoV-2](https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt)
-* Erin Gill's [COVID-19 dashboard](https://github.com/eringill/COVID_dashboard_reboot)
+* List of [homoplaises in SARS-CoV-2](https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt) [Last updated 3yr ago]
+* Erin Gill's [COVID-19 dashboard](https://github.com/eringill/COVID_dashboard_reboot) [not updated?]
 * [The Epi Graph Network](https://thegraphnetwork.training/): training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro.
-* [Nybbler tool](https://github.com/nodrogluap/nybbler) for subsampling SARS-CoV-2 genome ensembles
+* [Nybbler tool](https://github.com/nodrogluap/nybbler) for subsampling SARS-CoV-2 genome ensembles [last updated 3yr ago]
 * [Pokay tool](https://github.com/nodrogluap/pokay) for checking and reporitng mismatches
 * [IRIDA Canada's ID analysis platform](https://github.com/pvanheus/irida) for genomic epidemiology
 * [cov-lineages](https://cov-lineages.org/lineage_list.html): summaries of Pango lineages
 * [CoVizu](https://github.com/PoonLab/covizu/): analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time
-* [COVID-MVP](https://covidmvp.cidgoh.ca/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
+* [VIRUS-MVP](https://virusmvp.org/covid-mvp/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
 * [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
 * Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
+
+## Historical notes
+
+From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
+By the beginning of summer 2021, the VOCs Alpha and Gamma were the most sequenced lineages overall in Canada.
+The Delta wave grew during the summer of 2021 with sublineages AY.25 and AY.27 constituting sizeable proportions of this wave. Omicron arrived in November of 2021 and spread in three main waves, first BA.1* (early 2022), then BA.2* (spring 2022), then BA.5* (summer 2022). Current, multiple sublineages of Omicron persist, with emerging sublineages spreading, such as BQ.1.1 (a BA.5 sub-lineage).
+
+There are two Pango lineages that have a Canadian origin and that predominately spread within Canada (with some exportations internationally): B.1.438.1 and B.1.1.176. Other lineages of historical interest in Canada:  
+
+* A.2.5.2 - an A lineage (clade 19B) that spread in Quebec, involved in several outbreaks before Delta arrived  (see this post for more details: https://virological.org/t/recent-evolution-and-international-transmission-of-sars-cov-2-clade-19b-pango-a-lineages/711)
+* B.1.2 - a USA lineage that spread well in Canada  
+* B.1.160 - an European lineages that spread well in Canada  
+
+This historical analysis is not being further updated, as we focus on more interactive data plots and the “Current situation” text above.
 
 ## Previous Versions
 
