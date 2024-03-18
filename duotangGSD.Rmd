@@ -192,9 +192,8 @@ uniqueNamedLineageLast120Days <- unique(
 lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F, comment.char = "", fill = T) %>% 
   mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>% 
   mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
-  dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage & meta$sample_collection_date > startdate]), 0))
-colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "# In Canada Last 3Mo")
-
+  dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage & meta$sample_collection_date > startdate]), 0))%>% mutate(`Present in Canada Last 14 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage & meta$sample_collection_date > max(meta$sample_collection_date)-days(14)]), 0))
+colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "# In Canada Last 3Mo", "# In Canada Last 2wk")
 #this is used to build the tooltips in current situation.
 # write_tsv(lineageDescriptions, "downloads/lineagesNotesAnnotated.tsv")
 # system("python scripts/tooltipsadd.py")
