@@ -581,12 +581,9 @@ Additional COVID-19 information for Newfoundland and Labrador can be found at: h
 
 A selection of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
 
-* UShER: Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree [web-version](https://genome.ucsc.edu/cgi-bin/hgPhyloPlace), [local-version]( https://shusher.gi.ucsc.edu) [unavailable]
+* [UShER](https://usher-wiki.readthedocs.io/en/latest/UShER.html): Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree.
 * List of (mostly) [modelling tools by CANMOD](https://canmod.net/tools), includes [RECON](https://github.com/reconhub), an outbreak tools for both modelling and genomic epidemiology
-* List of [homoplaises in SARS-CoV-2](https://github.com/corneliusroemer/ncov-simplest/blob/main/data/exclude_sites_light.txt) [Last updated 3yr ago]
-* Erin Gill's [COVID-19 dashboard](https://github.com/eringill/COVID_dashboard_reboot) [not updated?]
 * [The Epi Graph Network](https://thegraphnetwork.training/): training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro.
-* [Nybbler tool](https://github.com/nodrogluap/nybbler) for subsampling SARS-CoV-2 genome ensembles [last updated 3yr ago]
 * [Pokay tool](https://github.com/nodrogluap/pokay) for checking and reporitng mismatches
 * [IRIDA Canada's ID analysis platform](https://github.com/pvanheus/irida) for genomic epidemiology
 * [cov-lineages](https://cov-lineages.org/lineage_list.html): summaries of Pango lineages
