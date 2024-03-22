@@ -242,7 +242,7 @@ These analyses are subject to frequent change given new data and updated lineage
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
 #individualSelectionPlotReference <- getStrictoSubLineages("EG.5.1.1", meta)
-individualSelectionPlotReference <- getStrictoSubLineages("JN.1", meta)
+individualSelectionPlotReference <- getStrictoSubLineages("HV.1", meta)
 
 #saveRDS(allparams, "newallparams.rds")
 allparams <- mclapply(latelineage_pangotree, function(l) {
