@@ -15,6 +15,8 @@ sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)]
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
+# sublineage_jn1.11 <- getStrictoSubLineages("JN.1.11*",meta)
+# sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% sublineage_jn1.11] #XBB Other
 sublineages_NonXBB<-setAll[!setAll %in% c(sublineage_hv1, sublineages_XBBOther, sublineage_jn1)] #the rest
 
 reference = sublineage_hv1
@@ -271,6 +273,8 @@ sum(p$toplot$n2)>10
 }else{FALSE}})]
 
 coefficientTable <- plot_growing_lineage(paramselected,makeplot=FALSE)
+
+mutantToHighlight <- list(paste0(as.character((lineageDescriptions %>% arrange(desc(`# In Canada Last 2wk`)) %>% dplyr::select(Lineage))[1,1]),"*"))
 ```
 
 ## Plot (stricto) {.tabset .tabset-fade}
@@ -290,7 +294,6 @@ selectparam <- function(p,reg){
   }else{FALSE}
   }
 
-
 for (i in 1:length(all.regions[["name"]])) {
   cat("###", all.regions[['shortname']][[i]], "\n")
   if (all.regions[['name']][[i]] == "Canada"){
@@ -303,7 +306,7 @@ for (i in 1:length(all.regions[["name"]])) {
 
   if(n!=0){
     #print(plot_growing_lineage(paramselected[1:n]))
-    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable, mutantNamesToHighlight = mutantNames) #A%>% as_widget()
+    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable, mutantNamesToHighlight = mutantToHighlight) #A%>% as_widget()
     #print(htmltools::tagList(ggplotly(p, height = 700)))
     print(p)
   }else{
@@ -337,7 +340,7 @@ for (i in 1:length(all.regions[["name"]])) {
   n=min(25,length(paramselected))
   if(n!=0){
     #print(plot_growing_lineage(paramselected[1:n]))
-    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable, mutantNamesToHighlight = mutantNames) #A%>% as_widget()
+    p<-plot_growing_lineage(paramselected[1:n], coefficientTable=coefficientTable, mutantNamesToHighlight = mutantToHighlight) #A%>% as_widget()
     #print(htmltools::tagList(ggplotly(p, height = 700)))
     print(p)
   }else{

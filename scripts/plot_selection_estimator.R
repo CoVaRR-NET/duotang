@@ -364,7 +364,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     scale_fill_manual(label =c(levels(plotData$variable)), values = unname(col)) +
     xlab("Sample collection date") +
     ylab(paste0("Proportion in ", est$region)) + 
-    ylim(0,1) +
+    ylim(0,1.2) +
     xlim(min(plotData$date), maxdate) 
 
   #format the fit (line)

@@ -51,7 +51,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable="", mutantNa
     }
   }
   
-  if (length(mutantNamesToHighlight) > 1){
+  if (length(mutantNamesToHighlight) >= 1){
     mutantNamesToHighlight <- c(gsub("\\*", "", mutantNamesToHighlight), mutantNamesToHighlight)
     d <- d %>% mutate(Highlight = ifelse(lineage %in% mutantNamesToHighlight, 1, 0))
   }
