@@ -1,6 +1,6 @@
 
 
-<u id='JN_1'>JN.1</u> still predominates, but multiple variants with the immune evasive mutations S:F456L and S:R346T (nicknamed the "FLiRT" combination of mutations) are growing notably, along with some variants like <u id='JN_1_7'>JN.1.7</u> with S:T572I (a mutation that may increase ACE2 binding). Currently <u id='KP_2'>KP.2</u> (<u id='JN_1_11_1'>JN.1.11.1</u> with S:R346T) is showing the most growth overall (albiet still at low numbers). Note that many <u id='KP_2'>KP.2</u> and the similar variant <u id='KP_1_1'>KP.1.1</u> may be currently falsely classified as their ancestor <u id='JN_1_11_1'>JN.1.11.1</u>. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
+<u id='JN_1'>JN.1</u> still predominates, but multiple variants with the immune evasive mutations S:F456L and S:R346T (nicknamed the “FLiRT” combination of mutations) are growing, along with some variants like <u id='JN_1_7'>JN.1.7</u> or <u id='JN_1_32'>JN.1.32</u> with S:T572I (a mutation that may increase ACE2 binding). Currently <u id='KP_2'>KP.2</u> (<u id='JN_1_11_1'>JN.1.11.1</u> with S:R346T) is showing the most growth overall (albiet still at low numbers). Note that many <u id='KP_2'>KP.2</u>, and the similar variant <u id='KP_1_1'>KP.1.1</u>, may be currently falsely classified as their ancestor <u id='JN_1_11_1'>JN.1.11.1</u>. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
 
 
 
