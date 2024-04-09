@@ -1,14 +1,10 @@
 
 
-<u id='JN_1'>JN.1</u> still predominates, but multiple variants with the immune evasive mutations S:F456L and S:R346T (nicknamed the "FLiRT" combination of mutations) are growing notably, along with some variants like <u id='JN_1_7'>JN.1.7</u> with S:T572I (a mutation that may increase ACE2 binding). Currently <u id='KP_2'>KP.2</u> (<u id='JN_1_11_1'>JN.1.11.1</u> with S:R346T) is showing the most growth overall (albiet still at low numbers). Note that many <u id='KP_2'>KP.2</u> and the similar variant <u id='KP_1_1'>KP.1.1</u> may be currently falsely classified as their ancestor <u id='JN_1_11_1'>JN.1.11.1</u>. Saltations (variants with a sudden large increase in number of mutations) are still being closely tracked.
+<u id='JN_1'>JN.1</u> still predominates, but multiple variants with the immune evasive mutations S:F456L and S:R346T (nicknamed the “FLiRT” combination of mutations) are growing, along with some variants like <u id='JN_1_7'>JN.1.7</u> or <u id='JN_1_32'>JN.1.32</u> with S:T572I (a mutation that may increase ACE2 binding). Currently <u id='KP_2'>KP.2</u> (<u id='JN_1_11_1'>JN.1.11.1</u> with S:R346T) is showing the most growth overall (albiet still at low numbers). Note that many <u id='KP_2'>KP.2</u>, and the similar variant <u id='KP_1_1'>KP.1.1</u>, may be currently falsely classified as their ancestor <u id='JN_1_11_1'>JN.1.11.1</u>.
 
 
 
-Variants of current interest:
-
-
-
-(Due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries.)
+Variants of current interest (due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries):
 
 
 
@@ -16,7 +12,7 @@ Variants of current interest:
 * <u id='JN_1_7'>JN.1.7</u> and other variants growing that have S:T572I (potentially increases ACE2 binding) with a particular interest with those with also S:R346T like <u id='KQ_1'>KQ.1</u> and <u id='XDK_1'>XDK.1</u> (nicknamed as having "TIRT" mutations).
 * <u id='KP_2'>KP.2</u> (<u id='JN_1_11'>JN.1.11</u> with S:F456L and S:R346T and other variants with these "FLiRT" mutations including <u id='KP_1_1'>KP.1.1</u>).
 
-Plus any highly divergent variants (saltations) and sublineages with additional combinations of mutations identified through mutation scanning that are involved in binding or immune evasion. See:
+Plus any highly divergent variants (“saltation” lineages with a sudden increase in number of mutations) and sublineages with additional combinations of mutations identified through mutation scanning that are involved in binding or immune evasion. See:
 
 
 
