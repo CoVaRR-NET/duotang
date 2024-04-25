@@ -346,9 +346,16 @@ for (i in 1:nrow(sublineagestoplot)) {
   # side = "right",
   # title = "Second y axis"
   # )
-  print(htmltools::tagList(ggplotly(subVariantData$absolute, height = 400)))
+  
+  if (i==1){
+      print(htmltools::tagList(ggplotly(subVariantData$absolute, height = 400)))
   #%>% add_lines(x=~Date, y=~`TotalCases(*10e2)`, colors="grey", yaxis="y2", data=subVariantData$data, showlegend=F, inherit=F) %>% layout(yaxis2=ay)))
-  print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
+      print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
+  } else{
+    print(subVariantData$absolute)
+    print(subVariantData$relative)
+  }
+
   cat("\n\n")
   
   if (nrow(frequencyTable) == 0){
