@@ -248,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("--after", type=int, default=1,
                         help="int, number of genomes to sample per lineage "
                              "per week per province, before cutoff date")
-    parser.add_argument("--year", type=int, default=2022,
+    parser.add_argument("--year", type=int, default=2023,
                         help="int, year number for cutoff date")
     parser.add_argument("--epiweek", type=int, default=31,
                         help="int, week number for cutoff date")
