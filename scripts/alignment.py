@@ -101,7 +101,7 @@ def apply_cigar(seq, rpos, cigar, reflen):
     return aligned
 
 
-def minimap2(stdin, refpath, path='minimap2', nthread=16, reflen=29903):
+def minimap2(stdin, refpath, path='minimap2', nthread=64, reflen=29903):
     """
     Wrapper function for minimap2.
 
@@ -248,9 +248,9 @@ if __name__ == "__main__":
     parser.add_argument("--after", type=int, default=1,
                         help="int, number of genomes to sample per lineage "
                              "per week per province, before cutoff date")
-    parser.add_argument("--year", type=int, default=2023,
+    parser.add_argument("--year", type=int, default=2024,
                         help="int, year number for cutoff date")
-    parser.add_argument("--epiweek", type=int, default=31,
+    parser.add_argument("--epiweek", type=int, default=1,
                         help="int, week number for cutoff date")
     parser.add_argument("--nosample", action=argparse.BooleanOptionalAction,
                         help="bool, whether or not sampling should be performed")

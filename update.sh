@@ -445,7 +445,7 @@ if [ "$SKIPTREE" = "NO" ]; then
 	#buildtree:
 	for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 		echo $alignedFasta
-		iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
+		iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 64; 
 	done
 	echo "cleantree" > $checkPointFile
 
