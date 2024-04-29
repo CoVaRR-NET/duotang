@@ -353,6 +353,7 @@ for (i in 1:nrow(sublineagestoplot)) {
       print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
   } else{
     print(subVariantData$absolute)
+     cat("\n")
     print(subVariantData$relative)
   }
 

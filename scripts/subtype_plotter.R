@@ -98,7 +98,7 @@ plot.subvariants <- function(region='Canada', sublineage,
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
 plot.subvariants.ggplot <- function(region='Canada', sublineage, 
-                             scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
+                             scaled=FALSE, col=NA, mindate=NA, maxdate=NA, max=12) {
   # sublineage <- set
   # region = 'Canada'
   # scaled=FALSE
@@ -115,7 +115,6 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   varmeta1$pango_group <- varmeta1$lineage
   
   lineagecount=varmeta1 %>% group_by(lineage) %>% count()
-  max=50
   if(nrow(lineagecount)>max){ 
     lineagecount=as_data_frame(lineagecount)
     rarelineages <- lineagecount %>% slice_min(n,n=nrow(lineagecount)-max) #filter(n<0.01*nrow(varmeta1))
