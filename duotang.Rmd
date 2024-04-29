@@ -297,7 +297,7 @@ Below is an interactive visualization showing frequencies of ciruclating lineage
 
 Tips: Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.
 
-```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
+```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="100%",results='asis'}
 
 source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
