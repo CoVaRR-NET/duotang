@@ -434,7 +434,7 @@ if [ "$SKIPTREE" = "NO" ]; then
 		name=${name%.*};
 		name=`echo $name|cut -d '_' -f3-`;
 		echo $variant
-		python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --nosample --reffile resources/NC_045512.fa; 
+		python3 ${scripts_dir}/alignment.py ${data_dir}/Sequences_regex_${name}.fasta.xz ${data_dir}/SequenceMetadata_regex_${name}.tsv.gz ${data_dir}/aligned_recombinant_$name --samplenum 1 --reffile resources/NC_045512.fa; 
 	done
 
 	#non-recombinants
@@ -445,7 +445,7 @@ if [ "$SKIPTREE" = "NO" ]; then
 	#buildtree:
 	for alignedFasta in `ls $data_dir/aligned_*.fasta`; do
 		echo $alignedFasta
-		iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 16; 
+		iqtree2 -ninit 2 -n 2 -me 0.05 -nt 8 -s $alignedFasta -m GTR -ninit 10 -n 8 --redo -T 64; 
 	done
 	echo "cleantree" > $checkPointFile
 

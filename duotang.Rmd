@@ -297,7 +297,7 @@ Below is an interactive visualization showing frequencies of ciruclating lineage
 
 Tips: Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.
 
-```{r, figures-side, echo=FALSE,  warning=FALSE, fig.width=5, fig.height=5, out.width="50%",results='asis'}
+```{r, figures-side, echo=FALSE,  warning=FALSE,out.width="100%",results='asis'}
 
 source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
@@ -346,9 +346,17 @@ for (i in 1:nrow(sublineagestoplot)) {
   # side = "right",
   # title = "Second y axis"
   # )
-  print(htmltools::tagList(ggplotly(subVariantData$absolute, height = 400)))
+  
+  if (i==1){
+      print(htmltools::tagList(ggplotly(subVariantData$absolute, height = 400)))
   #%>% add_lines(x=~Date, y=~`TotalCases(*10e2)`, colors="grey", yaxis="y2", data=subVariantData$data, showlegend=F, inherit=F) %>% layout(yaxis2=ay)))
-  print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
+      print(htmltools::tagList(ggplotly(subVariantData$relative, height = 400)))
+  } else{
+    print(subVariantData$absolute)
+     cat("\n")
+    print(subVariantData$relative)
+  }
+
   cat("\n\n")
   
   if (nrow(frequencyTable) == 0){
