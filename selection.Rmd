@@ -10,16 +10,21 @@ setAll=getAllStrictoLineages(meta)
 #sublineages_BQ <- getStrictoSubLineages("BQ*",meta) #BQ variants
 sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 #sublineages_EG5 <- getStrictoSubLineages("EG.5*",meta)
-sublineage_hv1 <- getStrictoSubLineages("HV.1*",meta)
-sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)] #XBB Other
+# sublineage_hv1 <- getStrictoSubLineages("HV.1*",meta)
+# sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)] #XBB Other
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
+sublineage_kp1 <- getStrictoSubLineages("KP.1*",meta)
+
+sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_kp1)] #XBB Other
+
+
 # sublineage_jn1.11 <- getStrictoSubLineages("JN.1.11*",meta)
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% sublineage_jn1.11] #XBB Other
-sublineages_NonXBB<-setAll[!setAll %in% c(sublineage_hv1, sublineages_XBBOther, sublineage_jn1)] #the rest
+sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_XBB, sublineage_jn1, sublineage_kp1)] #the rest
 
-reference = sublineage_hv1
+reference = sublineage_jn1
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
@@ -28,9 +33,9 @@ reference = sublineage_hv1
 # col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
 
 # 
-mutants = list(sublineages_XBBOther, sublineage_jn1 ,sublineages_NonXBB)
-mutantNames = list("XBB.Other", "JN.1*","BA.2.Other",  "HV.1*") #
-col <- c("XBB.Other"=pal["XBB"], "JN.1*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineages_XBB, sublineage_kp1 ,sublineages_NonXBB)
+mutantNames = list("XBB", "KP.1*","BA.2.Other",  "JN.1*") #
+col <- c("XBB"=pal["XBB"], "KP.1*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
