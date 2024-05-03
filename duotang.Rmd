@@ -213,8 +213,6 @@ Input and direction by other members of [Pillar 6](https://covarrnet.ca/our-team
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
-**NOTE: Due to the amount of visualizations provided in this notebook, this page may take up to 30 seconds to load completely. We apologize for the inconvenience.**
-
 # SARS-CoV-2 In Canada
 
 ## Introduction
@@ -242,7 +240,7 @@ These analyses are subject to frequent change given new data and updated lineage
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
 #individualSelectionPlotReference <- getStrictoSubLineages("EG.5.1.1", meta)
-individualSelectionPlotReference <- getStrictoSubLineages("HV.1", meta)
+individualSelectionPlotReference <- getStrictoSubLineages("JN.1", meta)
 
 #saveRDS(allparams, "newallparams.rds")
 allparams <- mclapply(latelineage_pangotree, function(l) {
