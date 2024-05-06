@@ -95,7 +95,7 @@ for (i in 1:length(all.regions$name)){
 
 Here we examine the relative rate of spread of the different sublineages of SARS-CoV-2 currently circulating in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale (and in the Fastest Growing Lineages section): `r mutantNames[length(mutantNames)]` and at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of SARS-CoV-2 lineages circulating are XBB.\* variants, including HV.1\*, as well as BA.2\* variants, particularly JN.1 and other BA.2.86 descendants. Thus, at the broad scale, we are currently track the frequencies of HV.1\*, Non-HV.1* XBB descendants (XBB.Other), JN.1* and Non-JN.1* BA.2 descendants. 
+Currently, the major group of SARS-CoV-2 lineages circulating are BA.2.86\* variants, particularly JN.1 and its descendants. Thus, at the broad scale, we are currently track the frequencies of JN.1\* descendants other than KP.1\*, KP.1\* descendants, XBB descendants and other BA.2 lineages (mainly BA.2.86 lineages not in JN.1\*).
 
 Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
@@ -284,7 +284,7 @@ mutantToHighlight <- list(paste0(as.character((lineageDescriptions %>% arrange(d
 
 ## Plot (stricto) {.tabset .tabset-fade}
 
-This plot highlights single lineages that are growing fastest (e.g., JN.1). 
+This plot highlights single lineages that are growing fastest. 
 
 ```{r buildStrictoPlots, results='asis', echo = F, warning=FALSE, fig.height=7}
 
