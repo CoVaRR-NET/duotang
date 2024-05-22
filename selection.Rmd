@@ -15,7 +15,7 @@ sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
-sublineage_kp1 <- getStrictoSubLineages("KP.1*",meta)
+sublineage_kp1 <- getStrictoSubLineages("KP.*",meta)
 
 sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_kp1)] #XBB Other
 
@@ -34,8 +34,8 @@ reference = sublineage_jn1
 
 # 
 mutants = list(sublineages_XBB, sublineage_kp1 ,sublineages_NonXBB)
-mutantNames = list("XBB", "KP.1*","BA.2.Other",  "JN.1*") #
-col <- c("XBB"=pal["XBB"], "KP.1*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("XBB", "KP.*","BA.2.Other",  "JN.1*") #
+col <- c("XBB"=pal["XBB"], "KP.*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
@@ -95,7 +95,7 @@ for (i in 1:length(all.regions$name)){
 
 Here we examine the relative rate of spread of the different sublineages of SARS-CoV-2 currently circulating in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale (and in the Fastest Growing Lineages section): `r mutantNames[length(mutantNames)]` and at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of SARS-CoV-2 lineages circulating are BA.2.86\* variants, particularly JN.1 and its descendants. Thus, at the broad scale, we are currently track the frequencies of JN.1\* descendants other than KP.1\*, KP.1\* descendants, XBB descendants and other BA.2 lineages (mainly BA.2.86 lineages not in JN.1\*).
+Currently, the major group of SARS-CoV-2 lineages circulating are BA.2.86\* variants, particularly JN.1 and its descendants. Thus, at the broad scale, we are currently track the frequencies of JN.1\* descendants other than KP.3\*, KP.3\* descendants, XBB descendants and other BA.2 lineages (mainly BA.2.86 lineages not in JN.1\*).
 
 Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 

@@ -213,6 +213,20 @@ Input and direction by other members of [Pillar 6](https://covarrnet.ca/our-team
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
 
+### Citation
+
+To cite Duotang in publications, please use:
+
+Gill E.E., et al. The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology. arXiv.  	
+doi:10.48550/arXiv.2405.04734. [Click To Copy BibTeX](@misc{gill2024canadian,
+    title={The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology},
+    author={Erin E. Gill and Baofeng Jia and Carmen Lia Murall and Raphaël Poujol and Muhammad Zohaib Anwar and Nithu Sara John and Justin Richardsson and Ashley Hobb and Abayomi S. Olabode and Alexandru Lepsa and Ana T. Duggan and Andrea D. Tyler and Arnaud N'Guessan and Atul Kachru and Brandon Chan and Catherine Yoshida and Christina K. Yung and David Bujold and Dusan Andric and Edmund Su and Emma J. Griffiths and Gary Van Domselaar and Gordon W. Jolly and Heather K. E. Ward and Henrich Feher and Jared Baker and Jared T. Simpson and Jaser Uddin and Jiannis Ragoussis and Jon Eubank and Jörg H. Fritz and José Héctor Gálvez and Karen Fang and Kim Cullion and Leonardo Rivera and Linda Xiang and Matthew A. Croxen and Mitchell Shiell and Natalie Prystajecky and Pierre-Olivier Quirion and Rosita Bajari and Samantha Rich and Samira Mubareka and Sandrine Moreira and Scott Cain and Steven G. Sutcliffe and Susanne A. Kraemer and Yann Joly and Yelizar Alturmessov and CPHLN consortium and CanCOGeN consortium and VirusSeq Data Portal Academic and Health network and Marc Fiume and Terrance P. Snutch and Cindy Bell and Catalina Lopez-Correa and Julie G. Hussin and Jeffrey B. Joy and Caroline Colijn and Paul M. K. Gordon and William W. L. Hsiao and Art F. Y. Poon and Natalie C. Knox and Mélanie Courtot and Lincoln Stein and Sarah P. Otto and Guillaume Bourque and B. Jesse Shapiro and Fiona S. L. Brinkman},
+    year={2024},
+    eprint={2405.04734},
+    archivePrefix={arXiv},
+    primaryClass={q-bio.GN}
+})
+
 # SARS-CoV-2 In Canada
 
 ## Introduction
@@ -295,7 +309,7 @@ Below is an interactive visualization showing frequencies of ciruclating lineage
 
 Tips: Click and drag to zoom, double click to reset. Clicking on an item in the legend will hide it, double clicking an item in legend will hide everything else but that item.
 
-```{r, figures-side, echo=FALSE,  warning=FALSE,out.width="100%",results='asis'}
+```{r, figures-side, echo=FALSE,  warning=FALSE,out.width="100%", out.height=800, results='asis'}
 
 source("scripts/subtype_plotter.R")
 sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
@@ -311,6 +325,7 @@ sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
 plotted=c()
 frequencyTable <- data.frame()
 for (i in 1:nrow(sublineagestoplot)) {
+  i=1
   mindate=NA
   maxdate=NA
   if(sublineagestoplot[[i,"mindate"]]!=""){
@@ -325,7 +340,12 @@ for (i in 1:nrow(sublineagestoplot)) {
   if(sublineagestoplot[[i,"exclude_previously_plotted"]]){
     set=set[!set %in% plotted]
   }
-  subVariantData=plot.subvariants.ggplot(sublineage=set,mindate=mindate,maxdate=maxdate)
+  if (i == 1){ #set the maximum number of lineages to show in legend. non-interactive plots can only accomodate 12.
+    maxLegendCount = 25
+  } else{
+    maxLegendCount = 12
+  }
+  subVariantData=plot.subvariants.ggplot(sublineage=set,mindate=mindate,maxdate=maxdate, max = maxLegendCount)
   
   #outputs the text/plots into RMD
   cat("###", sublineagestoplot[[i,"tabname"]], " {.unlisted .unnumbered}\n")
@@ -597,6 +617,7 @@ A selection of bioinformatics, phylogenetic, and modelling tools that are useful
 * [VIRUS-MVP](https://virusmvp.org/covid-mvp/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
 * [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
 * Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
+* [Mutation Distribution App] (https://eringill.shinyapps.io/covid-mutation-distributions/)
 
 ## Historical notes
 

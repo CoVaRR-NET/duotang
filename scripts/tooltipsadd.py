@@ -4,7 +4,7 @@ AllLineageNotes={}
 with open ("downloads/lineagesNotesAnnotated.tsv", 'r') as f:
     f.readline()
     for i in f:
-        if len(i)>3:
+        if len(i)>3 and i[0]!="A":
             row = i.split('\t')
             lineage = row[0]
             parent="Ancestor:" + row[1] if row[1] != "NA" else ""
