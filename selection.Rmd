@@ -15,7 +15,7 @@ sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
-sublineage_kp1 <- getStrictoSubLineages("KP.3*",meta)
+sublineage_kp1 <- getStrictoSubLineages("KP.*",meta)
 
 sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_kp1)] #XBB Other
 
@@ -34,8 +34,8 @@ reference = sublineage_jn1
 
 # 
 mutants = list(sublineages_XBB, sublineage_kp1 ,sublineages_NonXBB)
-mutantNames = list("XBB", "KP.3*","BA.2.Other",  "JN.1*") #
-col <- c("XBB"=pal["XBB"], "KP.3*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("XBB", "KP.*","BA.2.Other",  "JN.1*") #
+col <- c("XBB"=pal["XBB"], "KP.*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
