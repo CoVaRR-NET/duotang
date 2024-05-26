@@ -617,7 +617,7 @@ A selection of bioinformatics, phylogenetic, and modelling tools that are useful
 * [VIRUS-MVP](https://virusmvp.org/covid-mvp/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
 * [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
 * Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
-* [Mutation Distribution App] (https://eringill.shinyapps.io/covid-mutation-distributions/)
+* [Raj Rajnarayanan's data "vizzes"](https://public.tableau.com/app/profile/raj.rajnarayanan/vizzes)
 
 ## Historical notes
 
