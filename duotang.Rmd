@@ -325,7 +325,6 @@ sublineagestoplot = data.frame(name=c("B*", "BA.1*","BA.2*",
 plotted=c()
 frequencyTable <- data.frame()
 for (i in 1:nrow(sublineagestoplot)) {
-  i=1
   mindate=NA
   maxdate=NA
   if(sublineagestoplot[[i,"mindate"]]!=""){
