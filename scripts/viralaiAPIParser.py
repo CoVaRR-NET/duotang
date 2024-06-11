@@ -48,6 +48,18 @@ if __name__ == "__main__":
         if (is_valid_uuid(item.strip())):
             identifier = item.strip().replace("&nbsp","")
 
+    #sometimes the uuid is invalid for some reason e.g. missing a character. lets just be dumb about it and assign it something so the script can continue
+    if identifier == None:
+        information = re.split('<|>|;|\(|\)|identifier:',description[description.find('Release:'):])
+        for item in information:
+            if (item.count("-") == 4):
+                identifier = item.strip().replace("&nbsp","")
+
+
+    test = " ed3b55a-9096-48bd-95db-aed336055a8a".strip()
+    test2 = "d141babd-b824-4f8b-a310-717be1f5144f"
+    t2 = is_valid_uuid(test.strip())
+
     print (date + ";" + identifier)
 
     
