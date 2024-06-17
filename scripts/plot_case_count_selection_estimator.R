@@ -190,7 +190,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T) #merge the X values
     rColors[lineFits[[i]]$names] <- lineFits[[i]]$color #assign color to line
     rValues[lineFits[[i]]$names] <- round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
-    if (region != "Alberta" & region != "Quebec"){
+    if (region != "Quebec"){
       rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7
     }
   }
@@ -239,8 +239,8 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     #scale_shape_manual(name = NULL, values=c(19)) +
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
-    
-    ylim(0, max(6, max(d$n) + 2)) + 
+    #ylim(0, max(6, max(d$n) + 2)) + 
+    ylim(0, 6) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
     ylab("PCR-verified cases per 100,000 individuals") +
