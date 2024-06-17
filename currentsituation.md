@@ -1,6 +1,6 @@
 
 
-<u id='KP_3'>KP.3</u> (<u id='JN_1'>JN.1</u> with S:F456L and S:Q493E) is still dominating, however, multiple variants with  S:F456L and S:R346T (aka the “FLiRT” mutations), are still growing as well, in particular <u id='JN_1_16_1'>JN.1.16.1</u>. <u id='KP_1_1'>KP.1.1</u>, <u id='KP_2'>KP.2</u>, <u id='KS_1'>KS.1</u>, and <u id='LB_1'>LB.1</u> and those with the additional S:S31del mutation.
+<u id='KP_3'>KP.3</u> (<u id='JN_1'>JN.1</u> with S:F456L and S:Q493E) and its subvariants are still dominating, however, multiple variants with  S:F456L and S:R346T (aka the “FLiRT” mutations), are still growing as well, in particular <u id='JN_1_16_1'>JN.1.16.1</u>. <u id='KP_1_1'>KP.1.1</u>, <u id='KP_2'>KP.2</u>, <u id='KS_1'>KS.1</u>, and <u id='LB_1'>LB.1</u> and those with the additional S:S31del mutation.
 
 
 
