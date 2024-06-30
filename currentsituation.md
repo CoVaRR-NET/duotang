@@ -4,7 +4,7 @@ Variants with the S:S31del mutation are growing rapidly, involving multiple vari
 
 
 
-In addition saltations (highly divergent lineages) continue to be tracked, such as recent saltations of <u id='BA_1'>BA.1</u> and Delta detected (to view these, select only <u id='BA_1'>BA.1</u> or Delta under the root-to-tip plot below). These all have no evidence of growth to date and are all either noted as from a chronic infection in the additional annotation provided in the VirusSeq Data Portal or our further analysis indicates they have mutations consistent with chronic infection.
+In addition saltations (highly divergent lineages) continue to be tracked, such as recent saltations of <u id='BA_1'>BA.1</u> detected (to view these, select only <u id='BA_1'>BA.1</u> in the root-to-tip plot below). These all have no evidence of growth to date and are all either noted as from a chronic infection in the additional annotation provided in the VirusSeq Data Portal or further analysis we performed indicates they have mutations consistent with chronic infection.
 
 
 
