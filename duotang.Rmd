@@ -618,6 +618,13 @@ A selection of bioinformatics, phylogenetic, and modelling tools that are useful
 * Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
 * [Raj Rajnarayanan's data "vizzes"](https://public.tableau.com/app/profile/raj.rajnarayanan/vizzes)
 
+We look for additional combinations of mutations identified through mutation scanning that are involved in binding or immune evasion. See for example:
+* Greaney, Starr, & Bloom, Virus Evolution, 8:veac021 (2022)
+* Cao et al, Nature, 614:521-529 (2023)
+* Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
+* Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
+* Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
+
 ## Historical notes
 
 From the beginning of the pandemic to the fall of 2021, Canadian sequences were mostly of the wildtype lineages (pre-VOCs).
