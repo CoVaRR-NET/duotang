@@ -10,7 +10,7 @@ In addition saltations (highly divergent lineages) continue to be tracked, such 
 
 Variants of current interest (due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries):
 
-* Variants with S:S31del (also referred to as S:S31-) including subvariants of <u id='KP_1'>KP.1</u>, <u id='KP_2_3'>KP.2.3</u>, <u id='KP_3'>KP.3</u> (in particular <u id='KP_3_1_1'>KP.3.1.1</u>), and <u id='LB_1'>LB.1</u>, plus additional <u id='KP_3'>KP.3</u> variants like <u id='KP_3_2_3'>KP.3.2.3</u>.
+* Variants with S:S31del (also referred to as S:S31-) including subvariants of <u id='KP_1'>KP.1</u>, <u id='KP_2_3'>KP.2.3</u>, <u id='KP_3'>KP.3</u> (in particular <u id='KP_3_1_1'>KP.3.1.1</u>), and <u id='LB_1'>LB.1</u>, plus additional <u id='KP_3'>KP.3</u> variants like KP.3.2.3.
 
 Plus any highly divergent variants (“saltation” lineages with a sudden increase in number of mutations) and sublineages with additional combinations of mutations identified through mutation scanning (see references under List of Useful Tools below).
 
