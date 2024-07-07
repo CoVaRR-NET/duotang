@@ -218,14 +218,7 @@ A complete list of lab authors is in this repository, and more details are below
 To cite Duotang in publications, please use:
 
 Gill E.E., et al. The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology. arXiv.  	
-doi:10.48550/arXiv.2405.04734. [Click To Copy BibTeX](@misc{gill2024canadian,
-    title={The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology},
-    author={Erin E. Gill and Baofeng Jia and Carmen Lia Murall and Raphaël Poujol and Muhammad Zohaib Anwar and Nithu Sara John and Justin Richardsson and Ashley Hobb and Abayomi S. Olabode and Alexandru Lepsa and Ana T. Duggan and Andrea D. Tyler and Arnaud N'Guessan and Atul Kachru and Brandon Chan and Catherine Yoshida and Christina K. Yung and David Bujold and Dusan Andric and Edmund Su and Emma J. Griffiths and Gary Van Domselaar and Gordon W. Jolly and Heather K. E. Ward and Henrich Feher and Jared Baker and Jared T. Simpson and Jaser Uddin and Jiannis Ragoussis and Jon Eubank and Jörg H. Fritz and José Héctor Gálvez and Karen Fang and Kim Cullion and Leonardo Rivera and Linda Xiang and Matthew A. Croxen and Mitchell Shiell and Natalie Prystajecky and Pierre-Olivier Quirion and Rosita Bajari and Samantha Rich and Samira Mubareka and Sandrine Moreira and Scott Cain and Steven G. Sutcliffe and Susanne A. Kraemer and Yann Joly and Yelizar Alturmessov and CPHLN consortium and CanCOGeN consortium and VirusSeq Data Portal Academic and Health network and Marc Fiume and Terrance P. Snutch and Cindy Bell and Catalina Lopez-Correa and Julie G. Hussin and Jeffrey B. Joy and Caroline Colijn and Paul M. K. Gordon and William W. L. Hsiao and Art F. Y. Poon and Natalie C. Knox and Mélanie Courtot and Lincoln Stein and Sarah P. Otto and Guillaume Bourque and B. Jesse Shapiro and Fiona S. L. Brinkman},
-    year={2024},
-    eprint={2405.04734},
-    archivePrefix={arXiv},
-    primaryClass={q-bio.GN}
-})
+[doi:10.48550/arXiv.2405.04734](https://arxiv.org/abs/2405.04734)
 
 # SARS-CoV-2 In Canada
 
