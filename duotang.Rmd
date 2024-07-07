@@ -218,14 +218,7 @@ A complete list of lab authors is in this repository, and more details are below
 To cite Duotang in publications, please use:
 
 Gill E.E., et al. The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology. arXiv.  	
-doi:10.48550/arXiv.2405.04734. [Click To Copy BibTeX](@misc{gill2024canadian,
-    title={The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology},
-    author={Erin E. Gill and Baofeng Jia and Carmen Lia Murall and Raphaël Poujol and Muhammad Zohaib Anwar and Nithu Sara John and Justin Richardsson and Ashley Hobb and Abayomi S. Olabode and Alexandru Lepsa and Ana T. Duggan and Andrea D. Tyler and Arnaud N'Guessan and Atul Kachru and Brandon Chan and Catherine Yoshida and Christina K. Yung and David Bujold and Dusan Andric and Edmund Su and Emma J. Griffiths and Gary Van Domselaar and Gordon W. Jolly and Heather K. E. Ward and Henrich Feher and Jared Baker and Jared T. Simpson and Jaser Uddin and Jiannis Ragoussis and Jon Eubank and Jörg H. Fritz and José Héctor Gálvez and Karen Fang and Kim Cullion and Leonardo Rivera and Linda Xiang and Matthew A. Croxen and Mitchell Shiell and Natalie Prystajecky and Pierre-Olivier Quirion and Rosita Bajari and Samantha Rich and Samira Mubareka and Sandrine Moreira and Scott Cain and Steven G. Sutcliffe and Susanne A. Kraemer and Yann Joly and Yelizar Alturmessov and CPHLN consortium and CanCOGeN consortium and VirusSeq Data Portal Academic and Health network and Marc Fiume and Terrance P. Snutch and Cindy Bell and Catalina Lopez-Correa and Julie G. Hussin and Jeffrey B. Joy and Caroline Colijn and Paul M. K. Gordon and William W. L. Hsiao and Art F. Y. Poon and Natalie C. Knox and Mélanie Courtot and Lincoln Stein and Sarah P. Otto and Guillaume Bourque and B. Jesse Shapiro and Fiona S. L. Brinkman},
-    year={2024},
-    eprint={2405.04734},
-    archivePrefix={arXiv},
-    primaryClass={q-bio.GN}
-})
+[doi:10.48550/arXiv.2405.04734](https://arxiv.org/abs/2405.04734)
 
 # SARS-CoV-2 In Canada
 
@@ -298,6 +291,8 @@ cat(md_file, sep = "\n")
 
 ```{r rtt, child="Tooltip.Rmd"}
 ```
+
+We thank the global team of those monitoring variants, and other SARS-CoV-2 genome analysis tool providers (see [List of Useful Tools below](#Appendix)), which play a key role in identifying new variants of note.
 
 # Sublineages in Canada 
 
@@ -499,6 +494,29 @@ We are in the process of adding or would like to develop code for some of the fo
 With anonymized data on vaccination status, severity/outcome, reason for sequencing (*e.g.*, outbreak, hospitalization, or general sampling), and setting (workplace, school, daycare, LTC, health institution, other), we could analyze genomic characteristics of the virus relative to the epidemiological and immunological conditions in which it is spreading and evolving.
 Studies on mutational correlations to superspreading events, vaccination status, or comparisons between variants would allow us to better understand transmission and evolution in these environments.   
 
+## List of useful tools
+
+A selection of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
+
+* [UShER](https://usher-wiki.readthedocs.io/en/latest/UShER.html): Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree.
+* List of (mostly) [modelling tools by CANMOD](https://canmod.net/tools), includes [RECON](https://github.com/reconhub), an outbreak tools for both modelling and genomic epidemiology
+* [The Epi Graph Network](https://thegraphnetwork.training/): training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro.
+* [Pokay tool](https://github.com/nodrogluap/pokay) for checking and reporitng mismatches
+* [IRIDA Canada's ID analysis platform](https://github.com/pvanheus/irida) for genomic epidemiology
+* [cov-lineages](https://cov-lineages.org/lineage_list.html): summaries of Pango lineages
+* [CoVizu](https://github.com/PoonLab/covizu/): analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time
+* [VIRUS-MVP](https://virusmvp.org/covid-mvp/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
+* [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
+* Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
+* [Raj Rajnarayanan's data "vizzes"](https://public.tableau.com/app/profile/raj.rajnarayanan/vizzes)
+
+We look for additional combinations of mutations identified through mutation scanning that are involved in binding or immune evasion. See for example:
+* Greaney, Starr, & Bloom, Virus Evolution, 8:veac021 (2022)
+* Cao et al, Nature, 614:521-529 (2023)
+* Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
+* Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
+* Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
+
 
 ## Methodology {.tabset .tabset-fade} 
 
@@ -601,29 +619,6 @@ Additional COVID-19 information for New Brunswick can be found at: https://www2.
 #### Newfoundland and Labrador
 Additional COVID-19 information for Newfoundland and Labrador can be found at: https://experience.arcgis.com/experience/b47262b1265f48ba95d7477c56835593
 
-
-## List of useful tools
-
-A selection of bioinformatics, phylogenetic, and modelling tools that are useful for SARS-CoV-2 analyses:
-
-* [UShER](https://usher-wiki.readthedocs.io/en/latest/UShER.html): Ultrafast Sample placement on Existing tRee - for placing a small-ish dataset into the global GISAID phylogenetic tree.
-* List of (mostly) [modelling tools by CANMOD](https://canmod.net/tools), includes [RECON](https://github.com/reconhub), an outbreak tools for both modelling and genomic epidemiology
-* [The Epi Graph Network](https://thegraphnetwork.training/): training platform. Programming tools for health data analysis, African/European network of researchers and WHO Afro.
-* [Pokay tool](https://github.com/nodrogluap/pokay) for checking and reporitng mismatches
-* [IRIDA Canada's ID analysis platform](https://github.com/pvanheus/irida) for genomic epidemiology
-* [cov-lineages](https://cov-lineages.org/lineage_list.html): summaries of Pango lineages
-* [CoVizu](https://github.com/PoonLab/covizu/): analysis and visualization of the global diversity of SARS-CoV-2 genomes in real time
-* [VIRUS-MVP](https://virusmvp.org/covid-mvp/): mutation tracker and visualization in real-time from Centre for Infectious Disease Genomics and One Health (CIDGOH)
-* [Outbreak Info](https://outbreak.info/situation-reports): SARS-CoV-2 data explorer: lineage comparison, mutation tracker, etc
-* Mike Honey’s [SARS-CoV-2 genomes DataViz Projects](https://github.com/Mike-Honey/sars-cov-2-genomes)
-* [Raj Rajnarayanan's data "vizzes"](https://public.tableau.com/app/profile/raj.rajnarayanan/vizzes)
-
-We look for additional combinations of mutations identified through mutation scanning that are involved in binding or immune evasion. See for example:
-* Greaney, Starr, & Bloom, Virus Evolution, 8:veac021 (2022)
-* Cao et al, Nature, 614:521-529 (2023)
-* Yisimayi et al, bioRxiv, DOI 10.1101/2023.05.01.538516 (2023)
-* Dadonaite et al, bioRxiv, DOI 10.1101/2023.11.13.566961 (2023)
-* Bdeir et al, medRxiv, DOI 10.1101/2024.01.03.23300575 (2024)
 
 ## Historical notes
 
