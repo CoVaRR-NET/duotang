@@ -133,11 +133,8 @@ These plots follow reported cases per 100,000 individuals (green dots), ignoring
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
 #loads in the case count data for each province into a named list.
-caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
+caseData <- parsePositivityData(all.regions, params$datestamp, params$datadir)
 
-#remove NB cuz it doesnt have enough data
-# caseData[["NB"]] <- NULL
-# caseData[["NB"]] <- NULL
 #loads in population data for /100000invidivudal normalization
 populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='\t', check.names = F)
 #view(caseCountData)
@@ -147,7 +144,6 @@ populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
   # # 
-  saveToFile=F
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
       #caseCountData <- head(caseCountData, -1)
@@ -225,17 +221,15 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
   #gather the population data for /100000 individual normalization
-  if (!selectionEstimateObject$region %in% c( "Quebec")){ #"Alberta",
-    population <- as.numeric(populationData[1,selectionEstimateObject$region])* 7
-  } else {
-    population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
-  }
-  
+  population <- as.numeric(populationData[1,selectionEstimateObject$region]) * 7
+
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = enddate, order=mutantNames, saveToFile=saveToFile)
 }
 
+
 ```
+
 
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis', echo=FALSE}

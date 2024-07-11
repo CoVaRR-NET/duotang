@@ -5,7 +5,7 @@ require(lubridate)
 #' @param sublineage:  char, vector of lineage names for subsetting
 #' @param scaled:  bool, display absolute or relative frequencies per week
 #' @param mindate:  Date, exclude counts preceding this date
-plot.subvariants <- function(region='Canada', sublineage, 
+plot.subvariants.deprecated <- function(region='Canada', sublineage, 
                              scaled=FALSE, col=NA, mindate=NA, maxdate=NA) {
   #sublineage <- set
   #region = 'Canada'
@@ -141,8 +141,8 @@ plot.subvariants.ggplot <- function(region='Canada', sublineage,
   colnames(tab) <- c("Lineage", "Date", "Frequency", "Color")
   tab$Date <- floor_date(as.Date(tab$Date), "weeks", week_start = 1)
   #total case count data
-  epi <- epidataCANall[epidataCANall$prname==region, ] %>% dplyr::select(date, numtotal_last7) %>% mutate(date=floor_date(as.Date(date), "weeks", week_start = 1))
-  tab <- tab %>% left_join(epi, by=c("Date"="date")) 
+  #epi <- epidataCANall[epidataCANall$prname==region, ] %>% dplyr::select(date, numtotal_last7) %>% mutate(date=floor_date(as.Date(date), "weeks", week_start = 1))
+  #tab <- tab %>% left_join(epi, by=c("Date"="date")) 
   #coefficient used to scale the total case so that it fits into the same graph. 
   #coeff <- max(tab$numtotal_last7) / (tab %>% group_by(Date) %>% summarise(sum=sum(Frequency)) %>% dplyr::select(sum) %>% max() %>% as.numeric)
   #tab <- tab %>% mutate(numtotal_last7 = round(numtotal_last7/coeff,0)) 

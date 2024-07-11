@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2024-03-04"
+  value: "2024-07-11"
  datadir:
   label: "DataDir"
   input: text
@@ -155,24 +155,23 @@ latelineage_pangotree <- makepangotree(unique(
 ## 2. LOAD epidemiological data (PHAC)
 
 # #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
-epidataCANall <- read.csv(paste0(params$datadir, "/CanadianEpiData.csv"))
-epidataCANall$date <- as.Date(epidataCANall$date)
-epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
-epidate <- tail(epidataCANall,1)$date #download date
-
-epidataCANall$previousvalue <- 0
-# #small loop to get the numtoday column from previous versions of this file from the cumulative cases
-for(row in 1:nrow(epidataCANall)) {
-  p <- epidataCANall[row, "prname"]
-  subdf <- epidataCANall[which(
-    (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p)
-    ), ]
-  if(nrow(subdf) != 0) {
-    nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
-    epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
-  }
-}
-epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
+# epidataCANall <- read.csv(paste0(params$datadir, "/CanadianEpiData.csv"))
+# epidataCANall$date <- as.Date(epidataCANall$date)
+# epidataCANall$prname <- gsub('_', ' ', epidataCANall$prname)
+# 
+# epidataCANall$previousvalue <- 0
+# # #small loop to get the numtoday column from previous versions of this file from the cumulative cases
+# for(row in 1:nrow(epidataCANall)) {
+#   p <- epidataCANall[row, "prname"]
+#   subdf <- epidataCANall[which(
+#     (epidataCANall$date > epidataCANall[row, "date"] & epidataCANall$prname==p)
+#     ), ]
+#   if(nrow(subdf) != 0) {
+#     nextrow <- which( (epidataCANall$date == min(subdf$date) & epidataCANall$prname==p))
+#     epidataCANall[nextrow, "previousvalue"] <- epidataCANall[row, "totalcases"]
+#   }
+# }
+# epidataCANall$numtoday <- epidataCANall$totalcases - epidataCANall$previousvalue
 
 uniqueNamedLineageLast120Days <- unique(
   meta$lineage[
@@ -421,7 +420,7 @@ The image below is a screenshot from VIRUS-MVP showing a snapshot of the mutatio
 
 # Variants in Canada over time
 
-This plot shows the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to Pango lineage designation (Pango version `r pangoversion`), up to `r epidate`.
+This plot shows the changing composition of sequences for all Canadian data posted to the VirusSeq Portal according to Pango lineage designation, up to `r format(as.Date(max(meta$sample_collection_date)), '%d %B, %Y' )`.
 Because sampling and sequencing procedures vary by region and time, this does not necessarily reflect the true composition of SARS-CoV-2 viruses in Canada over time. 
 
 ```{r example_summaries, echo = FALSE, out.height="580px"}
