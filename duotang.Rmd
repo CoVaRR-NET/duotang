@@ -560,13 +560,13 @@ Provinces with sampling strategies that are variant specific are removed, unless
 
 #### Detection trends by variant 
 
-Reported cases are obtained from the Centre d'expertise et de référence en santé publique (Quebec; [link](https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648)), Canada Health InfoBase (Canada, Alberta, British Columbia, Ontario, Nova Scotia, and Newfoundland and Labrador; [link](https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv)). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are likely underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed case counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
+As of 13 July 2024, the number of detected cases for all provinces are obtained from the “Respiratory virus detection data” (PHAC; [link](https://health-infobase.canada.ca/respiratory-virus-detections/)), multiplying the number of SARS-CoV-2 tests times the fraction that are positive. These reported counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are likely underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed detection counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
 
-The previously discussed methods allow us to estimate the proportion of a lineage over time (see equation for $p_i(t)$ above). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date, $t$. By multiplying the list from case counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases that are due to a specific lineage at each time point as $$n_i(t) = p_i(t) \; n(t).$$
+The previously discussed methods allow us to estimate the proportion of a lineage over time (see equation for $p_i(t)$ above). This produces a list of proportions for each lineage of interest, where each element correspond to a lineage proportion on a particular date, $t$. By multiplying the list from detection counts to this lineage frequency list at all time points, we can estimate the inferred number of reported cases that are due to a specific lineage at each time point as $$n_i(t) = p_i(t) \; n(t).$$
 
-Finally, once the inferred case counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i(t)$ and $n_i(t-1)$, from which the growth rate of that lineage ($r_i$) is estimated as $$r_i = ln\left( \frac{n_i(t)}{n_i(t-1)} \right).$$
+Finally, once the inferred detection counts ($n_i(t)$) of each lineages are calculated, we take the last two days of data from the smooth spline times lineage frequency curve to get $n_i(t)$ and $n_i(t-1)$, from which the growth rate of that lineage ($r_i$) is estimated as $$r_i = ln\left( \frac{n_i(t)}{n_i(t-1)} \right).$$
 
-Because genomics data often lag case count data, the last date of reliable case count data may be closer to the present than the last date of genomics data. In these cases, the evolutionary model for $p_i(t)$ is projected forward in time and shown as a ligher shaded area under the curve within the plot).
+Because genomics data often lag detection count data, the last date of reliable detection count data may be closer to the present than the last date of genomics data. In these cases, the evolutionary model for $p_i(t)$ is projected forward in time and shown as a ligher shaded area under the curve within the plot).
 
 #### Rates
 ##### Root-to-tip estimates of substitution rate
@@ -577,48 +577,7 @@ Substitution rates were obtained from the maximum likelihood tree made using [IQ
 
 All analyses draw on the most recent publicly available viral sequence data on ViralSeq and should be interpreted with caution due to lags in reporting and sequencing priorities that can differ across provinces or territories. Note that the NCCID provides a timeline of Canadian events related to each variant: https://nccid.ca/covid-19-variants/. 
 
-### BC
-#### British Columbia  
-Provincial sequencing strategy includes a subset of representative positive samples and prioritized cases (outbreaks, long-term care, travel-related, vaccine escape, hospitalized).
-Additional COVID-19 information for British Columbia can be found here: http://www.bccdc.ca/health-info/diseases-conditions/covid-19
-
-### AB
-#### Alberta
-Additional COVID-19 information for Alberta can be found here: https://www.alberta.ca/coronavirus-info-for-albertans
-
-
-### SK
-#### Saskatchewan
-Additional COVID-19 information for Saskatchewan can be found at: https://www.saskatchewan.ca/government/health-care-administration-and-provider-resources/treatment-procedures-and-guidelines/emerging-public-health-issues/2019-novel-coronavirus/cases-and-risk-of-covid-19-in-saskatchewan
-
-
-### MB
-#### Manitoba
-Additional COVID-19 information for Manitoba can be found at: https://www.gov.mb.ca/health/publichealth/surveillance/influenza/index.html
-
-
-### ON
-#### Ontario
-Additional COVID-19 information for Ontario can be found at: https://www.publichealthontario.ca/en/Data-and-Analysis/Infectious-Disease/Respiratory-Virus-Tool
-
-### QC
-#### Quebec
-Quebec provides a list of updates on changes to screening and sequencing strategies, found here (in French): https://www.inspq.qc.ca/covid-19/donnees/variants#methodologie.
-Additions up-to-date COVID-19 data for Quebec can be found at: https://www.inspq.qc.ca/covid-19/donnees/variants
-
-### NS
-#### Nova Scotia
-Additional COVID-19 information for Nova Scotia can be found at: https://novascotia.ca/coronavirus/alerts-notices/#epidemiologic-summaries
-
-
-### NB
-#### New Brunswick
-Additional COVID-19 information for New Brunswick can be found at: https://www2.gnb.ca/content/gnb/en/corporate/promo/respiratory-watch.html
-
-
-### NL
-#### Newfoundland and Labrador
-Additional COVID-19 information for Newfoundland and Labrador can be found at: https://experience.arcgis.com/experience/b47262b1265f48ba95d7477c56835593
+As of 13 July 2024, the number of detected cases is obtained from the “Respiratory virus detection data” (PHAC; [link](https://health-infobase.canada.ca/respiratory-virus-detections/)).
 
 
 ## Historical notes
