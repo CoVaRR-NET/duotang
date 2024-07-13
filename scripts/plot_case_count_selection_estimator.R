@@ -269,7 +269,7 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     ylim(0, 3) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
-    ylab(paste0("Number of positive tests in ", region, " per 100,000 individuals")) +
+    ylab(paste0("Number of detections in ", region, " per 100,000 individuals")) +
 
     theme_bw() +
     guides(`Case Count` = guide_legend(order = 0),
