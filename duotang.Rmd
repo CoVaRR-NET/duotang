@@ -558,7 +558,7 @@ These estimates of selection ignore heterogeneity within provinces and may be bi
 Sampling strategies that oversample clustered cases (*e.g.*, sequencing outbreaks) will introduce additional variation beyond the multinomial expectation, but these should lead to one-time shifts in frequency rather than trends over time.
 Provinces with sampling strategies that are variant specific are removed, unless explicit information about the variant frequencies is available.
 
-#### Case count trends by variant 
+#### Detection trends by variant 
 
 Reported cases are obtained from the Centre d'expertise et de référence en santé publique (Quebec; [link](https://www.inspq.qc.ca/sites/default/files/covid/donnees/covid19-hist.csv?randNum=27899648)), Canada Health InfoBase (Canada, Alberta, British Columbia, Ontario, Nova Scotia, and Newfoundland and Labrador; [link](https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv)). These reported case counts are then normalized to cases per 100,000 individual based off of Statistics Canada's population estimates for each province or the total population of Canada. We then remove the last 1 data point as those data continue to be gathered and are likely underestimated. This normalized cases over time ($n$) is then log transformed and fitted to a smooth spline with a lambda value of 0.001 using the R stats' smooth.spline() function. A list of smoothed case counts ($n(t)$), where each element correspond to a count on a particular date $t$, is then obtained from this fitting function by reversing the log transformation.
 
