@@ -124,20 +124,18 @@ apply(all.regions,1,function(reg){
 
 ```
 
-# Case count trends by variant
+# Detection trends by variant
 
 ## {.tabset .tabset-fade .unlisted .unnumbered .toc-ignore}
 
-These plots follow reported cases per 100,000 individuals (green dots), ignoring the most recent case counts (hollow circles), which are generally underestimated as data continues to be gathered. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of fitted case counts are then used to estimate the daily exponential growth rate $r$ in COVID-19 cases. The fit from the "Selection on Omicron" section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of fitted case counts. Note that only a small fraction of cases are currently being tested by PCR, so the y-axis height is underestimated by orders of magnitude (e.g., by 92-fold in BC mid-2022, Skowronski et al. 2022). Thus, graphs should only be used to describe growth trends and not absolute numbers. For detailed methodology, please see the methods section in the [appendix](#appendix).
+These plots follow the number of detected cases per 100,000 individuals (green dots), ignoring the most recent week (hollow circles), which is generally underestimated as data continue to be gathered. A cubic spline is fit to the log of these case counts to illustrate trends (top curve). The last two days of inferred case counts are then used to estimate the daily exponential growth rate r in COVID-19 cases. The fit from the “Selection on Omicron” section above is used to show how each of the sub-lineages is growing or shrinking, with the corresponding growth rate $r$ for each sub-lineage on the last two days of inferred case counts. Note that only a small fraction of cases are currently being officially tested, so the y-axis height is underestimated by orders of magnitude (e.g., by 92-fold in BC mid-2022, Skowronski et al. 2022). Thus, graphs should only be used to describe growth trends and not absolute numbers. For detailed methodology including a change in case data source on 13 July 2024, please see the methods section in the [appendix.](#appendix).
+
 
 ```{r case count selection estimator setup, echo=FALSE, message=F, warning=F}
 source("scripts/plot_case_count_selection_estimator.R")
 #loads in the case count data for each province into a named list.
-caseData <- parseCaseData(all.regions, params$datestamp, params$datadir)
+caseData <- parsePositivityData(all.regions, params$datestamp, params$datadir)
 
-#remove NB cuz it doesnt have enough data
-# caseData[["NB"]] <- NULL
-# caseData[["NB"]] <- NULL
 #loads in population data for /100000invidivudal normalization
 populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='\t', check.names = F)
 #view(caseCountData)
@@ -147,7 +145,6 @@ populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
   # # 
-  saveToFile=F
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
       #caseCountData <- head(caseCountData, -1)
@@ -225,17 +222,15 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   caseSelectionLines[[ncol(selectionScurves) + 1]] <- list("line"=line, "names" = "The Rest", "color"="black")
   
   #gather the population data for /100000 individual normalization
-  if (!selectionEstimateObject$region %in% c( "Quebec")){ #"Alberta",
-    population <- as.numeric(populationData[1,selectionEstimateObject$region])* 7
-  } else {
-    population <- (as.numeric(populationData[1,selectionEstimateObject$region]) )
-  }
-  
+  population <- as.numeric(populationData[1,selectionEstimateObject$region]) * 7
+
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = enddate, order=mutantNames, saveToFile=saveToFile)
 }
 
+
 ```
+
 
 
 ```{r, warning=FALSE, message=FALSE, fig.height=8, fig.width=11, warning=FALSE, out.width="100%", results='asis', echo=FALSE}
@@ -358,7 +353,7 @@ for (i in 1:length(all.regions[["name"]])) {
 ```
 
 ```{r overview of the selection estimator table, echo=FALSE}
-dataDownload <- coefficientTable %>% mutate(sel_coeff = sel_coeff / 100)  %>% mutate(low_CI = low_CI / 100)  %>% mutate(high_CI = high_CI / 100)  %>% mutate(reference=ifelse(grepl("\\*", lineage), individualSelectionPlotReference[[1]], mutantNames[[length(mutantNames)]]))
+dataDownload <- coefficientTable %>% mutate(sel_coeff = sel_coeff / 100)  %>% mutate(low_CI = low_CI / 100)  %>% mutate(high_CI = high_CI / 100)  %>% mutate(reference=ifelse(grepl("\\*", lineage), mutantNames[[length(mutantNames)]], individualSelectionPlotReference[[1]]))
 
 link = DisplayHTMLTableDownloadLink(dataDownload, "GrowingLineages")
 #DisplayHTMLTable(plot_growing_lineage(paramselected,makeplot=FALSE))

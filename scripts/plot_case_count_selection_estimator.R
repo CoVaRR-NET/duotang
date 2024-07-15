@@ -70,9 +70,10 @@ parseCaseDataByAge_deprecated<- function(maxDate = Sys.Date(), datadir = "./data
 
 #' Reads in case count data from files in $data_dir for each province
 #' Return a named list for each province with key=shortname and value=df
+#' THIS CODE IS DEPRECATED DUE TO HEALTH-INFOBASE STOPPED REPORTING CASE COUNTS.USE parsePositivityData() instead.
 #' @param maxDate:  the maximum date to cutoff the data. Default=NA
 #' @param datadir:  the data directory where the agecount data is stored. Default='data_needed'
-parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, datadir = "./data_needed"){
+parseCaseData.deprecated<- function(all.regions = all.regions, maxDate = params$datestamp, datadir = "./data_needed"){
   #maxDate = Sys.Date()
   #datadir = "./data_needed"
   caseCounts <- list()
@@ -129,6 +130,30 @@ parseCaseData<- function(all.regions = all.regions, maxDate = params$datestamp, 
 
   
   return (caseCounts)#, "SK"=SK))
+}
+
+
+parsePositivityData <- function(all.regions = all.regions, maxDate = params$datestamp, datadir = "./data_needed"){
+  caseCounts <- list()
+  
+  for (i in 1:length(all.regions[["name"]])){
+    CC <-read.csv(gzfile(paste0(datadir, "/CanPositivityData.csv.gz")), header=T)%>% 
+      filter(prname == all.regions[["name"]][i]) %>% #keep only the 70+ case counts
+      filter(date > startdate) %>%#keep everything within the last 120 days from latest virrusseq colleection date. 
+      mutate (date = as.Date(date)) %>% #format the column as dates
+      dplyr::select(date, numtests_weekly, percentpositivity_weekly) %>%
+      drop_na() %>% #drop row if any col is NA
+      mutate(totalPositive = numtests_weekly * (percentpositivity_weekly / 100)) %>% 
+      dplyr::select(date, totalPositive)
+    colnames(CC) <- c("Reported_Date","n")
+    
+    if (nrow(CC) > 4){
+      caseCounts[[all.regions[["shortname"]][[i]]]] <- CC
+    } else{
+      #caseCounts[[all.regions[["shortname"]][[i]]]] <- NA
+    }
+  }
+  return(caseCounts)
 }
 
 #' get smooth fit of casecounts using knots
@@ -190,9 +215,8 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     countData<- merge(countData, fitData %>% dplyr::select(-type), by = "Reported_Date", all = T) #merge the X values
     rColors[lineFits[[i]]$names] <- lineFits[[i]]$color #assign color to line
     rValues[lineFits[[i]]$names] <- round(log(rev(countData[[lineFits[[i]]$names]])[1]/rev(countData[[lineFits[[i]]$names]])[2]) * 100,2) #calculate the R value
-    if (region != "Quebec"){
-      rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7
-    }
+    rValues[lineFits[[i]]$names] <- as.numeric(rValues[lineFits[[i]]$names]) / 7 #get the per day selection coefficient
+    
   }
   names(rValues)[names(rValues) == "The Rest"] <- paste0(mutantNames[[length(mutantNames)]], " (Reference)")
   names(rColors)[names(rColors) == "The Rest"] <- paste0(mutantNames[[length(mutantNames)]], " (Reference)")
@@ -223,9 +247,11 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
   lastDayAccurate$value=NA
   d <- rbind(d, lastDayActual) %>% rbind(lastDayAccurate)
   
+  #convert to per 100k people
   d$n <- (d$n*100000)/population
   d$value <- (d$value*100000)/population
   d$CaseCount <- (d$CaseCount*100000)/population
+
   caseCountLabel <- paste0("Case Count\n(r = ", round(as.numeric(rValues["CaseCount"]),0), "%)")
   
   #plot
@@ -240,10 +266,10 @@ plotCaseCountByDate2 <- function(countData, lineFits, population, order, maxdate
     scale_shape_manual(name = caseCountLabel, labels = c("Accurate", "Under Reported"), values = c(19, 1)) +
     geom_line(data = d[d$report_type=="Accurate",], mapping = aes(x=Reported_Date, y=CaseCount), color = 'darkgreen', size = 1) +
     #ylim(0, max(6, max(d$n) + 2)) + 
-    ylim(0, 6) + 
+    ylim(0, 3) + 
     xlim(min(d$Reported_Date), maxdate) +
     xlab("Sample collection date") +
-    ylab("PCR-verified cases per 100,000 individuals") +
+    ylab(paste0("Number of detections in ", region, " per 100,000 individuals")) +
 
     theme_bw() +
     guides(`Case Count` = guide_legend(order = 0),
