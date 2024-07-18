@@ -1,5 +1,1 @@
-<<<<<<< Updated upstream
-{"LastUpdated": "2024-07-12", "LastVirusSeqRelease": "2024-07-11", "LastVirusSeqReleaseID": "f1adc9e0-0deb-43a1-8a34-93c365899639", "LastViralAIUpdate": "2023-03-15", "LastNotifMessage": "1720807471.115799", "Rebuild": "2", "Approved": "False", "LastTreeUpdate": "2024-07-09", "InProgressUpdateDate": "2024-07-12", "FailedCounter": "0", "PRLink": "https://github.com/CoVaRR-NET/duotang/pull/369"}
-=======
-{"LastUpdated": "2024-06-10", "LastVirusSeqRelease": "2024-06-06", "LastVirusSeqReleaseID": "3ed3b55a-9096-48bd-95db-aed336055a8a", "LastViralAIUpdate": "2023-03-15", "LastNotifMessage": "1718093188.570089", "Rebuild": "1", "Approved": "True", "LastTreeUpdate": "2024-06-10", "InProgressUpdateDate": "2024-06-14", "FailedCounter": "2", "PRLink": "https://github.com/CoVaRR-NET/duotang/pull/359"}
->>>>>>> Stashed changes
+{"LastUpdated": "2024-07-12", "LastVirusSeqRelease": "2024-07-11", "LastVirusSeqReleaseID": "f1adc9e0-0deb-43a1-8a34-93c365899639", "LastViralAIUpdate": "2023-03-15", "LastNotifMessage": "1720807471.115799", "Rebuild": "2", "Approved": "True", "LastTreeUpdate": "2024-07-09", "InProgressUpdateDate": "2024-07-12", "FailedCounter": "0", "PRLink": "https://github.com/CoVaRR-NET/duotang/pull/369"}
