@@ -14,15 +14,17 @@ sublineages_XBB <- getStrictoSubLineages("XBB*",meta) #XBB variants
 # sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)] #XBB Other
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
+sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
+
+sublineage_KP <- getStrictoSubLineages("KP.*",meta)
+sublineage_KP <- sublineage_KP[!sublineage_KP %in% c(sublineage_KP3)]
+
 sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
-sublineage_kp1 <- getStrictoSubLineages("KP.*",meta)
-
-sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_kp1)] #XBB Other
-
+sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_KP, sublineage_KP3)] #XBB Other
 
 # sublineage_jn1.11 <- getStrictoSubLineages("JN.1.11*",meta)
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% sublineage_jn1.11] #XBB Other
-sublineages_NonXBB<-setAll[!setAll %in% c(sublineages_XBB, sublineage_jn1, sublineage_kp1)] #the rest
+sublineages_other<-setAll[!setAll %in% c(sublineage_jn1, sublineage_KP, sublineage_KP3)] #the rest
 
 reference = sublineage_jn1
 
@@ -33,14 +35,14 @@ reference = sublineage_jn1
 # col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
 
 # 
-mutants = list(sublineages_XBB, sublineage_kp1 ,sublineages_NonXBB)
-mutantNames = list("XBB", "KP.*","BA.2.Other",  "JN.1*") #
-col <- c("XBB"=pal["XBB"], "KP.*" = "#00eeff","BA.2.Other*"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineage_KP3, sublineage_KP ,sublineages_other)
+mutantNames = list("KP.3*", "KP.Others*","BA.2.Others",  "JN.1*") #
+col <- c("KP.3*"=pal["XBB"], "KP.Others*" = "#00eeff","BA.2.Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
 #//TODO, we need to subtract the number of root lineage names without numbers but with * (e.g. XBB*, HV*) from the total count. This arises as an artefact of the getStrictoSublineages() function. Modifying the function to remove this breaks the entire selection coefficient calculation loop. This subtraction need to be done dynamically and is usually equal to length(mutants). However, it's not always the case.. 
-if(length(reference)+length(Reduce(union,mutants)) -1 != length(setAll)){
+if(length(reference)+length(Reduce(union,mutants)) -3 != length(setAll)){
   print(length(setAll))
   print(length(reference))
   print(length(Reduce(union,mutants)))
@@ -145,6 +147,8 @@ populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='
 #' @param filename String. If not NA, it will save a local copy of a plot to $PWD
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
   # # 
+  # caseCountData<-caseData[["Canada"]]
+  # selectionEstimateObject<-selectionEstimateFits[["Canada"]]
   if (selectionEstimateObject$region == "Canada"){
       dayToCut = 1
       #caseCountData <- head(caseCountData, -1)
@@ -227,6 +231,7 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = enddate, order=mutantNames, saveToFile=saveToFile)
 }
+
 
 
 ```
