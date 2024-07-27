@@ -520,6 +520,7 @@ if [ "$CLEAN" = "YES" ]; then
 	echo "Removing temporary files..."
 	mkdir -p ${data_dir}/$datestamp
 	#cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
+	cp ${data_dir}/CanPositivityData.csv.gz ${data_dir}/$datestamp 
 	cp ${data_dir}/*.nwk ${data_dir}/$datestamp
 	#cp ${data_dir}/CanadianEpiData.csv ${data_dir}/$datestamp
 	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
@@ -545,8 +546,9 @@ if [ "$GITPUSH" = "YES" ]; then
 	git status
 	git add -f data_needed/*.nwk
 	git add -f data_needed/virusseq.metadata.csv.gz 
-	git add -f data_needed/AgeCaseCount*
-	git add -f data_needed/CanadianEpiData.csv
+	#git add -f data_needed/AgeCaseCount*
+	#git add -f data_needed/CanadianEpiData.csv
+	git add -f data_needed/CanPositivityData.csv.gz
 	git add -f data_needed/lineageNotes.tsv
 	#git add -f data_needed/virusseq.fasta.xz #removed because the file size is getting too big. 
 	#git add -f archive/*.html
