@@ -519,9 +519,9 @@ echo "cleanup" > $checkPointFile
 if [ "$CLEAN" = "YES" ]; then 
 	echo "Removing temporary files..."
 	mkdir -p ${data_dir}/$datestamp
-	cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
+	#cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
 	cp ${data_dir}/*.nwk ${data_dir}/$datestamp
-	cp ${data_dir}/CanadianEpiData.csv ${data_dir}/$datestamp
+	#cp ${data_dir}/CanadianEpiData.csv ${data_dir}/$datestamp
 	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.$datestamp.fasta.xz ${data_dir}/$datestamp
 	cp ${data_dir}/virusseq.metadata.csv.gz ${data_dir}/$datestamp
