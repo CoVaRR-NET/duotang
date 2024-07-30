@@ -122,7 +122,7 @@ meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'mont
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-max(meta$sample_collection_date)-days(120) #Using a later date with less sampling noise
+startdate<-max(meta$sample_collection_date)-days(130) #Using a later date with less sampling noise
 enddate<-params$datestamp
 
 ## parse PANGO lineages
@@ -244,7 +244,7 @@ These analyses are subject to frequent change given new data and updated lineage
 
 ```{r general fits for selection estimator, message = F, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator.R")
-startpar2 <- list(p=0.5, s=0.05)
+startpar2 <- list(p=0.5, s=0.02)
 #individualSelectionPlotReference <- getStrictoSubLineages("EG.5.1.1", meta)
 individualSelectionPlotReference <- getStrictoSubLineages("JN.1", meta)
 
@@ -259,7 +259,7 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
       NA
     }
   })
-}, mc.cores=16)
+}, mc.cores=1)
 
 allparams <- do.call(c, allparams)  # same structure as below
 allparams <- allparams[!is.na(allparams)]
@@ -276,6 +276,20 @@ allparams <- allparams[order(sapply(allparams, function(p) {
     }
     # ifelse( any(is.na(p$fit)), NA,(p$fit)$fit[["s1"]] )
   }), decreasing = TRUE)]
+
+#debugging
+# for (item in allparams){
+#   if (length(item$mut) == 1 && item$region == "Ontario"){
+#       if (item$mut == "KP.3.1.1"){
+#       this <- (item)
+#     }
+#   }
+# }
+# 
+# this$fit$fit
+# 
+# that <- generateAllParams(region="Canada", startdate=startdate, reference=individualSelectionPlotReference, mutants="KP.3.1.1", startpar=startpar2)
+# 
 
 ```
 
