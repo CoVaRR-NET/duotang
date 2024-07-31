@@ -260,7 +260,7 @@ alpha <- function(col, alpha) {
 #' @param method:  char, pass to optim()
 plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants, names=list(NA),
                                     startpar, maxdate, col=c('red', 'blue'), method='BFGS', includeReference=FALSE) {
-  # region <- "Ontario"
+  # region <- "Canada"
   # startdate <- startdate
   # reference <- c(reference)  # or c("BA.1", "BA.1.1")
   # mutants <- mutants
@@ -329,7 +329,6 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     mutate (s = ifelse((as.numeric(variable)-1) == 0, 0,(fit$fit[[paste0("s", (as.numeric(variable)-1))]]))) %>% 
     group_by(variable) %>% mutate(n = sum(value)) 
     
-    
     if (!includeReference){
       scurveStartIndex = 2
       colorStartIndex = 1
@@ -347,7 +346,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
       scurveStartIndex = 1
       colorStartIndex = 2
       plotData <- plotData %>%    
-        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (Reference)"), paste0(names[as.numeric(variable)-1], 
+        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (n=", n, ") "," [Reference]"), paste0(names[as.numeric(variable)-1], 
                                  "(n=", n, "): ", 
                                  round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
                                  " {", 

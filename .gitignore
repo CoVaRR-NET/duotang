@@ -36,3 +36,5 @@ gsd.metadata.tsv
 gsd.metadata.tsv.gz
 updatemonitor.log.gz
 whatsnew.send.md
+.Rproj.user/
+duotang.Rproj

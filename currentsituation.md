@@ -1,6 +1,6 @@
 
 
-<u id='KP_3'>KP.3</u> subvariants (with S:F456L and S:Q493E) are starting to dominate more now, with a particular interest in growth of <u id='KP_3_1'>KP.3.1</u> and <u id='KP_3_3'>KP.3.3</u> variants/subvariants. However, variants with S:F456L and S:R346T (aka the “FLiRT” mutations) are still growing, such as <u id='LB_1'>LB.1</u> and <u id='KP_2_3'>KP.2.3</u>. Variants of note frequently contain the S:S31del mutation (e.g. <u id='KP_3_1_1'>KP.3.1.1</u> and <u id='KP_2_3'>KP.2.3</u>). Different variants are growing in different regions, depending on timing of introduction.
+<u id='KP_3'>KP.3</u> subvariants (with S:F456L and S:Q493E), in particular <u id='KP_3_1_1'>KP.3.1.1</u> and related variants, are starting to dominate more now, with a particular interest in growth of <u id='KP_3_1'>KP.3.1</u> and <u id='KP_3_3'>KP.3.3</u> variants/subvariants. However, variants with S:F456L and S:R346T (aka the “FLiRT” mutations) are still growing, such as <u id='LB_1'>LB.1</u> and <u id='KP_2_3'>KP.2.3</u>. Variants of note frequently contain the S:S31del mutation (e.g. <u id='KP_3_1_1'>KP.3.1.1</u> and <u id='KP_2_3'>KP.2.3</u>). Different variants are growing in different regions, depending on timing of introduction.
 
 
 
