@@ -131,7 +131,7 @@ meta$month <- gsub("-..$","",as.character(cut(meta$sample_collection_date, 'mont
 #Note that the startdate shouldn't be too much before both alleles become common
 #or rare migration events that die off could throw off the estimation procedure 
 #(so that the parameter estimates account for the presence of those alleles long in the past).
-startdate<-max(meta$sample_collection_date,na.rm = TRUE)-days(120) #Using a later date with less sampling noise
+startdate<-max(meta$sample_collection_date,na.rm = TRUE)-days(130) #Using a later date with less sampling noise
 
 enddate<-params$datestamp
 

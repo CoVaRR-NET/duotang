@@ -1,6 +1,6 @@
 
 
-<u id='KP_3'>KP.3</u> subvariants (with S:F456L and S:Q493E), in particular <u id='KP_3_1_1'>KP.3.1.1</u> and related variants, are starting to dominate more now, with a particular interest in growth of <u id='KP_3_1'>KP.3.1</u> and <u id='KP_3_3'>KP.3.3</u> variants/subvariants. However, variants with S:F456L and S:R346T (aka the “FLiRT” mutations) are still growing, such as <u id='LB_1'>LB.1</u> and <u id='KP_2_3'>KP.2.3</u>. Variants of note frequently contain the S:S31del mutation (e.g. <u id='KP_3_1_1'>KP.3.1.1</u> and <u id='KP_2_3'>KP.2.3</u>). Different variants are growing in different regions, depending on timing of introduction.
+<u id='KP_3_1_1'>KP.3.1.1</u> is clearly dominating now in most provinces, after a delay versus some other countries. Some provinces, particularly in the maritimes, have some further delayed introduction of <u id='KP_3_1_1'>KP.3.1.1</u> and continued growth of variants like <u id='LB_1'>LB.1</u> or <u id='KP_2_3'>KP.2.3</u>. Variants of note frequently contain the S:S31del mutation (e.g. <u id='KP_3_1_1'>KP.3.1.1</u> and <u id='KP_2_3'>KP.2.3</u>). Some recombinants of interest globally are either not yet detected in Canada, or are at low levels (ie. <u id='XEC'>XEC</u>).
 
 
 
@@ -8,7 +8,8 @@ Variants of current interest (due to their current/potential growth advantage, m
 
 
 
-* Variants with S:S31del (also referred to as S:S31-) including <u id='KP_2_3'>KP.2.3</u>, <u id='KP_3_1_1'>KP.3.1.1</u>, and <u id='LB_1'>LB.1</u> subvariants, plus additional <u id='KP_3'>KP.3</u> variants like <u id='KP_3_2'>KP.3.2</u> and <u id='KP_3_3'>KP.3.3</u>.
+* Variants with S:S31del (also referred to as S:S31-) including <u id='KP_3_1_1'>KP.3.1.1</u> in particular and its subvariants (<u id='MC_1'>MC.1</u>). plus <u id='KP_2_3'>KP.2.3</u>, , and <u id='LB_1'>LB.1</u> subvariants.
+* Some recombinants such as <u id='XEC'>XEC</u> (recombinant of <u id='KS_1_1'>KS.1.1</u> and KP.3.3").
 
 Plus any highly divergent variants (“saltation” lineages with a sudden increase in number of mutations) and sublineages with additional combinations of mutations identified through mutation scanning (see references under List of Useful Tools below).
 
