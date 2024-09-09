@@ -1138,6 +1138,7 @@ LB.1.3.3	Alias of B.1.1.529.2.86.1.1.9.2.1.3.3, S:K182R, from #2723
 LB.1.4	Alias of B.1.1.529.2.86.1.1.9.2.1.4, ORF1a:A1473V
 LB.1.4.1	Alias of B.1.1.529.2.86.1.1.9.2.1.4.1, S:R190S
 LB.1.4.2	Alias of B.1.1.529.2.86.1.1.9.2.1.4.2, S:A879S, ORF1a:E472D, USA
+LB.1.4.3	Alias of B.1.1.529.2.86.1.1.9.2.1.4.3, S:A845S, USA
 LB.1.5	Alias of B.1.1.529.2.86.1.1.9.2.1.5, S:L1143F, ORF1b:T1621I, Asia，from sars-cov-2-variants/lineage-proposals#1557
 LB.1.6	Alias of B.1.1.529.2.86.1.1.9.2.1.6, S:I670M, England/Canada
 LB.1.7	Alias of B.1.1.529.2.86.1.1.9.2.1.7, ORF1a:L1507F, G21123T
@@ -1300,6 +1301,8 @@ LF.7	Alias of B.1.1.529.2.86.1.1.16.1.7, S:T22N, S:S31P, S:K182R, S:R190S, S:K44
 LF.8	Alias of B.1.1.529.2.86.1.1.16.1.8, S:M153I, C3244T, A18432T, C27110T
 LF.8.1	Alias of B.1.1.529.2.86.1.1.16.1.8.1, S:S31F
 LF.8.1.1	Alias of B.1.1.529.2.86.1.1.16.1.8.1, S:T22N
+LF.9	Alias of B.1.1.529.2.86.1.1.16.1.9, S:S60P
+LF.9.1	Alias of B.1.1.529.2.86.1.1.16.1.9.1, S:N185D
 JN.1.16.2	Alias of B.1.1.529.2.86.1.1.16.2, C4777T, from sars-cov-2-variants/lineage-proposals#1253
 LA.1	Alias of B.1.1.529.2.86.1.1.16.2.1, S:R346T, from sars-cov-2-variants/lineage-proposals#1253
 LA.2	Alias of B.1.1.529.2.86.1.1.16.2.2, S:R346I, from sars-cov-2-variants/lineage-proposals#1089
@@ -1318,6 +1321,7 @@ JN.1.18.2	Alias of B.1.1.529.2.86.1.1.18.2, S:F59S, after C4331T, T22321C, from 
 LZ.1	Alias of B.1.1.529.2.86.1.1.18.2.1, S:F456L (T22930A), N:A152T, ORF1a:I740V from #2654
 LZ.1.1	Alias of B.1.1.529.2.86.1.1.18.2.1.1, S:P217S, S:N1125S from #2654
 LZ.2	Alias of B.1.1.529.2.86.1.1.18.2.2, S:F456L (T22928C), ORF1a:K1226E, China
+LZ.2.1	Alias of B.1.1.529.2.86.1.1.18.2.2.1, ORF10:Q29*
 JN.1.18.3	Alias of B.1.1.529.2.86.1.1.18.3, S:F456V (T22928G), from sars-cov-2-variants/lineage-proposals#1253
 MA.1	Alias of B.1.1.529.2.86.1.1.18.3.1, S:R190S, S:31del, from sars-cov-2-variants/lineage-proposals#1635
 MA.1.1	Alias of B.1.1.529.2.86.1.1.18.3.1.1, S:E780A
@@ -1452,6 +1456,7 @@ MF.2	Alias of B.1.1.529.2.86.1.1.65.1.2, S:S60P, S:W64L from #2461
 JN.1.66	Alias of B.1.1.529.2.86.1.1.66, S:H445P, S:F456L (T22930A), S:T1117I, ORF1a:L2146F, ORF3a:L106F, Iceland/Sweden
 JN.1.67	Alias of B.1.1.529.2.86.1.1.67, M:L46F
 JN.1.67.1	Alias of B.1.1.529.2.86.1.1.67.1, S:F456L, China
+MZ.1	Alias of B.1.1.529.2.86.1.1.67.1.1, S:S31F
 JN.2	Alias of B.1.1.529.2.86.1.2, ORF1a:Y621C, Europe/North America, from #2284
 JN.2.1	Alias of B.1.1.529.2.86.1.2.1, S:S31F, Sweden/Australia
 JN.2.2	Alias of B.1.1.529.2.86.1.2.2, S:T572I, N:G25C, ORF1a:L3644F, Netherlands, from #2433
@@ -4236,8 +4241,10 @@ XDV.1.4	S:I1114T
 XDV.1.5	S:G184S, S:K478I, China
 XDV.1.6	S:K478T, S:A263T, ORF1a:V1783I, ORF1a:E1209D
 XDV.1.7	ORF1a:D2980N, C8950T, China
+XDV.1.7.1	S:T22N, S:V62F
 XDV.1.8	T2551C, T9892G
 XDV.1.9	ORF1a:T2197I
+XDV.1.9.1	S:A435S
 XDV.1.10	ORF1a:T4175I, S:G181V, China-Hubei
 XDV.1.11	T4057C
 XDW	Recombinant lineage of JN.2 (T1030C branch), XDA (breakpoint between 23424-23603), Japan, from sars-cov-2-variants/lineage-proposals#1471
