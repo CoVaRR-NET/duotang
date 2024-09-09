@@ -14,8 +14,4 @@ Variants of current interest (due to their current/potential growth advantage, m
 Plus any highly divergent variants (“saltation” lineages with a sudden increase in number of mutations) and sublineages with additional combinations of mutations identified through mutation scanning (see some references under List of Useful Tools below).
 
 
-
-We thank the global team of those monitoring variants (such as those posting issues here: <https://github.com/cov-lineages/pango-designation/issues>), and other SARS-CoV-2 genome analysis tool providers (see List of Useful Tools below), which play a key role in identifying new variants of note.
-
-
 <!-- edited -->
