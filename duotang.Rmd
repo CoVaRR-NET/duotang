@@ -305,7 +305,7 @@ cat(md_file, sep = "\n")
 ```{r rtt, child="Tooltip.Rmd"}
 ```
 
-We thank the global team of those monitoring variants, and other SARS-CoV-2 genome analysis tool providers (see [List of Useful Tools below](#Appendix)), which play a key role in identifying new variants of note.
+We thank the global team of those monitoring variants (such as those posting issues here: https://github.com/cov-lineages/pango-designation/issues), and other SARS-CoV-2 genome analysis tool providers (see [List of Useful Tools below](#Appendix)), which play a key role in identifying new variants of note.
 
 # Sublineages in Canada 
 
