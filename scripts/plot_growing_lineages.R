@@ -103,7 +103,7 @@ plot_growing_lineage <- function(r, makeplot=TRUE, coefficientTable="", mutantNa
     p<- p + theme_bw()+
     theme(plot.caption.position = "plot", plot.caption = element_text(hjust=0)) +
     ggtitle(title)+ labs(x="", y= paste("growth advantage (s% per day)\nrelative to ", individualSelectionPlotReference, " with 95% CI bars"))+
-      labs(caption = "*Circled dots indicate lineages with a positive selection coefficient in multiple provinces\n*Gray shading indicates the most prevalent strain in the last two weeks\n*Dashed line indicates the inability to estimate CI, likely do to low case counts.") 
+      labs(caption = "*Circled dots indicate lineages with a positive selection coefficient in multiple provinces\n*Gray shading indicates the most prevalent strain in the last two weeks\n*Dashed line indicates CI could not be estimated, likely due to low case counts.") 
     #plot(p)
     p
     return(p)
