@@ -277,6 +277,8 @@ x=p$mut[[1]];
 sum(p$toplot$n2)>10
 }else{FALSE}})]
 
+#this<-Filter(function(x) x$mut == "KP.3.1.1" && x$region == "Alberta", allparams)
+
 coefficientTable <- plot_growing_lineage(paramselected,makeplot=FALSE)
 
 mutantToHighlight <- list(paste0(as.character((lineageDescriptions %>% arrange(desc(`# In Canada Last 2wk`)) %>% dplyr::select(Lineage))[1,1]),"*"))

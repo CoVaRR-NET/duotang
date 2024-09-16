@@ -259,7 +259,7 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
       NA
     }
   })
-}, mc.cores=1)
+}, mc.cores=16)
 
 allparams <- do.call(c, allparams)  # same structure as below
 allparams <- allparams[!is.na(allparams)]
