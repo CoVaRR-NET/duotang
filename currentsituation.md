@@ -1,6 +1,6 @@
 
 
-<u id='KP_3_1_1'>KP.3.1.1</u> is still dominant and by far the most prevalent lineage. There are some other variants growing, in particular other different <u id='KP_3'>KP.3</u> subvariants, but nothing with a significantly better growth advantage. Collective variants with the S:S31del deletion (including <u id='KP_3_1_1'>KP.3.1.1</u>) are still growing steadily and this mutation is now present in the vast majority of sampled cases. Québec has the highest estimated prevalence of <u id='KP_3_1_1'>KP.3.1.1</u> of the provinces providing data, with an estimate of over 90% of cases (involving all variants) containing the S:S31del. Many other regions would be expected to follow suit, given there is no clear major competitor of <u id='KP_3_1_1'>KP.3.1.1</u> yet apparent.
+<u id='KP_3_1_1'>KP.3.1.1</u> is still dominant and by far the most prevalent lineage. There are some other variants growing, in particular other different <u id='KP_3'>KP.3</u> subvariants, but nothing with a significantly better growth advantage. Collective variants with the S:S31del deletion (including <u id='KP_3_1_1'>KP.3.1.1</u>) are still growing steadily and this mutation is now present in the vast majority of sampled cases. There is no clear major competitor of <u id='KP_3_1_1'>KP.3.1.1</u> yet apparent.
 
 
 
