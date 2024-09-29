@@ -139,6 +139,16 @@ meta <- meta %>% rowwise() %>%
                                           substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , ""),
                                    raw_lineage)) %>% as.data.frame()
 
+meta[67237,]
+paste0(realtorawlineage(substr(raw_lineage, 1,str_locate(raw_lineage, "\\.")-1)),
+                                          ".",
+                                          substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage)))
+substr("XEE", 1, str_locate("XEE.1", "\\."))
+
+raw_lineage = "XEE"
+realtorawlineage(substr(raw_lineage, 1,str_locate(raw_lineage, "\\.")-1))
+substr(raw_lineage, str_locate(raw_lineage, "\\.")+1, nchar(raw_lineage))),"[\r\n]" , "")
+
 dico <- makepangolindico() #rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB
 
 meta$pango_group <- create.pango.group(VOCVOI, meta)
