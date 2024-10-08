@@ -1,6 +1,6 @@
 
 
-<u id='KP_3_1_1'>KP.3.1.1</u> is still dominant, and by far the most prevalent lineage. There are some other variants growing, including <u id='XEC'>XEC</u> most consistently in multiple provinces, though data is very limited. However any growth advantage versus <u id='KP_3_1_1'>KP.3.1.1</u> is still relatively small. Variants collectively with the S:S31del deletion continue to grow steadily.
+<u id='KP_3_1_1'>KP.3.1.1</u> is still dominant, and by far the most prevalent lineage. Variants growing include <u id='XEC'>XEC</u>, which is growing consistently in multiple provinces, though data is very limited. However any growth advantage versus <u id='KP_3_1_1'>KP.3.1.1</u> for any variant is still relatively small.
 
 
 
