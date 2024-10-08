@@ -1,6 +1,6 @@
 
 
-<u id='KP_3_1_1'>KP.3.1.1</u> is still dominant, and by far the most prevalent lineage. There are some other variants growing, in particular other <u id='KP_3'>KP.3</u> subvariants, the recombinant <u id='XEC'>XEC</u> of particular interest internationally, and other variants with the S:S31del deletion. However any growth advantage versus, <u id='KP_3_1_1'>KP.3.1.1</u> is still relatively small. Variants collectively with the S:S31del deletion continue to grow steadily.
+<u id='KP_3_1_1'>KP.3.1.1</u> is still dominant, and by far the most prevalent lineage. Variants growing include <u id='XEC'>XEC</u>, which is growing consistently in multiple provinces, though data is very limited. However any growth advantage versus <u id='KP_3_1_1'>KP.3.1.1</u> for any variant is still relatively small.
 
 
 
@@ -8,11 +8,8 @@ Variants of current interest (due to their current/potential growth advantage, m
 
 
 
-Variants with S:S31del (also referred to as S:S31-) including <u id='KP_3_1_1'>KP.3.1.1</u> in particular and <u id='KP_3'>KP.3</u> subvariants.
-
-<u id='XEC'>XEC</u> which also has a KP.3-type spike, (recombinant of <u id='KS_1_1'>KS.1.1</u> and <u id='KP_3_3'>KP.3.3</u>).
-
-
+* <u id='XEC'>XEC</u> which also has a KP.3-type spike, (recombinant of <u id='KS_1_1'>KS.1.1</u> and <u id='KP_3_3'>KP.3.3</u>) but some changes that appear to confer a slight advantage including immune evasion.
+* Additional variants with S:S31del (deletion also referred to as S:S31-) including <u id='KP_3_1_1'>KP.3.1.1</u> subvariants (MC.**) and <u id='KP_3'>KP.3</u> subvariants.
 
 Plus any highly divergent variants (“saltation” lineages with a sudden increase in number of mutations) and sublineages with additional combinations of mutations identified through mutation scanning (see some references under List of Useful Tools below).
 
