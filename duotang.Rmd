@@ -251,7 +251,7 @@ These analyses are subject to frequent change given new data and updated lineage
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.02)
 #individualSelectionPlotReference <- getStrictoSubLineages("EG.5.1.1", meta)
-individualSelectionPlotReference <- getStrictoSubLineages("JN.1", meta)
+individualSelectionPlotReference <- getStrictoSubLineages("KP.3.1.1", meta)
 
 #saveRDS(allparams, "newallparams.rds")
 allparams <- mclapply(latelineage_pangotree, function(l) {
@@ -293,7 +293,7 @@ allparams <- allparams[order(sapply(allparams, function(p) {
 # 
 # this$fit$fit
 # 
-# that <- generateAllParams(region="Canada", startdate=startdate, reference=individualSelectionPlotReference, mutants="KP.3.1.1", startpar=startpar2)
+#that <- generateAllParams(region="Canada", startdate=startdate, reference=individualSelectionPlotReference, mutants="XEC", startpar=startpar2)
 # 
 
 ```
