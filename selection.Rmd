@@ -14,15 +14,21 @@ setAll=getAllStrictoLineages(meta)
 # sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)] #XBB Other
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
+sublineage_XEC <- getStrictoSubLineages("XEC*",meta)
 sublineage_MC <- getStrictoSubLineages("MC.*", meta)
-sublineage_KP <- getStrictoSubLineages("KP.*",meta)
-sublineage_KP_other <- sublineage_KP[!sublineage_KP %in% c(sublineage_KP3, sublineage_MC)]
+sublineage_MC <- sublineage_MC[!sublineage_MC %in% c(sublineage_XEC)]
+sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
+sublineage_KP3 <- sublineage_KP3[!sublineage_KP3 %in% c(sublineage_XEC, sublineage_MC)]
+
+# sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
+# sublineage_MC <- getStrictoSubLineages("MC.*", meta)
+# sublineage_KP <- getStrictoSubLineages("KP.*",meta)
+# sublineage_KP_other <- sublineage_KP[!sublineage_KP %in% c(sublineage_KP3, sublineage_MC)]
 # sublineage_jn1 <- getStrictoSubLineages("JN.1*",meta)
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_KP, sublineage_KP3)] #XBB Other
 # sublineage_jn1.11 <- getStrictoSubLineages("JN.1.11*",meta)
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% sublineage_jn1.11] #XBB Other
-sublineages_other<-setAll[!setAll %in% c(sublineage_KP_other, sublineage_MC, sublineage_KP3, sublineage_KP)] #the rest
+sublineages_other<-setAll[!setAll %in% c(sublineage_XEC, sublineage_MC, sublineage_KP3)] #the rest
 
 reference = sublineage_KP3
 
@@ -33,8 +39,8 @@ reference = sublineage_KP3
 # col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
 
 # 
-mutants = list(sublineage_MC, sublineage_KP_other, sublineages_other)
-mutantNames = list("MC.*", "KP.Others*","Others",  "KP.3*") #
+mutants = list(sublineage_XEC, sublineage_MC, sublineages_other)
+mutantNames = list("XEC*", "MC*","Others",  "KP.3*") #
 col <- c("MC.*"=pal["XBB"], "KP.Others*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
