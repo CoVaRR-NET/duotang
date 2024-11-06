@@ -374,11 +374,13 @@ echo "epidata" > $checkPointFile
 #wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f ${data_dir}/AgeCaseCountCAN.csv
 #wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f ${data_dir}/CanadianEpiData.csv
 #wget -O ${data_dir}/OutbreakDataCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-outbreaks-settings.csv || rm ${data_dir}/OutbreakDataCAN.csv
-wget -O ${data_dir}/CanPositivityData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-labIndicators2.csv || rm ${data_dir}/CanPositivityData.csv
+#wget -O ${data_dir}/CanPositivityData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-labIndicators2.csv || rm ${data_dir}/CanPositivityData.csv #OLD link
+wget -O ${data_dir}/CanPositivityData.csv https://health-infobase.canada.ca/src/data/respiratory-virus-detections/RVD_WeeklyData.csv || rm ${data_dir}/CanPositivityData.csv
+
+python3 ${scripts_dir}/parsePositivityData.py
 
 
-
-gzip -f ${data_dir}/CanPositivityData.csv
+#gzip -f ${data_dir}/CanPositivityData.csv
 
 echo "gsdmetadata" > $checkPointFile
 
