@@ -374,11 +374,14 @@ echo "epidata" > $checkPointFile
 #wget -O ${data_dir}/AgeCaseCountCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f ${data_dir}/AgeCaseCountCAN.csv
 #wget -O ${data_dir}/CanadianEpiData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-download.csv || rm -f ${data_dir}/CanadianEpiData.csv
 #wget -O ${data_dir}/OutbreakDataCAN.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-outbreaks-settings.csv || rm ${data_dir}/OutbreakDataCAN.csv
-wget -O ${data_dir}/CanPositivityData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-labIndicators2.csv || rm ${data_dir}/CanPositivityData.csv
+#wget -O ${data_dir}/CanPositivityData.csv https://health-infobase.canada.ca/src/data/covidLive/covid19-epiSummary-labIndicators2.csv || rm ${data_dir}/CanPositivityData.csv #OLD link
+wget -O ${data_dir}/CanPositivityData_new.csv https://health-infobase.canada.ca/src/data/respiratory-virus-detections/RVD_WeeklyData.csv || rm ${data_dir}/CanPositivityData_new.csv
 
+python3 ${scripts_dir}/parsePositivityData.py
 
+rm ${data_dir}/CanPositivityData_new.csv
 
-gzip -f ${data_dir}/CanPositivityData.csv
+#gzip -f ${data_dir}/CanPositivityData.csv
 
 echo "gsdmetadata" > $checkPointFile
 
@@ -520,7 +523,7 @@ if [ "$CLEAN" = "YES" ]; then
 	echo "Removing temporary files..."
 	mkdir -p ${data_dir}/$datestamp
 	#cp ${data_dir}/AgeCase* ${data_dir}/$datestamp
-	cp ${data_dir}/CanPositivityData.csv.gz ${data_dir}/$datestamp 
+	cp ${data_dir}/CanPositivityData.csv ${data_dir}/$datestamp 
 	cp ${data_dir}/*.nwk ${data_dir}/$datestamp
 	#cp ${data_dir}/CanadianEpiData.csv ${data_dir}/$datestamp
 	cp ${data_dir}/lineageNotes.tsv ${data_dir}/$datestamp
@@ -548,7 +551,7 @@ if [ "$GITPUSH" = "YES" ]; then
 	git add -f data_needed/virusseq.metadata.csv.gz 
 	#git add -f data_needed/AgeCaseCount*
 	#git add -f data_needed/CanadianEpiData.csv
-	git add -f data_needed/CanPositivityData.csv.gz
+	git add -f data_needed/CanPositivityData.csv
 	git add -f data_needed/lineageNotes.tsv
 	#git add -f data_needed/virusseq.fasta.xz #removed because the file size is getting too big. 
 	#git add -f archive/*.html
