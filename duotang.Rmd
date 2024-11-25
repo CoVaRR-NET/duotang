@@ -3,7 +3,7 @@
 title: |
   ![SARS-CoV-2 Duotang](img/CoVaRR-Net_Logo-600.png){width=1lm}
 subtitle: "Duotang, a genomic epidemiology analyses and mathematical modelling notebook"
-author: "Pillar 6 - CAMEO, CoVaRR-Net"
+author: "CAMEO"
 output:
   html_document:
     keep_md: true
@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2024-09-27"
+  value: "2024-11-17"
  datadir:
   label: "DataDir"
   input: text
@@ -212,7 +212,7 @@ htmltools::tagList(ggplotly(ggplot()))
 ### Contributing authors:  
 
 Data analysis, code, and maintenance of this notebook: Justin Jia (current), Carmen Lia Murall, Raphaël Poujol, Susanne Kraemer, Arnaud N'Guessan, Sarah Otto, Art Poon, Jesse Shapiro, Fiona Brinkman, Zohaib Anwar, and Erin Gill.
-Input and direction by other members of [Pillar 6](https://covarrnet.ca/our-team/#pillar-6) and [CAMEO](https://covarrnet.ca/computational-analysis-modelling-and-evolutionary-outcomes-cameo), which include: Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and William Hsiao. 
+Input and direction by other members of [CAMEO](https://covarrnet.ca/computational-analysis-modelling-and-evolutionary-outcomes-cameo), which include: Caroline Colijn, Jorg Fritz, Morgan Langille, Paul Gordon, Julie Hussin, Jeff Joy, and William Hsiao. 
 
 Sequence collection, generation, release, and feedback on analyses: Canadian laboratories as part of the CPHLN and CanCOGeN are making these data publicly available and contribute feedback on analyses presented here.
 A complete list of lab authors is in this repository, and more details are below in the Acknowledgement section.   
@@ -229,7 +229,7 @@ Gill E.E., et al. The Canadian VirusSeq Data Portal & Duotang: open resources fo
 ## Introduction
 
 This notebook was built to explore Canadian SARS-CoV-2 genomic and epidemiological data with the aim of investigating viral evolution and spread. 
-It is developed by the CAMEO team (Computational Analysis, Modelling and Evolutionary Outcomes Group) associated with the Coronavirus Variants Rapid Response Network (CoVaRR-Net) for sharing with collaborators, including public health labs. 
+It is developed by the CAMEO team (Computational Analysis, Modelling and Evolutionary Outcomes Group) for sharing with collaborators, including public health labs. 
 These analyses are freely available and open source, enabling code reuse by public health authorities and other researchers for their own use.
 
 Canadian genomic and epidemiological data will be regularly pulled from various public sources (see list below) to keep these analyses up-to-date.
