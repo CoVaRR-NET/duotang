@@ -190,9 +190,7 @@ alpha <- function(col, alpha) {
   refdata <- est$refdata
   mutdata <- est$mutdata
 
-  
-  startpar <- list(p=c(0.5, 0.1, 0.01), s=c(0.05, 0.05, 0.01))
-  
+
   tryCatch(
     {
       if (length(startpar$s) == 1) {
