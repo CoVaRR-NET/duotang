@@ -28,7 +28,7 @@ if __name__ == "__main__":
         sys.exit("User/Pass not found.")
 
     options = SeleniumOptions()
-    options.headless = True
+    options.headless = False
     #This script is a shall identify legit computer :)
     options.set_preference("general.useragent.override","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0") 
     options.set_preference("dom.webdriver.enabled", False) 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     password.send_keys(pswd)
     time.sleep(2)
     submit = driver.find_element(By.CLASS_NAME, "form_button_submit").click()
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "sys-actionbar-action-ni")))
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "sys-actionbar-action-ni"))) 
     time.sleep(1)
     downloadButtons = driver.find_elements(By.CLASS_NAME, 'sys-actionbar-action-ni')
     downloadButton = [x for x in downloadButtons if x.text == "Downloads"][0]
@@ -77,14 +77,15 @@ if __name__ == "__main__":
     downloadButton.click()
 
     #another iframe for the agreement checkbox
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//*[starts-with(@id, 'sysoverlay-wid')]")))
-    time.sleep(1)
-    iframe = driver.find_element(By.XPATH, "//*[starts-with(@id, 'sysoverlay-wid')]")
-    driver.switch_to.frame(iframe)
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "sys-event-hook")))
-    checkbox = driver.find_elements(By.CLASS_NAME, "sys-event-hook")[0].click()
-    time.sleep(3)
-    checkbox = driver.find_elements(By.CLASS_NAME, "sys-event-hook")[2].click()
+    #2024/11/26 Looks like GISAID removed the agreement box between clicking on download and actually downloading the fasta/metadata
+    #WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//*[starts-with(@id, 'sysoverlay-wid')]")))
+    #time.sleep(1)
+    #iframe = driver.find_element(By.XPATH, "//*[starts-with(@id, 'sysoverlay-wid')]")
+    #driver.switch_to.frame(iframe)
+    #WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "sys-event-hook")))
+    #checkbox = driver.find_elements(By.CLASS_NAME, "sys-event-hook")[0].click()
+    #time.sleep(3)
+    #checkbox = driver.find_elements(By.CLASS_NAME, "sys-event-hook")[2].click()
     print("Downloading metadata...")
 
     time.sleep(3)
