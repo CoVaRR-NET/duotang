@@ -28,7 +28,7 @@ if __name__ == "__main__":
         sys.exit("User/Pass not found.")
 
     options = SeleniumOptions()
-    options.headless = False
+    options.headless = True
     #This script is a shall identify legit computer :)
     options.set_preference("general.useragent.override","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0") 
     options.set_preference("dom.webdriver.enabled", False) 
