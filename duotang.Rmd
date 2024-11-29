@@ -132,7 +132,7 @@ source("scripts/scanlineages.R")
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
 #bandaid solution to remove XEE until i can fix the dico table
-meta <- meta %>% rowwise() %>% mutate(raw_lineage = ifelse(raw_lineage == "XEE", "JN.1", raw_lineage)) %>% mutate(raw_lineage = ifelse(raw_lineage == "XEF", "JN.1", raw_lineage) )
+meta <- meta %>% rowwise() %>% mutate(raw_lineage = ifelse(raw_lineage == "XEE", "JN.1", raw_lineage)) %>% mutate(raw_lineage = ifelse(raw_lineage == "XEF", "JN.1", raw_lineage) )%>% mutate(raw_lineage = ifelse(raw_lineage == "XEM", "JN.1", raw_lineage) )%>% mutate(raw_lineage = ifelse(raw_lineage == "XEL", "JN.1", raw_lineage) )%>% mutate(raw_lineage = ifelse(raw_lineage == "XEK", "JN.1", raw_lineage) )%>% mutate(raw_lineage = ifelse(raw_lineage == "XEP", "JN.1", raw_lineage) )%>% mutate(raw_lineage = ifelse(raw_lineage == "XEJ", "JN.1", raw_lineage) )
 
 
 #for the recombinant descendants that does not start with X, e.g. FD. append their full lineage path to the raw_lineage column
