@@ -41,7 +41,7 @@ reference = sublineage_KP3
 # 
 mutants = list(sublineage_XEC, sublineage_MC, sublineages_other)
 mutantNames = list("XEC*", "MC*","Others",  "KP.3*") #
-col <- c("MC.*"=pal["XBB"], "KP.Others*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+col <- c("XEC*"=pal["XBB"], "MC*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
@@ -443,7 +443,7 @@ apply(all.regions,1,function(reg){
       }
       if (i>3){cat("</details>")}
   }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data avilable"))
+    print(getEmptyErrorPlotWithMessage("Not enough data available"))
   }
   cat("\n\n")})
 

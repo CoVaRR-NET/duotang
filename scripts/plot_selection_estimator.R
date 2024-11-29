@@ -189,7 +189,8 @@ alpha <- function(col, alpha) {
 .fit.model <- function(est, startpar, method="BFGS") {
   refdata <- est$refdata
   mutdata <- est$mutdata
-  
+
+
   tryCatch(
     {
       if (length(startpar$s) == 1) {
@@ -345,16 +346,31 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }  else{
       scurveStartIndex = 1
       colorStartIndex = 2
-      plotData <- plotData %>%    
-        mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (n=", n, ") "," [Reference]"), paste0(names[as.numeric(variable)-1], 
-                                 "(n=", n, "): ", 
-                                 round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
-                                 " {", 
-                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), 
-                                 ", ", 
-                                 round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), 
-                                 "}"))) 
+      if (is.na(fit$confint["s1"])){
+
+        plotData <- plotData %>%    
+          mutate(variable = ifelse((as.numeric(variable)-1)==0, 
+                                   paste0(names[[length(names)]], " (n=", n, ") "," [Reference]"), 
+                                   paste0(names[as.numeric(variable)-1], 
+                                               "(n=", n, "): ", 
+                                               round(fit$fit[paste0("s", as.numeric(variable)-1)],2)
+                                               )
+                                   )
+                 ) 
+      } else{
+        plotData <- plotData %>%    
+          mutate(variable = ifelse((as.numeric(variable)-1)==0, paste0(names[[length(names)]], " (n=", n, ") "," [Reference]"), paste0(names[as.numeric(variable)-1], 
+                                                                                                                                       "(n=", n, "): ", 
+                                                                                                                                       round(fit$fit[paste0("s", as.numeric(variable)-1)],2), 
+                                                                                                                                       " {", 
+                                                                                                                                       round(fit$confint[paste0("s", as.numeric(variable)-1), "2.5 %"], 3), 
+                                                                                                                                       ", ", 
+                                                                                                                                       round(fit$confint[paste0("s", as.numeric(variable)-1), "97.5 %"], 3), 
+                                                                                                                                       "}"))) 
+      }
     }
+        
+
   
   plotData$variable =  factor(plotData$variable, levels=unique(plotData$variable))# unname(names)
   #plot the count data (circles)
