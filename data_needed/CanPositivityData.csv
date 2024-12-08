@@ -1526,7 +1526,7 @@ British Columbia,,2024,40,2024-10-05,3588.0,17.6,new
 British Columbia,,2024,41,2024-10-12,3613.0,17.7,new
 British Columbia,,2024,42,2024-10-19,3828.0,16.1,updated
 British Columbia,,2024,43,2024-10-26,3485.0,13.1,updated
-Canada,,2024,39,2024-09-28,34088.0,17.0,updated
+Canada,,2024,39,2024-09-28,34089.0,17.0,updated
 Canada,,2024,40,2024-10-05,34756.0,16.1,new
 Canada,,2024,41,2024-10-12,34780.0,15.0,updated
 Canada,,2024,42,2024-10-19,34981.0,15.6,updated
@@ -1566,7 +1566,7 @@ Ontario,,2024,40,2024-10-05,8161.0,15.6,new
 Ontario,,2024,41,2024-10-12,8624.0,14.4,new
 Ontario,,2024,42,2024-10-19,8899.0,17.4,new
 Ontario,,2024,43,2024-10-26,8918.0,18.2,updated
-Prairies,,2024,39,2024-09-28,7960.0,14.1,updated
+Prairies,,2024,39,2024-09-28,7961.0,14.1,updated
 Prairies,,2024,40,2024-10-05,8197.0,14.5,new
 Prairies,,2024,41,2024-10-12,8470.0,16.1,updated
 Prairies,,2024,42,2024-10-19,8498.0,15.0,updated
@@ -1581,7 +1581,7 @@ Quebec,,2024,40,2024-10-05,10840.0,17.9,new
 Quebec,,2024,41,2024-10-12,10199.0,14.7,new
 Quebec,,2024,42,2024-10-19,9958.0,15.8,updated
 Quebec,,2024,43,2024-10-26,9963.0,14.6,updated
-Saskatchewan,,2024,39,2024-09-28,1384.0,17.0,updated
+Saskatchewan,,2024,39,2024-09-28,1385.0,17.0,updated
 Saskatchewan,,2024,40,2024-10-05,1635.0,17.6,new
 Saskatchewan,,2024,41,2024-10-12,1658.0,20.6,updated
 Saskatchewan,,2024,42,2024-10-19,1649.0,16.6,updated
@@ -1616,7 +1616,7 @@ Yukon,,2024,44,2024-11-02,39.0,5.1,new
 Alberta,,2024,45,2024-11-09,6069.0,11.5,updated
 Atlantic,,2024,45,2024-11-09,3580.0,9.6,new
 British Columbia,,2024,45,2024-11-09,3471.0,8.7,updated
-Canada,,2024,45,2024-11-09,34059.0,12.5,updated
+Canada,,2024,45,2024-11-09,34064.0,12.5,updated
 Manitoba,,2024,45,2024-11-09,1349.0,18.0,new
 New Brunswick,,2024,45,2024-11-09,1083.0,8.9,new
 Newfoundland and Labrador,,2024,45,2024-11-09,1015.0,8.6,new
@@ -1624,16 +1624,16 @@ Northwest Territories,,2024,45,2024-11-09,25.0,12.0,new
 Nova Scotia,,2024,45,2024-11-09,1340.0,10.9,new
 Nunavut,,2024,45,2024-11-09,100.0,1.0,new
 Ontario,,2024,45,2024-11-09,8761.0,15.6,updated
-Prairies,,2024,45,2024-11-09,9013.0,13.1,updated
+Prairies,,2024,45,2024-11-09,9018.0,13.1,updated
 Prince Edward Island,,2024,45,2024-11-09,142.0,10.6,new
 Quebec,,2024,45,2024-11-09,9059.0,11.8,updated
-Saskatchewan,,2024,45,2024-11-09,1595.0,14.7,updated
+Saskatchewan,,2024,45,2024-11-09,1600.0,15.0,updated
 Territories,,2024,45,2024-11-09,175.0,4.6,updated
 Yukon,,2024,45,2024-11-09,50.0,8.0,updated
-Alberta,,2024,46,2024-11-16,6164.0,11.1,updated
+Alberta,,2024,46,2024-11-16,6166.0,11.1,updated
 Atlantic,,2024,46,2024-11-16,3280.0,8.6,new
 British Columbia,,2024,46,2024-11-16,3670.0,7.4,updated
-Canada,,2024,46,2024-11-16,32556.0,11.0,updated
+Canada,,2024,46,2024-11-16,32569.0,11.0,updated
 Manitoba,,2024,46,2024-11-16,1330.0,17.0,new
 New Brunswick,,2024,46,2024-11-16,1024.0,8.9,new
 Newfoundland and Labrador,,2024,46,2024-11-16,882.0,9.4,new
@@ -1641,26 +1641,43 @@ Northwest Territories,,2024,46,2024-11-16,41.0,7.3,new
 Nova Scotia,,2024,46,2024-11-16,1211.0,7.3,new
 Nunavut,,2024,46,2024-11-16,106.0,7.5,new
 Ontario,,2024,46,2024-11-16,7491.0,12.6,updated
-Prairies,,2024,46,2024-11-16,9071.0,11.9,updated
+Prairies,,2024,46,2024-11-16,9084.0,12.0,updated
 Prince Edward Island,,2024,46,2024-11-16,163.0,11.0,new
 Quebec,,2024,46,2024-11-16,8856.0,11.1,updated
-Saskatchewan,,2024,46,2024-11-16,1577.0,10.9,updated
+Saskatchewan,,2024,46,2024-11-16,1588.0,11.4,updated
 Territories,,2024,46,2024-11-16,188.0,5.9,updated
 Yukon,,2024,46,2024-11-16,41.0,0.0,updated
-Alberta,,2024,47,2024-11-23,5572.0,11.5,new
+Alberta,,2024,47,2024-11-23,5930.0,11.5,updated
 Atlantic,,2024,47,2024-11-23,3389.0,6.7,new
-British Columbia,,2024,47,2024-11-23,3378.0,6.0,new
-Canada,,2024,47,2024-11-23,32165.0,10.2,new
+British Columbia,,2024,47,2024-11-23,3428.0,6.0,updated
+Canada,,2024,47,2024-11-23,32612.0,10.2,updated
 Manitoba,,2024,47,2024-11-23,1228.0,13.0,new
 New Brunswick,,2024,47,2024-11-23,1098.0,8.4,new
 Newfoundland and Labrador,,2024,47,2024-11-23,975.0,3.8,new
 Northwest Territories,,2024,47,2024-11-23,38.0,7.9,new
 Nova Scotia,,2024,47,2024-11-23,1209.0,7.6,new
 Nunavut,,2024,47,2024-11-23,122.0,6.6,new
-Ontario,,2024,47,2024-11-23,8051.0,12.4,new
-Prairies,,2024,47,2024-11-23,8223.0,11.1,new
+Ontario,,2024,47,2024-11-23,8053.0,12.4,updated
+Prairies,,2024,47,2024-11-23,8624.0,11.3,updated
 Prince Edward Island,,2024,47,2024-11-23,107.0,6.5,new
-Quebec,,2024,47,2024-11-23,8921.0,10.2,new
-Saskatchewan,,2024,47,2024-11-23,1423.0,7.8,new
+Quebec,,2024,47,2024-11-23,8915.0,10.3,updated
+Saskatchewan,,2024,47,2024-11-23,1466.0,8.9,updated
 Territories,,2024,47,2024-11-23,203.0,6.9,new
 Yukon,,2024,47,2024-11-23,43.0,7.0,new
+Alberta,,2024,48,2024-11-30,5915.0,9.8,new
+Atlantic,,2024,48,2024-11-30,3263.0,6.0,new
+British Columbia,,2024,48,2024-11-30,3360.0,4.6,new
+Canada,,2024,48,2024-11-30,31929.0,9.6,new
+Manitoba,,2024,48,2024-11-30,1124.0,10.9,new
+New Brunswick,,2024,48,2024-11-30,1058.0,8.7,new
+Newfoundland and Labrador,,2024,48,2024-11-30,859.0,3.4,new
+Northwest Territories,,2024,48,2024-11-30,25.0,8.0,new
+Nova Scotia,,2024,48,2024-11-30,1200.0,5.7,new
+Nunavut,,2024,48,2024-11-30,83.0,1.2,new
+Ontario,,2024,48,2024-11-30,7962.0,13.5,new
+Prairies,,2024,48,2024-11-30,8428.0,9.3,new
+Prince Edward Island,,2024,48,2024-11-30,146.0,5.5,new
+Quebec,,2024,48,2024-11-30,8782.0,9.8,new
+Saskatchewan,,2024,48,2024-11-30,1389.0,6.0,new
+Territories,,2024,48,2024-11-30,134.0,3.0,new
+Yukon,,2024,48,2024-11-30,26.0,3.8,new

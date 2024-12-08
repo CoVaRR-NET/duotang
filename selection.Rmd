@@ -34,29 +34,16 @@ reference = sublineage_KP3
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
-# mutants = list(sublineages_XBBOther, sublineages_EG5  )
-# mutantNames = list("XBB.Other",  "EG.5*", "XBB.1.5*") #
-# col <- c("XBB.Other"=pal["XBB"],"EG.5*" = "#00eeff") 
-
-# 
 mutants = list(sublineage_XEC, sublineage_MC, sublineages_other)
 mutantNames = list("XEC*", "MC*","Others",  "KP.3*") #
 col <- c("XEC*"=pal["XBB"], "MC*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
+
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
-#//TODO, we need to subtract the number of root lineage names without numbers but with * (e.g. XBB*, HV*) from the total count. This arises as an artefact of the getStrictoSublineages() function. Modifying the function to remove this breaks the entire selection coefficient calculation loop. This subtraction need to be done dynamically and is usually equal to length(mutants). However, it's not always the case.. 
-# if(length(reference)+length(Reduce(union,mutants)) -3 != length(setAll)){
-#   print(length(setAll))
-#   print(length(reference))
-#   print(length(Reduce(union,mutants)))
-#   print(length(mutants))
-#   combinedList <- Reduce(union,mutants)
-#   dupsInList <- combinedList[duplicated(combinedList)]
-#   view(combinedList)
-#   view(setAll)
-#   #stop("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
-# }
+if(length(reference)+length(Reduce(union,mutants)) -3 != length(setAll)){
+  warn("sublineage groups used for selection plots might contain lineages that are in multiple groups.")
+}
 
 #wrapper for calling plot.selection.estimate.ggplot() to avoid passing in the same local variables multiple time anjd to include a trycatch statement to show empty plots.
 sub.plot.selection.estimate <- function(region,maxdate=NA){
