@@ -132,7 +132,12 @@ source("scripts/scanlineages.R")
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
 #append the right raw parent lineage to XE* recombinants
-meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XE", raw_lineage), paste0("B.1.1.529.2.86.1.1.", raw_lineage), raw_lineage))
+meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XE", raw_lineage), paste0("B.1.1.529.", raw_lineage), raw_lineage))
+#append the right raw parent lineage to NA* variants.
+meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^NA", raw_lineage), paste0("B.1.1.529.2.86.1.1.49.1.1.1.2.1.", raw_lineage), raw_lineage))
+#IMPORTANT CHECK: 2024/12/13
+#The table we use to map the lineages to raw lineage must be out of date or stopped being updated. Might consider dropping it and just use the alias table since we already have that info.
+
 
 # #for the recombinant descendants that does not start with X, e.g. FD. append their full lineage path to the raw_lineage column
 meta <- meta %>% rowwise() %>%
@@ -155,7 +160,6 @@ latelineage_pangotree <- makepangotree(unique(
     meta$sample_collection_date > startdate
     ]
   ))
-
 ## 2. LOAD epidemiological data (PHAC)
 
 # #from: https://health-infobase.canada.ca/covid-19/epidemiological-summary-covid-19-cases.html?stat=num&measure=total&map=pt#a2
