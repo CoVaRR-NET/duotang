@@ -1,6 +1,6 @@
 
 
-<u id='XEC'>XEC</u> (a recombinant with the KP.3-type spike) becoming more prominent now. Any growth to date of all variants is still relatively small, verses what has been seen for past notable waves.
+<u id='XEC'>XEC</u> (a recombinant with the KP.3-type spike) is becoming more prominent now. Any growth to date of all variants is still relatively small, verses what has been seen for past notable waves.
 
 Variants of current interest (due to their current/potential growth advantage, mutations of potential functional significance, or spread in other countries):
 
