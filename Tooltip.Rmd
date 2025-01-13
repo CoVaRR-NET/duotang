@@ -3,11 +3,13 @@
 
 
 ```{r, echo=FALSE}
-tippy::tippy_this(elementId = "XEC", tooltip = "3612 samples in last 120 days.//Recombinant lineage of KS.1.1 (JN.1.13.1.1.1) and KP.3.3 (breakpoint 21738-22599), Europe (Germany), from #2717")
+tippy::tippy_this(elementId = "XEC", tooltip = "3701 samples in last 120 days.//Recombinant lineage of KS.1.1 (JN.1.13.1.1.1) and KP.3.3 (breakpoint 21738-22599), Europe (Germany), from #2717")
+tippy::tippy_this(elementId = "KP_3_1_1", tooltip = "Ancestor:KP.3.1//10251 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.3.1.1, ORF1a:S4286C, C12616T, S:S31del, Spain, from sars-cov-2-variants/lineage-proposals#1563")
+tippy::tippy_this(elementId = "LP_8_1", tooltip = "Ancestor:LP.8//174 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1, S:R190S")
+tippy::tippy_this(elementId = "LP_8_1_1", tooltip = "Ancestor:LP.8.1//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1, S:K679R")
+tippy::tippy_this(elementId = "KP_1_1", tooltip = "Ancestor:KP.1//13 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.1.1, S:R346T, from sars-cov-2-variants/lineage-proposals#1089")
 tippy::tippy_this(elementId = "KS_1_1", tooltip = "Ancestor:KS.1//11 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.13.1.1.1, S:T22N, Singapore/Taiwan/Canada, from sars-cov-2-variants/lineage-proposals#1565")
 tippy::tippy_this(elementId = "KP_3_3", tooltip = "Ancestor:KP.3//247 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.3.3, N:R204P, from sars-cov-2-variants/lineage-proposals#1531")
-tippy::tippy_this(elementId = "LP_8_1", tooltip = "Ancestor:LP.8//173 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1, S:R190S")
 tippy::tippy_this(elementId = "KP_1_1_3", tooltip = "Ancestor:KP.1.1//181 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.1.1.3, C4999T, many with S:S31del, from sars-cov-2-variants/lineage-proposals#1502")
-tippy::tippy_this(elementId = "KP_3_1_1", tooltip = "Ancestor:KP.3.1//10133 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.3.1.1, ORF1a:S4286C, C12616T, S:S31del, Spain, from sars-cov-2-variants/lineage-proposals#1563")
-tippy::tippy_this(elementId = "MC_1", tooltip = "Ancestor:KP.3.1.1//1872 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.1, S:T572I, from sars-cov-2-variants/lineage-proposals#1638")
+tippy::tippy_this(elementId = "MC_1", tooltip = "Ancestor:KP.3.1.1//1922 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.1, S:T572I, from sars-cov-2-variants/lineage-proposals#1638")
 ```
