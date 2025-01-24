@@ -216,7 +216,8 @@ create.pango.group <-  function(VOCVOI, meta) {
   names(lineage.groups) <- VOCVOI$name
   rest= unique(meta$lineage)
   rest <- rest[! rest %in% unlist(lineage.groups)]
-  lineage.groups[["Recombinants"]]  <- rest[grepl("^X", rest)]
+  #isRecombinant("NB.1")
+  lineage.groups[["Recombinants"]]  <- Filter(isRecombinant, rest)
   # re-order in decreasing order to handle duplicates, since a derived 
   # group will necessarily have fewer members
   # e.g., BQ.1 is in both Omicron BA.5 and Omicron BQ, but the latter is a

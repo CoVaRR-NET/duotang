@@ -346,7 +346,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }  else{
       scurveStartIndex = 1
       colorStartIndex = 2
-      if (is.na(fit$confint["s1"])){
+      if (!is.na(fit$confint["s1"])){
 
         plotData <- plotData %>%    
           mutate(variable = ifelse((as.numeric(variable)-1)==0, 
