@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2024-11-27"
+  value: "2025-01-24"
  datadir:
   label: "DataDir"
   input: text
@@ -132,7 +132,7 @@ source("scripts/scanlineages.R")
 meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
 #append the right raw parent lineage to XE* recombinants
-meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XE", raw_lineage), paste0("B.1.1.529.", raw_lineage), raw_lineage))
+meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XE", raw_lineage), paste0("B.1.1.529", raw_lineage), raw_lineage))
 #append the right raw parent lineage to NA* variants.
 meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^NA", raw_lineage), paste0("B.1.1.529.2.86.1.1.49.1.1.1.2.1.", raw_lineage), raw_lineage))
 #IMPORTANT CHECK: 2024/12/13
@@ -152,6 +152,7 @@ dico <- makepangolindico() #rebuild the lineage dictionary so the correct names 
 #dico[dico$surname=="XEE"]
 meta$pango_group <- create.pango.group(VOCVOI, meta)
 meta$pango_group <- as.factor(meta$pango_group)
+
 
 fullpangotree <- makepangotree(unique(meta$raw_lineage))
 
@@ -186,10 +187,10 @@ uniqueNamedLineageLast120Days <- unique(
     meta$sample_collection_date > startdate
     ]
   )
-
+# 
 #load the pango_lineage notes file and extracts parental data using it's alias as a separate column
-lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F, comment.char = "", fill = T) %>% 
-  mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>% 
+lineageDescriptions <- read.table(paste0(params$datadir,"lineageNotes.tsv"), sep = "\t", header=T, as.is=TRUE, quote = "", stringsAsFactors = F, comment.char = "", fill = T) %>%
+  mutate(alias=str_extract(Description, "(?<=Alias of )(.*?)(?=(,| ))")) %>%
   mutate(parentAlias = str_extract(alias, ".*(?=\\.)")) %>% rowwise() %>% mutate(Parent = rawtoreallineage(parentAlias)) %>%
   dplyr::select(Lineage, Parent, Description) %>% mutate(`Present in Canada Last 120 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage & meta$sample_collection_date > startdate]), 0)) %>% mutate(`Present in Canada Last 14 days` = ifelse(Lineage %in% uniqueNamedLineageLast120Days, length(meta$lineage[meta$lineage == Lineage & meta$sample_collection_date > max(meta$sample_collection_date)-days(14)]), 0))
 colnames(lineageDescriptions) <- c("Lineage", "Ancestor", "Description", "# In Canada Last 3Mo", "# In Canada Last 2wk")
@@ -222,10 +223,7 @@ A complete list of lab authors is in this repository, and more details are below
 
 ### Citation
 
-To cite Duotang in publications, please use:
-
-Gill E.E., et al. The Canadian VirusSeq Data Portal & Duotang: open resources for SARS-CoV-2 viral sequences and genomic epidemiology. arXiv.  	
-[doi:10.48550/arXiv.2405.04734](https://arxiv.org/abs/2405.04734)
+If you use the VirusSeq Data Portal or Duotang resource, please cite: Gill et al. (2024) Microbial Genomics. [doi:10.1099/mgen.0.001293](https://doi.org/10.1099/mgen.0.001293)
 
 # SARS-CoV-2 In Canada
 

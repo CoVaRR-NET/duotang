@@ -15,8 +15,7 @@ setAll=getAllStrictoLineages(meta)
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineage_XEC <- getStrictoSubLineages("XEC*",meta)
-sublineage_MC <- getStrictoSubLineages("MC.*", meta)
-sublineage_MC <- sublineage_MC[!sublineage_MC %in% c(sublineage_XEC)]
+sublineage_MC <- getStrictoSubLineages("MC.*", meta)[-2]
 sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
 sublineage_KP3 <- sublineage_KP3[!sublineage_KP3 %in% c(sublineage_XEC, sublineage_MC)]
 
@@ -38,6 +37,14 @@ mutants = list(sublineage_XEC, sublineage_MC, sublineages_other)
 mutantNames = list("XEC*", "MC*","Others",  "KP.3*") #
 col <- c("XEC*"=pal["XBB"], "MC*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
+# mutants = list(sublineage_XEC, sublineages_other)
+# mutantNames = list("XEC*", "Others",  "KP.3*") #
+# col <- c("XEC*"=pal["XBB"], "Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+# 
+# mutants = list(sublineage_MC, sublineages_other)
+# mutantNames = list("MC*","Others",  "KP.3*") #
+# col <- c("MC*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+# 
 
 #SALLY:SUGGEST THAT WE ADD A FLAG HERE IF THE FOLLOWING ISN'T ZERO
 #this check ensures that we dont have overlapping  groups in which 1 lineage is present in multiple groups.
@@ -135,7 +142,7 @@ populationData <- read.table("resources/CanadianPopulation.tsv", header=T, sep='
 #' function used to generate data required case count selection plots.
 #' @param caseCountData The case counts for a specific province. i.e. one item in variable caseData
 #' @param selectionEstimateObject The selection estimate object for a specific province. i.e. one item in variable selectionEstimateFits
-#' @param filename String. If not NA, it will save a local copy of a plot to $PWD
+#' @param filename String. If not NA, it will save a local copy of a plot to $PWDhj
 plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveToFile=F){
   # # 
   # caseCountData<-caseData[["Canada"]]
@@ -222,8 +229,6 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
   #pass the lines into the plotting function
   plotCaseCountByDate2(caseCountData, rev(caseSelectionLines),population,region=selectionEstimateObject$region, maxdate = enddate, order=mutantNames, saveToFile=saveToFile)
 }
-
-
 
 ```
 
