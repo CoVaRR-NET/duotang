@@ -411,35 +411,35 @@ for (i in 1:length(all.regions$name)){
 
 ```
 
-## XBB sublineages {.tabset .tabset-fade}
+<!-- ## XBB sublineages {.tabset .tabset-fade} -->
 
-Here we show the trends of the various XBB.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection.
+<!-- Here we show the trends of the various XBB.\* sublineages over time, relative to the frequency of `r individualSelectionPlotReference[[1]]` by itself (shown for sublineages with at least 50 (Canada) or 20 (provinces) cases). Proportions shown here are only among `r individualSelectionPlotReference[[1]]` (stricto) and the lineage illustrated. Note that these plots are not necessarily representative of trends in each province and that mixing of data from different provinces may lead to shifts in frequency that are not due to selection. -->
 
-```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150}
-#prints the BA.2 plots
-apply(all.regions,1,function(reg){
-  cat("###", reg[["shortname"]], "\n")
-  n_min=20
-  if(reg[["name"]]=="Canada"){n_min=50}
-  cat("####",reg[["name"]],"\n","\n")
-  if (length(individualSublineageSelectionPlots.XBB[[reg[["shortname"]]]])>0){
-      i = 0
-      for (plot in individualSublineageSelectionPlots.XBB[[reg[["shortname"]]]]){
-        i = i + 1
-        if (i==4){
-          cat ("<P>")
-          cat("<details>")
-          cat ("<summary><b>Only the three most strongly selected variants are displayed. Click here to see the rest.</b></summary>")
-        }
-        print(plot$plot)
-      }
-      if (i>3){cat("</details>")}
-  }else{
-    print(getEmptyErrorPlotWithMessage("Not enough data available"))
-  }
-  cat("\n\n")})
+<!-- ```{r, warning=FALSE, message=FALSE, echo = FALSE, fig.height=5, fig.width=5, warning=FALSE, out.width="33%", results='asis', dpi=150} -->
+<!-- #prints the BA.2 plots -->
+<!-- apply(all.regions,1,function(reg){ -->
+<!--   cat("###", reg[["shortname"]], "\n") -->
+<!--   n_min=20 -->
+<!--   if(reg[["name"]]=="Canada"){n_min=50} -->
+<!--   cat("####",reg[["name"]],"\n","\n") -->
+<!--   if (length(individualSublineageSelectionPlots.XBB[[reg[["shortname"]]]])>0){ -->
+<!--       i = 0 -->
+<!--       for (plot in individualSublineageSelectionPlots.XBB[[reg[["shortname"]]]]){ -->
+<!--         i = i + 1 -->
+<!--         if (i==4){ -->
+<!--           cat ("<P>") -->
+<!--           cat("<details>") -->
+<!--           cat ("<summary><b>Only the three most strongly selected variants are displayed. Click here to see the rest.</b></summary>") -->
+<!--         } -->
+<!--         print(plot$plot) -->
+<!--       } -->
+<!--       if (i>3){cat("</details>")} -->
+<!--   }else{ -->
+<!--     print(getEmptyErrorPlotWithMessage("Not enough data available")) -->
+<!--   } -->
+<!--   cat("\n\n")}) -->
 
-```
+<!-- ``` -->
 
 ## BA.2 sublineages {.tabset .tabset-fade}
 
