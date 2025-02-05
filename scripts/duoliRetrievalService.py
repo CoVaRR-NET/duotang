@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--ts", type=str,
                         help="the thread id")
-    parser.add_argument("--channel", type=str, default="C046T5JA48H",
+    parser.add_argument("--channel", type=str, default="C088LULD5PY",
                         help="Specify the channel that command applies to, default: pillar6-duotang_github")
 
     args = parser.parse_args()
@@ -33,6 +33,8 @@ if __name__ == "__main__":
         authToken = fh.readline().strip()
     with open (".secret/duoliapptoken", 'r') as fh:
         appToken = fh.readline().strip()
+        #appToken is used for websocket connections, NOT USED CURRENTLY
+
 
     app = App(token=authToken)
     client = WebClient(token=authToken)
