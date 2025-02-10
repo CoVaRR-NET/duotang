@@ -46,7 +46,7 @@ if __name__ == "__main__":
         # Call the conversations.list method using the WebClient
         threadMessage = client.conversations_replies(channel=channelID, ts=ts)
         for msg in threadMessage.data["messages"]:
-            if (msg["text"].find("<@@U0896AQ14NM>") != -1):
+            if (msg["text"].find("<@U0896AQ14NM>") != -1):
                 #duoli was tagged in this message
                 if (msg["text"].find("/update") != -1):
                     rebuildCount = rebuildCount + 1
