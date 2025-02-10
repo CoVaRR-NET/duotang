@@ -1,5 +1,3 @@
-<@U0896AQ14NM> /currentsituation
-
 
 
 <u id='XEC'>XEC</u> (a recombinant with the KP.3-type spike) continues to be the most prevalent. <u id='LP_8_1_1'>LP.8.1.1</u> is showing significant selective growth in multiple regions, while some <u id='XEC'>XEC</u> variants like those related to <u id='XEC_8'>XEC.8</u> (characterized by nucleotide change T24376C) also show growth, as well as some <u id='KP_3_1_1'>KP.3.1.1</u> descendants like <u id='MC_10_1'>MC.10.1</u>.
