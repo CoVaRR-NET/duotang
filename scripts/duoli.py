@@ -21,13 +21,14 @@ if __name__ == "__main__":
                         help="path to the file to be uploaded, can specify multiple")
     parser.add_argument("--messagefile", type=str, default=None,
                         help="The filepath for a text file to be sent as the message")
-    parser.add_argument("--channel", type=str, default="C046T5JA48H",
+    parser.add_argument("--channel", type=str, default="C088LULD5PY",
                         help="Specify the channel that the message should be sent to, default: pillar6-duotang_github")
     parser.add_argument("--thread", type=str, default=None,
                         help="Specify the thread that the message should be sent to")
 
     args = parser.parse_args()
     
+    #old covarrnet channel: C046T5JA48H
     
     if not (os.path.exists(".secret/duolioauthtoken") and os.path.exists(".secret/duoliapptoken")):
         print ("This script reqires the oauth token and app token for duoli to be placed in .secret/duolioauthtoken and .secret/duoliapptoken")
@@ -39,6 +40,7 @@ if __name__ == "__main__":
         authToken = fh.readline().strip()
     with open (".secret/duoliapptoken", 'r') as fh:
         appToken = fh.readline().strip()
+        #appToken is used for websocket connections, NOT USED CURRENTLY
 
     app = App(token=authToken)
     client = WebClient(token=authToken)

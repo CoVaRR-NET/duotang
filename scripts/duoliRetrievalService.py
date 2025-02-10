@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--ts", type=str,
                         help="the thread id")
-    parser.add_argument("--channel", type=str, default="C046T5JA48H",
+    parser.add_argument("--channel", type=str, default="C088LULD5PY",
                         help="Specify the channel that command applies to, default: pillar6-duotang_github")
 
     args = parser.parse_args()
@@ -33,6 +33,8 @@ if __name__ == "__main__":
         authToken = fh.readline().strip()
     with open (".secret/duoliapptoken", 'r') as fh:
         appToken = fh.readline().strip()
+        #appToken is used for websocket connections, NOT USED CURRENTLY
+
 
     app = App(token=authToken)
     client = WebClient(token=authToken)
@@ -44,12 +46,12 @@ if __name__ == "__main__":
         # Call the conversations.list method using the WebClient
         threadMessage = client.conversations_replies(channel=channelID, ts=ts)
         for msg in threadMessage.data["messages"]:
-            if (msg["text"].find("<@U04R5U03V46>") != -1):
+            if (msg["text"].find("<@U0896AQ14NM>") != -1):
                 #duoli was tagged in this message
                 if (msg["text"].find("/update") != -1):
                     rebuildCount = rebuildCount + 1
                 elif (msg["text"].find("/currentsituation") != -1):
-                    text = msg["text"].replace("<@U04R5U03V46> /currentsituation\n", "")
+                    text = msg["text"].replace("<@U0896AQ14NM> /currentsituation\n", "")
                     #format the text a bit
                     text = text.replace("**Current Situation:**", "").replace("*", "**").replace("•", "*").replace("_*","*").replace("*_","*").replace("\n","\n\n")
                     text = text.split("\n")
