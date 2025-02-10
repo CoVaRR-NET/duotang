@@ -51,7 +51,7 @@ if __name__ == "__main__":
                 if (msg["text"].find("/update") != -1):
                     rebuildCount = rebuildCount + 1
                 elif (msg["text"].find("/currentsituation") != -1):
-                    text = msg["text"].replace("<@@U0896AQ14NM> /currentsituation\n", "")
+                    text = msg["text"].replace("<@U0896AQ14NM> /currentsituation\n", "")
                     #format the text a bit
                     text = text.replace("**Current Situation:**", "").replace("*", "**").replace("•", "*").replace("_*","*").replace("*_","*").replace("\n","\n\n")
                     text = text.split("\n")
