@@ -77,7 +77,8 @@ if [ "$approveStatus" = "True" ]; then
 				echo "trees skipped"
 			fi
 			
-			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush $treeFlag > update.log 2>&1
+			#bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush $treeFlag > update.log 2>&1
+			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --clean --gitpush $treeFlag > update.log 2>&1
 
 			status=$( tail -n 1 update.log )
 			echo $status
@@ -146,6 +147,7 @@ else
 		dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
 		#python scripts/tooltipsadd.py
 		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitgsd > rebuild.log 2>&1
+
 		python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
 		status=$( tail -n 1 rebuild.log )
 		echo $status
