@@ -1,6 +1,6 @@
 
 
-<u id='XEC'>XEC</u> continues to be widely prevalent. <u id='LP_8_1_1'>LP.8.1.1</u> is still showing selective growth in multiple regions. Variants of other potential interest include <u id='LF_7_2'>LF.7.2</u>/<u id='LF_7_2_1'>LF.7.2.1</u> subvariants (<u id='JN_1_16'>JN.1.16</u> subvariants) which are showing selective growth in multiple regions of Canada and internationally. XFJ (a recombinant of <u id='LF_7_6'>LF.7.6</u> and <u id='LS_2'>LS.2</u>, with breakpoint in the Spike receptor binding domain and <u id='LF_7'>LF.7</u> Spike N-terminal domain) is of international interest, but not showing signs of rapid spread.
+<u id='XEC'>XEC</u> continues to be widely prevalent. <u id='LP_8_1_1'>LP.8.1.1</u> is still showing selective growth in multiple regions. Variants of other potential interest include <u id='LF_7_2'>LF.7.2</u>/<u id='LF_7_2_1'>LF.7.2.1</u> subvariants (<u id='JN_1_16'>JN.1.16</u> subvariants) which are showing selective growth in multiple regions of Canada and internationally. <u id='XFJ'>XFJ</u> (a recombinant of <u id='LF_7_6'>LF.7.6</u> and <u id='LS_2'>LS.2</u>, with breakpoint in the Spike receptor binding domain and <u id='LF_7'>LF.7</u> Spike N-terminal domain) is of international interest, but not showing signs of rapid spread.
 
 
 
