@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2025-01-24"
+  value: "2025-04-24"
  datadir:
   label: "DataDir"
   input: text
@@ -252,7 +252,7 @@ These analyses are subject to frequent change given new data and updated lineage
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.02)
 #individualSelectionPlotReference <- getStrictoSubLineages("EG.5.1.1", meta)
-individualSelectionPlotReference <- getStrictoSubLineages("KP.3.1.1", meta)
+individualSelectionPlotReference <- getStrictoSubLineages("XEC", meta)
 
 #saveRDS(allparams, "newallparams.rds")
 allparams <- mclapply(latelineage_pangotree, function(l) {
