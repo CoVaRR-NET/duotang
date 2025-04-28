@@ -15,8 +15,8 @@ setAll=getAllStrictoLineages(meta)
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
 sublineage_XEC <- getStrictoSubLineages("XEC*",meta)
-sublineage_MC <- getStrictoSubLineages("MC.*", meta) #if CI estimation fails after all the checks (i.e. reasonable number of samples, and time), remove the root lineage in the mutant group. i.e. remove MC (AKA KP.3.1.1) from the mutant group. 
-sublineage_LP811 <- getStrictoSubLineages("LP.8.1.1*",meta)
+sublineage_MC <- getStrictoSubLineages("MC*", meta) #if CI estimation fails after all the checks (i.e. reasonable number of samples, and time), remove the root lineage in the mutant group. i.e. remove MC (AKA KP.3.1.1) from the mutant group. 
+sublineage_LP811 <- getStrictoSubLineages("LP.8*",meta)
 sublineage_LP811 <- sublineage_LP811[!sublineage_LP811 %in% c(sublineage_XEC, sublineage_MC)]
 
 # sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
@@ -34,8 +34,8 @@ reference = sublineage_XEC
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
 mutants = list(sublineage_MC, sublineage_LP811, sublineages_other)
-mutantNames = list("MC*", "LP.8.8.1*","Others",  "XEC*") #
-col <- c("MC*"=pal["XBB"], "LP.8.8.1*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutantNames = list("MC*", "LP.8*","Others",  "XEC*") #
+col <- c("MC*"=pal["XBB"], "LP.8*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 # mutants = list(sublineage_XEC, sublineages_other)
 # mutantNames = list("XEC*", "Others",  "KP.3*") #
@@ -95,9 +95,9 @@ for (i in 1:length(all.regions$name)){
 
 Here we examine the relative rate of spread of the different sublineages of SARS-CoV-2 currently circulating in Canada. Specifically, we determine if a new or emerging lineage has a selective advantage (s), and by how much, against a previously common reference lineage (broad scale (and in the Fastest Growing Lineages section): `r mutantNames[length(mutantNames)]` and at the fine scale, against `r individualSelectionPlotReference[[1]]`; see [methods](#appendix) for more details about selection and how it is estimated).
 
-Currently, the major group of SARS-CoV-2 lineages circulating are BA.2.86\* variants, particularly JN.1 and its descendants. Thus, at the broad scale, we are currently track the frequencies of JN.1\* descendants other than KP.3\*, KP.3\* descendants, XBB descendants and other BA.2 lineages (mainly BA.2.86 lineages not in JN.1\*).
+Currently, the major group of SARS-CoV-2 lineages circulating are BA.2.86* variants. At the broad scale, we are now tracking the frequencies of `r mutantNames[length(mutantNames)]` (as the reference), `r mutantNames[1]`, `r mutantNames[2]`  and other BA.2 lineages (mainly BA.2.86 lineages).
 
-Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r mutantNames[-length(mutantNames)]`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
+Left plot: y-axis is the proportion of these sub-lineages over time. Right plot: y-axis describes the logit function, log(freq(`r paste(mutantNames[-length(mutantNames)], collapse = "/")`)/freq(`r mutantNames[length(mutantNames)]`)), which gives a straight line whose slope is the selection coefficient if selection is constant over time (see methods).
 
 For comparison, Alpha had a selective advantage of s ~ 6%-11% per day over preexisting SARS-CoV-2 lineages, and Delta had a selective advantage of about 10% per day over Alpha.
 

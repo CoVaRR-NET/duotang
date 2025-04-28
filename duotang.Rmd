@@ -237,7 +237,7 @@ Canadian genomic and epidemiological data will be regularly pulled from various 
 Only representations of aggregate data will be posted here.
 
 ## Important limitations
-These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing reposittories.
+These analyses represent only a snapshot of SARS-CoV-2 evolution in Canada. Only some infections are detected by PCR testing, only some of those are sent for whole-genome sequencing, and not all sequences are posted to public facing repositories.
 Furthermore, sequencing volumes and priorities have changed during the pandemic, specific variants or populations might be preferentially sequenced at certain times in certain jurisdictions.
 When possible, these differences in sampling strategies are mentioned but they are not always known.
 With the arrival of the Omicron wave, many jurisdictions across Canada reached testing and sequencing capacity mid-late December 2021 and thus switched to targeted testing of priority groups (e.g., hospitalized patients, health care workers, and people in high-risk settings).
