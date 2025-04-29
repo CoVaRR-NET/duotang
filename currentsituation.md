@@ -4,7 +4,7 @@
 
 
 
-Note that there has been a reduction in data, potentially impacting interpretations of trends over this shift in the past month.
+Note that there has been a reduction in data, potentially causing delays in the detection of new variants and more uncertainty when estimating selection.
 
 
 
