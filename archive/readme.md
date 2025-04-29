@@ -1,4 +1,5 @@
 Here we store old versions of the duotang notebook:
+- [2025-04-25](./2025-04-25/2025-04-25.html)
 - [2025-04-11](./2025-04-11/2025-04-11.html)
 - [2025-04-08](./2025-04-08/2025-04-08.html)
 - [2025-03-25](https://bbea75d9.duotang.pages.dev/duotang)
