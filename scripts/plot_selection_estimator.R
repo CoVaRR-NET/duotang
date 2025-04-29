@@ -423,7 +423,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   }
   #define theme
   p<-p + theme_bw() +     
-    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", max(toplot$date))) + 
+    labs(caption = paste0("\nMost recent data date: ", max(toplot$date))) + 
     theme(legend.position=c(0.45, 0.92), legend.title=element_blank(), 
           legend.text=element_text(size=18), 
           legend.background = element_blank(), 
@@ -465,7 +465,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   
   #define plot theme
   p2<-p2 + theme_bw() + 
-    labs(caption = paste0("*Relative to the rest","\nMost recent data date: ", max(toplot$date))) + 
+    labs(caption = paste0("\nMost recent data date: ", max(toplot$date))) + 
     theme(legend.position=c(0.45, 0.92), legend.title=element_blank(), 
           legend.text=element_text(size=18), 
           legend.background = element_blank(), 
