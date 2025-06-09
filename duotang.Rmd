@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2025-04-24"
+  value: "2025-05-27"
  datadir:
   label: "DataDir"
   input: text
