@@ -394,13 +394,13 @@ if [ "$INCLUDEGSD" = "YES" ]; then
 	#python3 ${scripts_dir}/downloadGSDfasta.py ${data_dir}/GSDfasta.tar.xz
 	
 	#extract out the Canadian sequences.
-	tar -xvf GSDmetadata.tar.xz -O | grep "North America / Canada" > GSDMetadata.Canada.tsv
+	tar -xvf ${data_dir}/GSDmetadata.tar.xz -O | grep "North America / Canada" > ${data_dir}/GSDMetadata.Canada.tsv
 	
 	#clean it up and append the required columns
-	python scripts/cleanGSDData.py --metadata data_needed/GSDMetadata.Canada.tsv --alias data_needed/pango_designation_alias_key.tsv --out data_needed/GSDMetadata.Canada.Cleaned.tsv
+	python ${scripts_dir}/cleanGSDData.py --metadata ${data_dir}/GSDMetadata.Canada.tsv --alias ${data_dir}/pango_designation_alias_key.tsv --out ${data_dir}/GSDMetadata.Canada.Cleaned.tsv
 	
 	#gz compress it
-	gzip -f data_needed/GSDMetadata.Canada.Cleaned.tsv
+	gzip -f ${data_dir}/GSDMetadata.Canada.Cleaned.tsv
 	
 	##Extract GISAID id and collection date 
 	# zcat ${data_dir}/virusseq.metadata.csv.gz | cut -f19,38 | grep EPI | sort -k1,1 > ${data_dir}/temp_vssampledate
