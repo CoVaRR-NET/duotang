@@ -278,7 +278,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   est <- .make.estimator(region, startdate, reference, mutants)
 
   toplot <- est$toplot
-  toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+  #toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
   
   fit <- .fit.model(est, startpar, method=method)
   
@@ -291,7 +291,7 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     }
     est <- .make.estimator(region, startdate, reference, mutants, refDate = newRefDate)
     toplot <- est$toplot
-    toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
+    #toplot$tot <- apply(toplot[which(!is.element(names(toplot), c('time', 'date')))], 1, sum)
     fit <- .fit.model(est, startpar, method=method)
   }
   # Once we get the set of {p,s} values, we can run them through the s-shaped 
@@ -325,10 +325,11 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
     # format the count data (circles)
   plotData <- toplot %>% melt(id = c("date", "time", "tot")) %>% dplyr::select(date, variable, value, tot) %>% 
     mutate (variable = str_extract(variable,"[^n]+$")) %>% 
-    mutate (p = 2*value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot)  %>% 
-    rowwise() %>% 
-    mutate (s = ifelse((as.numeric(variable)-1) == 0, 0,(fit$fit[[paste0("s", (as.numeric(variable)-1))]]))) %>% 
-    group_by(variable) %>% mutate(n = sum(value)) 
+    mutate (p = value/tot) %>% mutate(p=ifelse(is.nan(p),0,p)) %>% dplyr::select(-tot)  %>%
+    rowwise() %>%
+    mutate (s = ifelse((as.numeric(variable)-1) == 0, 0,(fit$fit[[paste0("s", (as.numeric(variable)-1))]]))) %>%
+    group_by(variable) %>% mutate(n = sum(value))
+
     
     if (!includeReference){
       scurveStartIndex = 2
@@ -387,7 +388,6 @@ plot.selection.estimate.ggplot <- function(region, startdate, reference, mutants
   colnames(scurvesPlotData) <- c("date", levels(plotData$variable))
   scurvesPlotData=scurvesPlotData %>% melt(id="date")
 
-  
   #plot the VOC fits (line)
   p <- p + geom_line(data = scurvesPlotData, mapping = aes(x=date, y=value, color=variable)) +
     scale_color_manual(label = c(levels(scurvesPlotData$variable)), values = unname(col)) 

@@ -388,25 +388,38 @@ echo "gsdmetadata" > $checkPointFile
 #gsdmetadata:
 if [ "$INCLUDEGSD" = "YES" ]; then 
 	echo "downloading GSD metadata"
-	python3 ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
-	# Extract GISAID id and collection date 
-	zcat ${data_dir}/virusseq.metadata.csv.gz | cut -f19,38 | grep EPI | sort -k1,1 > ${data_dir}/temp_vssampledate
-	#Extracting Canadian sequences in last GISAID metadata 
-	tar -xvf $(ls ${data_dir}/GSDmetadata.tar.xz | tail -n 1) metadata.tsv -O| tr ' ' '_' |  awk 'substr($6,1,22)=="North_America_/_Canada"||NR==1' > ${data_dir}/temp_metadata_gisaid_canada.tsv
-
-	#Rename and keep the columns according to header_corresp_VirusSeq_GISAID
-	#Correct a few spotted errors from metadata file
-	echo -e "fasta_header_name Virus_name\nGISAID_ID Accession_ID\ngeo_loc_name_state_province_territory Location\nhost_gender Gender\nhost_age_bin Patient_age\nsample_collection_date Collection_date\npurpose_of_sampling Is_high_coverage?\npurpose_of_sequencing Is_low_coverage?\nsample_collected_by Is_reference?\nlineage Pango_lineage" > ${data_dir}/header_corresp_VirusSeq_GISAID
-
-	cat ${data_dir}/header_corresp_VirusSeq_GISAID ${data_dir}/temp_metadata_gisaid_canada.tsv | sed 's/Toronto/Ontario/' | sed 's/North_America_\/_Canada_\/_//' | sed 's/North_America_\/_Canada/NA/' | sed 's/_\/_[^\t]*//' | sed 's/Newfoundland\t/Newfoundland_and_Labrador\t/' |  sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | awk 'NF==2{d[$2]=$1;h=0}NF!=2 && h==1{for(i=1;i<=NF;i++){if(i in dd){printf "%s\t",$i}}printf "\n"}NF!=2 && h==0{h=1;for(i=1;i<=NF;i++){if($i in d){dd[i]=1;printf "%s\t",d[$i]}}printf "\n"}' | sed 's/_-_/-/' > ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv
-
-	cat ${data_dir}/pango_designation_alias_key.tsv ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv | awk 'NF==2{t[$1]=$2}NF!=2{rem=$7;split($7,p,".");if(p[1] in t){gsub(p[1] , t[p[1]], $7)}$7=rem" "$7;print}' | sed 's/lineage lineage/lineage raw_lineage/' | tr ' ' '\t' | sort -k2,2 > ${data_dir}/temp_metadatagisaid_beforecorrection.tsv
-
-	join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' |  gzip > ${data_dir}/GSDMetadataCleaned.tsv.gz
 	
-	echo -e "fasta_header_name\tsample_collection_date\tprovince\thost_age_bin\thost_gender\tlineage\traw_lineage\tsample_collected_by\tpurpose_of_sampling\tpurpose_of_sequencing" > ${data_dir}/gsd.metadata.tsv
-	zcat ${data_dir}/GSDMetadataCleaned.tsv.gz | grep -v "fasta_header_name" >> ${data_dir}/gsd.metadata.tsv
-	gzip -f ${data_dir}/gsd.metadata.tsv
+	#download the bulk GSD metadata
+	python3 ${scripts_dir}/downloadGSD.py ${data_dir}/GSDmetadata.tar.xz
+	#python3 ${scripts_dir}/downloadGSDfasta.py ${data_dir}/GSDfasta.tar.xz
+	
+	#extract out the Canadian sequences.
+	tar -xvf ${data_dir}/GSDmetadata.tar.xz -O | grep "North America / Canada" > ${data_dir}/GSDMetadata.Canada.tsv
+	
+	#clean it up and append the required columns
+	python ${scripts_dir}/cleanGSDData.py --metadata ${data_dir}/GSDMetadata.Canada.tsv --alias ${data_dir}/pango_designation_alias_key.tsv --out ${data_dir}/GSDMetadata.Canada.Cleaned.tsv
+	
+	#gz compress it
+	gzip -f ${data_dir}/GSDMetadata.Canada.Cleaned.tsv
+	
+	##Extract GISAID id and collection date 
+	# zcat ${data_dir}/virusseq.metadata.csv.gz | cut -f19,38 | grep EPI | sort -k1,1 > ${data_dir}/temp_vssampledate
+	##Extracting Canadian sequences in last GISAID metadata 
+	# tar -xvf $(ls ${data_dir}/GSDmetadata.tar.xz | tail -n 1) metadata.tsv -O| tr ' ' '_' |  awk 'substr($6,1,22)=="North_America_/_Canada"||NR==1' > ${data_dir}/temp_metadata_gisaid_canada.tsv
+
+	##Rename and keep the columns according to header_corresp_VirusSeq_GISAID
+	##Correct a few spotted errors from metadata file
+	# echo -e "fasta_header_name Virus_name\nGISAID_ID Accession_ID\ngeo_loc_name_state_province_territory Location\nhost_gender Gender\nhost_age_bin Patient_age\nsample_collection_date Collection_date\npurpose_of_sampling Is_high_coverage?\npurpose_of_sequencing Is_low_coverage?\nsample_collected_by Is_reference?\nlineage Pango_lineage" > ${data_dir}/header_corresp_VirusSeq_GISAID
+
+	# cat ${data_dir}/header_corresp_VirusSeq_GISAID ${data_dir}/temp_metadata_gisaid_canada.tsv | sed 's/Toronto/Ontario/' | sed 's/North_America_\/_Canada_\/_//' | sed 's/North_America_\/_Canada/NA/' | sed 's/_\/_[^\t]*//' | sed 's/Newfoundland\t/Newfoundland_and_Labrador\t/' |  sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g' | awk 'NF==2{d[$2]=$1;h=0}NF!=2 && h==1{for(i=1;i<=NF;i++){if(i in dd){printf "%s\t",$i}}printf "\n"}NF!=2 && h==0{h=1;for(i=1;i<=NF;i++){if($i in d){dd[i]=1;printf "%s\t",d[$i]}}printf "\n"}' | sed 's/_-_/-/' > ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv
+
+	# cat ${data_dir}/pango_designation_alias_key.tsv ${data_dir}/temp_metadata_gisaid_canada_changeformat.tsv | awk 'NF==2{t[$1]=$2}NF!=2{rem=$7;split($7,p,".");if(p[1] in t){gsub(p[1] , t[p[1]], $7)}$7=rem" "$7;print}' | sed 's/lineage lineage/lineage raw_lineage/' | tr ' ' '\t' | sort -k2,2 > ${data_dir}/temp_metadatagisaid_beforecorrection.tsv
+
+	# join -1 1 -2 2 -a 2 -o auto -e"NA" ${data_dir}/temp_vssampledate ${data_dir}/temp_metadatagisaid_beforecorrection.tsv | awk '$2!=$4 && $2!="NA"{$4=$2}{print}' | awk 'length($4)==7{$4=$4"-15"}{print}' | awk 'length($4)==4{$4=$4"-01-01"}{print}' | tr ' ' '\t' |  sort -rk2,2 | cut -f3- | awk 'BEGIN { OFS = "\t" }NR!=1{gsub("_"," ", $3)}{print}' |  gzip > ${data_dir}/GSDMetadataCleaned.tsv.gz
+	
+	# echo -e "fasta_header_name\tsample_collection_date\tprovince\thost_age_bin\thost_gender\tlineage\traw_lineage\tsample_collected_by\tpurpose_of_sampling\tpurpose_of_sequencing" > ${data_dir}/gsd.metadata.tsv
+	# zcat ${data_dir}/GSDMetadataCleaned.tsv.gz | grep -v "fasta_header_name" >> ${data_dir}/gsd.metadata.tsv
+	# gzip -f ${data_dir}/gsd.metadata.tsv
 	
 fi
 
