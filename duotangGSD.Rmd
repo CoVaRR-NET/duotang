@@ -142,8 +142,11 @@ source("scripts/scanlineages.R")
 #meta <- meta %>% mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>% rename(GID=gisaid_accession)
 
 #for the recombinant descendants that does not start with X, e.g. FD. append their full lineage path to the raw_lineage column
-view(meta[629322,])
+view(meta[37265,])
 meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XEJ", raw_lineage), paste0("B.1.1.529.XEJ", raw_lineage), raw_lineage))
+meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XEF", raw_lineage), paste0("B.1.1.529.XEF", raw_lineage), raw_lineage))
+meta<-meta %>% rowwise() %>% mutate(raw_lineage = ifelse(grepl("^XEE", raw_lineage), paste0("B.1.1.529.XEF", raw_lineage), raw_lineage))
+
 
 meta <- meta %>% rowwise() %>%
       mutate(raw_lineage = ifelse(grepl("^X", raw_lineage), 
