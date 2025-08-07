@@ -14,10 +14,17 @@ setAll=getAllStrictoLineages(meta)
 # sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineage_hv1)] #XBB Other
 #sublineages_XBBOther <- sublineages_XBB[!sublineages_XBB %in% c(sublineages_EG5,sublineage_hv1)] #XBB Other
 #setAll=setAll[!setAll %in% c(sublineages_BQ, sublineages_XBB)] #the rest
-sublineage_XEC <- getStrictoSubLineages("XEC*",meta)
-sublineage_MC <- getStrictoSubLineages("MC*", meta) #if CI estimation fails after all the checks (i.e. reasonable number of samples, and time), remove the root lineage in the mutant group. i.e. remove MC (AKA KP.3.1.1) from the mutant group. 
-sublineage_LP811 <- getStrictoSubLineages("LP.8*",meta)
-sublineage_LP811 <- sublineage_LP811[!sublineage_LP811 %in% c(sublineage_XEC, sublineage_MC)]
+#sublineage_XEC <- getStrictoSubLineages("XEC*",meta)
+#sublineage_MC <- getStrictoSubLineages("MC*", meta) #if CI estimation fails after all the checks (i.e. reasonable number of samples, and time), remove the root lineage in the mutant group. i.e. remove MC (AKA KP.3.1.1) from the mutant group. 
+#sublineage_LP811 <- getStrictoSubLineages("LP.8*",meta)
+#sublineage_LP811 <- sublineage_LP811[!sublineage_LP811 %in% c(sublineage_XEC, sublineage_MC)]
+
+
+sublineage_NB <- getStrictoSubLineages("NB*",meta)
+sublineage_XFG <- getStrictoSubLineages("XFG*",meta)
+sublineage_LP8 <- getStrictoSubLineages("LP.8*",meta)
+sublineage_LP8 <- sublineage_LP8[!sublineage_LP8 %in% c(sublineage_NB, sublineage_XFG)]
+
 
 # sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
 # sublineage_MC <- getStrictoSubLineages("MC.*", meta)
@@ -27,15 +34,15 @@ sublineage_LP811 <- sublineage_LP811[!sublineage_LP811 %in% c(sublineage_XEC, su
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_KP, sublineage_KP3)] #XBB Other
 # sublineage_jn1.11 <- getStrictoSubLineages("JN.1.11*",meta)
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% sublineage_jn1.11] #XBB Other
-sublineages_other<-setAll[!setAll %in% c(sublineage_XEC, sublineage_MC, sublineage_LP811)] #the rest
+sublineages_other<-setAll[!setAll %in% c(sublineage_NB, sublineage_XFG, sublineage_LP8)] #the rest
 
-reference = sublineage_XEC
+reference = sublineage_LP8
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
-mutants = list(sublineage_MC, sublineage_LP811, sublineages_other)
-mutantNames = list("MC*", "LP.8*","Others",  "XEC*") #
-col <- c("MC*"=pal["XBB"], "LP.8*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineage_NB, sublineage_XFG, sublineages_other)
+mutantNames = list("NB*", "XFG*","Others",  "LP.8*") #
+col <- c("NB*"=pal["XBB"], "XFG*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 # mutants = list(sublineage_XEC, sublineages_other)
 # mutantNames = list("XEC*", "Others",  "KP.3*") #
