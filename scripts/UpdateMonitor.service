@@ -146,7 +146,7 @@ else
 		git pull --recurse-submodules
 		dateToUse=`python scripts/UpdateStatusManager.py --action get --key InProgressUpdateDate`
 		#python scripts/tooltipsadd.py
-		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitgsd > rebuild.log 2>&1
+		bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --gitpush --gotostep knitduotang > rebuild.log 2>&1
 
 		python scripts/UpdateStatusManager.py --action set --key Rebuild --value $newRebuildCount
 		status=$( tail -n 1 rebuild.log )
