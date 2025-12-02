@@ -499,6 +499,7 @@ if [ "$INCLUDEGSD" = "YES" ]; then
 
 	Rscript -e "rmarkdown::render('duotangGSD.Rmd',params=list(datestamp="\"$datestamp\""))"
 	echo "encrypt" > $checkPointFile
+fi
 
 echo "knitduotang" > $checkPointFile
 
