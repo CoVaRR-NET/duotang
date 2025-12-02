@@ -77,8 +77,8 @@ if [ "$approveStatus" = "True" ]; then
 				echo "trees skipped"
 			fi
 			
-			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush $treeFlag > update.log 2>&1
-			#bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --clean --gitpush $treeFlag > update.log 2>&1
+			#bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --includegsd --clean --gitpush $treeFlag > update.log 2>&1
+			bash -e ./update.sh --noconda --venvpath "/home/jjjjia/duotang_venv" --date $dateToUse --clean --gitpush $treeFlag > update.log 2>&1
 
 			status=$( tail -n 1 update.log )
 			echo $status
