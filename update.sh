@@ -492,11 +492,11 @@ fi
 
 #python scripts/tooltipsadd.py 
 
+#knitgsd:
 if [ "$INCLUDEGSD" = "YES" ]; then 
-		
 	echo "knitgsd" > $checkPointFile
+	echo "knitting the GSD Rmd..."
 
-	#knitgsd:
 	Rscript -e "rmarkdown::render('duotangGSD.Rmd',params=list(datestamp="\"$datestamp\""))"
 	echo "encrypt" > $checkPointFile
 
