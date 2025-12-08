@@ -17,4 +17,8 @@ There is no clear subsequent variant driving an increase in the provinces report
 We continue to monitor for, but have not recently detected, highly divergent variants in Canada (“saltation” lineages with a sudden increase in number of mutations).
 
 
+
+Note reductions or delays in data can cause delays in the detection of new variants and more uncertainty when estimating selection.
+
+
 <!-- edited -->
