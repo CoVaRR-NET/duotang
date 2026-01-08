@@ -1,5 +1,5 @@
 Duotang update {updatedate}:  
 
 Detailed changes:
-* Update to VirusSeq Release 2025-11-24 
+* Update to VirusSeq Release 2025-12-11 
 
