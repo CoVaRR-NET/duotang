@@ -97,7 +97,12 @@ alpha <- function(col, alpha) {
   })
   
   if (is.na(refDate)){
-    refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
+    if (length(v) < 10){
+      refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=length(v))$y)
+    } else{
+      refdate <- which.max(smooth.spline(v[!is.na(v)],nknots=10)$y)
+      
+    }
   } else{
     refdate <-refDate
   }
@@ -599,6 +604,7 @@ generateAllParams <- function(region, startdate, reference, mutants, startpar, m
   # collapseMutants = T
   # startpar = startpar2
   # method='BFGS'
+
 
   est <- .make.estimator(region, startdate, reference, mutants, collapseMutants = T)
   if(any(is.na(est))){
