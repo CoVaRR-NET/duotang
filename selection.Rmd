@@ -22,8 +22,8 @@ setAll=getAllStrictoLineages(meta)
 
 sublineage_NB <- getStrictoSubLineages("NB*",meta)
 sublineage_XFG <- getStrictoSubLineages("XFG*",meta)
-sublineage_LP8 <- getStrictoSubLineages("LP.8*",meta)
-sublineage_LP8 <- sublineage_LP8[!sublineage_LP8 %in% c(sublineage_NB, sublineage_XFG)]
+sublineage_PQ <- getStrictoSubLineages("PQ*",meta)
+sublineage_NB <- c(sublineage_NB[!sublineage_NB %in% c(sublineage_PQ, sublineage_XFG)],"NB.1.8.1")
 
 
 # sublineage_KP3 <- getStrictoSubLineages("KP.3*",meta)
@@ -34,15 +34,15 @@ sublineage_LP8 <- sublineage_LP8[!sublineage_LP8 %in% c(sublineage_NB, sublineag
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% c(sublineage_KP, sublineage_KP3)] #XBB Other
 # sublineage_jn1.11 <- getStrictoSubLineages("JN.1.11*",meta)
 # sublineage_jn1 <- sublineage_jn1[!sublineage_jn1 %in% sublineage_jn1.11] #XBB Other
-sublineages_other<-setAll[!setAll %in% c(sublineage_NB, sublineage_XFG, sublineage_LP8)] #the rest
+sublineages_other<-setAll[!setAll %in% c(sublineage_NB, sublineage_XFG, sublineage_PQ)] #the rest
 
-reference = sublineage_LP8
+reference = sublineage_XFG
 
 #this list defines the mutants we are looking at for plotting. The order of mutants listed will be respected on the respective plots. 
 #!!!last element is always the reference.
-mutants = list(sublineage_NB, sublineage_XFG, sublineages_other)
-mutantNames = list("NB*", "XFG*","Others",  "LP.8*") #
-col <- c("NB*"=pal["XBB"], "XFG*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
+mutants = list(sublineage_NB, sublineage_PQ, sublineages_other)
+mutantNames = list("NB*", "PQ*","Others",  "XFG*") #
+col <- c("NB*"=pal["XBB"], "PQ*" = "#00eeff","Others"="#CC5500") #define custom color for XBB here because otherwise it will be black cuz recombinant.
 
 # mutants = list(sublineage_XEC, sublineages_other)
 # mutantNames = list("XEC*", "Others",  "KP.3*") #
