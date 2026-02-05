@@ -12,7 +12,7 @@ Variants of current interest (due to their current/potential growth advantage, m
 
 
 
-Subvariants of <u id='XFG'>XFG</u>, a recombinant of two Omicron lineages, <u id='LF_7'>LF.7</u> and LP.8.1.2.
+Subvariants of <u id='XFG'>XFG</u>, a recombinant of two Omicron lineages, <u id='LF_7'>LF.7</u> and <u id='LP_8_1_2'>LP.8.1.2</u>.
 
 
 
