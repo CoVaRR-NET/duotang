@@ -59,7 +59,7 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       ;;
 	--includegsd)
-      INCLUDEGSD="NO"
+      INCLUDEGSD="YES"
       shift # past argument
       ;;
 	--gitpull)
