@@ -105,6 +105,8 @@ columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin",
              "raw_lineage")
 meta <- meta[ , columnlist]
 
+bad_rows <- which(is.na(as.Date(meta$sample_collection_date, format = "%Y-%m-%d")))
+meta <- meta[-bad_rows, ]
 ### metadata cleaning 
 unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
                  "Not Applicable","","NA","unknow")
