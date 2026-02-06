@@ -1,6 +1,6 @@
 
 
-While data on cases and genomic sampling has been limited, the data available to date are consistent with variant <u id='XFG'>XFG</u> driving a wave starting in August that was delayed or extended in some regions into late Fall 2025.
+While data on cases and genomic sampling has been limited, the data available to date are consistent with variant <u id='XFG'>XFG</u> driving a wave starting in August that was delayed or extended in some regions into late Fall 2025. Then a combination of <u id='XFG'>XFG</u> subvariants and PQ subvariants continued to extend cases.
 
 
 
@@ -8,19 +8,12 @@ Variants of current interest (due to their current/potential growth advantage, m
 
 
 
-<u id='BA_3_2_2'>BA.3.2.2</u> subvariants (including <u id='RE_2'>RE.2</u> variants).
+* <u id='PQ_2_1'>PQ.2.1</u> subvariants (descended from <u id='NB_1_8_1'>NB.1.8.1</u>), particularly <u id='PQ_2_1_3'>PQ.2.1.3</u>
+* <u id='PQ_2_8_1'>PQ.2.8.1</u>, or subvariants (includes <u id='RC_1'>RC.1</u>)
+* <u id='PQ_17'>PQ.17</u>
+* Subvariants of <u id='XFG'>XFG</u>, a recombinant of two Omicron lineages, <u id='LF_7'>LF.7</u> and <u id='LP_8_1_2'>LP.8.1.2</u>, particularly <u id='XFG_1_1'>XFG.1.1</u>/<u id='XFG_1_1_1'>XFG.1.1.1</u>, of note internationally
 
-
-
-Subvariants of <u id='XFG'>XFG</u>, a recombinant of two Omicron lineages, <u id='LF_7'>LF.7</u> and <u id='LP_8_1_2'>LP.8.1.2</u>.
-
-
-
-<u id='PQ_2_1'>PQ.2.1</u> subvariants (descended from <u id='NB_1_8_1'>NB.1.8.1</u>).
-
-
-
-There is no clear subsequent variant driving an increase in the provinces reporting, based on data obtained to date, though a small winter wave would not be unexpected.
+There is no clear, single variant driving an increase in the provinces reporting, based on data obtained to date.
 
 
 
