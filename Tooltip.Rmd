@@ -3,10 +3,15 @@
 
 
 ```{r, echo=FALSE}
-tippy::tippy_this(elementId = "XFG", tooltip = "153 samples in last 120 days.//Recombinant lineage of LF.7, LP.8.1.2, LF.7 (breakpoints: 22894-22895, 23040-24818), from sars-cov-2-variants/lineage-proposals#2449")
-tippy::tippy_this(elementId = "BA_3_2_2", tooltip = "Ancestor:BA.3.2//0 samples in last 120 days.//Alias of B.1.1.529.3.2.2, S:K356T, S:A575S")
-tippy::tippy_this(elementId = "RE_2", tooltip = "Ancestor:BA.3.2.2//0 samples in last 120 days.//Alias of B.1.1.529.3.2.2.2, ORF1a:E1015G")
+tippy::tippy_this(elementId = "XFG", tooltip = "149 samples in last 120 days.//Recombinant lineage of LF.7, LP.8.1.2, LF.7 (breakpoints: 22894-22895, 23040-24818), from sars-cov-2-variants/lineage-proposals#2449")
+tippy::tippy_this(elementId = "PQ_2_1", tooltip = "Ancestor:XDV.1.5.1.1.8.1.2//47 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1.2.1, S:I478T (rev), from sars-cov-2-variants/lineage-proposals#2594")
+tippy::tippy_this(elementId = "NB_1_8_1", tooltip = "Ancestor:XDV.1.5.1.1.8//236 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1, S:A435S, from sars-cov-2-variants/lineage-proposals#2431")
+tippy::tippy_this(elementId = "PQ_2_1_3", tooltip = "Ancestor:XDV.1.5.1.1.8.1.2.1//57 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1.2.1.3, C19263T")
+tippy::tippy_this(elementId = "PQ_2_8_1", tooltip = "Ancestor:XDV.1.5.1.1.8.1.2.8//10 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1.2.8.1, S:H445P, from sars-cov-2-variants/lineage-proposals#2803")
+tippy::tippy_this(elementId = "RC_1", tooltip = "Ancestor:XDV.1.5.1.1.8.1.2.8.1//0 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1.2.8.1.1, S:I478T (rev)")
+tippy::tippy_this(elementId = "PQ_17", tooltip = "Ancestor:XDV.1.5.1.1.8.1//52 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1.17, S:I478T (rev) on polytomy, from sars-cov-2-variants/lineage-proposals#2594")
 tippy::tippy_this(elementId = "LF_7", tooltip = "Ancestor:JN.1.16.1//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.16.1.7, S:T22N, S:S31P, S:K182R, S:R190S, S:K444R, ORF9b:I5T, Senegal, from #2733")
-tippy::tippy_this(elementId = "PQ_2_1", tooltip = "Ancestor:XDV.1.5.1.1.8.1.2//68 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1.2.1, S:I478T (rev), from sars-cov-2-variants/lineage-proposals#2594")
-tippy::tippy_this(elementId = "NB_1_8_1", tooltip = "Ancestor:XDV.1.5.1.1.8//308 samples in last 120 days.//Alias of XDV.1.5.1.1.8.1, S:A435S, from sars-cov-2-variants/lineage-proposals#2431")
+tippy::tippy_this(elementId = "LP_8_1_2", tooltip = "Ancestor:LP.8.1//0 samples in last 120 days.//Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2, S:N487D, from sars-cov-2-variants/lineage-proposals#2199")
+tippy::tippy_this(elementId = "XFG_1_1", tooltip = "30 samples in last 120 days.//S:W452R (rev), ORF7a:V8A (rev), M:V104L, from sars-cov-2-variants/lineage-proposals#2796")
+tippy::tippy_this(elementId = "XFG_1_1_1", tooltip = "30 samples in last 120 days.//ORF7a:A13S")
 ```

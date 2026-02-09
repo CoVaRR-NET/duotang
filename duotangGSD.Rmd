@@ -105,6 +105,8 @@ columnlist=c("fasta_header_name", "province", "host_gender", "host_age_bin",
              "raw_lineage")
 meta <- meta[ , columnlist]
 
+bad_rows <- which(is.na(as.Date(meta$sample_collection_date, format = "%Y-%m-%d")))
+meta <- meta[-bad_rows, ]
 ### metadata cleaning 
 unknown.str <- c("Undeclared", "Not Provided", "Restricted Access", "Missing", 
                  "Not Applicable","","NA","unknow")
@@ -261,7 +263,7 @@ These analyses are subject to frequent change given new data and updated lineage
 ```{r general fits for selection estimator, message = F, warning=FALSE, echo = FALSE, fig.width=5,fig.height=5, fig.show="hold", out.width="50%"}
 source("scripts/plot_selection_estimator.R")
 startpar2 <- list(p=0.5, s=0.05)
-individualSelectionPlotReference <- getStrictoSubLineages("LP.8.1.1", meta)
+individualSelectionPlotReference <- getStrictoSubLineages("XFG.3", meta)
 
 #saveRDS(allparams, "newallparams.rds")
 allparams <- mclapply(latelineage_pangotree, function(l) {
