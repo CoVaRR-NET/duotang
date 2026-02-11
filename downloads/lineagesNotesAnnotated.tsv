@@ -1245,7 +1245,7 @@ NY.6	LP.8.1.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.6, S:A475V, on LP.8.1
 NY.7	LP.8.1.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.7, S:T22N, from sars-cov-2-variants/lineage-proposals#2199	2	0
 NY.7.1	NY.7	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.7.1, ORF1b:A788V, C925T, C29708T, from sars-cov-2-variants/lineage-proposals#2199	3	0
 NY.7.1.1	NY.7.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.7.1.1, S:A475V, ORF1b:R2257S, from sars-cov-2-variants/lineage-proposals#2199	0	0
-NY.7.1.2	NY.7.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.7.1.2, S:N487D	0	0
+NY.7.1.2	NY.7.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.7.1.2, S:N487D, from sars-cov-2-variants/lineage-proposals#2874	0	0
 NY.7.2	NY.7	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.7.2, S:K478E, ORF1a:K3353R, N:G19E, from sars-cov-2-variants/lineage-proposals#2199	0	0
 NY.8	LP.8.1.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.8, S:R214H, on ORF1b:A241V branch, USA, from #2894	0	0
 NY.9	LP.8.1.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.1.9, S:K478T (rev), from sars-cov-2-variants/lineage-proposals#2199	1	0
@@ -1293,12 +1293,12 @@ NW.1.1.1	NW.1.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.1.1, S:T572I, S:S
 NW.1.2	NW.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2, S:T22N, ORF1b:P2256S, from sars-cov-2-variants/lineage-proposals#2563	31	0
 NW.1.2.1	NW.1.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.1, ORF8:A51T, ORF9b:G38D, on G9646A branch	14	0
 QM.1	NW.1.2.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.1.1, S:T572I, ORF1a:S1612L	7	0
-QM.2	NW.1.2.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.1.2, S:T345S	0	0
+QM.2	NW.1.2.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.1.2, S:T345S, from sars-cov-2-variants/lineage-proposals#3051	0	0
 QM.3	NW.1.2.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.1.3, C7732T, C19884T	7	0
 NW.1.2.2	NW.1.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2, G25401A	0	0
-RG.1	NW.1.2.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.1, S:S680A, on ORF1a:Q1224R branch	0	0
-RG.1.1	RG.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.1.1, S:N532D	0	0
-RG.1.2	RG.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.1.2, S:K679R	0	0
+RG.1	NW.1.2.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.1, S:S680A, on ORF1a:Q1224R branch, from sars-cov-2-variants/lineage-proposals#2872	0	0
+RG.1.1	RG.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.1.1, S:N532D, from sars-cov-2-variants/lineage-proposals#2872	0	0
+RG.1.2	RG.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.1.2, S:K679R, from sars-cov-2-variants/lineage-proposals#2872	0	0
 RG.2	NW.1.2.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.2, ORF1a:L1507F, on ORF1a:Q1224R branch	1	0
 RG.3	NW.1.2.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.2.3, C27649T, G29825T, on A28032-(ORF8:I47- out of frame) branch, from sars-cov-2-variants/lineage-proposals#3212	0	0
 NW.1.2.3	NW.1.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.2.1.2.3, T9610C, C27294T	0	0
@@ -1341,8 +1341,8 @@ PF.2.2.1	PF.2.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.2.2.1, S:A475V	0	0
 PF.2.3	PF.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.2.3, ORF1a:V2206, G25455A	1	0
 PF.2.4	PF.2	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.2.4, S:K679R, ORF1a:T1788M, C10138T	3	0
 PF.3	LP.8.1.6	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.3, ORF1a:T319I, C29614T	0	0
-PF.3.1	PF.3	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.3.1, S:A475V	0	0
-PF.4	LP.8.1.6	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.4, S:S256L, S:S689N	0	0
+PF.3.1	PF.3	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.3.1, S:A475V, from sars-cov-2-variants/lineage-proposals#2199	0	0
+PF.4	LP.8.1.6	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.4, S:S256L, S:S689N, from sars-cov-2-variants/lineage-proposals#2199	0	0
 PF.5	LP.8.1.6	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.6.5, S:K679R, ORF1b:P2321L, on A9328G branch	0	0
 LP.8.1.7	LP.8.1	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.7, ORF1b:V980I, ORF10:Q29*, from #2869	0	0
 QH.1	LP.8.1.7	Alias of B.1.1.529.2.86.1.1.11.1.1.1.3.8.1.7.1, S:A475V, from sars-cov-2-variants/lineage-proposals#2220	0	0
@@ -1513,14 +1513,14 @@ PE.1.3	PE.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.3, ORF1a:E775K, ORF1
 PE.1.4	PE.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.4, S:H445P, on ORF7a:T28I, ORF1a:del84-85 branch, Australia, from sars-cov-2-variants/lineage-proposals#2650	0	0
 PE.1.4.1	PE.1.4	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.4.1, S:V1176F, Australia	0	0
 PE.1.4.2	PE.1.4	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.4.2, ORF1a:H2659Y, ORF8:Q72H, Australia	0	0
-PE.1.4.3	PE.1.4	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.4.3, S:Q52K, New Zealand	0	0
+PE.1.4.3	PE.1.4	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.4.3, S:Q52K, New Zealand, from sars-cov-2-variants/lineage-proposals#2918	0	0
 PE.1.5	PE.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.5, S:T716I, New Zealand	0	0
 PE.1.6	PE.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.6, C11050T, Australia	0	0
 PE.1.7	PE.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.1.7, S:H445P, S:T547K, ORF1a:R77Q, ORF1a:A3454V, on ORF7a:T28I, ORF1a:del84-85 branch, Australia	0	0
 PE.2	MC.10.2.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.2, ORF1a:E632G, New Zealand	0	0
 PE.3	MC.10.2.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.3, N:T362I, ORF1a:S1510F, ORF7a:T28I, New Zealand, from sars-cov-2-variants/lineage-proposals#2682	0	0
 PE.4	MC.10.2.1	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.4, A25983C	0	0
-PE.4.1	PE.4	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.4.1, S:H445P	0	0
+PE.4.1	PE.4	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.1.4.1, S:H445P, from sars-cov-2-variants/lineage-proposals#2917	0	0
 MC.10.2.2	MC.10.2	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.2, ORF1a:K2200R, T10033C, from sars-cov-2-variants/lineage-proposals#2015	0	0
 QP.1	MC.10.2.2	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.2.1, ORF1a:A3523V, T7402C, C17676T	0	0
 MC.10.2.3	MC.10.2	Alias of B.1.1.529.2.86.1.1.11.1.3.1.1.10.2.3, S:Q1201H, ORF1b:P1427S, England	0	0
@@ -1831,10 +1831,10 @@ PY.1	LF.7.9.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1, A10978T, C19029T, T27484
 PY.1.1	PY.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1, S:K679R, ORF1a:A486V, G8863A, India	0	0
 PY.1.1.1	PY.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1, S:A435S, ORF1a:M3862I, India, from sars-cov-2-variants/lineage-proposals#2585	26	0
 RF.1	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.1, C12439T	44	0
-RF.2	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.2, ORF1b:T239I, ORF3a:S26L	0	0
+RF.2	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.2, ORF1b:T239I, ORF3a:S26L, from sars-cov-2-variants/lineage-proposals#3106	0	0
 RF.3	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.3, S:R182G, ORF1a:Q2034R	1	0
 RF.4	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.4, C8683T	0	0
-RF.5	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.5, S:M153I, S:K478T (rev)	0	0
+RF.5	PY.1.1.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.1.1.5, S:M153I, S:K478T (rev), from sars-cov-2-variants/lineage-proposals#3043	0	0
 PY.1.2	PY.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.2, ORF1a:F2173L, ORF8:A51V	0	0
 PY.1.3	PY.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.3, T24163C	0	0
 PY.1.4	PY.1	Alias of B.1.1.529.2.86.1.1.16.1.7.9.1.1.4, ORF1b:S638I	0	0
@@ -2164,36 +2164,36 @@ BA.3.1	BA.3	Alias of B.1.1.529.3.1, mainly found in Poland, from #540	0	0
 BA.3.2	BA.3	Alias of B.1.1.529.3.2, saltation with ~40 spike AA substitutions, South Africa, from #2909	0	0
 BA.3.2.1	BA.3.2	Alias of B.1.1.529.3.2.1, S:H681R, S:P1162R	0	0
 RD.1	BA.3.2.1	Alias of B.1.1.529.3.2.1.1, A10978G	0	0
-RD.1.1	BA.3.2.1.1	Alias of B.1.1.529.3.2.1.1.1, S:V227L	0	0
-RD.1.1.1	BA.3.2.1.1.1	Alias of B.1.1.529.3.2.1.1.1.1, N:T271I, Netherlands/Denmark	0	0
-RD.1.2	BA.3.2.1.1	Alias of B.1.1.529.3.2.1.1.2, N:T296I	0	0
+RD.1.1	BA.3.2.1.1	Alias of B.1.1.529.3.2.1.1.1, S:V227L, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RD.1.1.1	BA.3.2.1.1.1	Alias of B.1.1.529.3.2.1.1.1.1, N:T271I, Netherlands/Denmark, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RD.1.2	BA.3.2.1.1	Alias of B.1.1.529.3.2.1.1.2, N:T296I, from sars-cov-2-variants/lineage-proposals#3093	0	0
 BA.3.2.2	BA.3.2	Alias of B.1.1.529.3.2.2, S:K356T, S:A575S	0	0
-RE.1	BA.3.2.2	Alias of B.1.1.529.3.2.2.1, ORF1a:G227S, ORF1a:A776V	0	0
+RE.1	BA.3.2.2	Alias of B.1.1.529.3.2.2.1, ORF1a:G227S, ORF1a:A776V, from sars-cov-2-variants/lineage-proposals#3093	0	0
 RE.1.1	BA.3.2.2.1	Alias of B.1.1.529.3.2.2.1.1, ORF1a:R24H, ORF1a:A131V, ORF1a:K3353R, ORF1b:R276C, Australia	0	0
-RE.1.1.1	BA.3.2.2.1.1	Alias of B.1.1.529.3.2.2.1.1.1, ORF1b:H1897Y, on C18747T branch, Australia	0	0
+RE.1.1.1	BA.3.2.2.1.1	Alias of B.1.1.529.3.2.2.1.1.1, ORF1b:H1897Y, on C18747T branch, Australia, from sars-cov-2-variants/lineage-proposals#3093	0	0
 RS.1	BA.3.2.2.1.1.1	Alias of B.1.1.529.3.2.2.1.1.1.1, C4012T, C13375T (rev), C14889T, Australia	0	0
-RE.1.1.2	BA.3.2.2.1.1	Alias of B.1.1.529.3.2.2.1.1.2, S:H49Y, ORF1a:R1467K, Australia	0	0
-RE.1.1.3	BA.3.2.2.1.1	Alias of B.1.1.529.3.2.2.1.1.3, S:P1162L, Australia	0	0
-RE.1.2	BA.3.2.2.1	Alias of B.1.1.529.3.2.2.1.2, C203T, C5654T, C9836T, C22594T, C28987T, South Africa	0	0
-RE.2	BA.3.2.2	Alias of B.1.1.529.3.2.2.2, ORF1a:E1015G	0	0
-RE.2.1	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.1, N:T296I, on ORF1a:T1896I branch, Europe	0	0
+RE.1.1.2	BA.3.2.2.1.1	Alias of B.1.1.529.3.2.2.1.1.2, S:H49Y, ORF1a:R1467K, Australia, from sars-cov-2-variants/lineage-proposals#3164	0	0
+RE.1.1.3	BA.3.2.2.1.1	Alias of B.1.1.529.3.2.2.1.1.3, S:P1162L, Australia, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.1.2	BA.3.2.2.1	Alias of B.1.1.529.3.2.2.1.2, C203T, C5654T, C9836T, C22594T, C28987T, South Africa, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2	BA.3.2.2	Alias of B.1.1.529.3.2.2.2, ORF1a:E1015G, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2.1	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.1, N:T296I, on ORF1a:T1896I branch, Europe, from sars-cov-2-variants/lineage-proposals#3093	0	0
 RE.2.1.1	BA.3.2.2.2.1	Alias of B.1.1.529.3.2.2.2.1.1, C4891T, T8803C	0	0
-RE.2.1.2	BA.3.2.2.2.1	Alias of B.1.1.529.3.2.2.2.1.2, ORF3a:I63T, on C10594T branch	0	0
-RE.2.1.3	BA.3.2.2.2.1	Alias of B.1.1.529.3.2.2.2.1.3, ORF1a:P1640L, on C10594T branch	0	0
-RE.2.2	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.2, N:A173V, C5884T, on A10864G branch	0	0
+RE.2.1.2	BA.3.2.2.2.1	Alias of B.1.1.529.3.2.2.2.1.2, ORF3a:I63T, on C10594T branch, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2.1.3	BA.3.2.2.2.1	Alias of B.1.1.529.3.2.2.2.1.3, ORF1a:P1640L, on C10594T branch, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2.2	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.2, N:A173V, C5884T, on A10864G branch, from sars-cov-2-variants/lineage-proposals#3093	0	0
 RE.2.2.1	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.1, C1663T, on ORF1a:G30D branch, after T1177C	0	0
-RE.2.2.2	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.2, ORF1a:G3578S, ORF1a:A3889T, on T1177C branch	0	0
-RU.1	BA.3.2.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.2.1, N:L219F	0	0
+RE.2.2.2	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.2, ORF1a:G3578S, ORF1a:A3889T, on T1177C branch, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RU.1	BA.3.2.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.2.1, N:L219F, from sars-cov-2-variants/lineage-proposals#3093	0	0
 RE.2.2.3	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.3, C11020T, on T1177C branch	0	0
-RE.2.2.4	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.4, ORF1a:S2500F, on T1177C branch	0	0
-RT.1	BA.3.2.2.2.2.4	Alias of B.1.1.529.3.2.2.2.2.4.1, S:S98F, S:Q173H, Netherlands/Germany	0	0
+RE.2.2.4	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.4, ORF1a:S2500F, on T1177C branch, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RT.1	BA.3.2.2.2.2.4	Alias of B.1.1.529.3.2.2.2.2.4.1, S:S98F, S:Q173H, Netherlands/Germany, from sars-cov-2-variants/lineage-proposals#3146	0	0
 RE.2.2.5	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.5, C4438T	0	0
 RE.2.2.6	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.6, ORF1a:Q998H	0	0
-RE.2.2.7	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.7, S:K300R, on ORF1a:G30D branch, after T1177C	0	0
-RE.2.2.8	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.8, S:T827I, on C10726T branch, after T1177C	0	0
-RE.2.3	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.3, ORF1a:T2648N, ORF1a:T4065I, on A10864G branch	0	0
-RE.2.4	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.4, N:N126K	0	0
-RE.3	BA.3.2.2	Alias of B.1.1.529.3.2.2.3, ORF1b:T2084I	0	0
+RE.2.2.7	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.7, S:K300R, on ORF1a:G30D branch, after T1177C, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2.2.8	BA.3.2.2.2.2	Alias of B.1.1.529.3.2.2.2.2.8, S:T827I, on C10726T branch, after T1177C, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2.3	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.3, ORF1a:T2648N, ORF1a:T4065I, on A10864G branch, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.2.4	BA.3.2.2.2	Alias of B.1.1.529.3.2.2.2.4, N:N126K, from sars-cov-2-variants/lineage-proposals#3093	0	0
+RE.3	BA.3.2.2	Alias of B.1.1.529.3.2.2.3, ORF1b:T2084I, from sars-cov-2-variants/lineage-proposals#3093	0	0
 RE.3.1	BA.3.2.2.3	Alias of B.1.1.529.3.2.2.3.1, ORF1a:L3796I, ORF1b:L1681F	0	0
 BA.4	B.1.1.529	Alias of B.1.1.529.4, from #517	0	0
 BA.4.1	BA.4	Alias of B.1.1.529.4.1, mainly found in South Africa, from #548	0	0
@@ -4968,7 +4968,7 @@ PQ.2.1.7	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.7, ORF1b:T2432I	0	0
 PQ.2.1.8	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.8, ORF1a:L4391F, ORF1b:V1092F, ORF1b:S2359F	0	0
 PQ.2.1.9	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.9, C10369T	11	0
 PQ.2.1.10	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.10, C27149T	1	0
-PQ.2.1.11	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.11, S:S680P, S:H954Y	0	0
+PQ.2.1.11	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.11, S:S680P, S:H954Y, from sars-cov-2-variants/lineage-proposals#3071	0	0
 PQ.2.1.12	XDV.1.5.1.1.8.1.2.1	Alias of XDV.1.5.1.1.8.1.2.1.12, C6268T, T6376C	0	0
 PQ.2.2	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.2, S:H1088R, Malaysia, from sars-cov-2-variants/lineage-proposals#2705	1	0
 PQ.2.3	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.3, S:Q677H, T20310C, from sars-cov-2-variants/lineage-proposals#2776	0	0
@@ -4980,24 +4980,24 @@ PQ.2.4.4	XDV.1.5.1.1.8.1.2.4	Alias of XDV.1.5.1.1.8.1.2.4.4, ORF1a:T3750I	0	0
 PQ.2.5	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.5, ORF3a:I20T	8	0
 PQ.2.5.1	XDV.1.5.1.1.8.1.2.5	Alias of XDV.1.5.1.1.8.1.2.5.1, S:N532S	1	0
 PQ.2.5.2	XDV.1.5.1.1.8.1.2.5	Alias of XDV.1.5.1.1.8.1.2.5.2, C1912T	9	0
-RQ.1	XDV.1.5.1.1.8.1.2.5.2	Alias of XDV.1.5.1.1.8.1.2.5.2.1, S:I478V, ORF1a:G519S, ORF1b:V389I	10	0
-RQ.2	XDV.1.5.1.1.8.1.2.5.2	Alias of XDV.1.5.1.1.8.1.2.5.2.2, S:H445P, S:P1263L, South Korea	0	0
+RQ.1	XDV.1.5.1.1.8.1.2.5.2	Alias of XDV.1.5.1.1.8.1.2.5.2.1, S:I478V, ORF1a:G519S, ORF1b:V389I, from sars-cov-2-variants/lineage-proposals#3182	10	0
+RQ.2	XDV.1.5.1.1.8.1.2.5.2	Alias of XDV.1.5.1.1.8.1.2.5.2.2, S:H445P, S:P1263L, South Korea, from sars-cov-2-variants/lineage-proposals#2860	0	0
 PQ.2.5.3	XDV.1.5.1.1.8.1.2.5	Alias of XDV.1.5.1.1.8.1.2.5.3, ORF1b:Q1509R	89	2
-PQ.2.5.4	XDV.1.5.1.1.8.1.2.5	Alias of XDV.1.5.1.1.8.1.2.5.4, ORF3a:K21N	3	0
+PQ.2.5.4	XDV.1.5.1.1.8.1.2.5	Alias of XDV.1.5.1.1.8.1.2.5.4, ORF3a:K21N, from sars-cov-2-variants/lineage-proposals#2597	3	0
 PQ.2.5.5	XDV.1.5.1.1.8.1.2.5	Alias of XDV.1.5.1.1.8.1.2.5.5, S:R346T, ORF1a:H45Y, M:L29F	0	0
 PQ.2.6	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.6, S:S446T, N:A359S, ORF1a:A2850T, from sars-cov-2-variants/lineage-proposals#2685	0	0
 PQ.2.7	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.7, C28603T	11	0
 PQ.2.7.1	XDV.1.5.1.1.8.1.2.7	Alias of XDV.1.5.1.1.8.1.2.7.1, S:N148H, from sars-cov-2-variants/lineage-proposals#2825	0	0
 PQ.2.8	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.8, C8344T	0	0
 PQ.2.8.1	XDV.1.5.1.1.8.1.2.8	Alias of XDV.1.5.1.1.8.1.2.8.1, S:H445P, from sars-cov-2-variants/lineage-proposals#2803	10	0
-RC.1	XDV.1.5.1.1.8.1.2.8.1	Alias of XDV.1.5.1.1.8.1.2.8.1.1, S:I478T (rev)	0	0
+RC.1	XDV.1.5.1.1.8.1.2.8.1	Alias of XDV.1.5.1.1.8.1.2.8.1.1, S:I478T (rev), from sars-cov-2-variants/lineage-proposals#3096	0	0
 RC.2	XDV.1.5.1.1.8.1.2.8.1	Alias of XDV.1.5.1.1.8.1.2.8.1.2, ORF1a:K958R	0	0
-RC.2.1	XDV.1.5.1.1.8.1.2.8.1.2	Alias of XDV.1.5.1.1.8.1.2.8.1.2.1, S:S680Y	0	0
+RC.2.1	XDV.1.5.1.1.8.1.2.8.1.2	Alias of XDV.1.5.1.1.8.1.2.8.1.2.1, S:S680Y, from sars-cov-2-variants/lineage-proposals#3045	0	0
 RC.3	XDV.1.5.1.1.8.1.2.8.1	Alias of XDV.1.5.1.1.8.1.2.8.1.3, C21952T	0	0
 RC.4	XDV.1.5.1.1.8.1.2.8.1	Alias of XDV.1.5.1.1.8.1.2.8.1.4, T3802C	0	0
 PQ.2.8.2	XDV.1.5.1.1.8.1.2.8	Alias of XDV.1.5.1.1.8.1.2.8.2, S:V289I	0	0
 PQ.2.9	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.9, C18814T	13	1
-PQ.2.10	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.10, ORF8:M1V, T13668C	3	0
+PQ.2.10	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.10, ORF8:M1V, T13668C, from sars-cov-2-variants/lineage-proposals#2736	3	0
 PQ.2.11	XDV.1.5.1.1.8.1.2	Alias of XDV.1.5.1.1.8.1.2.11, ORF1b:N79S	0	0
 PQ.2.11.1	XDV.1.5.1.1.8.1.2.11	Alias of XDV.1.5.1.1.8.1.2.11.1, S:I478T (rev), T4640C	0	0
 PQ.3	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.3, N:H300Y, N:G321S, from sars-cov-2-variants/lineage-proposals#2578	0	0
@@ -5008,14 +5008,14 @@ PQ.4.3	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.3, S:V193L, on C21742T branc
 PQ.4.4	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.4, ORF1a:Y3685C	0	0
 PQ.4.5	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.5, ORF1a:P971L	6	0
 PQ.4.6	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.6, ORF1b:V818M	0	0
-PQ.4.6.1	XDV.1.5.1.1.8.1.4.6	Alias of XDV.1.5.1.1.8.1.4.6.1, S:S446N	0	0
-PQ.4.6.2	XDV.1.5.1.1.8.1.4.6	Alias of XDV.1.5.1.1.8.1.4.6.2, ORF8:G8*	0	0
+PQ.4.6.1	XDV.1.5.1.1.8.1.4.6	Alias of XDV.1.5.1.1.8.1.4.6.1, S:S446N, from sars-cov-2-variants/lineage-proposals#2815	0	0
+PQ.4.6.2	XDV.1.5.1.1.8.1.4.6	Alias of XDV.1.5.1.1.8.1.4.6.2, ORF8:G8*, from sars-cov-2-variants/lineage-proposals#3117	0	0
 RJ.1	XDV.1.5.1.1.8.1.4.6.2	Alias of XDV.1.5.1.1.8.1.4.6.2.1, S:K150N	11	0
 PQ.4.7	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.7, ORF1b:V165I, on C11833T branch	2	0
 PQ.4.8	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.8, A17409G, C26013T	0	0
 PQ.4.9	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.9, ORF1a:V757F, ORF1a:T1597I, on C11833T branch	0	0
 PQ.4.10	XDV.1.5.1.1.8.1.4	Alias of XDV.1.5.1.1.8.1.4.10, A5536G, C20235T, T21820C	0	0
-PQ.4.10.1	XDV.1.5.1.1.8.1.4.10	Alias of XDV.1.5.1.1.8.1.4.10.1, S:V1264L	2	0
+PQ.4.10.1	XDV.1.5.1.1.8.1.4.10	Alias of XDV.1.5.1.1.8.1.4.10.1, S:V1264L, from sars-cov-2-variants/lineage-proposals#3211	2	0
 PQ.5	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.5, ORF3a:L94F, from sars-cov-2-variants/lineage-proposals#2577	3	0
 PQ.5.1	XDV.1.5.1.1.8.1.5	Alias of XDV.1.5.1.1.8.1.5.1, ORF3a:A99S, ORF8:T87I, after ORF3a:P42L, from sars-cov-2-variants/lineage-proposals#2577	0	0
 PQ.5.1.1	XDV.1.5.1.1.8.1.5.1	Alias of XDV.1.5.1.1.8.1.5.1.1, S:K150N	0	0
@@ -5033,21 +5033,21 @@ PQ.10.1.1	XDV.1.5.1.1.8.1.10.1	Alias of XDV.1.5.1.1.8.1.10.1.1, S:S221L	0	0
 PQ.10.1.2	XDV.1.5.1.1.8.1.10.1	Alias of XDV.1.5.1.1.8.1.10.1.2, S:P174S, from sars-cov-2-variants/lineage-proposals#2943	0	0
 PQ.10.1.3	XDV.1.5.1.1.8.1.10.1	Alias of XDV.1.5.1.1.8.1.10.1.3, ORF3a:A103S, New Zealand, from sars-cov-2-variants/lineage-proposals#2597	1	0
 PQ.10.1.4	XDV.1.5.1.1.8.1.10.1	Alias of XDV.1.5.1.1.8.1.10.1.4, ORF1a:G519C	2	0
-RH.1	XDV.1.5.1.1.8.1.10.1.4	Alias of XDV.1.5.1.1.8.1.10.1.4.1, S:I569V, S:V1264L	17	0
+RH.1	XDV.1.5.1.1.8.1.10.1.4	Alias of XDV.1.5.1.1.8.1.10.1.4.1, S:I569V, S:V1264L, from sars-cov-2-variants/lineage-proposals#2981	17	0
 PQ.11	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.11, ORF1a:D1229G	3	0
 PQ.12	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.12, C13968T	1	0
 PQ.13	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.13, T13764C	5	1
 PQ.13.1	XDV.1.5.1.1.8.1.13	Alias of XDV.1.5.1.1.8.1.13.1, S:I478T (rev)	23	0
 PQ.13.2	XDV.1.5.1.1.8.1.13	Alias of XDV.1.5.1.1.8.1.13.2, S:S680F, ORF1a:L590F, ORF1a:G1100S, ORF1a:D2980N, from sars-cov-2-variants/lineage-proposals#2775	0	0
 PQ.13.3	XDV.1.5.1.1.8.1.13	Alias of XDV.1.5.1.1.8.1.13.3, C16293T, C25416T	0	0
-PQ.13.3.1	XDV.1.5.1.1.8.1.13.3	Alias of XDV.1.5.1.1.8.1.13.3.1, S:T572I	0	0
+PQ.13.3.1	XDV.1.5.1.1.8.1.13.3	Alias of XDV.1.5.1.1.8.1.13.3.1, S:T572I, from sars-cov-2-variants/lineage-proposals#3165	0	0
 PQ.14	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.14, C3619T	5	1
 PQ.14.1	XDV.1.5.1.1.8.1.14	Alias of XDV.1.5.1.1.8.1.14.1, A532G	34	1
-PQ.14.1.1	XDV.1.5.1.1.8.1.14.1	Alias of XDV.1.5.1.1.8.1.14.1.1, S:I478T (rev), T11371C, A16311G	5	0
+PQ.14.1.1	XDV.1.5.1.1.8.1.14.1	Alias of XDV.1.5.1.1.8.1.14.1.1, S:I478T (rev), T11371C, A16311G, from sars-cov-2-variants/lineage-proposals#3001	5	0
 PQ.14.2	XDV.1.5.1.1.8.1.14	Alias of XDV.1.5.1.1.8.1.14.2, C12664T, on C28603T branch	1	0
 PQ.14.3	XDV.1.5.1.1.8.1.14	Alias of XDV.1.5.1.1.8.1.14.3, M:L29F, on C28603T branch	4	0
 PQ.14.3.1	XDV.1.5.1.1.8.1.14.3	Alias of XDV.1.5.1.1.8.1.14.3.1, S:K679R, from #3168	0	0
-RR.1	XDV.1.5.1.1.8.1.14.3.1	Alias of XDV.1.5.1.1.8.1.14.3.1.1, S:H445P, S:A829T	3	0
+RR.1	XDV.1.5.1.1.8.1.14.3.1	Alias of XDV.1.5.1.1.8.1.14.3.1.1, S:H445P, S:A829T, from sars-cov-2-variants/lineage-proposals#3054	3	0
 PQ.14.4	XDV.1.5.1.1.8.1.14	Alias of XDV.1.5.1.1.8.1.14.4, C12049T	0	0
 PQ.15	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.15, ORF1a:T1773I	13	0
 PQ.16	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.16, C10156T	0	0
@@ -5058,16 +5058,16 @@ PQ.17.2.1	XDV.1.5.1.1.8.1.17.2	Alias of XDV.1.5.1.1.8.1.17.2.1, C1102G	2	0
 PQ.17.3	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.3, S:S680F, from sars-cov-2-variants/lineage-proposals#2912	3	0
 PQ.17.4	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.4, S:R683Q, from sars-cov-2-variants/lineage-proposals#2953	0	0
 PQ.17.5	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.5, N:P279S	1	0
-PQ.17.6	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.6, ORF3a:A72S	0	0
+PQ.17.6	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.6, ORF3a:A72S, from sars-cov-2-variants/lineage-proposals#2597	0	0
 PQ.17.7	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.7, ORF1b:I2626V	14	0
 PQ.17.7.1	XDV.1.5.1.1.8.1.17.7	Alias of XDV.1.5.1.1.8.1.17.7.1, S:S680F, on A26046G branch, South Korea	24	0
-PQ.17.7.2	XDV.1.5.1.1.8.1.17.7	Alias of XDV.1.5.1.1.8.1.17.7.2, S:H445P, on A26046G branch, South Korea	0	0
-RK.1	XDV.1.5.1.1.8.1.17.7.2	Alias of XDV.1.5.1.1.8.1.17.7.2.1, S:D420N	1	0
+PQ.17.7.2	XDV.1.5.1.1.8.1.17.7	Alias of XDV.1.5.1.1.8.1.17.7.2, S:H445P, on A26046G branch, South Korea, from sars-cov-2-variants/lineage-proposals#2980	0	0
+RK.1	XDV.1.5.1.1.8.1.17.7.2	Alias of XDV.1.5.1.1.8.1.17.7.2.1, S:D420N, from sars-cov-2-variants/lineage-proposals#2980	1	0
 PQ.17.8	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.8, S:A701V, S:P809S, ORF7a:L20F, from #3125	0	0
-PQ.17.9	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.9, ORF3a:P240L, T15009C	3	0
+PQ.17.9	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.9, ORF3a:P240L, T15009C, from sars-cov-2-variants/lineage-proposals#2597	3	0
 PQ.17.10	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.10, T4441C	0	0
-PQ.17.10.1	XDV.1.5.1.1.8.1.17.10	Alias of XDV.1.5.1.1.8.1.17.10.1, S:T572I	1	0
-PQ.17.11	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.11, S:T572I	0	0
+PQ.17.10.1	XDV.1.5.1.1.8.1.17.10	Alias of XDV.1.5.1.1.8.1.17.10.1, S:T572I, from sars-cov-2-variants/lineage-proposals#3076	1	0
+PQ.17.11	XDV.1.5.1.1.8.1.17	Alias of XDV.1.5.1.1.8.1.17.11, S:T572I, from sars-cov-2-variants/lineage-proposals#3120	0	0
 PQ.17.11.1	XDV.1.5.1.1.8.1.17.11	Alias of XDV.1.5.1.1.8.1.17.11.1, S:R346K, ORF3a:V112I, from #3163	0	0
 PQ.18	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.18, S:S680F, from sars-cov-2-variants/lineage-proposals#2706	2	0
 PQ.19	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.19, S:T51A, S:R346K, from sars-cov-2-variants/lineage-proposals#2633	1	0
@@ -5096,24 +5096,24 @@ PQ.35	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.35, ORF3a:T151I, from sars-cov-2-
 PQ.36	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.36, T13120C	0	0
 PQ.37	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.37, S:S680P, ORF1a:V2061F, M:L29F, from sars-cov-2-variants/lineage-proposals#2835	0	0
 PQ.38	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.38, ORF1a:T1840I, C27513T	8	0
-PQ.39	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.39, S:H445P	0	0
-PQ.39.1	XDV.1.5.1.1.8.1.39	Alias of XDV.1.5.1.1.8.1.39.1, S:Q677H	0	0
+PQ.39	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.39, S:H445P, from sars-cov-2-variants/lineage-proposals#3099	0	0
+PQ.39.1	XDV.1.5.1.1.8.1.39	Alias of XDV.1.5.1.1.8.1.39.1, S:Q677H, from sars-cov-2-variants/lineage-proposals#3099	0	0
 PQ.40	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.40, S:R214L, S:K478T (rev), S:N556K, Hong Kong	0	0
-PQ.41	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.41, S:V1264L, ORF10:R24C	0	0
+PQ.41	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.41, S:V1264L, ORF10:R24C, from sars-cov-2-variants/lineage-proposals#3022	0	0
 PQ.41.1	XDV.1.5.1.1.8.1.41	Alias of XDV.1.5.1.1.8.1.41.1, ORF1a:Q768R, ORF1a:N869S	0	0
-PQ.41.1.1	XDV.1.5.1.1.8.1.41.1	Alias of XDV.1.5.1.1.8.1.41.1.1, S:R346T, S:H445R	1	0
-PQ.42	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.42, S:L176F, S:K478T (rev), S:T572I, ORF3a:W193R, most with T26491C, A26492T, T26494-, T26497C	0	0
+PQ.41.1.1	XDV.1.5.1.1.8.1.41.1	Alias of XDV.1.5.1.1.8.1.41.1.1, S:R346T, S:H445R, from sars-cov-2-variants/lineage-proposals#3022	1	0
+PQ.42	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.42, S:L176F, S:K478T (rev), S:T572I, ORF3a:W193R, most with T26491C, A26492T, T26494-, T26497C, from sars-cov-2-variants/lineage-proposals#3173	0	0
 PQ.43	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.43, G24928T	2	0
 PQ.43.1	XDV.1.5.1.1.8.1.43	Alias of XDV.1.5.1.1.8.1.43.1, ORF7b:L19P, A10558G	0	0
 PQ.43.1.1	XDV.1.5.1.1.8.1.43.1	Alias of XDV.1.5.1.1.8.1.43.1.1, S:I478T (rev), from #3167	0	0
-PQ.43.2	XDV.1.5.1.1.8.1.43	Alias of XDV.1.5.1.1.8.1.43.2, ORF3a:K16N	15	1
+PQ.43.2	XDV.1.5.1.1.8.1.43	Alias of XDV.1.5.1.1.8.1.43.2, ORF3a:K16N, from sars-cov-2-variants/lineage-proposals#2597	15	1
 PQ.44	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.44, ORF1a:L969F	0	0
 PQ.45	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.45, C6031T	0	0
 PQ.46	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.46, C745T	0	0
-PQ.46.1	XDV.1.5.1.1.8.1.46	Alias of XDV.1.5.1.1.8.1.46.1, ORF1a:T770I, ORF3a:S171L	0	0
+PQ.46.1	XDV.1.5.1.1.8.1.46	Alias of XDV.1.5.1.1.8.1.46.1, ORF1a:T770I, ORF3a:S171L, from sars-cov-2-variants/lineage-proposals#2597	0	0
 PQ.47	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.47, S:S446N, ORF1a:M2254I	0	0
 PQ.48	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.48, ORF1a:T4175I	0	0
-PQ.48.1	XDV.1.5.1.1.8.1.48	Alias of XDV.1.5.1.1.8.1.48.1, S:Q677H	0	0
+PQ.48.1	XDV.1.5.1.1.8.1.48	Alias of XDV.1.5.1.1.8.1.48.1, S:Q677H, from sars-cov-2-variants/lineage-proposals#2819	0	0
 PQ.49	XDV.1.5.1.1.8.1	Alias of XDV.1.5.1.1.8.1.49, C28657T	0	0
 NB.1.9	XDV.1.5.1.1	Alias of XDV.1.5.1.1.9, S:L176F, S:H445P, from sars-cov-2-variants/lineage-proposals#2460	0	0
 NB.1.10	XDV.1.5.1.1	Alias of XDV.1.5.1.1.10, S:S680F	0	0
@@ -5327,7 +5327,7 @@ XFC.1.1.1	NA	S:K478E, from sars-cov-2-variants/lineage-proposals#2573	1	0
 XFC.1.2	NA	S:H207Y, from sars-cov-2-variants/lineage-proposals#2572	0	0
 XFC.1.2.1	NA	S:R445P, ORF1a:S1561A, ORF1a:T2280I	0	0
 XFC.1.3	NA	ORF1a:A1473V	0	0
-XFC.1.3.1	NA	S:A435S, S:A475V	0	0
+XFC.1.3.1	NA	S:A435S, S:A475V, from sars-cov-2-variants/lineage-proposals#2722	0	0
 XFC.1.4	NA	S:K478E	20	0
 XFC.1.5	NA	C9541T	0	0
 XFC.1.6	NA	ORF1b:D729E	0	0
@@ -5342,7 +5342,7 @@ XFC.3	NA	ORF1a:A2128T, most with ORF9b:T79I	5	0
 XFC.3.1	NA	S:K478E, C5020T, C21697T, T25072C, C28732T, Costa Rica	1	0
 XFC.3.2	NA	S:K478T (rev), ORF3a:R134C	0	0
 XFC.3.3	NA	ORF1b:A2431V	0	0
-XFC.3.3.1	NA	S:G75V	0	0
+XFC.3.3.1	NA	S:G75V, from sars-cov-2-variants/lineage-proposals#2831	0	0
 XFC.3.3.2	NA	S:A475V	0	0
 XFC.3.4	NA	C17733T	0	0
 XFC.3.5	NA	G17427A	0	0
@@ -5355,8 +5355,8 @@ XFG	NA	Recombinant lineage of LF.7, LP.8.1.2, LF.7 (breakpoints: 22894-22895, 23
 XFG.1	NA	S:E96D, S:R445P, on T16224C branch, from sars-cov-2-variants/lineage-proposals#2560	0	0
 XFG.1.1	NA	S:W452R (rev), ORF7a:V8A (rev), M:V104L, from sars-cov-2-variants/lineage-proposals#2796	30	0
 XFG.1.1.1	NA	ORF7a:A13S	30	2
-RP.1	XFG.1.1.1	Alias of XFG.1.1.1.1, S:D1146G, C2065T, A16890G	0	0
-RP.2	XFG.1.1.1	Alias of XFG.1.1.1.2, S:T307I	1	1
+RP.1	XFG.1.1.1	Alias of XFG.1.1.1.1, S:D1146G, C2065T, A16890G, from sars-cov-2-variants/lineage-proposals#3128	0	0
+RP.2	XFG.1.1.1	Alias of XFG.1.1.1.2, S:T307I, from sars-cov-2-variants/lineage-proposals#3189	1	1
 XFG.1.1.2	NA	S:A688V	18	0
 XFG.1.2	NA	C16111T	2	0
 XFG.1.3	NA	ORF7a:I10V	0	0
@@ -5367,11 +5367,11 @@ XFG.2.3	NA	G27621A, from sars-cov-2-variants/lineage-proposals#2738	2	0
 XFG.2.3.1	NA	S:N417T, from sars-cov-2-variants/lineage-proposals#2738	26	0
 XFG.2.4	NA	S:L176F, from sars-cov-2-variants/lineage-proposals#3011	1	0
 XFG.2.5	NA	ORF7b:E33V	41	0
-XFG.2.5.1	NA	S:L335F, S:N417T, USA	0	0
+XFG.2.5.1	NA	S:L335F, S:N417T, USA, from sars-cov-2-variants/lineage-proposals#3108	0	0
 XFG.2.6	NA	C29311T	9	0
 XFG.2.7	NA	C4897T	43	1
 XFG.2.7.1	NA	T1570C, A2410G, T18099A, T27546C	14	0
-XFG.2.7.2	NA	ORF3a:A72V, T14415C, C19572T	3	0
+XFG.2.7.2	NA	ORF3a:A72V, T14415C, C19572T, from sars-cov-2-variants/lineage-proposals#2884	3	0
 XFG.2.8	NA	C13426T, C26091T	38	0
 XFG.2.8.1	NA	S:K679R, ORF1b:T2488M, from #3139	12	0
 XFG.2.9	NA	C25413T	9	0
@@ -5403,23 +5403,23 @@ XFG.3.2	NA	ORF1a:H1500Y, ORF1a:V2047I	1	0
 XFG.3.3	NA	S:S680F, on C10615T branch, from sars-cov-2-variants/lineage-proposals#2609	12	0
 XFG.3.3.1	NA	ORF1a:L2062F	4	0
 XFG.3.3.2	NA	C1426T, C4331T, C10718A	0	0
-XFG.3.3.3	NA	S:L335F, ORF1a:V4102I	0	0
+XFG.3.3.3	NA	S:L335F, ORF1a:V4102I, from sars-cov-2-variants/lineage-proposals#2586	0	0
 XFG.3.4	NA	C18885T, T28822G, on C10615T branch	64	0
 XFG.3.4.1	NA	S:S680P, on T15762C branch, from sars-cov-2-variants/lineage-proposals#2602	93	8
 QF.1	XFG.3.4.1	Alias of XFG.3.4.1.1, S:L244S, C3695T, C9979T	2	0
 QF.1.1	XFG.3.4.1.1	Alias of XFG.3.4.1.1.1, ORF8:G66V	11	0
-QF.1.1.1	XFG.3.4.1.1.1	Alias of XFG.3.4.1.1.1.1, S:A1174V	7	0
+QF.1.1.1	XFG.3.4.1.1.1	Alias of XFG.3.4.1.1.1.1, S:A1174V, from sars-cov-2-variants/lineage-proposals#3034	7	0
 QF.2	XFG.3.4.1	Alias of XFG.3.4.1.2, C27812T	102	0
-QF.2.1	XFG.3.4.1.2	Alias of XFG.3.4.1.2.1, S:N641K	5	0
+QF.2.1	XFG.3.4.1.2	Alias of XFG.3.4.1.2.1, S:N641K, from sars-cov-2-variants/lineage-proposals#2908	5	0
 QF.2.2	XFG.3.4.1.2	Alias of XFG.3.4.1.2.2, G29044A	8	0
 QF.2.2.1	XFG.3.4.1.2	Alias of XFG.3.4.1.2.2, S:I326V, from #3140	10	0
 QF.2.3	XFG.3.4.1.2	Alias of XFG.3.4.1.2.3, C13247T	0	0
 QF.2.4	XFG.3.4.1.2	Alias of XFG.3.4.1.2.4, C21811T	0	0
-QF.3	XFG.3.4.1	Alias of XFG.3.4.1.3, ORF1a:P1921L	26	0
+QF.3	XFG.3.4.1	Alias of XFG.3.4.1.3, ORF1a:P1921L, from sars-cov-2-variants/lineage-proposals#2840	26	0
 QF.4	XFG.3.4.1	Alias of XFG.3.4.1.4, C15960A, C28651T	17	0
 QF.5	XFG.3.4.1	Alias of XFG.3.4.1.5, C5284T	44	0
-QF.5.1	XFG.3.4.1.5	Alias of XFG.3.4.1.5.1, S:S704L	1	0
-QF.6	XFG.3.4.1	Alias of XFG.3.4.1.6, S:A958S, UK	0	0
+QF.5.1	XFG.3.4.1.5	Alias of XFG.3.4.1.5.1, S:S704L, from sars-cov-2-variants/lineage-proposals#2768	1	0
+QF.6	XFG.3.4.1	Alias of XFG.3.4.1.6, S:A958S, UK, from sars-cov-2-variants/lineage-proposals#3030	0	0
 QF.7	XFG.3.4.1	Alias of XFG.3.4.1.7, ORF3a:A72T, from #3154	33	0
 XFG.3.4.2	NA	ORF1a:A372T	11	0
 QT.1	XFG.3.4.2	Alias of XFG.3.4.2.1, C3817T	5	0
@@ -5433,9 +5433,9 @@ QS.2	XFG.3.4.3	Alias of XFG.3.4.3.2, S:K679R, from sars-cov-2-variants/lineage-p
 XFG.3.4.4	NA	S:V367I, N:A152S, ORF1b:A520T, on T15762C branch, from sars-cov-2-variants/lineage-proposals#2816	1	0
 XFG.3.4.5	NA	S:S680P, S:A1174V, N:G5E	1	0
 XFG.3.4.6	NA	C15763T	18	0
-RN.1	XFG.3.4.6	Alias of XFG.3.4.6.1, ORF1a:G519S, ORF3a:L106F	52	1
+RN.1	XFG.3.4.6	Alias of XFG.3.4.6.1, ORF1a:G519S, ORF3a:L106F, from sars-cov-2-variants/lineage-proposals#2695	52	1
 RN.2	XFG.3.4.6	Alias of XFG.3.4.6.2, N:T24I	5	0
-RN.2.1	XFG.3.4.6.2	Alias of XFG.3.4.6.2.1, S:K679R	16	0
+RN.2.1	XFG.3.4.6.2	Alias of XFG.3.4.6.2.1, S:K679R, from sars-cov-2-variants/lineage-proposals#2995	16	0
 XFG.3.4.7	NA	ORF1b:P2169S, T580A	1	1
 XFG.3.4.8	NA	C29200T	0	0
 XFG.3.4.9	NA	ORF1a:V2766F	60	1
@@ -5457,7 +5457,7 @@ XFG.3.11	NA	C15738T, Myanmar	7	0
 XFG.3.12	NA	C556T	0	0
 XFG.3.12.1	NA	S:A376S, ORF1a:R560C, from sars-cov-2-variants/lineage-proposals#2746	3	0
 XFG.3.13	NA	S:G946R, ORF1a:L3339F, on A28877T, G28878C branch, from sars-cov-2-variants/lineage-proposals#2794	41	0
-XFG.3.13.1	NA	S:A845S	0	0
+XFG.3.13.1	NA	S:A845S, from sars-cov-2-variants/lineage-proposals#3035	0	0
 XFG.3.13.2	NA	ORF1a:A3939S	0	0
 XFG.3.14	NA	S:S704L, C6031T, on C10615T branch, from sars-cov-2-variants/lineage-proposals#2768	1	0
 XFG.3.15	NA	G28681A, on C10615T branch	178	4
@@ -5477,11 +5477,11 @@ XFG.3.26	NA	S:K679R, ORF1b:Y2329H, on C10615T branch, from sars-cov-2-variants/l
 XFG.3.27	NA	ORF3a:R134H, A1588G, on C10615T branch, from sars-cov-2-variants/lineage-proposals#2891	0	0
 XFG.3.27.1	NA	ORF1a:K1753R, on A4624G branch	0	0
 XFG.3.27.2	NA	C11339T, C12085T, on A4624G branch	0	0
-XFG.3.28	NA	S:G184A, ORF1a:S2500F, N:P67S, on C10615T branch	11	0
-XFG.3.29	NA	S:N532S, T15330C, on C10615T branch	6	0
+XFG.3.28	NA	S:G184A, ORF1a:S2500F, N:P67S, on C10615T branch, from sars-cov-2-variants/lineage-proposals#3004	11	0
+XFG.3.29	NA	S:N532S, T15330C, on C10615T branch, from sars-cov-2-variants/lineage-proposals#2919	6	0
 XFG.3.30	NA	C10207T, on C10615T branch	0	0
-XFG.3.30.1	NA	S:G219D	0	0
-XFG.3.30.2	NA	S:K679T, ORF1a:T1638N, ORF1a:L4126F	0	0
+XFG.3.30.1	NA	S:G219D, from sars-cov-2-variants/lineage-proposals#2978	0	0
+XFG.3.30.2	NA	S:K679T, ORF1a:T1638N, ORF1a:L4126F, from sars-cov-2-variants/lineage-proposals#3020	0	0
 XFG.3.31	NA	S:K150E, ORF1a:K3351R, on A28877T, G28878C branch, from #3127	0	0
 XFG.3.32	NA	S:L189F, C1150T, on C10615T branch, from #3126	0	0
 XFG.3.33	NA	C829T	0	0
@@ -5498,7 +5498,7 @@ XFG.4.1.5	NA	S:A67V, ORF10:A8V, from sars-cov-2-variants/lineage-proposals#2836	
 XFG.4.2	NA	S:K1191R, ORF3a:del24-27, F28I, on C16887T, C29762T branch, from sars-cov-2-variants/lineage-proposals#2734	0	0
 XFG.4.3	NA	T28474A, on C16887T, C29762T branch	0	0
 XFG.4.4	NA	G8017T, on C16887T, C29762T branch	0	0
-XFG.4.5	NA	S:G219D, ORF1a:N854D, on C16887T, C29762T branch	3	0
+XFG.4.5	NA	S:G219D, ORF1a:N854D, on C16887T, C29762T branch, from sars-cov-2-variants/lineage-proposals#2878	3	0
 XFG.5	NA	C10039T, on C20178T branch	10	0
 XFG.5.1	NA	ORF1a:T2093I	130	1
 XFG.5.1.1	NA	S:A688V, ORF3a:I37T, England/Wales	0	0
@@ -5507,21 +5507,21 @@ XFG.5.1.3	NA	S:S680F, UK, from sars-cov-2-variants/lineage-proposals#2838	0	0
 XFG.5.1.4	NA	C2485T	64	0
 XFG.5.1.5	NA	S:L441I, C24034T, from sars-cov-2-variants/lineage-proposals#2861	2	0
 XFG.5.1.6	NA	S:A688T	0	0
-XFG.5.1.7	NA	S:K679R, ORF8:D63G	9	3
+XFG.5.1.7	NA	S:K679R, ORF8:D63G, from sars-cov-2-variants/lineage-proposals#2973	9	3
 XFG.5.2	NA	A9079G	87	1
 XFG.5.2.1	NA	S:S680F, from sars-cov-2-variants/lineage-proposals#2808	8	0
 XFG.5.2.2	NA	T26972C	5	0
 XFG.5.2.3	NA	C23758T	3	0
 XFG.5.2.4	NA	ORF1a:D2980G	14	0
 XFG.5.2.5	NA	ORF1a:P2079S, N:T24I, ORF7a:A66V, ORF7b:Y10C, ORF10:I27M	113	11
-RM.1	XFG.5.2.5	Alias of XFG.5.2.5.1, S:I1172V	33	5
+RM.1	XFG.5.2.5	Alias of XFG.5.2.5.1, S:I1172V, from sars-cov-2-variants/lineage-proposals#3162	33	5
 RM.2	XFG.5.2.5	Alias of XFG.5.2.5.2, S:A67V	26	1
 XFG.5.2.6	NA	S:S704L, C12295T, from sars-cov-2-variants/lineage-proposals#2768	5	0
 XFG.5.3	NA	S:S254F, Canada	16	0
 XFG.5.4	NA	T2698C	19	0
 XFG.5.4.1	NA	ORF3a:D155Y	0	0
 QW.1	XFG.5.4.1	Alias of XFG.5.4.1.1, S:Q677R, ORF1a:G400S, from sars-cov-2-variants/lineage-proposals#2896	0	0
-QW.1.1	XFG.5.4.1.1	Alias of XFG.5.4.1.1.1, S:L176F, C7834T	1	0
+QW.1.1	XFG.5.4.1.1	Alias of XFG.5.4.1.1.1, S:L176F, C7834T, from sars-cov-2-variants/lineage-proposals#3018	1	0
 QW.2	XFG.5.4.1	Alias of XFG.5.4.1.2, C1420T, T16695C, G24199A, T27484C, A29617G	0	0
 XFG.6	NA	S:L441I, on C20178T branch, from sars-cov-2-variants/lineage-proposals#2621	66	1
 XFG.6.1	NA	S:T678I, from sars-cov-2-variants/lineage-proposals#2829	12	0
@@ -5530,8 +5530,8 @@ XFG.6.2.1	NA	S:D253G, from sars-cov-2-variants/lineage-proposals#2962	1	0
 XFG.6.2.2	NA	A18585T	0	0
 XFG.6.3	NA	T8359C	3	0
 XFG.6.3.1	NA	C920T	3	0
-XFG.6.3.2	NA	S:K679R	0	0
-XFG.6.3.3	NA	S:S446N	2	0
+XFG.6.3.2	NA	S:K679R, from sars-cov-2-variants/lineage-proposals#3048	0	0
+XFG.6.3.3	NA	S:S446N, from sars-cov-2-variants/lineage-proposals#3138	2	0
 XFG.6.4	NA	ORF1a:T2611I	5	0
 XFG.6.5	NA	C23758T	0	0
 XFG.6.5.1	NA	S:S680Y, UK	1	0
@@ -5544,14 +5544,14 @@ XFG.6.11	NA	ORF1b:G1772S	0	0
 XFG.6.12	NA	G2875A	2	0
 XFG.7	NA	N:K65I, ORF9b:N62Y, on C20178T branch, from #3001	6	0
 XFG.7.1	NA	ORF1a:K2029R, ORF1a:S3242G	0	0
-XFG.7.1.1	NA	S:K150E, G28079T	3	0
+XFG.7.1.1	NA	S:K150E, G28079T, from sars-cov-2-variants/lineage-proposals#2906	3	0
 QZ.1	XFG.7.1.1	Alias of XFG.7.1.1.1, S:A688V, from sars-cov-2-variants/lineage-proposals#2906	0	0
 XFG.7.1.2	NA	S:V90I, S:W152R	0	0
 XFG.8	NA	T17610C, C19170T, A20163G, on C20178T branch	51	1
 XFG.8.1	NA	C15024T	44	0
 XFG.8.1.1	NA	S:L54F, S:W258R	0	0
 XFG.8.2	NA	ORF1a:T1597I	5	0
-XFG.8.2.1	NA	S:G946R, ORF1a:T1844I	2	0
+XFG.8.2.1	NA	S:G946R, ORF1a:T1844I, from sars-cov-2-variants/lineage-proposals#3113	2	0
 XFG.8.3	NA	C2857T	2	0
 XFG.8.4	NA	T18630C	0	0
 XFG.8.5	NA	C21306T	11	0
@@ -5559,13 +5559,13 @@ XFG.9	NA	ORF1a:G2499S, on C20178T branch	40	2
 XFG.9.1	NA	S:A845S, ORF1a:E745D, from sars-cov-2-variants/lineage-proposals#2745	8	0
 XFG.9.2	NA	S:L8F, from sars-cov-2-variants/lineage-proposals#2910	2	0
 XFG.9.3	NA	T12865C	52	0
-XFG.9.3.1	NA	S:E154V	0	0
+XFG.9.3.1	NA	S:E154V, from sars-cov-2-variants/lineage-proposals#2966	0	0
 XFG.9.3.2	NA	ORF1a:H2125Y	1	0
 XFG.9.4	NA	T7225G	37	1
 XFG.9.4.1	NA	S:V227L, ORF3a:S40P, from sars-cov-2-variants/lineage-proposals#2937	1	0
 XFG.9.4.2	NA	S:L189F	0	0
 XFG.9.5	NA	S:L176F, from sars-cov-2-variants/lineage-proposals#2830	1	0
-XFG.9.6	NA	S:V1104L, C24337T	0	0
+XFG.9.6	NA	S:V1104L, C24337T, from sars-cov-2-variants/lineage-proposals#2982	0	0
 XFG.10	NA	T979A, on C20178T branch	9	0
 XFG.10.1	NA	ORF1a:L2122F	49	0
 XFG.10.2	NA	ORF1a:T1847I	2	0
@@ -5583,14 +5583,14 @@ RL.1	XFG.14.1.2	Alias of XFG.14.1.2.1, S:Q675H, Canada	10	0
 XFG.14.1.3	NA	C10798T	19	0
 XFG.14.1.4	NA	C19983T	26	0
 XFG.14.1.5	NA	C817T, C10183T	1	0
-XFG.14.1.6	NA	S:V705F, USA	0	0
+XFG.14.1.6	NA	S:V705F, USA, from sars-cov-2-variants/lineage-proposals#2991	0	0
 XFG.14.1.7	NA	S:R346I, Canada	45	1
 XFG.14.1.8	NA	ORF1b:T250I	14	0
 XFG.14.2	NA	S:Q677L, from sars-cov-2-variants/lineage-proposals#2747	28	0
 XFG.14.2.1	NA	S:P1162L, ORf1a:L3694F, ORF3a:I35T, from sars-cov-2-variants/lineage-proposals#2954	0	0
 XFG.14.3	NA	S:K147E, ORF1a:D1440G, ORF1b:P970L, pre-ORF7a:E121Q, from sars-cov-2-variants/lineage-proposals#2624	1	0
 XFG.14.4	NA	ORF1a:A3548V, C25680T, C28744T, on C203T branch	4	0
-XFG.14.5	NA	ORF7a:E39*, C5002T, C5365T, C9166T, T10819C	1	0
+XFG.14.5	NA	ORF7a:E39*, C5002T, C5365T, C9166T, T10819C, from sars-cov-2-variants/lineage-proposals#3010	1	0
 XFG.14.6	NA	C5884T	0	0
 XFG.14.7	NA	C17463T	1	0
 XFG.14.8	NA	C9565T	0	0
@@ -5602,7 +5602,7 @@ XFG.17.1	NA	S:F59S, from sars-cov-2-variants/lineage-proposals#2701	0	0
 XFG.17.2	NA	S:K679R, from sars-cov-2-variants/lineage-proposals#2828	7	3
 XFG.17.2.1	NA	S:G219S, from sars-cov-2-variants/lineage-proposals#2828	31	1
 QQ.1	XFG.17.2.1	Alias of XFG.17.2.1.1, S:Q677H, N:F307L, from sars-cov-2-variants/lineage-proposals#2988	0	0
-QQ.2	XFG.17.2.1	Alias of XFG.17.2.1.2, ORF3a:K16R	4	0
+QQ.2	XFG.17.2.1	Alias of XFG.17.2.1.2, ORF3a:K16R, from sars-cov-2-variants/lineage-proposals#3057	4	0
 QQ.3	XFG.17.2.1	Alias of XFG.17.2.1.3, ORF1a:S1510F	0	0
 XFG.17.3	NA	S:L335F, Orf9b:A82V  , from sars-cov-2-variants/lineage-proposals#2586	4	0
 XFG.17.4	NA	S:G219D, S:T345S, from sars-cov-2-variants/lineage-proposals#2867	2	0
@@ -5618,12 +5618,12 @@ XFG.23	NA	ORF1a:L1546I	1	0
 XFG.23.1	NA	S:L335F, ORF1a:I114T, from sars-cov-2-variants/lineage-proposals#2586	10	0
 XFG.23.1.1	NA	N:P67H, N:P365L, on C29137T branch	3	0
 RB.1	XFG.23.1.1	Alias of XFG.23.1.1.1, S:I210S	0	0
-RB.2	XFG.23.1.1	Alias of XFG.23.1.1.2, S:S704L	0	0
+RB.2	XFG.23.1.1	Alias of XFG.23.1.1.2, S:S704L, from sars-cov-2-variants/lineage-proposals#2768	0	0
 XFG.23.1.2	NA	C5944T, C18912T, C21676T, C29546T	0	0
-XFG.23.1.3	NA	S:A1174V, on C29137T branch	0	0
-RV.1	XFG.23.1.3	Alias of XFG.23.1.3.1, S:S446N	0	0
-XFG.23.1.4	NA	S:W258R, ORF1a:A2855V, ORF3a:T89I	0	0
-XFG.23.1.5	NA	ORF1a:S944L, ORF3a:S74F	0	0
+XFG.23.1.3	NA	S:A1174V, on C29137T branch, from sars-cov-2-variants/lineage-proposals#3053	0	0
+RV.1	XFG.23.1.3	Alias of XFG.23.1.3.1, S:S446N, from sars-cov-2-variants/lineage-proposals#3053	0	0
+XFG.23.1.4	NA	S:W258R, ORF1a:A2855V, ORF3a:T89I, from sars-cov-2-variants/lineage-proposals#3039	0	0
+XFG.23.1.5	NA	ORF1a:S944L, ORF3a:S74F, from sars-cov-2-variants/lineage-proposals#2968	0	0
 XFG.23.2	NA	S:Y796H	1	0
 XFG.24	NA	S:G75V, on ORF1b:P1821S branch, from sars-cov-2-variants/lineage-proposals#2676	0	0
 XFG.25	NA	S:A262V, on C20178T branch, from sars-cov-2-variants/lineage-proposals#2854	0	0
@@ -5638,7 +5638,7 @@ XFG.34	NA	S:F135L, on C20178T branch, South America, from sars-cov-2-variants/li
 XFG.35	NA	ORF8:R52I, C5581T, T10913C, T19158C, on C20178T branch, Costa Rica	0	0
 XFG.36	NA	T10567C, on C20178T branch	26	0
 XFG.37	NA	T5911C, C28475A, on A29671G branch	2	0
-XFG.38	NA	S:W258L, ORF1a:G445S, ORF1a:T1543I, on A29671G branch	8	0
+XFG.38	NA	S:W258L, ORF1a:G445S, ORF1a:T1543I, on A29671G branch, from sars-cov-2-variants/lineage-proposals#2894	8	0
 XFG.39	NA	ORF7a:F114S, on C20178T branch	1	0
 XFH	NA	Recombinant lineage of LF.7.1.13, XEF, LF.7.1.13 (breakpoints: 22133-22565, 23040-24871), from #2910	0	0
 XFH.1	NA	C29719A, A949G	0	0
@@ -5654,7 +5654,7 @@ XFJ.2.2	NA	C7768T, C29386T	0	0
 XFJ.3	NA	S:V1264L, from sars-cov-2-variants/lineage-proposals#2604	0	0
 XFJ.3.1	NA	S:I19V, ORF1a:T1543I, from sars-cov-2-variants/lineage-proposals#2604	24	0
 XFJ.3.1.1	NA	S:K679N (rev)	0	0
-RA.1	XFJ.3.1.1	Alias of XFJ.3.1.1.1, S:T236S	1	0
+RA.1	XFJ.3.1.1	Alias of XFJ.3.1.1.1, S:T236S, from sars-cov-2-variants/lineage-proposals#3037	1	0
 XFJ.3.1.2	NA	N:A152S, N:K229T	0	0
 XFJ.3.1.3	NA	ORF1a:H1108Y	0	0
 XFJ.3.2	NA	ORF1b:A241T	1	0
@@ -5673,7 +5673,7 @@ XFM	NA	Recombinant lineage of LF.7.6.2, LS.2.1.1 (breakpoints: 22600-22892), fro
 XFN	NA	Recombinant lineage of XEC.25.1, LF.7, XEC.25.1 (breakpoints: 16601-18656, 22600-22864), from sars-cov-2-variants/lineage-proposals#2562	0	0
 XFN.1	NA	T28600C	1	0
 XFN.2	NA	ORF1b:G1772S	0	0
-XFN.2.1	NA	S:K484R, ORF1a:P1921S, ORF1b:A374S, Orf9b:S10F, UK	1	0
+XFN.2.1	NA	S:K484R, ORF1a:P1921S, ORF1b:A374S, Orf9b:S10F, UK, from sars-cov-2-variants/lineage-proposals#2994	1	0
 XFP	NA	Recombinant lineage of LS.2.1.1, LF.7, LS.2.1.1 (breakpoints: 8819-12891, 22133-22883), from #2969	0	0
 XFP.1	NA	S:N477D, India, from sars-cov-2-variants/lineage-proposals#2642	0	0
 XFP.1.1	NA	ORF1a:E457D	0	0
@@ -5687,20 +5687,20 @@ XFU	NA	Recombinant lineage of LF.7.6.2, PG.3.1 (breakpoint 22896-23039), from sa
 XFV	NA	Recombinant lineage of LP.8.1, XFG.3.3.1 (breakpoint 5240-7112), from sars-cov-2-variants/lineage-proposals#2749	39	1
 XFV.1	NA	S:G252S, from sars-cov-2-variants/lineage-proposals#2841	0	0
 XFV.2	NA	S:A688V, from sars-cov-2-variants/lineage-proposals#2950	2	0
-XFV.3	NA	S:S446N	0	0
+XFV.3	NA	S:S446N, from sars-cov-2-variants/lineage-proposals#2972	0	0
 XFV.4	NA	ORF1b:T1621I	0	0
 XFV.5	NA	ORF1a:H2092Y	2	2
 XFV.6	NA	S:V1129I	0	0
 XFW	NA	Recombinant lineage of XDY.3, LF.7, XDY.3 (breakpoints 8818-12651, 22132-22865), from sars-cov-2-variants/lineage-proposals#2740	1	0
 XFW.1	NA	S:R681H, ORF1b:S997L, from sars-cov-2-variants/lineage-proposals#2740	4	0
 XFW.1.1	NA	S:T676P, from sars-cov-2-variants/lineage-proposals#2740	0	0
-XFW.1.1.1	NA	S:Q677R, ORF7a:T39I	0	0
+XFW.1.1.1	NA	S:Q677R, ORF7a:T39I, from sars-cov-2-variants/lineage-proposals#2740	0	0
 XFY	NA	Recombinant lineage of XFG.5.1, NB.1.8.1 (breakpoint 25793-28432) with extra S:Q677H, from sars-cov-2-variants/lineage-proposals#2837	49	8
-XFY.1	NA	S:I1169V, C4456T, ORF1b:K1537R	2	0
+XFY.1	NA	S:I1169V, C4456T, ORF1b:K1537R, from sars-cov-2-variants/lineage-proposals#3064	2	0
 XFY.2	NA	C8626T	0	0
 XFY.3	NA	C29272T	0	0
 XFZ	NA	Recombinant lineage of XFC.3, PG.3.2 (breakpoint 23600-24818), from sars-cov-2-variants/lineage-proposals#2805	10	0
-XFZ.1	NA	S:M153V, A22486G	3	0
+XFZ.1	NA	S:M153V, A22486G, from sars-cov-2-variants/lineage-proposals#3046	3	0
 XFZ.2	NA	N:K237R	10	0
 XGA	NA	Recombinant lineage of XFJ.4.1, PY.1, XFG.6.2 (breakpoints 15661-18251, 19030-20177), from #3077	2	0
 XGA.1	NA	C25578T	1	0
