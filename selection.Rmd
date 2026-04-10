@@ -245,6 +245,9 @@ plotCaseCountSelection <- function(caseCountData, selectionEstimateObject, saveT
 
 #remove manitoba from the list, they havent updated anything since November 2024
 selectionEstimateFits[["MB"]]$plot1 = NULL
+selectionEstimateFits[["BC"]]$plot1 = NULL
+selectionEstimateFits[["ON"]]$plot1 = NULL
+
 #plots the case count selection plots with each pronvince as a tab.
 apply(all.regions,1,function(reg){
   cat("###", reg[["shortname"]], "\n")
