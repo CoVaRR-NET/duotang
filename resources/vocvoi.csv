@@ -1,9 +1,9 @@
 name,pangodesignation,color
 Alpha,Q*,#B29C71
-Beta,B.1.351*,#F08C3A
+Beta,B.1.351*,#FF4D00
 Gamma,B.1.1.28.1*,#0000FF
 Delta,AY*,#A6CEE3
-Lambda,B.1.1.1*,#FFFF00
+Lambda,B.1.1.1*,#F08C3A
 Omicron BA.1,BA.1*,#8B0000
 Omicron BA.2,BA.2*,#FF0000
 Omicron BA.4,BA.4*,#BC544B
@@ -13,4 +13,4 @@ Omicron BA.2.75,BA.2.75*,#FBCEB1
 Omicron BA.2.86,BA.2.86*,#3EA534
 Recombinants,X*,#000000
 XBB,XBB*,#004C75
-XFG,XFG*,#FF4D00
+XFG,XFG*,#FFFF00
