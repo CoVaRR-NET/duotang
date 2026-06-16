@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2026-04-07"
+  value: "2026-06-01"
  datadir:
   label: "DataDir"
   input: text
@@ -66,7 +66,7 @@ theme_set(theme_classic())
 opts_knit$set(root.dir = getwd())
 ```
 
-```{r load_data, echo=FALSE}
+```{r load_data, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
 ############################
 ##### GLOBAL VARIABLES #####
 ############################
@@ -265,7 +265,7 @@ allparams <- mclapply(latelineage_pangotree, function(l) {
       NA
     }
   })
-}, mc.cores=16)
+}, mc.cores=1)
 
 allparams <- do.call(c, allparams)  # same structure as below
 allparams <- allparams[!is.na(allparams)]
