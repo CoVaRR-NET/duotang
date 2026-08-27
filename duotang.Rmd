@@ -59,7 +59,6 @@ library(DT)
 library(plotly)
 library(splines)
 library(grid)
-library(Cairo)
 
 theme_set(theme_classic())
 
