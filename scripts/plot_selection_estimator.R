@@ -39,6 +39,8 @@ alpha <- function(col, alpha) {
 #'                 to estimate selection advantages for.
 #' @param collapseMutants:  bool. specify to true if you are using this for the generateAllParam() function
 .make.estimator <- function(region, startdate, reference, mutants, collapseMutants = F, refDate=NA) {
+  print(mutants)
+  print(reference)
   prov <- get.province.list(region)
   #filter out the metadata rows that have the reference and mutant as lineage
   #view(mydata)
@@ -54,9 +56,10 @@ alpha <- function(col, alpha) {
     mutants = "n2"
     if (nrow(mydata) == 0 | length(unique(mydata$lineage)) != 2){return(list(region=region, prov=prov, refdata=NA, mutdata=NA, toplot=NA))}
   }
+  print(nrow(mydata))
   
   #>4 samples are needed for smooth.spline() function. Add a check to ensure it's true. otherwise return NA because the model will be useless anyways.
-  if (nrow(mydata) < 5){
+  if (nrow(mydata) <= 5){
     return(list(region=region, prov=prov, refdata=NA, mutdata=NA, toplot=NA, refdate=NA))
   }
   

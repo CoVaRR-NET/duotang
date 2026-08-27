@@ -64,6 +64,8 @@ theme_set(theme_classic())
 
 # You would need to change this folder to be wherever you wanted the html file to be written.
 opts_knit$set(root.dir = getwd())
+options(bitmapType="cairo")
+
 ```
 
 ```{r load_data, echo=FALSE}

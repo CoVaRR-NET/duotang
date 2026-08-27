@@ -18,7 +18,7 @@ params:
   label: "Datestamp"
   input: date
   format: yyyy-mm-dd
-  value: "2026-06-01"
+  value: "2026-08-27"
  datadir:
   label: "DataDir"
   input: text
@@ -64,6 +64,7 @@ theme_set(theme_classic())
 
 # You would need to change this folder to be wherever you wanted the html file to be written.
 opts_knit$set(root.dir = getwd())
+options(bitmapType="cairo")
 ```
 
 ```{r load_data, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
