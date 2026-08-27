@@ -301,23 +301,25 @@ cat  ${data_dir}/alias_key.json | sed 's\[":]\\g' | awk 'NF==2{print $1,$2}' |  
 ' | tr ' ' '\t' | sed '/^\t$/d' >  ${data_dir}/pango_designation_alias_key.tsv
 
 
-echo "ncovfasta" > $checkPointFile
+#echo "ncovfasta" > $checkPointFile
 #ncovfasta:
 
 #get the fasta from ncov
-wget -O ${data_dir}/ncov-open.$datestamp.fasta.xz https://data.nextstrain.org/files/ncov/open/sequences.fasta.xz  #> /dev/null 2>&1
-echo "ncovmetadata" > $checkPointFile
+#we no longer use ncov data because raphgraph had been replaced
+#wget -O ${data_dir}/ncov-open.$datestamp.fasta.xz https://data.nextstrain.org/files/ncov/open/sequences.fasta.xz  #> /dev/null 2>&1
+#echo "ncovmetadata" > $checkPointFile
 
 #ncovmetadata:
 #get the metadata from ncov and add a column with raw names (eg: BA.5 is B.1.1.529.5)
-wget -O ${data_dir}/ncov-open.$datestamp.tsv.gz https://data.nextstrain.org/files/ncov/open/metadata.tsv.gz # > /dev/null 2>&1
-	(
-	  cat ${data_dir}/pango_designation_alias_key.tsv;
-	  zcat ${data_dir}/ncov-open.$datestamp.tsv.gz | tr ' ' '_' | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g'| sed 's/\t$/\tNA/g'
-	  ) |
-	awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"raw_lineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
-	tr ' ' '\t'  | gzip > ${data_dir}/ncov-open.$datestamp.withalias.tsv.gz
+#wget -O ${data_dir}/ncov-open.$datestamp.tsv.gz https://data.nextstrain.org/files/ncov/open/metadata.tsv.gz # > /dev/null 2>&1
+#	(
+#	  cat ${data_dir}/pango_designation_alias_key.tsv;
+#	  zcat ${data_dir}/ncov-open.$datestamp.tsv.gz | tr ' ' '_' | sed 's/\t\t/\tNA\t/g' | sed 's/\t\t/\tNA\t/g'| sed 's/\t$/\tNA/g'
+#	  ) |
+#	awk  '$1=="alias"{t[$2]=$3;next;}$1=="strain"{for(i=1;i<=NF;i++){if($i=="pango_lineage"){col=i;print $0,"raw_lineage";next;}}}{rem=$i;split($i,p,".");if(p[1] in t){gsub(p[1]"." , t[p[1]]".", $i)};raw=$i;$i=rem;print $0,raw}' |
+#	tr ' ' '\t'  | gzip > ${data_dir}/ncov-open.$datestamp.withalias.tsv.gz
 echo "virusseq" > $checkPointFile
+
 #virusseq:
 
 if [[ $SOURCE == "viralai" ]]; then
